@@ -1,0 +1,1394 @@
+{
+  "v": 3,
+  "slug": "mbatha",
+  "house": "vanilla",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/mbatha.json",
+    "sha1": "fae54846f99b8d575f1b68bf95e59978de01e9e5",
+    "beatsNow": 23,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-steady-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "hortusfox",
+        "gitea",
+        "akaunting",
+        "twenty",
+        "home-assistant",
+        "mealie"
+      ],
+      "beatApps": {},
+      "reviewNeeded": [
+        "mealie"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "hortusfox",
+          "gitea",
+          "akaunting",
+          "twenty",
+          "home-assistant",
+          "ntfy"
+        ],
+        "beatApps": {
+          "food": "yuvomi"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "beatApps.food yuvomi dropped",
+        "ntfy dropped to make room",
+        "mealie added: carries food"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 6,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "thandi": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      },
+      "sipho": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "thandi",
+      "name": "Thandi",
+      "age": 44,
+      "role": "partner",
+      "archetype": "host",
+      "work": "grows and sells plants",
+      "companion": {
+        "name": "Fern",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "shop-owner",
+        "grower"
+      ],
+      "thread": "A plant nursery run from the greenhouse: stock, labels and orders."
+    },
+    {
+      "id": "sipho",
+      "name": "Sipho",
+      "age": 46,
+      "role": "partner",
+      "archetype": "builder",
+      "work": "backend engineer",
+      "companion": {
+        "name": "Acorn",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "business-office"
+      ],
+      "thread": "A backend engineer who builds the web shop in the library."
+    }
+  ],
+  "character": {
+    "lede": "A stepped modern farmhouse in blue-white brick has a glass-box greenhouse at one end and a tall front gable. A serpentine gravel walk runs past fern, lavender and hydrangea beds to a timber-edged lap pool.",
+    "spots": [
+      {
+        "room": "Greenhouse",
+        "line": "Jade plants, aloes and birds of paradise fill the glass-box greenhouse."
+      },
+      {
+        "room": "Library",
+        "line": "Two club chairs and a sideboard make the library, where the Core sits."
+      },
+      {
+        "room": "Living & Dining",
+        "line": "A modular sectional and a pedestal table share the living room."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 272,
+      "ground": "lawn",
+      "style": "Stepped five-part modern farmhouse in blue-white painted brick: glass-box greenhouse, tall front gable with a dark board panel, flat-roofed box, front-gabled living wing under a tan-brick chimney and a lattice-canopied east entry, behind a serpentine gravel walk, deep fern, lavender and hydrangea beds and a timber-edged lap pool",
+      "rooms": [
+        "Greenhouse",
+        "Library",
+        "Hall",
+        "Bathroom",
+        "Stair Hall",
+        "Laundry",
+        "Powder Room",
+        "Living & Dining",
+        "Kitchen",
+        "Foyer",
+        "Gable Front",
+        "Landing",
+        "Upper Hall",
+        "Primary Bedroom",
+        "Family Bathroom",
+        "Bedroom Three"
+      ],
+      "flags": []
+    },
+    "truths": "The Core sits on a desk in the Library. A television is in the Living and Dining room. The kitchen has a breakfast bar. Greenhouse, lap pool, pergola, barbecue and string lights outside.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "inkscape",
+      "name": "Inkscape",
+      "member": "thandi",
+      "room": "Greenhouse",
+      "service": "Adobe Illustrator",
+      "serviceId": "adobe-illustrator",
+      "status": "add",
+      "beat": "green-labels",
+      "seed": "Thandi draws the plant labels for the stall in Inkscape, in a browser session the Core serves.",
+      "line": "Inkscape draws the lettering for the van door, running in a browser session served from the Core."
+    },
+    {
+      "app": "rembg",
+      "name": "Rembg",
+      "member": "sipho",
+      "room": "The dining table",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "dining-photos",
+      "seed": "Sipho cuts the background from each product picture with Rembg, so the plants sit clean on the shop page.",
+      "line": "Rembg cuts the background from a product photo, so the candle sits clean on the page."
+    },
+    {
+      "app": "lunalytics",
+      "name": "Lunalytics",
+      "member": "sipho",
+      "room": "Library",
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "status": "add",
+      "beat": "lib-check",
+      "seed": "Sipho sets Lunalytics to check that the shop site and the label printer answer.",
+      "line": "Lunalytics checks that the shop site and the label printer answer."
+    },
+    {
+      "app": "dropgate",
+      "name": "Dropgate",
+      "member": null,
+      "room": "Living & Dining",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "dining-dropgate",
+      "seed": "A short code sends a big video from the Living and Dining room to the laptop in the next room with Dropgate, over the home Wi-Fi.",
+      "line": "Dropgate sends a camera-card video across the room by a short code."
+    },
+    {
+      "app": "lubelogger",
+      "name": "LubeLogger",
+      "member": null,
+      "room": "Foyer",
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "status": "add",
+      "beat": "foyer-lubelogger",
+      "seed": "LubeLogger keeps the service history, fuel and reminders of the market van in one log that the household shares.",
+      "line": "LubeLogger keeps the van's service history, fuel and reminders in one log."
+    },
+    {
+      "app": "photoview",
+      "name": "Photoview",
+      "member": "thandi",
+      "room": "The living room",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "swap",
+      "beat": "living-film",
+      "seed": "Thandi's greenhouse pictures build into a gallery of the whole season in Photoview, with the date beside each frame.",
+      "line": "Photoview builds a gallery from a folder of camera files, with the camera details beside each frame."
+    },
+    {
+      "app": "memos",
+      "name": "Memos",
+      "member": "thandi",
+      "room": "Out in the garden",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "status": "swap",
+      "beat": "garden-beds",
+      "seed": "Thandi dates each cutting in a Memos note as she trims the lavender, and the notes run as one timeline.",
+      "line": "Memos catches a quick note by the kitchen door and keeps it in a timeline on the Core."
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "member": "sipho",
+      "room": "Out in the garden",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "status": "swap",
+      "beat": "garden-deck",
+      "seed": "Sipho asks the model on the Core about the stock count, in Open WebUI, and checks its sums against the table.",
+      "line": "Open WebUI is the chat window for the model on the Core, in the browser."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "dining-photos",
+      "member": "sipho",
+      "chapter": "dining",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "rembg",
+      "toName": "Rembg",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Sipho cuts the background from each product picture with Rembg, so the plants sit clean on the shop page.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-meals",
+      "member": "sipho",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Thursday's lunch starts with chives: Sipho opens the recipe in Mealie, and the list adds what is missing.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-week",
+      "member": "sipho",
+      "chapter": "living",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "vikunja",
+      "toName": "Vikunja",
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Thandi and Sipho split the market jobs on shared task lists in Vikunja, and each phone's calendar shows them.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-film",
+      "member": "thandi",
+      "chapter": "living",
+      "from": "jellyfin",
+      "fromName": "Jellyfin",
+      "to": "photoview",
+      "toName": "Photoview",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "loose",
+      "qualifier": "for photos already on the Core",
+      "seed": "Thandi's greenhouse pictures build into a gallery of the whole season in Photoview, with the date beside each frame.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-beds",
+      "member": "thandi",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "memos",
+      "toName": "Memos",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Thandi dates each cutting in a Memos note as she trims the lavender, and the notes run as one timeline.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-deck",
+      "member": "sipho",
+      "chapter": "garden",
+      "from": "open-webui",
+      "fromName": "Open WebUI",
+      "to": "open-webui",
+      "toName": "Open WebUI",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Sipho asks the model on the Core about the stock count, in Open WebUI, and checks its sums against the table.",
+      "filmBeat": false,
+      "dropWith": [
+        "jupyterlab"
+      ],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "living-week",
+        "kitchen-meals"
+      ],
+      "retoldAs": [
+        "kitchen-meals -> Mealie",
+        "living-week -> Vikunja"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "jellyfin",
+      "name": "Jellyfin",
+      "beats": [
+        "living-film"
+      ],
+      "retoldAs": [
+        "living-film -> Photoview"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "dining-photos"
+      ],
+      "retoldAs": [
+        "dining-photos -> Rembg"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "beats": [
+        "garden-deck"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "gitea",
+      "hortusfox"
+    ],
+    "was": [
+      "gitea",
+      "hortusfox"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "green-stock",
+      "chapter": "greenhouse",
+      "newChapter": null,
+      "member": "thandi",
+      "also": [],
+      "room": "Greenhouse",
+      "roomRole": "living",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Thandi keeps the nursery's stock and orders as a table in Grist, with a column that shows what is nearly sold out."
+    },
+    {
+      "id": "green-labels",
+      "chapter": "greenhouse",
+      "newChapter": null,
+      "member": "thandi",
+      "also": [],
+      "room": "Greenhouse",
+      "roomRole": "living",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "small-business",
+      "app": "inkscape",
+      "appName": "Inkscape",
+      "with": [],
+      "service": "Adobe Illustrator",
+      "serviceId": "adobe-illustrator",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Thandi draws the plant labels for the stall in Inkscape, in a browser session the Core serves."
+    },
+    {
+      "id": "lib-editor",
+      "chapter": "library",
+      "newChapter": null,
+      "member": "sipho",
+      "also": [],
+      "room": "Library",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "code-server",
+      "appName": "Code Server",
+      "with": [],
+      "service": "Cursor",
+      "serviceId": "cursor",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Sipho opens his editor in the laptop browser from Code Server, and the editor runs on the Core."
+    },
+    {
+      "id": "lib-api",
+      "chapter": "library",
+      "newChapter": null,
+      "member": "sipho",
+      "also": [],
+      "room": "Library",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Sipho tests the shop's order service from a Hoppscotch tab, and the collection stays in that browser."
+    },
+    {
+      "id": "lib-check",
+      "chapter": "library",
+      "newChapter": null,
+      "member": "sipho",
+      "also": [],
+      "room": "Library",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "lunalytics",
+      "appName": "Lunalytics",
+      "with": [],
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Sipho sets Lunalytics to check that the shop site and the label printer answer."
+    },
+    {
+      "id": "living-solidtime",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living & Dining",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "solidtime",
+      "appName": "Solidtime",
+      "with": [],
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The shop logs the week's hours by job in Solidtime."
+    },
+    {
+      "id": "kitchen-spliit",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "spliit",
+      "appName": "Spliit",
+      "with": [],
+      "service": "Splitwise",
+      "serviceId": "splitwise",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "After market day the couple settle who paid for what in Spliit, a group that lives on the Core."
+    },
+    {
+      "id": "foyer-lubelogger",
+      "chapter": "foyer",
+      "newChapter": "foyer",
+      "member": null,
+      "also": [],
+      "room": "Foyer",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "lubelogger",
+      "appName": "LubeLogger",
+      "with": [],
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "LubeLogger keeps the service history, fuel and reminders of the market van in one log that the household shares."
+    },
+    {
+      "id": "dining-dropgate",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living & Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "dropgate",
+      "appName": "Dropgate",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A short code sends a big video from the Living and Dining room to the laptop in the next room with Dropgate, over the home Wi-Fi."
+    },
+    {
+      "id": "kitchen-bookstack",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "bookstack",
+      "appName": "BookStack",
+      "with": [],
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple write the house manual in BookStack: the stopcock, the boiler and the sitter's notes, with page history."
+    },
+    {
+      "id": "greenhouse-booklore",
+      "chapter": "greenhouse",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Greenhouse",
+      "roomRole": "living",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "booklore",
+      "appName": "BookLore",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "BookLore shelves the family library by series and author, so each shelf reads in order."
+    },
+    {
+      "id": "dining-tldraw",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living & Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "tldraw",
+      "appName": "tldraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple draw the seating plan for market day on tldraw and export it as a picture."
+    },
+    {
+      "id": "kitchen-cryptpad",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "cryptpad",
+      "appName": "CryptPad",
+      "with": [],
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple fill in the market list together in a CryptPad document, and each edit appears as it is typed."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "foyer",
+        "kind": "room",
+        "room": "entry",
+        "title": "The foyer",
+        "place": "after:library"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "library",
+        "room": "office",
+        "title": "Sipho in the library",
+        "new": false
+      },
+      {
+        "id": "foyer",
+        "room": "entry",
+        "title": "The foyer",
+        "new": true
+      },
+      {
+        "id": "greenhouse",
+        "room": "living",
+        "title": "Thandi in the greenhouse",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining table",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "library",
+      "title": "Sipho in the library",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk in the library where the Core sits",
+      "beats": [
+        {
+          "id": "lib-repo",
+          "member": "sipho",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "lib-issue",
+          "member": "thandi",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "lib-late",
+          "member": "sipho",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "lib-crm",
+          "member": "sipho",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "lib-editor",
+          "member": "sipho",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "add"
+        },
+        {
+          "id": "lib-api",
+          "member": "sipho",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        },
+        {
+          "id": "lib-check",
+          "member": "sipho",
+          "app": "lunalytics",
+          "service": "UptimeRobot",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "foyer",
+      "title": "The foyer",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "foyer-lubelogger",
+          "member": null,
+          "app": "lubelogger",
+          "service": "Fuelly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "greenhouse",
+      "title": "Thandi in the greenhouse",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the potting tables among the jade plants",
+      "beats": [
+        {
+          "id": "green-journal",
+          "member": "thandi",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "green-buyer",
+          "member": "sipho",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "green-lamps",
+          "member": "thandi",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "green-courier",
+          "member": "thandi",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "green-stock",
+          "member": "thandi",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "green-labels",
+          "member": "thandi",
+          "app": "inkscape",
+          "service": "Adobe Illustrator",
+          "origin": "add"
+        },
+        {
+          "id": "greenhouse-booklore",
+          "member": null,
+          "app": "booklore",
+          "service": "Kindle",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the sectional and the pedestal table",
+      "beats": [
+        {
+          "id": "living-week",
+          "member": "sipho",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "swap"
+        },
+        {
+          "id": "living-film",
+          "member": "thandi",
+          "app": "photoview",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "living-solidtime",
+          "member": null,
+          "app": "solidtime",
+          "service": "Toggl Track",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-books",
+          "member": "thandi",
+          "app": "akaunting",
+          "service": "QuickBooks",
+          "origin": "now"
+        },
+        {
+          "id": "dining-photos",
+          "member": "sipho",
+          "app": "rembg",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "dining-dropgate",
+          "member": null,
+          "app": "dropgate",
+          "service": "WeTransfer",
+          "origin": "add"
+        },
+        {
+          "id": "dining-tldraw",
+          "member": null,
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-meals",
+          "member": "sipho",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-ping",
+          "member": "thandi",
+          "app": "ntfy",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-spliit",
+          "member": null,
+          "app": "spliit",
+          "service": "Splitwise",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-bookstack",
+          "member": null,
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-cryptpad",
+          "member": null,
+          "app": "cryptpad",
+          "service": "Microsoft Office",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-beds",
+          "member": "thandi",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "swap"
+        },
+        {
+          "id": "garden-deck",
+          "member": "sipho",
+          "app": "open-webui",
+          "service": "ChatGPT",
+          "origin": "swap"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "green-journal",
+      "line": "Thandi repots the jade plant."
+    },
+    {
+      "at": "morning",
+      "beat": "lib-repo",
+      "line": "Sipho pushes the postcode fix."
+    },
+    {
+      "at": "midday",
+      "beat": "green-stock",
+      "line": "Thandi checks what is nearly sold out."
+    },
+    {
+      "at": "afternoon",
+      "beat": "dining-photos",
+      "line": "Sipho cuts out the product pictures."
+    },
+    {
+      "at": "afternoon",
+      "beat": "dining-books",
+      "line": "Thandi raises a garden centre invoice."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-beds",
+      "line": "Thandi cuts back the lavender."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-film",
+      "line": "The season's gallery builds from the greenhouse pictures."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "GitHub",
+      "Salesforce",
+      "Google Home",
+      "Plex",
+      "QuickBooks",
+      "Google Photos",
+      "ChatGPT"
+    ],
+    "servicesFinal": [
+      "GitHub",
+      "Salesforce",
+      "Google Home",
+      "Todoist",
+      "Google Photos",
+      "QuickBooks",
+      "Paprika",
+      "Google Keep",
+      "ChatGPT",
+      "Airtable",
+      "Adobe Illustrator",
+      "Cursor",
+      "Postman",
+      "UptimeRobot",
+      "Toggl Track",
+      "Splitwise",
+      "Fuelly",
+      "WeTransfer",
+      "Confluence",
+      "Kindle",
+      "Miro",
+      "Microsoft Office"
+    ],
+    "count": 22
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "green-labels",
+      "dining-photos",
+      "lib-check",
+      "dining-dropgate",
+      "foyer-lubelogger",
+      "living-film",
+      "garden-beds",
+      "garden-deck"
+    ],
+    "mustCarry": {
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "twenty": [
+        "marketplace: QA capture shows real company names and logos."
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "vikunja": [
+        "[note] Supports CalDAV sync.",
+        "QA shot is a sign-in wall",
+        "CalDAV sync with calendar apps"
+      ],
+      "photoview": [
+        "[cloud-link] Map view uses a Mapbox token you can add. Leave it off for a fully local gallery.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Public sharing links need inbound reach: keep out of stories",
+        "Face recognition is a feature, not a claim to amplify"
+      ],
+      "akaunting": [
+        "[claims] Bookkeeping tool. No accounting, tax or legal advice.",
+        "marketplace: Source-available (Business Source License). Seafile and others carry umbrel strings: the admin email default is a placeholder address on umbrel.local."
+      ],
+      "rembg": [
+        "[note] amd64 only (fine on the Core). REST API available.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "amd64 only; CPU inference; models are cached after the first download (internet).",
+        "No built-in authentication (home network only).",
+        "No QA screenshot and no gallery image at all: needs a capture."
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "ntfy": [
+        "[cloud-link] iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "No sign-in is configured: anyone who can reach the URL can publish and subscribe. Keep it on the home network.",
+        "iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "QA screenshot is an empty app with a notifications-blocked banner (shows the product)."
+      ],
+      "memos": [],
+      "open-webui": [
+        "[note] The Hub onboarding wizard offers Open WebUI as a featured app.",
+        "[cloud-link] It can also connect to cloud models with an API key. Leave that off.",
+        "[note] Wired to the Core's local model by the Hub (hub_integration inference). Say \"a model on the Core\"; never claim it matches a hosted model and never give a speed figure.",
+        "Can connect to cloud models with an API key (field in the install form): leave out of any scene.",
+        "Hub wires it to the local model."
+      ],
+      "grist": [],
+      "inkscape": [
+        "Runs as a remote-desktop style session in the browser, not a native window",
+        "Image tag is the Kasm image version, not the Inkscape version"
+      ],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "lunalytics": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "solidtime": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "listing mentions invoices: say nothing about billing or tax"
+      ],
+      "spliit": [],
+      "lubelogger": [
+        "Do not claim savings or economy figures",
+        "No sign-in until the user sets one (unverified)"
+      ],
+      "dropgate": [
+        "The QA build shows \"Standard uploads are disabled on this server\": only direct transfer worked in the capture",
+        "\"Beyond your network\" sharing needs outside reach to the Core"
+      ],
+      "bookstack": [],
+      "booklore": [
+        "[cloud-link] Fetches metadata and covers from outside."
+      ],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "cryptpad": [
+        "Listing says \"end-to-end encrypted\": banned wording (f-security-guarantee), do not repeat",
+        "Collaboration with people outside the home needs outside reach"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "lunalytics",
+      "display": "Lunalytics",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "UptimeRobot",
+        "Statuspage"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "evidence": "CI-Marketplace apps/lunalytics/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "dropgate",
+      "display": "Dropgate",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "WeTransfer",
+        "Dropbox"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The QA build shows \"Standard uploads are disabled on this server\": only direct transfer worked in the capture",
+        "\"Beyond your network\" sharing needs outside reach to the Core"
+      ],
+      "evidence": "CI-Marketplace apps/dropgate/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "photoview",
+      "beats": [
+        "living-film"
+      ]
+    },
+    {
+      "app": "rembg",
+      "beats": [
+        "dining-photos"
+      ]
+    },
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-meals"
+      ]
+    },
+    {
+      "app": "code-server",
+      "beats": [
+        "lib-editor"
+      ]
+    },
+    {
+      "app": "solidtime",
+      "beats": [
+        "living-solidtime"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

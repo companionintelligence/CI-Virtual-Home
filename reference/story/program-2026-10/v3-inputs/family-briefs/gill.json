@@ -1,0 +1,1320 @@
+{
+  "v": 3,
+  "slug": "gill",
+  "house": "valleyview",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/gill.json",
+    "sha1": "98c97647b8be6f96026992c3e119ecbad0f386d8",
+    "beatsNow": 23,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": false,
+  "narrator": "v-deep-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "immich",
+        "jellyfin",
+        "home-assistant",
+        "hortusfox",
+        "ci-planning",
+        "mealie"
+      ],
+      "beatApps": {
+        "privacy": "vaultwarden"
+      },
+      "reviewNeeded": [
+        "mealie"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "immich",
+          "jellyfin",
+          "home-assistant",
+          "hortusfox",
+          "airtrail",
+          "firefly-iii"
+        ],
+        "beatApps": {
+          "food": "kitchenowl",
+          "privacy": "vaultwarden"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "beatApps.food kitchenowl dropped",
+        "firefly-iii dropped to make room",
+        "ci-planning added: the organiser pool for jaswinder",
+        "airtrail dropped to make room",
+        "mealie added: carries food"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 4,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "harpreet": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      },
+      "jaswinder": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 7
+  },
+  "members": [
+    {
+      "id": "harpreet",
+      "name": "Harpreet",
+      "age": 61,
+      "role": "partner",
+      "archetype": "host",
+      "work": "retired electrician who hosts and cooks",
+      "companion": {
+        "name": "Cardamom",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "host-cook",
+        "tradesperson",
+        "musician-listener"
+      ],
+      "thread": "A retired electrician who cooks for friends: recipes, costs, music and the quiz."
+    },
+    {
+      "id": "jaswinder",
+      "name": "Jaswinder",
+      "age": 63,
+      "role": "partner",
+      "archetype": "organiser",
+      "work": "retired pharmacist",
+      "companion": {
+        "name": "Cumin",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "elder-day",
+        "reader-collector",
+        "traveller-rider"
+      ],
+      "thread": "A retired pharmacist who keeps the papers, the books, the news and the trips."
+    }
+  ],
+  "character": {
+    "lede": "A powder-blue riverside villa stands on a raised plinth, with a set-back upper storey behind a full-width glass balcony. An L-shaped pool, a curtained cabana and a walled five-a-side pitch sit on the paved plaza.",
+    "spots": [
+      {
+        "room": "Reading Lounge",
+        "line": "A chaise, a slipper chair and a bookshelf make the reading lounge."
+      },
+      {
+        "room": "Kitchen",
+        "line": "A breakfast bar with three stools stands beside the range and the fridge."
+      },
+      {
+        "room": "Cabana Terrace",
+        "line": "An outdoor sofa, two club chairs and a bar sit under the cabana."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 215,
+      "ground": "lawn",
+      "style": "Powder-blue riverside villa on a raised plinth: a set-back upper storey behind a full-width glass balcony, thin cream cantilevered slabs, a honey-timber pier portal, a curtained cabana on the water, an L-shaped glass-edged pool and a walled five-a-side pitch on a paved plaza",
+      "rooms": [
+        "Hearth Salon",
+        "Reading Lounge",
+        "Kitchen",
+        "Dining Hall",
+        "Bay Seat",
+        "Stair Hall",
+        "Garden Room",
+        "Slider Palms",
+        "Terrace Column",
+        "Pool Peninsula",
+        "Timber Portal",
+        "Cabana Terrace",
+        "Primary Suite",
+        "Primary Ensuite",
+        "Dressing Room",
+        "Upper Landing",
+        "Roof Deck"
+      ],
+      "flags": [
+        "tv: hall-only"
+      ]
+    },
+    "truths": "The Core sits on a credenza in the Hearth Salon, in sight of the door. The only television is a wall screen at the pool portal: never put a TV scene indoors. The kitchen has a breakfast bar. L-shaped pool, cabana and a walled pitch.",
+    "mustNot": [
+      "no television indoors"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "razzia",
+      "name": "Razzia",
+      "member": "harpreet",
+      "room": "Kitchen",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "kitchen-quiz",
+      "seed": "Harpreet sets Friday's quiz for his friends in Razzia: everyone joins by game PIN from a phone, and the quiz runs on the Core.",
+      "line": "Razzia runs the birthday quiz: the guests join on their phones by a game PIN and the quiz runs on the Core."
+    },
+    {
+      "app": "miniflux",
+      "name": "Miniflux",
+      "member": "jaswinder",
+      "room": "Reading Lounge",
+      "service": "Feedly",
+      "serviceId": "feedly",
+      "status": "add",
+      "beat": "reading-news",
+      "seed": "Jaswinder follows her favourite writers and the local paper in Miniflux, with the read list kept on the Core.",
+      "line": "Miniflux follows the writers and the local paper, with the read list kept on the Core."
+    },
+    {
+      "app": "karakeep",
+      "name": "Karakeep",
+      "member": null,
+      "room": "Hearth Salon",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "status": "add",
+      "beat": "living-karakeep",
+      "seed": "The couple gather clippings for the next project in Karakeep, tagged by hand.",
+      "line": "Karakeep gathers the clippings for a project in one place, tagged by hand."
+    },
+    {
+      "app": "pingvin-share",
+      "name": "Pingvin Share",
+      "member": null,
+      "room": "Dressing Room",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "living-pingvin-share",
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day.",
+      "line": "Pingvin Share makes a link for a big file that someone in the house opens."
+    },
+    {
+      "app": "spliit",
+      "name": "Spliit",
+      "member": "harpreet",
+      "room": "Kitchen",
+      "service": "Splitwise",
+      "serviceId": "splitwise",
+      "status": "add",
+      "beat": "kitchen-costs",
+      "seed": "After a lunch for eight Harpreet splits the shopping between the friends in Spliit, a group that lives on the Core.",
+      "line": "Spliit splits a weekend's costs between cousins or housemates, and the group lives on the Core."
+    },
+    {
+      "app": "mstream",
+      "name": "mStream",
+      "member": "harpreet",
+      "room": "Hearth Salon",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "status": "add",
+      "beat": "living-records",
+      "seed": "Harpreet plays his digitised record collection through the salon speaker from a folder on the Core with mStream.",
+      "line": "mStream plays a record collection, digitised years ago, through the living-room speaker."
+    },
+    {
+      "app": "calibre-web",
+      "name": "Calibre-Web",
+      "member": "jaswinder",
+      "room": "Reading Lounge",
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "status": "add",
+      "beat": "reading-books",
+      "seed": "Jaswinder shelves her paperbacks and the travel guides in Calibre-Web and reads at the window.",
+      "line": "Calibre-Web keeps the family's own ebooks on a shelf in the browser, ready to read at the window."
+    },
+    {
+      "app": "papra",
+      "name": "Papra",
+      "member": "jaswinder",
+      "room": "The salon and reading lounge",
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "status": "swap",
+      "beat": "reading-papers",
+      "seed": "Jaswinder scans the certificate into Papra and finds it by its name when the council asks.",
+      "line": "Papra keeps the warranty cards and letters in a light archive that finds them by name."
+    }
+  ],
+  "chipFixes": [
+    {
+      "beat": "dining-ledger",
+      "app": "firefly-iii",
+      "from": "Mint",
+      "to": "YNAB",
+      "why": "the first listed name is a service that no longer exists as named, so the chip and the detail use the next name"
+    }
+  ],
+  "swaps": [
+    {
+      "beat": "reading-papers",
+      "member": "jaswinder",
+      "chapter": "living",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "papra",
+      "toName": "Papra",
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "loose",
+      "qualifier": "a scanned-paper archive",
+      "seed": "Jaswinder scans the certificate into Papra and finds it by its name when the council asks.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-recipe",
+      "member": "harpreet",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Harpreet types the dal he never wrote down into Mealie, one pot at a time, and scales it for eight.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-list",
+      "member": "harpreet",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Eight for lunch needs one list: Harpreet scales the menu in Mealie, and the shopping list follows.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-fridge",
+      "member": "jaswinder",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "memos",
+      "toName": "Memos",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Jaswinder clears the fridge door and moves each reminder into Memos, where the notes run as one timeline.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "kitchenowl",
+      "name": "KitchenOwl",
+      "beats": [
+        "ftue-pick",
+        "kitchen-list",
+        "kitchen-recipe"
+      ],
+      "retoldAs": [
+        "kitchen-recipe -> Mealie",
+        "kitchen-list -> Mealie"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "reading-papers"
+      ],
+      "retoldAs": [
+        "reading-papers -> Papra"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "kitchen-fridge"
+      ],
+      "retoldAs": [
+        "kitchen-fridge -> Memos"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "immich",
+      "nextcloud"
+    ],
+    "was": [
+      "immich",
+      "kitchenowl"
+    ],
+    "changed": [
+      {
+        "from": "kitchenowl",
+        "to": "nextcloud"
+      }
+    ],
+    "note": "ftue-pick names apps in `with` that the plan retells away; set `with` to this list and name each one in the popup body (the first-install list), so the fleet counts are the ones in fleet-simulation.md"
+  },
+  "adds": [
+    {
+      "id": "kitchen-quiz",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "harpreet",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "razzia",
+      "appName": "Razzia",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Harpreet sets Friday's quiz for his friends in Razzia: everyone joins by game PIN from a phone, and the quiz runs on the Core."
+    },
+    {
+      "id": "kitchen-costs",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "harpreet",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "spliit",
+      "appName": "Spliit",
+      "with": [],
+      "service": "Splitwise",
+      "serviceId": "splitwise",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "After a lunch for eight Harpreet splits the shopping between the friends in Spliit, a group that lives on the Core."
+    },
+    {
+      "id": "living-records",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "harpreet",
+      "also": [],
+      "room": "Hearth Salon",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "mstream",
+      "appName": "mStream",
+      "with": [],
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Harpreet plays his digitised record collection through the salon speaker from a folder on the Core with mStream."
+    },
+    {
+      "id": "reading-books",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "jaswinder",
+      "also": [],
+      "room": "Reading Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "calibre-web",
+      "appName": "Calibre-Web",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jaswinder shelves her paperbacks and the travel guides in Calibre-Web and reads at the window."
+    },
+    {
+      "id": "reading-news",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "jaswinder",
+      "also": [],
+      "room": "Reading Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "miniflux",
+      "appName": "Miniflux",
+      "with": [],
+      "service": "Feedly",
+      "serviceId": "feedly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jaswinder follows her favourite writers and the local paper in Miniflux, with the read list kept on the Core."
+    },
+    {
+      "id": "living-karakeep",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Hearth Salon",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "karakeep",
+      "appName": "Karakeep",
+      "with": [],
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple gather clippings for the next project in Karakeep, tagged by hand."
+    },
+    {
+      "id": "kitchen-changedetection",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "changedetection",
+      "appName": "changedetection.io",
+      "with": [],
+      "service": "Visualping",
+      "serviceId": "visualping",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "changedetection.io watches the pool engineer's booking page and tells the house when it changes."
+    },
+    {
+      "id": "living-pingvin-share",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dressing Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pingvin-share",
+      "appName": "Pingvin Share",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day."
+    },
+    {
+      "id": "dining-super-productivity",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Hall",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "super-productivity",
+      "appName": "Super Productivity",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "loose",
+      "qualifier": "with Nextcloud WebDAV sync, else the tasks sit in the browser",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple plan the day in blocks in Super Productivity, with a timer beside each task."
+    },
+    {
+      "id": "dining-drawio",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Hall",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "drawio",
+      "appName": "draw.io",
+      "with": [],
+      "service": "Lucidchart",
+      "serviceId": "lucidchart",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple draw the garden plan in draw.io and save the diagram as a file on a laptop."
+    },
+    {
+      "id": "dining-stirling-pdf",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Hall",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "stirling-pdf",
+      "appName": "Stirling-PDF",
+      "with": [],
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple merge the forms for a lunch for eight into one PDF in Stirling-PDF, on the Core instead of on a PDF website."
+    },
+    {
+      "id": "dining-jotty",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Hall",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "jotty",
+      "appName": "Jotty",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple keep room checklists as plain Markdown files in Jotty, one list for each part of the house."
+    },
+    {
+      "id": "garden-enclosed",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Cabana Terrace",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "enclosed",
+      "appName": "Enclosed",
+      "with": [],
+      "service": "PrivNote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "An Enclosed note holds the pool-gate code for the cricket friends staying over, read on the home Wi-Fi, with an expiry that closes it after a day."
+    }
+  ],
+  "chapters": {
+    "add": [],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The salon and reading lounge",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining hall",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "Harpreet’s kitchen",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the water",
+        "new": false
+      },
+      {
+        "id": "suite",
+        "room": "bedroom",
+        "title": "Upstairs, the primary suite",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The salon and reading lounge",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the reading lounge and the hearth salon",
+      "beats": [
+        {
+          "id": "living-parade",
+          "member": "harpreet",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "reading-contacts",
+          "member": "harpreet",
+          "app": "nextcloud",
+          "service": "iCloud",
+          "origin": "now"
+        },
+        {
+          "id": "reading-papers",
+          "member": "jaswinder",
+          "app": "papra",
+          "service": "Evernote",
+          "origin": "swap"
+        },
+        {
+          "id": "reading-lamp",
+          "member": "harpreet",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "reading-cumin",
+          "member": "jaswinder",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "reading-vault",
+          "member": "jaswinder",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "living-week",
+          "member": "jaswinder",
+          "app": "ci-planning",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-records",
+          "member": "harpreet",
+          "app": "mstream",
+          "service": "Spotify",
+          "origin": "add"
+        },
+        {
+          "id": "reading-books",
+          "member": "jaswinder",
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "add"
+        },
+        {
+          "id": "reading-news",
+          "member": "jaswinder",
+          "app": "miniflux",
+          "service": "Feedly",
+          "origin": "add"
+        },
+        {
+          "id": "living-karakeep",
+          "member": null,
+          "app": "karakeep",
+          "service": "Raindrop.io",
+          "origin": "add"
+        },
+        {
+          "id": "living-pingvin-share",
+          "member": null,
+          "app": "pingvin-share",
+          "service": "WeTransfer",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining hall",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-ledger",
+          "member": "jaswinder",
+          "app": "firefly-iii",
+          "service": "YNAB",
+          "origin": "now"
+        },
+        {
+          "id": "dining-super-productivity",
+          "member": null,
+          "app": "super-productivity",
+          "service": "Todoist",
+          "origin": "add"
+        },
+        {
+          "id": "dining-drawio",
+          "member": null,
+          "app": "drawio",
+          "service": "Lucidchart",
+          "origin": "add"
+        },
+        {
+          "id": "dining-stirling-pdf",
+          "member": null,
+          "app": "stirling-pdf",
+          "service": "Adobe Acrobat",
+          "origin": "add"
+        },
+        {
+          "id": "dining-jotty",
+          "member": null,
+          "app": "jotty",
+          "service": "Todoist",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "Harpreet’s kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": "the breakfast bar and the range",
+      "beats": [
+        {
+          "id": "kitchen-list",
+          "member": "harpreet",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-recipe",
+          "member": "harpreet",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-fridge",
+          "member": "jaswinder",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-range",
+          "member": "harpreet",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-quiz",
+          "member": "harpreet",
+          "app": "razzia",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-costs",
+          "member": "harpreet",
+          "app": "spliit",
+          "service": "Splitwise",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-changedetection",
+          "member": null,
+          "app": "changedetection",
+          "service": "Visualping",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the water",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": "the cabana terrace by the pool",
+      "beats": [
+        {
+          "id": "garden-planters",
+          "member": "harpreet",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-cabana",
+          "member": "jaswinder",
+          "app": "audiobookshelf",
+          "service": "Audible",
+          "origin": "now"
+        },
+        {
+          "id": "garden-enclosed",
+          "member": null,
+          "app": "enclosed",
+          "service": "PrivNote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "suite",
+      "title": "Upstairs, the primary suite",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "bedroom-trip",
+          "member": "jaswinder",
+          "app": "airtrail",
+          "service": "Flighty",
+          "origin": "now"
+        },
+        {
+          "id": "bedroom-prints",
+          "member": "harpreet",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "reading-news",
+      "line": "Jaswinder reads her writers over tea."
+    },
+    {
+      "at": "morning",
+      "beat": "kitchen-recipe",
+      "line": "Harpreet scales the dal for eight."
+    },
+    {
+      "at": "midday",
+      "beat": "reading-papers",
+      "line": "Jaswinder scans the certificate before lunch."
+    },
+    {
+      "at": "afternoon",
+      "beat": "living-records",
+      "line": "The record collection plays through the salon."
+    },
+    {
+      "at": "afternoon",
+      "beat": "garden-cabana",
+      "line": "Harpreet peels while she listens."
+    },
+    {
+      "at": "weekend",
+      "beat": "kitchen-quiz",
+      "line": "Friday's quiz sets up in the kitchen."
+    },
+    {
+      "at": "weekend",
+      "beat": "bedroom-prints",
+      "line": "The wedding album goes in once."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Plex",
+      "iCloud",
+      "Evernote",
+      "Google Home",
+      "LastPass",
+      "Mint",
+      "Audible",
+      "Flighty",
+      "Google Photos"
+    ],
+    "servicesFinal": [
+      "Plex",
+      "iCloud",
+      "Evernote",
+      "Google Home",
+      "LastPass",
+      "YNAB",
+      "Paprika",
+      "Google Keep",
+      "Audible",
+      "Flighty",
+      "Google Photos",
+      "Splitwise",
+      "Spotify",
+      "Kindle",
+      "Feedly",
+      "Raindrop.io",
+      "Visualping",
+      "WeTransfer",
+      "Todoist",
+      "Lucidchart",
+      "Adobe Acrobat",
+      "PrivNote"
+    ],
+    "count": 22
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "kitchen-quiz",
+      "reading-news",
+      "living-karakeep",
+      "living-pingvin-share",
+      "kitchen-costs",
+      "living-records",
+      "reading-books",
+      "reading-papers"
+    ],
+    "mustCarry": {
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "papra": [],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "ci-planning": [
+        "[cloud-link] Two-way Google Calendar sync exists but is off by default and needs a Google OAuth client. Do not say it never touches Google.",
+        "[note] Local-model briefings, task extraction and auto-scheduling appear only when Ollama is reachable.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "[cloud-link] Crash reports go to Companion Intelligence unless \"Share crash reports\" is turned off at install (it is on by default). Credentials, file paths, request bodies and memories are stripped first. Do not write t",
+        "Two way Google Calendar sync exists, off by default: never say it never touches Google."
+      ],
+      "firefly-iii": [
+        "[cloud-link] Bank import through GoCardless or Spectre is an outside service. CSV import stays local.",
+        "[claims] Bookkeeping tool. No financial advice and no savings promises.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024."
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "memos": [],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "audiobookshelf": [],
+      "airtrail": [
+        "Logbook and statistics, not live flight tracking (listing short_desc says \"flight tracking\")",
+        "First user becomes administrator",
+        "Does not claim live flight status; story must say logbook"
+      ],
+      "razzia": [
+        "[qa] Set a manager password at install; the upstream default blocks access.",
+        "The compose falls back to a weak default password if the field were blank",
+        "Players join with a game PIN (a QR code also shows): never write \"QR code\"",
+        "Remote players are not claimed"
+      ],
+      "spliit": [],
+      "mstream": [
+        "[note] Overlaps Navidrome.",
+        "Description says \"from anywhere\", \"completely private\" and \"no data collection\": absolute and remote claims, paraphrase",
+        "Overlaps Navidrome"
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: An upstream default admin sign-in exists (not repeated here); no QA capture."
+      ],
+      "miniflux": [
+        "[note] Overlaps FreshRSS.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Integrations push to outside services if switched on (Pocket, Telegram, webhooks)",
+        "No QA screenshot",
+        "Overlaps FreshRSS (utilities slice)"
+      ],
+      "karakeep": [
+        "[cloud-link] The install form asks for an OpenAI key. Automatic tagging can use a local model instead; do not imply the key is needed.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI tagging is optional: never imply the key is needed (catalog)",
+        "No QA screenshot",
+        "Listing names OpenAI or a self-hosted Ollama; only the OpenAI route is in the form"
+      ],
+      "changedetection": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "pingvin-share": [
+        "[public-access] Recipients outside your home network need to reach your Core.",
+        "public-access for anyone outside the house"
+      ],
+      "super-productivity": [
+        "by default tasks live in the browser local storage, not on the Core",
+        "no sync means no custody on the Core"
+      ],
+      "drawio": [
+        "Stateless: diagrams live in the browser or as .drawio files on the person's own device. The Core serves the editor only, so never say the diagram sits on the Core.",
+        "Listing says nothing else phones home: leave it.",
+        "QA screenshot is a blank editor."
+      ],
+      "stirling-pdf": [
+        "QA screenshot is a sign-in wall that prints default credentials",
+        "already in the persona pool: share cap risk"
+      ],
+      "jotty": [
+        "Public share links need outside reach",
+        "Everything is Markdown and JSON files, no database"
+      ],
+      "enclosed": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "changedetection",
+      "display": "changedetection.io",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Visualping",
+        "Distill"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "evidence": "CI-Marketplace apps/changedetection/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "enclosed",
+      "display": "Enclosed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "PrivNote"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "evidence": "CI-Marketplace apps/enclosed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-list",
+        "kitchen-recipe"
+      ]
+    },
+    {
+      "app": "calibre-web",
+      "beats": [
+        "reading-books"
+      ]
+    },
+    {
+      "app": "miniflux",
+      "beats": [
+        "reading-news"
+      ]
+    },
+    {
+      "app": "karakeep",
+      "beats": [
+        "living-karakeep"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

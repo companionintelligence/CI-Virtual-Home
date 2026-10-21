@@ -135,11 +135,16 @@ const families: FamilyLite[] = stories.map((s) => ({ slug: s.slug, house: s.hous
   personas: [...new Set(s.members.map((m) => m.archetype || casting[s.slug]?.members?.find((c: any) => c.id === m.id)?.archetype).filter(Boolean) as string[])] }));
 const houses: { id: string }[] = J('content', 'houses', 'index.json').houses;
 
-test('on the tree: the plan is valid, and its only complaint is a claim still on hold', () => {
+test('on the tree: the plan is valid and nothing in it is on hold', () => {
   const plan = J('content', 'story', 'lander.json');
   const check = validatePlan(plan, { schema: files.schema, stories, services: files.services, apps: files.apps, claims: files.claims, houses });
   assert.deepEqual(check.errors, []);
-  assert.ok(check.warnings.every((w) => /on hold in claims\.json/.test(w)), check.warnings.join('\n'));
+  assert.deepEqual(check.warnings, [], 'the headline\'s claim is approved');
+  // a claim the plan names that is on hold still warns (and a strict build fails on the warning)
+  const held = { ...files.claims, allowedClaims: files.claims.allowedClaims.map((c) => (c.id === 'rent-line' ? { ...c, status: 'hold' } : c)) };
+  const warn = validatePlan(plan, { schema: files.schema, stories, services: files.services, apps: files.apps, claims: held, houses });
+  assert.deepEqual(warn.errors, []);
+  assert.match(warn.warnings.join('\n'), /messages\.rent: the claim rent-line is on hold in claims\.json/);
 });
 
 test('validatePlan has teeth: each mistake in the plan is found', () => {

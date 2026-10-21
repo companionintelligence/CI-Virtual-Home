@@ -1,0 +1,1437 @@
+{
+  "v": 3,
+  "slug": "kamau",
+  "house": "gardennook",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/kamau.json",
+    "sha1": "94e3730a4f7f0ef1ef0be980a10a77fcc15d8303",
+    "beatsNow": 22,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "young-family",
+  "business": false,
+  "narrator": "v-warm-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "hortusfox",
+        "home-assistant",
+        "n8n",
+        "immich",
+        "audiobookshelf"
+      ],
+      "beatApps": {
+        "food": "grocy",
+        "privacy": "gitea"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "hortusfox",
+          "home-assistant",
+          "n8n",
+          "immich",
+          "audiobookshelf",
+          "kitchenowl"
+        ],
+        "beatApps": {
+          "privacy": "duplicati"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "kitchenowl dropped: no beat tells it any more",
+        "beatApps.privacy duplicati dropped",
+        "beatApps.food grocy added",
+        "beatApps.privacy gitea added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 14,
+    "swaps": 4,
+    "householdBeats": 6,
+    "householdBeatsMax": 6,
+    "persona": {
+      "wanjiru": {
+        "now": 6,
+        "add": 4,
+        "target": 10
+      },
+      "juma": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      },
+      "zuri": {
+        "now": 1,
+        "add": 2,
+        "target": 3
+      }
+    },
+    "pairShare": 0.862,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "wanjiru",
+      "name": "Wanjiru",
+      "age": 34,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "software developer, works from home",
+      "companion": {
+        "name": "Rowan",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro"
+      ],
+      "thread": "Software from the glass garden nook, in the baby's naps."
+    },
+    {
+      "id": "juma",
+      "name": "Juma",
+      "age": 36,
+      "role": "parent",
+      "archetype": "host",
+      "work": "at home with Zuri, grows vegetables",
+      "companion": {
+        "name": "Biscuit",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "grower",
+        "host-cook",
+        "baby-year"
+      ],
+      "thread": "At home with Zuri: the garden, the kitchen, the photos and the day's notes."
+    },
+    {
+      "id": "zuri",
+      "name": "Zuri",
+      "age": 0,
+      "role": "baby",
+      "archetype": null,
+      "work": null,
+      "companion": null,
+      "lens": [
+        "baby-year"
+      ],
+      "thread": "A first year of rhymes, outgrown clothes and a growing photo timeline."
+    }
+  ],
+  "character": {
+    "lede": "A powder-blue brick cottage sits on a plinth under a clay-tile roof, with a string-lit porch of white columns. A glass garden nook, a kitchen loggia and a hot tub open onto the garden.",
+    "spots": [
+      {
+        "room": "Garden Nook",
+        "line": "A rattan armchair and nesting tables make the glass nook."
+      },
+      {
+        "room": "Bedroom & Nursery",
+        "line": "The family bed and the crib share one room."
+      },
+      {
+        "room": "Playroom",
+        "line": "Building blocks, a toy box and a rocking horse fill the playroom."
+      }
+    ],
+    "facts": {
+      "storeys": 1,
+      "areaSqm": 136,
+      "ground": "lawn",
+      "style": "Single-storey powder-blue painted-brick cottage on a brick plinth: a clay-tile swoop skillion rising west to a white outrigger post meets a pale-gabled clay front gable in a V; string-lit porch of white column trios on a raised timber deck, recessed kitchen loggia, glass garden nook and a stucco chimney; gravel S-curve between curbed hydrangea and hibiscus beds, slatted rear pergola deck and a round flagstone hot-tub terrace",
+      "rooms": [
+        "Front Porch",
+        "Entry",
+        "Kitchen",
+        "Dining",
+        "Garden Nook",
+        "Living Room",
+        "Bathroom",
+        "Playroom",
+        "Bedroom & Nursery"
+      ],
+      "flags": [
+        "tv: none",
+        "kitchen-island: none",
+        "desk: core-shelf-only"
+      ]
+    },
+    "truths": "The Core sits on a console in the Living Room. There is no television and no kitchen island. A single storey with a string-lit porch, a hot tub, pergolas, a picnic table and a fire bowl. The nursery shares the main bedroom.",
+    "mustNot": [
+      "no television",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "minio",
+      "name": "MinIO",
+      "member": "wanjiru",
+      "room": "Garden Nook",
+      "service": "Amazon S3",
+      "serviceId": "amazon-s3",
+      "status": "add",
+      "beat": "nook-bucket",
+      "seed": "Wanjiru gives a side project a bucket of its own on the Core with MinIO.",
+      "line": "MinIO gives a side project a bucket of its own on the Core."
+    },
+    {
+      "app": "wallos",
+      "name": "Wallos",
+      "member": "juma",
+      "room": "Kitchen",
+      "service": "Rocket Money",
+      "serviceId": "rocket-money",
+      "status": "add",
+      "beat": "kitchen-renew",
+      "seed": "Juma lists the nappy delivery and every other renewal in Wallos, and sees what comes round next.",
+      "line": "Wallos lists every renewing subscription in one place, so the family sees what it still rents."
+    },
+    {
+      "app": "homebox",
+      "name": "HomeBox",
+      "member": "zuri",
+      "room": "Bedroom & Nursery",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "status": "add",
+      "beat": "nursery-boxes",
+      "seed": "Zuri's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once.",
+      "line": "HomeBox gives every box in the loft and garage a label, a place and a note about what is inside."
+    },
+    {
+      "app": "ollama",
+      "name": "Ollama",
+      "member": "wanjiru",
+      "room": "Garden Nook",
+      "service": "OpenAI",
+      "serviceId": "openai",
+      "status": "add",
+      "beat": "nook-model",
+      "seed": "Wanjiru pulls an open-weight model onto the Core with Ollama, and the prompts she used to send out are answered at home.",
+      "line": "Ollama runs an open-weight model on the Core for the prompts a builder used to send out."
+    },
+    {
+      "app": "karakeep",
+      "name": "Karakeep",
+      "member": null,
+      "room": "Living Room",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "status": "add",
+      "beat": "living-karakeep",
+      "seed": "The two of them gather clippings for the next project in Karakeep, tagged by hand.",
+      "line": "Karakeep gathers the clippings for a project in one place, tagged by hand."
+    },
+    {
+      "app": "dropgate",
+      "name": "Dropgate",
+      "member": null,
+      "room": "Dining",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "dining-dropgate",
+      "seed": "A short code sends a big video from the Living Room to the laptop in the next room with Dropgate, over the home Wi-Fi.",
+      "line": "Dropgate sends a camera-card video across the room by a short code."
+    },
+    {
+      "app": "it-tools",
+      "name": "IT-Tools",
+      "member": "wanjiru",
+      "room": "Garden Nook",
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "status": "add",
+      "beat": "nook-tools",
+      "seed": "Wanjiru converts a timestamp and checks a hash in IT-Tools, the page running in the browser tab.",
+      "line": "IT-Tools holds the small developer utilities, from a colour picker to a token decoder, in one page."
+    },
+    {
+      "app": "baikal",
+      "name": "Baikal",
+      "member": "juma",
+      "room": "The kitchen",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "status": "swap",
+      "beat": "kitchen-swap",
+      "seed": "Thursday's call moves lunch to Juma on the calendar that Baikal serves from the Core to both phones.",
+      "line": "Baikal serves the household calendar from the Core, and the calendar app on each phone reads it at home."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-backup",
+      "member": "wanjiru",
+      "chapter": "living",
+      "from": "duplicati",
+      "fromName": "Duplicati",
+      "to": "nextcloud",
+      "toName": "Nextcloud",
+      "service": "Google Drive",
+      "serviceId": "google-drive",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Wanjiru deletes the wrong folder by mistake, and Nextcloud brings it back from its trash on the Core.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": "Duplicati cannot back up the family's other apps as installed (market review): the beat promised a backup the Hub does not wire"
+    },
+    {
+      "beat": "kitchen-list",
+      "member": "juma",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "grocy",
+      "toName": "Grocy",
+      "service": "AnyList",
+      "serviceId": "anylist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Juma takes the paper list off the fridge and counts the pantry in Grocy, which builds the shopping list from what is nearly out.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-plan",
+      "member": "juma",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Wednesday's greens come from the garden: Juma opens the soup recipe in Mealie and scales it for the freezer.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-swap",
+      "member": "juma",
+      "chapter": "kitchen",
+      "from": "nextcloud",
+      "fromName": "Nextcloud",
+      "to": "baikal",
+      "toName": "Baikal",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Thursday's call moves lunch to Juma on the calendar that Baikal serves from the Core to both phones.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "duplicati",
+      "name": "Duplicati",
+      "beats": [
+        "living-backup"
+      ],
+      "retoldAs": [
+        "living-backup -> Nextcloud"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kitchenowl",
+      "name": "KitchenOwl",
+      "beats": [
+        "kitchen-list",
+        "kitchen-plan"
+      ],
+      "retoldAs": [
+        "kitchen-list -> Grocy",
+        "kitchen-plan -> Mealie"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "gitea",
+      "home-assistant"
+    ],
+    "was": [
+      "gitea",
+      "home-assistant"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "nook-model",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "wanjiru",
+      "also": [],
+      "room": "Garden Nook",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "ollama",
+      "appName": "Ollama",
+      "with": [],
+      "service": "OpenAI",
+      "serviceId": "openai",
+      "pairQuality": "loose",
+      "qualifier": "a model on the Core, not a chat window",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Wanjiru pulls an open-weight model onto the Core with Ollama, and the prompts she used to send out are answered at home."
+    },
+    {
+      "id": "nook-bucket",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "wanjiru",
+      "also": [],
+      "room": "Garden Nook",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "minio",
+      "appName": "MinIO",
+      "with": [],
+      "service": "Amazon S3",
+      "serviceId": "amazon-s3",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Wanjiru gives a side project a bucket of its own on the Core with MinIO."
+    },
+    {
+      "id": "nook-sync",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "wanjiru",
+      "also": [],
+      "room": "Garden Nook",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "syncthing",
+      "appName": "Syncthing",
+      "with": [],
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Wanjiru keeps a project folder in step between the laptop and the Core with Syncthing."
+    },
+    {
+      "id": "nook-tools",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "wanjiru",
+      "also": [],
+      "room": "Garden Nook",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "it-tools",
+      "appName": "IT-Tools",
+      "with": [],
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Wanjiru converts a timestamp and checks a hash in IT-Tools, the page running in the browser tab."
+    },
+    {
+      "id": "kitchen-notes",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "juma",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "memos",
+      "appName": "Memos",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Juma jots the day's small firsts in Memos, one line each, and the notes run as one timeline on the Core."
+    },
+    {
+      "id": "kitchen-renew",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "juma",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "wallos",
+      "appName": "Wallos",
+      "with": [],
+      "service": "Rocket Money",
+      "serviceId": "rocket-money",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Juma lists the nappy delivery and every other renewal in Wallos, and sees what comes round next."
+    },
+    {
+      "id": "nursery-boxes",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "zuri",
+      "also": [],
+      "room": "Bedroom & Nursery",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "crib",
+        "room": "bedroom"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Zuri's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once."
+    },
+    {
+      "id": "nursery-lullaby",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "zuri",
+      "also": [],
+      "room": "Bedroom & Nursery",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "crib",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "navidrome",
+      "appName": "Navidrome",
+      "with": [],
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The nap lullaby plays from the family's own music in Navidrome while Zuri settles."
+    },
+    {
+      "id": "garden-enclosed",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "enclosed",
+      "appName": "Enclosed",
+      "with": [],
+      "service": "PrivNote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "An Enclosed note holds the side-gate code for the grandmother who is visiting, read on the home Wi-Fi, with an expiry that closes it after a day."
+    },
+    {
+      "id": "living-karakeep",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "karakeep",
+      "appName": "Karakeep",
+      "with": [],
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The two of them gather clippings for the next project in Karakeep, tagged by hand."
+    },
+    {
+      "id": "kitchen-monetr",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "monetr",
+      "appName": "monetr",
+      "with": [],
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The two of them plan the month's bills into envelopes in monetr and see what is left to spend."
+    },
+    {
+      "id": "living-tldraw",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "tldraw",
+      "appName": "tldraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The two of them draw the seating plan for the week on tldraw and export it as a picture."
+    },
+    {
+      "id": "dining-dropgate",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "dropgate",
+      "appName": "Dropgate",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A short code sends a big video from the Living Room to the laptop in the next room with Dropgate, over the home Wi-Fi."
+    },
+    {
+      "id": "porch-changedetection",
+      "chapter": "porch",
+      "newChapter": "porch",
+      "member": null,
+      "also": [],
+      "room": "Front Porch",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "changedetection",
+      "appName": "changedetection.io",
+      "with": [],
+      "service": "Visualping",
+      "serviceId": "visualping",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "changedetection.io watches the nursery supplier's stock page and tells the house when it changes."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "porch",
+        "kind": "room",
+        "room": "entry",
+        "title": "On the front porch",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "porch",
+        "room": "entry",
+        "title": "On the front porch",
+        "new": true
+      },
+      {
+        "id": "nook",
+        "room": "office",
+        "title": "Wanjiru in the garden nook",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining table",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "nursery",
+        "room": "bedroom",
+        "title": "The bedroom and nursery",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-album",
+          "member": "juma",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "living-backup",
+          "member": "wanjiru",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "swap"
+        },
+        {
+          "id": "living-out",
+          "member": "juma",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "living-karakeep",
+          "member": null,
+          "app": "karakeep",
+          "service": "Raindrop.io",
+          "origin": "add"
+        },
+        {
+          "id": "living-tldraw",
+          "member": null,
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "porch",
+      "title": "On the front porch",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "porch-changedetection",
+          "member": null,
+          "app": "changedetection",
+          "service": "Visualping",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "nook",
+      "title": "Wanjiru in the garden nook",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the glass garden nook",
+      "beats": [
+        {
+          "id": "nook-repos",
+          "member": "wanjiru",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "nook-flow",
+          "member": "wanjiru",
+          "app": "n8n",
+          "service": "Zapier",
+          "origin": "now"
+        },
+        {
+          "id": "nook-rowan",
+          "member": "wanjiru",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "nook-model",
+          "member": "wanjiru",
+          "app": "ollama",
+          "service": "OpenAI",
+          "origin": "add"
+        },
+        {
+          "id": "nook-bucket",
+          "member": "wanjiru",
+          "app": "minio",
+          "service": "Amazon S3",
+          "origin": "add"
+        },
+        {
+          "id": "nook-sync",
+          "member": "wanjiru",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "add"
+        },
+        {
+          "id": "nook-tools",
+          "member": "wanjiru",
+          "app": "it-tools",
+          "service": "DevUtils",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-note",
+          "member": "wanjiru",
+          "app": "joplin",
+          "service": "Evernote",
+          "origin": "now"
+        },
+        {
+          "id": "dining-plant",
+          "member": "juma",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "dining-dropgate",
+          "member": null,
+          "app": "dropgate",
+          "service": "WeTransfer",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-list",
+          "member": "juma",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-plan",
+          "member": "juma",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-swap",
+          "member": "juma",
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-notes",
+          "member": "juma",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-renew",
+          "member": "juma",
+          "app": "wallos",
+          "service": "Rocket Money",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-monetr",
+          "member": null,
+          "app": "monetr",
+          "service": "YNAB",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "nursery",
+      "title": "The bedroom and nursery",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the crib beside the family bed",
+      "beats": [
+        {
+          "id": "nursery-rhymes",
+          "member": "zuri",
+          "app": "audiobookshelf",
+          "service": "Apple Podcasts",
+          "origin": "now"
+        },
+        {
+          "id": "nursery-boxes",
+          "member": "zuri",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        },
+        {
+          "id": "nursery-lullaby",
+          "member": "zuri",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": "the deck and the pergolas",
+      "beats": [
+        {
+          "id": "garden-beans",
+          "member": "juma",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-read",
+          "member": "wanjiru",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "now"
+        },
+        {
+          "id": "garden-seeds",
+          "member": "juma",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-enclosed",
+          "member": null,
+          "app": "enclosed",
+          "service": "PrivNote",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-list",
+      "line": "Juma counts the pantry while Zuri eats."
+    },
+    {
+      "at": "morning",
+      "beat": "nook-bucket",
+      "line": "Wanjiru gives a side project its bucket in the first nap."
+    },
+    {
+      "at": "midday",
+      "beat": "nursery-lullaby",
+      "line": "The nap lullaby plays from the family's music."
+    },
+    {
+      "at": "afternoon",
+      "beat": "garden-beans",
+      "line": "Last year's journal picks the bean spot."
+    },
+    {
+      "at": "afternoon",
+      "beat": "nook-repos",
+      "line": "Naptime is code time."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-enclosed",
+      "line": "A note with an expiry holds the door code."
+    },
+    {
+      "at": "weekend",
+      "beat": "dining-dropgate",
+      "line": "A short code sends a big video next door."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Google Photos",
+      "Backblaze",
+      "Google Home",
+      "GitHub",
+      "Zapier",
+      "Evernote",
+      "iCloud",
+      "Apple Podcasts",
+      "Amazon Kindle"
+    ],
+    "servicesFinal": [
+      "Google Photos",
+      "Google Drive",
+      "Google Home",
+      "GitHub",
+      "Zapier",
+      "Evernote",
+      "AnyList",
+      "Paprika",
+      "Google Calendar",
+      "Apple Podcasts",
+      "Amazon Kindle",
+      "OpenAI",
+      "Amazon S3",
+      "Dropbox",
+      "DevUtils",
+      "Google Keep",
+      "Rocket Money",
+      "Sortly",
+      "Spotify",
+      "PrivNote",
+      "Raindrop.io",
+      "YNAB",
+      "Miro",
+      "WeTransfer",
+      "Visualping"
+    ],
+    "count": 25
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "nook-bucket",
+      "kitchen-renew",
+      "nursery-boxes",
+      "nook-model",
+      "living-karakeep",
+      "dining-dropgate",
+      "nook-tools",
+      "kitchen-swap"
+    ],
+    "mustCarry": {
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "n8n": [
+        "[licence] Fair-code licence, not open source. Say \"source-available\"; do not say \"open source\".",
+        "[note] An n8n MCP entry exists for agents.",
+        "Fair-code licence: say source-available, never open source.",
+        "Public URL setting is for webhooks; leave off the scene.",
+        "Listing says full control over data: connectors to cloud services still pass data to them."
+      ],
+      "joplin": [
+        "[note] Joplin Server only; the Joplin apps are separate.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "marketplace: Joplin Server carries its own Personal Use License: not open source and limited for business use."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "grocy": [
+        "[note] The listing is short. Describe pantry stock, shopping lists, recipes and chores only.",
+        "Short listing: describe pantry stock, shopping lists, recipes, tasks and habits only (catalog)",
+        "Upstream demo screenshot shows a dollar total: prices on screen"
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "audiobookshelf": [],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "ollama": [
+        "[note] The Hub also has its own built-in Ollama service. Many listings say \"the Hub built-in Ollama\".",
+        "[claims] Model sizes and speeds come only from the fact sheet table. No own tok/s.",
+        "[claims] This package serves on the CPU unless the host passes a GPU in (not enabled by default), so say nothing about speed. It has no chat window of its own: it sits behind Open WebUI or an agent. It asks for no cloud ",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No chat UI of its own: sits behind Open WebUI or an agent."
+      ],
+      "minio": [
+        "Developer plumbing: the story needs a script or app using buckets.",
+        "Do not frame a bucket on the Core as an off-site backup.",
+        "No QA screenshot."
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "it-tools": [
+        "Listing says it keeps working with the network unplugged: do not repeat (install and updates use the internet).",
+        "Everything computes in the browser; the Core serves static files only."
+      ],
+      "memos": [],
+      "wallos": [
+        "[note] Fetches logos for popular services from outside.",
+        "[claims] Do not promise savings."
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "enclosed": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "karakeep": [
+        "[cloud-link] The install form asks for an OpenAI key. Automatic tagging can use a local model instead; do not imply the key is needed.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI tagging is optional: never imply the key is needed (catalog)",
+        "No QA screenshot",
+        "Listing names OpenAI or a self-hosted Ollama; only the OpenAI route is in the form"
+      ],
+      "monetr": [
+        "[claims] No financial advice.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024.",
+        "marketplace: Licence is the Functional Source License (not open source)."
+      ],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "dropgate": [
+        "The QA build shows \"Standard uploads are disabled on this server\": only direct transfer worked in the capture",
+        "\"Beyond your network\" sharing needs outside reach to the Core"
+      ],
+      "changedetection": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "minio",
+      "display": "MinIO",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Amazon S3"
+      ],
+      "qa": "none",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Developer plumbing: the story needs a script or app using buckets.",
+        "Do not frame a bucket on the Core as an off-site backup.",
+        "No QA screenshot."
+      ],
+      "evidence": "CI-Marketplace apps/minio/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "it-tools",
+      "display": "IT-Tools",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "DevUtils",
+        "Browserling Tools"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Listing says it keeps working with the network unplugged: do not repeat (install and updates use the internet).",
+        "Everything computes in the browser; the Core serves static files only."
+      ],
+      "evidence": "CI-Marketplace apps/it-tools/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "enclosed",
+      "display": "Enclosed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "PrivNote"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "evidence": "CI-Marketplace apps/enclosed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "dropgate",
+      "display": "Dropgate",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "WeTransfer",
+        "Dropbox"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The QA build shows \"Standard uploads are disabled on this server\": only direct transfer worked in the capture",
+        "\"Beyond your network\" sharing needs outside reach to the Core"
+      ],
+      "evidence": "CI-Marketplace apps/dropgate/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "changedetection",
+      "display": "changedetection.io",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Visualping",
+        "Distill"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "evidence": "CI-Marketplace apps/changedetection/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-plan"
+      ]
+    },
+    {
+      "app": "ollama",
+      "beats": [
+        "nook-model"
+      ]
+    },
+    {
+      "app": "minio",
+      "beats": [
+        "nook-bucket"
+      ]
+    },
+    {
+      "app": "syncthing",
+      "beats": [
+        "nook-sync"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "nursery-boxes"
+      ]
+    },
+    {
+      "app": "karakeep",
+      "beats": [
+        "living-karakeep"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

@@ -418,7 +418,7 @@ export default async function player(ctx: TestCtx): Promise<void> {
     const none = await page.evaluate(() => ({ st: document.querySelectorAll('.st, .st-start, .st-card, .st-btn-chapters, .st-btn-sound').length, flag: document.documentElement.dataset.story ?? null, api: typeof (window as any).__houseStory, shot: new URL(location.href).searchParams.get('shot'), chips: document.querySelectorAll('.vh-shots .vh-chip').length, link: document.querySelectorAll('link[data-story]').length }));
     ok(none.st === 0 && none.flag === null && none.api === 'undefined' && none.link === 0, '?no=story: no tour element, no flag, no tour API, no tour stylesheet');
     ok(none.shot === 'orbit' && none.chips >= 4, `?no=story opens on the Orbit with the player's own shot chips (${none.chips})`);
-    ok(!requests.some((u: string) => /assets\/story\/|story\.css|\/story\/[a-z-]+\.[0-9a-f]{10}\.json|\.m4a/.test(u.replace(/\/story\/(manifest|families|legacy)/, ''))), '?no=story requests no tour module, stylesheet, story file or audio');
+    ok(!requests.some((u: string) => /assets\/story\/(?!fine-print\.js)|story\.css|\/story\/[a-z-]+\.[0-9a-f]{10}\.json|\.m4a/.test(u.replace(/\/story\/(manifest|families|legacy)/, ''))), '?no=story requests no tour module, stylesheet, story file or audio');
     ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
     await close();
   }

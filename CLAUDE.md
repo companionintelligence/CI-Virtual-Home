@@ -124,7 +124,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   beside "fictional" and never a digit ("Thirty fictional families in thirty-six homes."), written by the build from the data; `portal:build` fails on a count typed in `index.html` (step 5b) and runs
   `scripts/story/lib/lander-check.mts` on the built page (step 7). A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The six apartments are declared without a family in
   `content/story/cast-plan.json` (`homesWithoutFamily`; `portal:build` names them, `story:cast-lint` holds the list to the homes, `--strict-families` errors on a home that is neither current nor declared), so the copy never says
-  every home has a family. The H1's claim `rent-line` is on hold in `claims.json` until the owner signs it off: the page builds with a warning, and a strict build (a push to main) fails.
+  every home has a family. The H1's claim `rent-line` is the owner's own wording (approved 2026-10-20, `status: ok-verbatim`; it is not in CAMPAIGN.md or COPY.md). A claim the plan names that is on `hold` still builds with a warning and fails a strict build (a push to main), so an unsanctioned line cannot go live.
 - The homes' own pages are linked by the footer's "Every home, on its own page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in
   `index.html` and `gallery.js` leaves alone, so the rendered DOM links them and not only the sitemap does. A home's page carries "Meet the family" when a
   current family lives there (`<!-- meet-family: -->`, written by the same step).

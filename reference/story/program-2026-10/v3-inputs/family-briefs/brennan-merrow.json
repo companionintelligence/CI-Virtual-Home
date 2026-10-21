@@ -1,0 +1,1587 @@
+{
+  "v": 3,
+  "slug": "brennan-merrow",
+  "house": "familyhouse-nora",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/brennan-merrow.json",
+    "sha1": "37ac63f7503b7b2f4e736900c27a9f98c09d7c14",
+    "beatsNow": 26,
+    "chaptersNow": 9,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "older-kids",
+  "business": true,
+  "narrator": "v-warm-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-memory",
+        "joplin",
+        "vaultwarden",
+        "gitea",
+        "steam-headless",
+        "ci-spellbook",
+        "mealie"
+      ],
+      "beatApps": {
+        "iot": "pi-hole",
+        "home": "vikunja"
+      },
+      "reviewNeeded": [
+        "mealie"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-memory",
+          "joplin",
+          "vaultwarden",
+          "gitea",
+          "code-server",
+          "steam-headless",
+          "ci-spellbook"
+        ],
+        "beatApps": {
+          "iot": "pi-hole",
+          "food": "yuvomi"
+        },
+        "reviewNeeded": [
+          "code-server"
+        ]
+      },
+      "notes": [
+        "beatApps.food yuvomi dropped",
+        "beatApps.home vikunja added",
+        "code-server dropped to make room",
+        "mealie added: carries food"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 12,
+    "swaps": 9,
+    "householdBeats": 3,
+    "householdBeatsMax": 6,
+    "persona": {
+      "sally": {
+        "now": 7,
+        "add": 1,
+        "target": 8
+      },
+      "john": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      },
+      "steve": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "jean": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      }
+    },
+    "pairShare": 0.839,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "sally",
+      "name": "Sally",
+      "age": 43,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "consultant, runs her own small practice",
+      "companion": {
+        "name": "Juniper",
+        "runtime": "Hermes",
+        "memory": true
+      },
+      "lens": [
+        "business-office"
+      ],
+      "thread": "Consulting from the craft room, with Companion Memory (beta) for her calendar."
+    },
+    {
+      "id": "john",
+      "name": "John",
+      "age": 45,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "software engineer",
+      "companion": {
+        "name": "Quill",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "athlete"
+      ],
+      "thread": "The garage workbench: code, tool crates and Sunday rides."
+    },
+    {
+      "id": "steve",
+      "name": "Steve",
+      "age": 16,
+      "role": "teen",
+      "archetype": "gamer",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-play"
+      ],
+      "thread": "The den: clips, music and a quiz for the family."
+    },
+    {
+      "id": "jean",
+      "name": "Jean",
+      "age": 14,
+      "role": "teen",
+      "archetype": "learner",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-study"
+      ],
+      "thread": "Study in the shared bedroom, with sources and sketches."
+    }
+  ],
+  "character": {
+    "lede": "A mid-century raised ranch stands on a park lot, its main floor a storey up behind a brick loggia. A tuck-under garage and a downstairs playroom sit below, and a terrace opens off the kitchen.",
+    "spots": [
+      {
+        "room": "Garage",
+        "line": "A workbench, wall hooks and a bicycle fill the garage under the house."
+      },
+      {
+        "room": "Playroom",
+        "line": "Play rug, shelves and an easel fill the playroom."
+      },
+      {
+        "room": "Kitchen & Dining",
+        "line": "A whiteboard hangs by the range, and the Core sits on the sideboard."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 371,
+      "ground": "lawn",
+      "style": "Mid-century raised ranch on a city park lot: a tuck-under garage between fieldstone piers under a balcony room with a dark slat rail, the main floor a storey up behind a brick-walled loggia, pale ashlar over a dark brick base under a tall west shed and a low asymmetric east gable, a switchback picket-railed stoop through brick planters, stepping stones across a lavender cottage garden",
+      "rooms": [
+        "Garage",
+        "Laundry",
+        "Craft Room",
+        "Den",
+        "Playroom",
+        "Foyer",
+        "Living Room",
+        "Nook",
+        "Kitchen & Dining",
+        "Pantry",
+        "Hall",
+        "Primary Bedroom",
+        "Walk-in Closet",
+        "Ensuite",
+        "Bath",
+        "Kids Bedroom",
+        "Terrace",
+        "Loggia"
+      ],
+      "flags": [
+        "kitchen-island: none"
+      ]
+    },
+    "truths": "The Core sits on a sideboard in the Kitchen and Dining room. No kitchen island: say the counter. The main floor is a storey up; the garage and playroom are below. A whiteboard hangs in the kitchen.",
+    "mustNot": [
+      "no kitchen island or breakfast bar"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "twenty",
+      "name": "Twenty",
+      "member": "sally",
+      "room": "Craft Room",
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "status": "add",
+      "beat": "office-crm",
+      "seed": "Sally records a new consulting client and the next follow-up in Twenty from the craft room.",
+      "line": "Twenty keeps the small business's contacts, deals and follow-ups."
+    },
+    {
+      "app": "ollama",
+      "name": "Ollama",
+      "member": "john",
+      "room": "Garage",
+      "service": "OpenAI",
+      "serviceId": "openai",
+      "status": "add",
+      "beat": "garage-model",
+      "seed": "John pulls an open-weight model onto the Core with Ollama, and the prompts he used to send out are answered at home.",
+      "line": "Ollama runs an open-weight model on the Core for the prompts a builder used to send out."
+    },
+    {
+      "app": "razzia",
+      "name": "Razzia",
+      "member": "steve",
+      "room": "Out by the lavender",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "garden-lavender",
+      "seed": "Steve hosts a family quiz on the terrace in Razzia: everyone joins by game PIN, and the quiz runs on the Core.",
+      "line": "Razzia runs the birthday quiz: the guests join on their phones by a game PIN and the quiz runs on the Core."
+    },
+    {
+      "app": "readeck",
+      "name": "Readeck",
+      "member": "jean",
+      "room": "The kids' bedroom",
+      "service": "Instapaper",
+      "serviceId": "instapaper",
+      "status": "swap",
+      "beat": "kids-lookup",
+      "seed": "Jean saves a long article on cell biology to Readeck, so it waits for her on the tablet after school.",
+      "line": "Readeck holds the long reads in a list for the sofa tablet, saved when the person finds them."
+    },
+    {
+      "app": "opencut",
+      "name": "OpenCut",
+      "member": "steve",
+      "room": "Den",
+      "service": "CapCut",
+      "serviceId": "capcut",
+      "status": "add",
+      "beat": "den-shorts",
+      "seed": "Steve trims clips on the OpenCut timeline, adds subtitles and exports a short that he keeps on his laptop.",
+      "line": "OpenCut trims clips, adds text and exports a short, with the footage kept in the browser."
+    },
+    {
+      "app": "mindustry",
+      "name": "Mindustry Server",
+      "member": "steve",
+      "room": "Den",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "den-world",
+      "seed": "Steve starts a Mindustry Server world on the Core, and the cousins join from their own game clients on the home Wi-Fi.",
+      "line": "Mindustry Server hosts the cousins' factory world on the Core, so the world runs on the Core."
+    },
+    {
+      "app": "endurain",
+      "name": "Endurain",
+      "member": "john",
+      "room": "Garage",
+      "service": "Strava",
+      "serviceId": "strava",
+      "status": "add",
+      "beat": "garage-ride",
+      "seed": "John uploads Sunday's ride from its GPX file to Endurain, and the route and the chain mileage sit on the Core.",
+      "line": "Endurain keeps the ride and run log from GPX files, with the gear mileage."
+    },
+    {
+      "app": "open-notebook",
+      "name": "Open Notebook",
+      "member": "jean",
+      "room": "The kids' bedroom",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "status": "swap",
+      "beat": "kids-french",
+      "seed": "Jean adds her French reader and a word list to an Open Notebook notebook and asks for ten phrases she still needs.",
+      "line": "Open Notebook gathers three articles and the lecture notes into one notebook and answers from them."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "kids-lookup",
+      "member": "jean",
+      "chapter": "kids",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "readeck",
+      "toName": "Readeck",
+      "service": "Instapaper",
+      "serviceId": "instapaper",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Jean saves a long article on cell biology to Readeck, so it waits for her on the tablet after school.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "office-paper",
+      "member": "sally",
+      "chapter": "office",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "docuseal",
+      "toName": "Docuseal",
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Sally sets the school consent form out in Docuseal, and it is signed at the desk and kept as a file.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "den-photos",
+      "member": "steve",
+      "chapter": "den",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "photoprism",
+      "toName": "PhotoPrism",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Steve lets PhotoPrism sort the school-trip pictures into albums and picks the ones for the class page.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-lavender",
+      "member": "steve",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "razzia",
+      "toName": "Razzia",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Steve hosts a family quiz on the terrace in Razzia: everyone joins by game PIN, and the quiz runs on the Core.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kids-question",
+      "member": "jean",
+      "chapter": "kids",
+      "from": "obsidian",
+      "fromName": "Obsidian",
+      "to": "excalidraw",
+      "toName": "Excalidraw",
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Jean and her father sketch the diagram for a proof on Excalidraw until the steps line up.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kids-french",
+      "member": "jean",
+      "chapter": "kids",
+      "from": "libretranslate",
+      "fromName": "LibreTranslate",
+      "to": "open-notebook",
+      "toName": "Open Notebook",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Jean adds her French reader and a word list to an Open Notebook notebook and asks for ten phrases she still needs.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-week",
+      "member": "sally",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "vikunja",
+      "toName": "Vikunja",
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "The whiteboard gets a twin: the week's jobs go into Vikunja, and the calendar app on each phone shows them.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-meals",
+      "member": "steve",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Steve types his grandmother's Saturday dinner into Mealie once, and the shopping list follows the recipe.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "den-friday",
+      "member": "steve",
+      "chapter": "den",
+      "from": "jellyfin",
+      "fromName": "Jellyfin",
+      "to": "mstream",
+      "toName": "mStream",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "seed": "Steve plays Friday's playlist from the family's music folder through the den speaker with mStream.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "kitchen-week",
+        "kitchen-meals"
+      ],
+      "retoldAs": [
+        "kitchen-week -> Vikunja",
+        "kitchen-meals -> Mealie"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "kids-lookup"
+      ],
+      "retoldAs": [
+        "kids-lookup -> Readeck"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "obsidian",
+      "name": "Obsidian",
+      "beats": [
+        "kids-question"
+      ],
+      "retoldAs": [
+        "kids-question -> Excalidraw"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "kids-question"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "libretranslate",
+      "name": "LibreTranslate",
+      "beats": [
+        "kids-french"
+      ],
+      "retoldAs": [
+        "kids-french -> Open Notebook"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "office-paper"
+      ],
+      "retoldAs": [
+        "office-paper -> Docuseal"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "jellyfin",
+      "name": "Jellyfin",
+      "beats": [
+        "den-friday"
+      ],
+      "retoldAs": [
+        "den-friday -> mStream"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "den-photos"
+      ],
+      "retoldAs": [
+        "den-photos -> PhotoPrism"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "hortusfox",
+      "name": "HortusFox",
+      "beats": [
+        "garden-lavender"
+      ],
+      "retoldAs": [
+        "garden-lavender -> Razzia"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "ci-memory",
+      "joplin",
+      "gitea"
+    ],
+    "was": [
+      "ci-memory",
+      "joplin",
+      "gitea"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "garage-boxes",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "john",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "John gives every tool crate in the garage a HomeBox label and a shelf, so the right drill bits are found in one look."
+    },
+    {
+      "id": "garage-model",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "john",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "ollama",
+      "appName": "Ollama",
+      "with": [],
+      "service": "OpenAI",
+      "serviceId": "openai",
+      "pairQuality": "loose",
+      "qualifier": "a model on the Core, not a chat window",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "John pulls an open-weight model onto the Core with Ollama, and the prompts he used to send out are answered at home."
+    },
+    {
+      "id": "garage-ride",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "john",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "endurain",
+      "appName": "Endurain",
+      "with": [],
+      "service": "Strava",
+      "serviceId": "strava",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "John uploads Sunday's ride from its GPX file to Endurain, and the route and the chain mileage sit on the Core."
+    },
+    {
+      "id": "den-shorts",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "steve",
+      "also": [],
+      "room": "Den",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "opencut",
+      "appName": "OpenCut",
+      "with": [],
+      "service": "CapCut",
+      "serviceId": "capcut",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Steve trims clips on the OpenCut timeline, adds subtitles and exports a short that he keeps on his laptop."
+    },
+    {
+      "id": "den-world",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "steve",
+      "also": [],
+      "room": "Den",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "mindustry",
+      "appName": "Mindustry Server",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Steve starts a Mindustry Server world on the Core, and the cousins join from their own game clients on the home Wi-Fi."
+    },
+    {
+      "id": "kids-board",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "jean",
+      "also": [],
+      "room": "Kids Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "planka",
+      "appName": "Planka",
+      "with": [],
+      "service": "Trello",
+      "serviceId": "trello",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jean runs her exam revision as cards on a Planka board and drags each topic across as she finishes it."
+    },
+    {
+      "id": "kids-shelf",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "jean",
+      "also": [],
+      "room": "Kids Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "koodo-reader",
+      "appName": "Koodo Reader",
+      "with": [],
+      "service": "Amazon Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jean opens her set text in Koodo Reader, enlarges the type and bookmarks the page where she stops."
+    },
+    {
+      "id": "kids-sketch",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "jean",
+      "also": [],
+      "room": "Kids Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "tldraw",
+      "appName": "tldraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jean draws the food web for biology as one picture in tldraw and exports it for her class."
+    },
+    {
+      "id": "office-crm",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "sally",
+      "also": [],
+      "room": "Craft Room",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "twenty",
+      "appName": "Twenty",
+      "with": [],
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Sally records a new consulting client and the next follow-up in Twenty from the craft room."
+    },
+    {
+      "id": "kitchen-invoice-ninja",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen & Dining",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "invoice-ninja",
+      "appName": "Invoice Ninja",
+      "with": [],
+      "service": "FreshBooks",
+      "serviceId": "freshbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The consultancy raises a quote and an invoice for a consulting client in Invoice Ninja."
+    },
+    {
+      "id": "kitchen-changedetection",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen & Dining",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "dining-table",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "changedetection",
+      "appName": "changedetection.io",
+      "with": [],
+      "service": "Visualping",
+      "serviceId": "visualping",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "changedetection.io watches the school's trip-dates page and tells the house when it changes."
+    },
+    {
+      "id": "pantry-radicale",
+      "chapter": "pantry",
+      "newChapter": "pantry",
+      "member": null,
+      "also": [],
+      "room": "Pantry",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "radicale",
+      "appName": "Radicale",
+      "with": [],
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The household calendar and address book are served by Radicale from the Core to every phone on the home Wi-Fi."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "pantry",
+        "kind": "room",
+        "room": "kitchen",
+        "title": "The pantry",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "pantry",
+        "room": "kitchen",
+        "title": "The pantry",
+        "new": true
+      },
+      {
+        "id": "kids",
+        "room": "kids",
+        "title": "The kids' bedroom",
+        "new": false
+      },
+      {
+        "id": "office",
+        "room": "office",
+        "title": "Sally's craft room",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "John's garage",
+        "new": false
+      },
+      {
+        "id": "den",
+        "room": "living",
+        "title": "Steve's den",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the lavender",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-couch",
+          "member": "john",
+          "app": "pi-hole",
+          "service": "NextDNS",
+          "origin": "now"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-week",
+          "member": "sally",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-meals",
+          "member": "steve",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-invoice-ninja",
+          "member": null,
+          "app": "invoice-ninja",
+          "service": "FreshBooks",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-changedetection",
+          "member": null,
+          "app": "changedetection",
+          "service": "Visualping",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "pantry",
+      "title": "The pantry",
+      "roomRole": "kitchen",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "pantry-radicale",
+          "member": null,
+          "app": "radicale",
+          "service": "Google Calendar",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kids",
+      "title": "The kids' bedroom",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "Jean's desk in the shared bedroom",
+      "beats": [
+        {
+          "id": "kids-lookup",
+          "member": "jean",
+          "app": "readeck",
+          "service": "Instapaper",
+          "origin": "swap"
+        },
+        {
+          "id": "kids-question",
+          "member": "jean",
+          "app": "excalidraw",
+          "service": "Miro",
+          "origin": "swap"
+        },
+        {
+          "id": "kids-french",
+          "member": "jean",
+          "app": "open-notebook",
+          "service": "NotebookLM",
+          "origin": "swap"
+        },
+        {
+          "id": "kids-spellbook",
+          "member": "jean",
+          "app": "ci-spellbook",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kids-board",
+          "member": "jean",
+          "app": "planka",
+          "service": "Trello",
+          "origin": "add"
+        },
+        {
+          "id": "kids-shelf",
+          "member": "jean",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "add"
+        },
+        {
+          "id": "kids-sketch",
+          "member": "jean",
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "office",
+      "title": "Sally's craft room",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "office-notes",
+          "member": "sally",
+          "app": "joplin",
+          "service": "Evernote",
+          "origin": "now"
+        },
+        {
+          "id": "office-draft",
+          "member": "sally",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "office-pdf",
+          "member": "sally",
+          "app": "stirling-pdf",
+          "service": "Smallpdf",
+          "origin": "now"
+        },
+        {
+          "id": "office-paper",
+          "member": "sally",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "swap"
+        },
+        {
+          "id": "office-vault",
+          "member": "sally",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "office-crm",
+          "member": "sally",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "John's garage",
+      "roomRole": "garage",
+      "isNew": false,
+      "subject": "the workbench with the bicycle beside it",
+      "beats": [
+        {
+          "id": "garage-code",
+          "member": "john",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "now"
+        },
+        {
+          "id": "garage-repos",
+          "member": "john",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "garage-errand",
+          "member": "john",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garage-boxes",
+          "member": "john",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        },
+        {
+          "id": "garage-model",
+          "member": "john",
+          "app": "ollama",
+          "service": "OpenAI",
+          "origin": "add"
+        },
+        {
+          "id": "garage-ride",
+          "member": "john",
+          "app": "endurain",
+          "service": "Strava",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "den",
+      "title": "Steve's den",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the den sofa and the screen",
+      "beats": [
+        {
+          "id": "den-session",
+          "member": "steve",
+          "app": "steam-headless",
+          "service": "GeForce Now",
+          "origin": "now"
+        },
+        {
+          "id": "den-friday",
+          "member": "steve",
+          "app": "mstream",
+          "service": "Spotify",
+          "origin": "swap"
+        },
+        {
+          "id": "den-photos",
+          "member": "steve",
+          "app": "photoprism",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "den-shorts",
+          "member": "steve",
+          "app": "opencut",
+          "service": "CapCut",
+          "origin": "add"
+        },
+        {
+          "id": "den-world",
+          "member": "steve",
+          "app": "mindustry",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the lavender",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-lavender",
+          "member": "steve",
+          "app": "razzia",
+          "service": null,
+          "origin": "swap"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-week",
+      "line": "Sally reads the whiteboard's twin before the school run."
+    },
+    {
+      "at": "morning",
+      "beat": "garage-code",
+      "line": "John opens the editor beside the workbench."
+    },
+    {
+      "at": "midday",
+      "beat": "office-notes",
+      "line": "Sally's call notes sync to the Core."
+    },
+    {
+      "at": "afternoon",
+      "beat": "kids-board",
+      "line": "Jean moves a finished topic across her board."
+    },
+    {
+      "at": "after-school",
+      "beat": "den-shorts",
+      "line": "Steve trims a clip on the den sofa."
+    },
+    {
+      "at": "after-school",
+      "beat": "pantry-radicale",
+      "line": "The calendar reaches every phone at home."
+    },
+    {
+      "at": "weekend",
+      "beat": "garage-ride",
+      "line": "Sunday's ride goes into the log."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-lavender",
+      "line": "The terrace turns into a quiz hall."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "NextDNS",
+      "Google Search",
+      "Notion",
+      "Google Translate",
+      "Evernote",
+      "Smallpdf",
+      "Google Drive",
+      "LastPass",
+      "Cursor",
+      "GitHub",
+      "GeForce Now",
+      "Plex",
+      "Google Photos"
+    ],
+    "servicesFinal": [
+      "NextDNS",
+      "Todoist",
+      "Paprika",
+      "Instapaper",
+      "Miro",
+      "NotebookLM",
+      "Evernote",
+      "Smallpdf",
+      "DocuSign",
+      "LastPass",
+      "Cursor",
+      "GitHub",
+      "GeForce Now",
+      "Spotify",
+      "Google Photos",
+      "Sortly",
+      "OpenAI",
+      "Strava",
+      "CapCut",
+      "Trello",
+      "Amazon Kindle",
+      "Salesforce",
+      "FreshBooks",
+      "Visualping",
+      "Google Calendar"
+    ],
+    "count": 25
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "office-crm",
+      "garage-model",
+      "garden-lavender",
+      "kids-lookup",
+      "den-shorts",
+      "den-world",
+      "garage-ride",
+      "kids-french"
+    ],
+    "mustCarry": {
+      "joplin": [
+        "[note] Joplin Server only; the Joplin apps are separate.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "marketplace: Joplin Server carries its own Personal Use License: not open source and limited for business use."
+      ],
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "pi-hole": [
+        "[claims] Network-wide blocking at DNS. Do not call it parental control or promise safety.",
+        "Blocks ad, tracker and bad domains at DNS: not parental control and no promise of safety",
+        "Unblocked lookups are forwarded to an upstream resolver (the upstream demo dashboard lists a public DNS, dns.google), so a DNS provider still sees them and it is not offline",
+        "Overlaps AdGuard Home: one per household"
+      ],
+      "vikunja": [
+        "[note] Supports CalDAV sync.",
+        "QA shot is a sign-in wall",
+        "CalDAV sync with calendar apps"
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "readeck": [
+        "listing says securely: do not repeat",
+        "QA shot is the first-run form"
+      ],
+      "excalidraw": [
+        "[note] amd64 only. An Excalidraw MCP entry exists for agents.",
+        "marketplace: Manifest source points to ozencb/excalidraw-persist, a 105-star wrapper, not excalidraw/excalidraw."
+      ],
+      "open-notebook": [
+        "[cloud-link] Supports 18 plus providers including cloud ones. Ollama is the local path.",
+        "[heavy] Podcast-style audio overviews need a speech model.",
+        "Install form has OpenAI, Anthropic, Google and Groq key fields: leave blank; Ollama is the local path.",
+        "Podcast style audio overviews need a speech model: do not mention.",
+        "Capture shows sample notebook content, not personal data."
+      ],
+      "ci-spellbook": [
+        "[cloud-link] Crash reports go to Companion Intelligence unless \"Share crash reports\" is turned off at install (it is on by default). Credentials, file paths, request bodies and memories are stripped first. Do not write t",
+        "Never print the tool count (797) or shelf count.",
+        "Crash reports on by default.",
+        "Dark navy UI; real QA capture, nothing personal."
+      ],
+      "stirling-pdf": [
+        "QA screenshot is a sign-in wall that prints default credentials",
+        "already in the persona pool: share cap risk"
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "steam-headless": [
+        "[cloud-link] Steam needs a Valve account to sign in, and the game library and the purchases are Valve's. The Core runs the session; the account stays with Valve. Say that, never \"no account\".",
+        "[hardware] The listing asks for GPU passthrough for best performance and the Hub package declares no GPU device, so a given Core may not run a given game well. Say what the Core does (it runs the session at home), never ",
+        "[claims] No frame rate, resolution or latency figure, and not \"smooth\". Never \"gaming PC\", \"console replacement\" or \"cloud gaming replacement\" in the text. The chip may read \"replaces GeForce Now\" or \"replaces Xbox Cloud",
+        "[note] It shows a streamed desktop with sound in a browser (noVNC), so the screen needs a browser, not a console. The container runs privileged with host access: do not call it sandboxed. Keep the stream on the home netw",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-account exclusion for the gamer archetype, with the caveats above."
+      ],
+      "mstream": [
+        "[note] Overlaps Navidrome.",
+        "Description says \"from anywhere\", \"completely private\" and \"no data collection\": absolute and remote claims, paraphrase",
+        "Overlaps Navidrome"
+      ],
+      "photoprism": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "razzia": [
+        "[qa] Set a manager password at install; the upstream default blocks access.",
+        "The compose falls back to a weak default password if the field were blank",
+        "Players join with a game PIN (a QR code also shows): never write \"QR code\"",
+        "Remote players are not claimed"
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "ollama": [
+        "[note] The Hub also has its own built-in Ollama service. Many listings say \"the Hub built-in Ollama\".",
+        "[claims] Model sizes and speeds come only from the fact sheet table. No own tok/s.",
+        "[claims] This package serves on the CPU unless the host passes a GPU in (not enabled by default), so say nothing about speed. It has no chat window of its own: it sits behind Open WebUI or an agent. It asks for no cloud ",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No chat UI of its own: sits behind Open WebUI or an agent."
+      ],
+      "endurain": [
+        "[cloud-link] Optional sync with Strava and Garmin Connect. Bulk GPX and FIT upload is local.",
+        "[claims] Logging only. No health outcomes.",
+        "Strava and Garmin sync are outside links: say bulk upload is the local path",
+        "GPS history is location data: story must not map a home address",
+        "Logging only: no health outcomes"
+      ],
+      "opencut": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Footage stays in the browser's storage on the editing machine, not on the Core",
+        "Compose points NEXT_PUBLIC_MARBLE_API_URL at api.marblecms.com with a disabled key: an outside call to check",
+        "No QA run and no screenshot"
+      ],
+      "mindustry": [
+        "[note] Headless game server; no web interface. Players use the game client.",
+        "[claims] No frame rate or player-count claims.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Headless: the household needs a console to run commands such as host and gameover",
+        "No QA run recorded"
+      ],
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "twenty": [
+        "marketplace: QA capture shows real company names and logos."
+      ],
+      "invoice-ninja": [
+        "[cloud-link] Taking card payments needs a payment provider. Say invoicing, not payment processing.",
+        "marketplace: Elastic License 2.0 (source-available)."
+      ],
+      "changedetection": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "radicale": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot (the app has a bare web page)",
+        "sync away from home is not claimed",
+        "listing says secure"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "changedetection",
+      "display": "changedetection.io",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Visualping",
+        "Distill"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "evidence": "CI-Marketplace apps/changedetection/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-meals"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "garage-boxes"
+      ]
+    },
+    {
+      "app": "ollama",
+      "beats": [
+        "garage-model"
+      ]
+    },
+    {
+      "app": "opencut",
+      "beats": [
+        "den-shorts"
+      ]
+    },
+    {
+      "app": "mindustry",
+      "beats": [
+        "den-world"
+      ]
+    },
+    {
+      "app": "radicale",
+      "beats": [
+        "pantry-radicale"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

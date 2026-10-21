@@ -1,0 +1,1312 @@
+{
+  "v": 3,
+  "slug": "jankowski",
+  "house": "neweco",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/jankowski.json",
+    "sha1": "adb1b9ba27c0a926abe7fcfe53291d711f454dc8",
+    "beatsNow": 23,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-steady-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "nextcloud",
+        "twenty",
+        "docuseal",
+        "home-assistant",
+        "frigate",
+        "activepieces"
+      ],
+      "beatApps": {
+        "food": "homehub"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "nextcloud",
+          "twenty",
+          "docuseal",
+          "home-assistant",
+          "frigate",
+          "activepieces"
+        ],
+        "beatApps": {
+          "food": "homehub"
+        },
+        "reviewNeeded": []
+      },
+      "notes": []
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 2,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "agnieszka": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      },
+      "tomasz": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      }
+    },
+    "pairShare": 0.862,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "agnieszka",
+      "name": "Agnieszka",
+      "age": 42,
+      "role": "partner",
+      "archetype": "organiser",
+      "work": "runs a bookkeeping and HR service",
+      "companion": {
+        "name": "Truffle",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "business-office",
+        "reader-collector"
+      ],
+      "thread": "A bookkeeping and HR service from the writing desk upstairs."
+    },
+    {
+      "id": "tomasz",
+      "name": "Tomasz",
+      "age": 44,
+      "role": "partner",
+      "archetype": "builder",
+      "work": "IoT consultant",
+      "companion": {
+        "name": "Gadget",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "tinkerer"
+      ],
+      "thread": "An IoT consultant at the octagonal table in the sunroom."
+    }
+  ],
+  "character": {
+    "lede": "An eco-modern house stands on a raised plinth, a sage board tower between a glass living wing and the entry. Rust-shingle roofs, a split-level garage and tropical foundation beds surround it, with a hammock on the deck.",
+    "spots": [
+      {
+        "room": "Sunroom Lounge",
+        "line": "An L-shaped sectional, an octagonal table and rattan chairs fill the sunroom."
+      },
+      {
+        "room": "Bedroom 2",
+        "line": "A writing desk and a ladderback chair stand against the wall."
+      },
+      {
+        "room": "Garage",
+        "line": "A workbench, a bicycle and tool hooks fill the garage."
+      }
+    ],
+    "facts": {
+      "storeys": 3,
+      "areaSqm": 311,
+      "ground": "lawn",
+      "style": "Two-storey eco-modern on a raised plinth: a projecting sage board tower between a one-storey glass living wing and a recessed double-door entry up broad dark timber steps, a cascade of rust-shingle roofs edged in thick chocolate fascia with glazed gable ends, a split-level garage with a loft dormer, tropical foundation beds and palms on a seaside lot",
+      "rooms": [
+        "Garage",
+        "Entry Hall",
+        "Breakfast Nook",
+        "Kitchen",
+        "Dining Room",
+        "Sunroom Lounge",
+        "Primary Bedroom",
+        "Hall Bath",
+        "Primary Bath & Dressing",
+        "Bedroom 2",
+        "Upper Landing"
+      ],
+      "flags": [
+        "tv: none"
+      ]
+    },
+    "truths": "The Core sits on a shelf in the Sunroom Lounge, in sight of the door. There is no television. The kitchen has an island. A hammock and a fire bowl on the deck; the garage is split-level.",
+    "mustNot": [
+      "no television"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "stirling-pdf",
+      "name": "Stirling-PDF",
+      "member": "agnieszka",
+      "room": "Bedroom 2",
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "status": "add",
+      "beat": "desk-pdf",
+      "seed": "Agnieszka merges a month's payslips into one PDF in Stirling-PDF, on the Core instead of on a PDF website.",
+      "line": "Stirling-PDF merges, splits and shrinks the PDFs on the Core instead of on a PDF website."
+    },
+    {
+      "app": "glasshome",
+      "name": "GlassHome",
+      "member": "tomasz",
+      "room": "Sunroom Lounge",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "table-panel",
+      "seed": "Tomasz puts the lights and the sensors on one wall panel in GlassHome, in front of his Home Assistant.",
+      "line": "GlassHome puts the lights and the sensors on one tidy wall panel."
+    },
+    {
+      "app": "thinkdashboard",
+      "name": "ThinkDashboard",
+      "member": null,
+      "room": "Kitchen",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "kitchen-thinkdashboard",
+      "seed": "The tablet at the breakfast bar opens on one page of big tiles that lead to the apps the household uses, with ThinkDashboard.",
+      "line": "ThinkDashboard opens the kitchen tablet on one page of big tiles that lead to the apps the family uses."
+    },
+    {
+      "app": "influxdb2",
+      "name": "InfluxDB 2",
+      "member": "tomasz",
+      "room": "Sunroom Lounge",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "table-influx",
+      "seed": "Tomasz writes a client's sensor readings into InfluxDB 2 and plots a week of them.",
+      "line": "InfluxDB 2 keeps the greenhouse and garden sensor readings in one time-series store."
+    },
+    {
+      "app": "lubelogger",
+      "name": "LubeLogger",
+      "member": null,
+      "room": "Entry Hall",
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "status": "add",
+      "beat": "entry-lubelogger",
+      "seed": "LubeLogger keeps the service history, fuel and reminders of the boat-trailer car in one log that the household shares.",
+      "line": "LubeLogger keeps the van's service history, fuel and reminders in one log."
+    },
+    {
+      "app": "donetick",
+      "name": "Donetick",
+      "member": "agnieszka",
+      "room": "The kitchen",
+      "service": "Tody",
+      "serviceId": "tody",
+      "status": "swap",
+      "beat": "kitchen-deck-oil",
+      "seed": "Agnieszka gives Tomasz the deck oiling as a Donetick job, and he taps the tag by the door when it is done.",
+      "line": "Donetick turns the chore rota into a tap of a phone on a tag stuck to the fridge or the laundry door."
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "member": "tomasz",
+      "room": "Tomasz at his table",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "status": "swap",
+      "beat": "table-notebook",
+      "seed": "Tomasz asks the model on the Core, in Open WebUI, about a gappy sensor record and compares its answer with the readings.",
+      "line": "Open WebUI is the chat window for the model on the Core, in the browser."
+    },
+    {
+      "app": "grist",
+      "name": "Grist",
+      "member": "agnieszka",
+      "room": "Bedroom 2",
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "status": "add",
+      "beat": "desk-sheet",
+      "seed": "Agnieszka keeps a client's leave and hours as a table in Grist, with a column that totals each month.",
+      "line": "Grist keeps the club's accounts as a spreadsheet and a database in one portable file."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "table-notebook",
+      "member": "tomasz",
+      "chapter": "table",
+      "from": "open-webui",
+      "fromName": "Open WebUI",
+      "to": "open-webui",
+      "toName": "Open WebUI",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Tomasz asks the model on the Core, in Open WebUI, about a gappy sensor record and compares its answer with the readings.",
+      "filmBeat": false,
+      "dropWith": [
+        "jupyterlab"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-deck-oil",
+      "member": "agnieszka",
+      "chapter": "kitchen",
+      "from": "homehub",
+      "fromName": "HomeHub",
+      "to": "donetick",
+      "toName": "Donetick",
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Agnieszka gives Tomasz the deck oiling as a Donetick job, and he taps the tag by the door when it is done.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "beats": [
+        "table-notebook"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "nextcloud",
+      "forgejo"
+    ],
+    "was": [
+      "nextcloud",
+      "forgejo"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "desk-pdf",
+      "chapter": "desk",
+      "newChapter": null,
+      "member": "agnieszka",
+      "also": [],
+      "room": "Bedroom 2",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "stirling-pdf",
+      "appName": "Stirling-PDF",
+      "with": [],
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Agnieszka merges a month's payslips into one PDF in Stirling-PDF, on the Core instead of on a PDF website."
+    },
+    {
+      "id": "desk-sheet",
+      "chapter": "desk",
+      "newChapter": null,
+      "member": "agnieszka",
+      "also": [],
+      "room": "Bedroom 2",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Agnieszka keeps a client's leave and hours as a table in Grist, with a column that totals each month."
+    },
+    {
+      "id": "table-influx",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "tomasz",
+      "also": [],
+      "room": "Sunroom Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "dining-table",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "influxdb2",
+      "appName": "InfluxDB 2",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tomasz writes a client's sensor readings into InfluxDB 2 and plots a week of them."
+    },
+    {
+      "id": "table-panel",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "tomasz",
+      "also": [],
+      "room": "Sunroom Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "dining-table",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "glasshome",
+      "appName": "GlassHome",
+      "with": [
+        "home-assistant"
+      ],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tomasz puts the lights and the sensors on one wall panel in GlassHome, in front of his Home Assistant."
+    },
+    {
+      "id": "table-api",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "tomasz",
+      "also": [],
+      "room": "Sunroom Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "dining-table",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tomasz tests a device's service from a Hoppscotch tab, and the collection stays in that browser."
+    },
+    {
+      "id": "living-cryptpad",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Sunroom Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cryptpad",
+      "appName": "CryptPad",
+      "with": [],
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The office drafts the month's payslips in a CryptPad document, and each edit appears as it is typed."
+    },
+    {
+      "id": "kitchen-thinkdashboard",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "thinkdashboard",
+      "appName": "ThinkDashboard",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The tablet at the breakfast bar opens on one page of big tiles that lead to the apps the household uses, with ThinkDashboard."
+    },
+    {
+      "id": "entry-lubelogger",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Entry Hall",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "lubelogger",
+      "appName": "LubeLogger",
+      "with": [],
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "LubeLogger keeps the service history, fuel and reminders of the boat-trailer car in one log that the household shares."
+    },
+    {
+      "id": "desk-photoview",
+      "chapter": "desk",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Bedroom 2",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "photoview",
+      "appName": "Photoview",
+      "with": [],
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "loose",
+      "qualifier": "for photos already on the Core",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Photoview builds a gallery from the camera folder, and the couple flick through the harbour pictures on the laptop in the Sunroom Lounge."
+    },
+    {
+      "id": "kitchen-blinko",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "blinko",
+      "appName": "Blinko",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Anyone at the breakfast bar catches a half-formed idea in Blinko before it is lost."
+    },
+    {
+      "id": "garage-cryptgeon",
+      "chapter": "garage",
+      "newChapter": "garage",
+      "member": null,
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "cryptgeon",
+      "appName": "Cryptgeon",
+      "with": [],
+      "service": "Privnote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A Cryptgeon note holds the gate code for the friends who are staying, read on the home Wi-Fi, and opens once and is gone."
+    },
+    {
+      "id": "garden-planka",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "planka",
+      "appName": "Planka",
+      "with": [],
+      "service": "Trello",
+      "serviceId": "trello",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The deck, the boat and the hammock corner sit as cards on a Planka board that the couple move along."
+    },
+    {
+      "id": "kitchen-searxng",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "searxng",
+      "appName": "SearXNG",
+      "with": [],
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "pairQuality": "loose",
+      "qualifier": "the search engines it asks still see the question",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone asks how a boat is trimmed to the wind on the tablet at the breakfast bar, and SearXNG asks several search engines at once and returns one plain list."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "garage",
+        "kind": "room",
+        "room": "garage",
+        "title": "The garage",
+        "place": "after:kitchen"
+      },
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "The entry hall",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The sunroom lounge",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "The entry hall",
+        "new": true
+      },
+      {
+        "id": "table",
+        "room": "living",
+        "title": "Tomasz at his table",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "The garage",
+        "new": true
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining room",
+        "new": false
+      },
+      {
+        "id": "desk",
+        "room": "bedroom",
+        "title": "Agnieszka at her desk",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Deck and drive",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The sunroom lounge",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-read",
+          "member": "agnieszka",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "now"
+        },
+        {
+          "id": "living-cryptpad",
+          "member": null,
+          "app": "cryptpad",
+          "service": "Microsoft Office",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "The entry hall",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-lubelogger",
+          "member": null,
+          "app": "lubelogger",
+          "service": "Fuelly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "table",
+      "title": "Tomasz at his table",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the octagonal table in the sunroom",
+      "beats": [
+        {
+          "id": "table-repo",
+          "member": "tomasz",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "table-notebook",
+          "member": "tomasz",
+          "app": "open-webui",
+          "service": "ChatGPT",
+          "origin": "swap"
+        },
+        {
+          "id": "table-gadget",
+          "member": "tomasz",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "table-influx",
+          "member": "tomasz",
+          "app": "influxdb2",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "table-panel",
+          "member": "tomasz",
+          "app": "glasshome",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "table-api",
+          "member": "tomasz",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-deck-oil",
+          "member": "agnieszka",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-mackerel",
+          "member": "agnieszka",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-sensors",
+          "member": "tomasz",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-thinkdashboard",
+          "member": null,
+          "app": "thinkdashboard",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-blinko",
+          "member": null,
+          "app": "blinko",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-searxng",
+          "member": null,
+          "app": "searxng",
+          "service": "Google Search",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "The garage",
+      "roomRole": "garage",
+      "isNew": true,
+      "subject": "the workbench and the bicycle",
+      "beats": [
+        {
+          "id": "garage-cryptgeon",
+          "member": null,
+          "app": "cryptgeon",
+          "service": "Privnote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining room",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-sign",
+          "member": "agnieszka",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "now"
+        },
+        {
+          "id": "dining-budget",
+          "member": "tomasz",
+          "app": "monetr",
+          "service": "YNAB",
+          "origin": "now"
+        }
+      ]
+    },
+    {
+      "chapter": "desk",
+      "title": "Agnieszka at her desk",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the writing desk upstairs",
+      "beats": [
+        {
+          "id": "desk-payroll",
+          "member": "agnieszka",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "desk-deal",
+          "member": "agnieszka",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "desk-flow",
+          "member": "tomasz",
+          "app": "activepieces",
+          "service": "Zapier",
+          "origin": "now"
+        },
+        {
+          "id": "desk-invoice",
+          "member": "agnieszka",
+          "app": "akaunting",
+          "service": "QuickBooks",
+          "origin": "now"
+        },
+        {
+          "id": "desk-handbook",
+          "member": "agnieszka",
+          "app": "libreoffice",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "desk-pdf",
+          "member": "agnieszka",
+          "app": "stirling-pdf",
+          "service": "Adobe Acrobat",
+          "origin": "add"
+        },
+        {
+          "id": "desk-sheet",
+          "member": "agnieszka",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "desk-photoview",
+          "member": null,
+          "app": "photoview",
+          "service": "Google Photos",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Deck and drive",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-music",
+          "member": "tomasz",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "garden-zone",
+          "member": "tomasz",
+          "app": "frigate",
+          "service": "Ring",
+          "origin": "now"
+        },
+        {
+          "id": "garden-planka",
+          "member": null,
+          "app": "planka",
+          "service": "Trello",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-mackerel",
+      "line": "The oldest mackerel goes first."
+    },
+    {
+      "at": "morning",
+      "beat": "desk-pdf",
+      "line": "Agnieszka merges the payslips for the month."
+    },
+    {
+      "at": "midday",
+      "beat": "table-influx",
+      "line": "Tomasz plots a client's week of readings."
+    },
+    {
+      "at": "afternoon",
+      "beat": "desk-payroll",
+      "line": "The payroll run finds its folder."
+    },
+    {
+      "at": "afternoon",
+      "beat": "table-panel",
+      "line": "Tomasz tidies the wall panel for a client."
+    },
+    {
+      "at": "weekend",
+      "beat": "kitchen-deck-oil",
+      "line": "Saturday's deck oiling gets its tag."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-zone",
+      "line": "Tomasz draws the drive's edge."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Amazon Kindle",
+      "GitHub",
+      "ChatGPT",
+      "OurHome",
+      "Cozi",
+      "Google Home",
+      "DocuSign",
+      "YNAB",
+      "Google Drive",
+      "Salesforce",
+      "Zapier",
+      "QuickBooks",
+      "Microsoft Office",
+      "Spotify",
+      "Ring"
+    ],
+    "servicesFinal": [
+      "Amazon Kindle",
+      "GitHub",
+      "ChatGPT",
+      "Tody",
+      "Cozi",
+      "Google Home",
+      "DocuSign",
+      "YNAB",
+      "Google Drive",
+      "Salesforce",
+      "Zapier",
+      "QuickBooks",
+      "Microsoft Office",
+      "Spotify",
+      "Ring",
+      "Adobe Acrobat",
+      "Airtable",
+      "Postman",
+      "Fuelly",
+      "Google Photos",
+      "Google Keep",
+      "Privnote",
+      "Trello",
+      "Google Search"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "desk-pdf",
+      "table-panel",
+      "kitchen-thinkdashboard",
+      "table-influx",
+      "entry-lubelogger",
+      "kitchen-deck-oil",
+      "table-notebook",
+      "desk-sheet"
+    ],
+    "mustCarry": {
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "open-webui": [
+        "[note] The Hub onboarding wizard offers Open WebUI as a featured app.",
+        "[cloud-link] It can also connect to cloud models with an API key. Leave that off.",
+        "[note] Wired to the Core's local model by the Hub (hub_integration inference). Say \"a model on the Core\"; never claim it matches a hosted model and never give a speed figure.",
+        "Can connect to cloud models with an API key (field in the install form): leave out of any scene.",
+        "Hub wires it to the local model."
+      ],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "monetr": [
+        "[claims] No financial advice.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024.",
+        "marketplace: Licence is the Functional Source License (not open source)."
+      ],
+      "twenty": [
+        "marketplace: QA capture shows real company names and logos."
+      ],
+      "activepieces": [
+        "[note] Overlaps n8n.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "Listing says \"Secure by Design ... network-gapped\": over-claim, do not repeat.",
+        "Overlaps n8n: name one automation tool per household.",
+        "AI pieces call outside model providers if a key is added; leave that out of any scene."
+      ],
+      "akaunting": [
+        "[claims] Bookkeeping tool. No accounting, tax or legal advice.",
+        "marketplace: Source-available (Business Source License). Seafile and others carry umbrel strings: the admin email default is a placeholder address on umbrel.local."
+      ],
+      "libreoffice": [
+        "[note] The listing is generic. Name the suite, not specific features.",
+        "[note] ONLYOFFICE Desktop Editors does the same job: one suite per household."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "frigate": [
+        "[hardware] Needs IP cameras that stream over RTSP. Cameras are not part of the Core.",
+        "[public-access] Watching cameras from away from home is remote access, which the sheet leaves unfinished.",
+        "[claims] No detection-speed or accuracy numbers. Do not say it prevents anything.",
+        "QA screenshot shows \"No frames have been received, check error logs\": reject. The store listing image shows a real backyard photo that is not a Hub capture.",
+        "Watching away from home is remote access: not claimed."
+      ],
+      "stirling-pdf": [
+        "QA screenshot is a sign-in wall that prints default credentials",
+        "already in the persona pool: share cap risk"
+      ],
+      "grist": [],
+      "influxdb2": [
+        "Not the 1.x line.",
+        "QA screenshot is the welcome page.",
+        "Needs something writing to it (Home Assistant or sensors)."
+      ],
+      "glasshome": [
+        "[note] Has a hardware-free demo mode.",
+        "Listing and notes say entity data never leaves the network: do not repeat the absolute.",
+        "Optional community widgets come from an outside hub.",
+        "Has a hardware-free demo mode."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "cryptpad": [
+        "Listing says \"end-to-end encrypted\": banned wording (f-security-guarantee), do not repeat",
+        "Collaboration with people outside the home needs outside reach"
+      ],
+      "thinkdashboard": [
+        "no replaces chip"
+      ],
+      "lubelogger": [
+        "Do not claim savings or economy figures",
+        "No sign-in until the user sets one (unverified)"
+      ],
+      "photoview": [
+        "[cloud-link] Map view uses a Mapbox token you can add. Leave it off for a fully local gallery.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Public sharing links need inbound reach: keep out of stories",
+        "Face recognition is a feature, not a claim to amplify"
+      ],
+      "blinko": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI search and chat need a model provider added in the app (OpenAI, Ollama, LiteLLM...): not wired by the Hub.",
+        "No QA run; gallery frame is upstream marketing with a \"#Password\" tagged note and a gmail file name: reject.",
+        "Companion desktop and mobile clients are separate downloads."
+      ],
+      "cryptgeon": [
+        "Notes live only in RAM: a restart of the app wipes every unread note",
+        "Do not repeat the listing's encryption wording (sec-absolute); say a note opens once and is gone",
+        "Overlaps Enclosed and PrivateBin: one burn-after-reading tool per household"
+      ],
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "searxng": [
+        "[cloud-link] It queries outside search engines for you. Say \"private search\", not \"offline search\".",
+        "cloud-link: the engines still see the query from the Core",
+        "listing says users are not tracked: do not repeat"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "influxdb2",
+      "display": "InfluxDB 2",
+      "reason": "not in catalog-apps.json",
+      "replaces": [],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 2",
+      "caveats": [
+        "Not the 1.x line.",
+        "QA screenshot is the welcome page.",
+        "Needs something writing to it (Home Assistant or sensors)."
+      ],
+      "evidence": "CI-Marketplace apps/influxdb2/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "thinkdashboard",
+      "display": "ThinkDashboard",
+      "reason": "not in catalog-apps.json",
+      "replaces": [],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "no replaces chip"
+      ],
+      "evidence": "CI-Marketplace apps/thinkdashboard/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m2)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "photoview",
+      "beats": [
+        "desk-photoview"
+      ]
+    },
+    {
+      "app": "blinko",
+      "beats": [
+        "kitchen-blinko"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

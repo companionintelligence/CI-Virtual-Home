@@ -1,0 +1,1414 @@
+{
+  "v": 3,
+  "slug": "petrov",
+  "house": "newcrest",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/petrov.json",
+    "sha1": "defe124ddfa19e173d11e559ccae50691c4d2713",
+    "beatsNow": 23,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "young-family",
+  "business": false,
+  "narrator": "v-warm-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-memory",
+        "wallos",
+        "kitchenowl",
+        "home-assistant",
+        "hortusfox",
+        "immich",
+        "nextcloud"
+      ],
+      "beatApps": {},
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-memory",
+          "ci-planning",
+          "wallos",
+          "kitchenowl",
+          "home-assistant",
+          "hortusfox",
+          "immich"
+        ],
+        "beatApps": {},
+        "reviewNeeded": []
+      },
+      "notes": [
+        "ci-planning dropped: no beat tells it any more",
+        "nextcloud added: the organiser pool for elena"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 6,
+    "householdBeats": 6,
+    "householdBeatsMax": 6,
+    "persona": {
+      "elena": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      },
+      "nikolai": {
+        "now": 7,
+        "add": 3,
+        "target": 10
+      },
+      "mila": {
+        "now": 1,
+        "add": 2,
+        "target": 3
+      }
+    },
+    "pairShare": 0.862,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "elena",
+      "name": "Elena",
+      "age": 34,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "project manager",
+      "companion": {
+        "name": "Nettle",
+        "runtime": "Hermes",
+        "memory": true
+      },
+      "lens": [
+        "household-manager",
+        "business-office"
+      ],
+      "thread": "Project work from the loft desk, with Companion Memory (beta) and an agent drafting the weekly note."
+    },
+    {
+      "id": "nikolai",
+      "name": "Nikolai",
+      "age": 36,
+      "role": "parent",
+      "archetype": "host",
+      "work": "at home with the baby",
+      "companion": {
+        "name": "Barley",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "host-cook",
+        "baby-year",
+        "grower"
+      ],
+      "thread": "At home with Mila: the kitchen, the nursery, the laundry and the garden."
+    },
+    {
+      "id": "mila",
+      "name": "Mila",
+      "age": 1,
+      "role": "baby",
+      "archetype": null,
+      "work": null,
+      "companion": null,
+      "lens": [
+        "baby-year"
+      ],
+      "thread": "A first year of songs, rhymes and labelled boxes."
+    }
+  ],
+  "character": {
+    "lede": "A tall narrow cottage of stucco, grey siding and painted brick stands on the lake, its main floor up an exterior stair. A steel-stair side deck and a loft in the gable catch the light.",
+    "spots": [
+      {
+        "room": "Loft",
+        "line": "A daybed, a writing desk and a sofa fill the loft in the gable."
+      },
+      {
+        "room": "Nursery",
+        "line": "A crib, a glider and a toy box fill the nursery."
+      },
+      {
+        "room": "Kitchen",
+        "line": "A kitchen island sits at the centre of the upstairs kitchen."
+      }
+    ],
+    "facts": {
+      "storeys": 3,
+      "areaSqm": 331,
+      "ground": "lawn",
+      "style": "Tall narrow steep-gable lake-side townhouse-cottage: stucco, greige lap siding and a painted-brick strip under black trim, a garden floor beneath a raised front terrace, the main floor up an exterior stair, a steel-stair side deck, a loft in the gable",
+      "rooms": [
+        "Family Room & Kitchenette",
+        "Dressing",
+        "Dining",
+        "Bath",
+        "Primary Bedroom",
+        "Nursery",
+        "Laundry",
+        "Garden Lamp",
+        "Living Room",
+        "Kitchen",
+        "Kitchen Steps",
+        "Dining Nook",
+        "Hall",
+        "Entry Vestibule",
+        "Powder Room",
+        "Loft"
+      ],
+      "flags": []
+    },
+    "truths": "The Core sits on a shelf in the upstairs Kitchen. A television stands in the garden-floor family room. The main floor is up an exterior stair. Pool and decks outside.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "teampass",
+      "name": "TeamPass",
+      "member": "elena",
+      "room": "The living room",
+      "service": "LastPass",
+      "serviceId": "lastpass",
+      "status": "swap",
+      "beat": "living-vault",
+      "seed": "Elena swaps the childcare portal's old password for a new one, kept in a TeamPass folder set up for the two of them.",
+      "line": "TeamPass keeps the crew's shared sign-ins in folders, with its own permissions for each."
+    },
+    {
+      "app": "tandoor",
+      "name": "Tandoor Recipes",
+      "member": "nikolai",
+      "room": "Nikolai in the kitchen",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "status": "swap",
+      "beat": "kitchen-lemons",
+      "seed": "Lemons arrive from the loft: Nikolai adds them to the shopping list in Tandoor Recipes, beside the recipe that needs them.",
+      "line": "Tandoor Recipes scales a recipe to the number at the table and adds the missing items to the list."
+    },
+    {
+      "app": "homebox",
+      "name": "HomeBox",
+      "member": "mila",
+      "room": "Nursery",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "status": "add",
+      "beat": "nursery-boxes",
+      "seed": "Mila's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once.",
+      "line": "HomeBox gives every box in the loft and garage a label, a place and a note about what is inside."
+    },
+    {
+      "app": "hermitstash",
+      "name": "HermitStash",
+      "member": null,
+      "room": "Garden",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "garden-hermitstash",
+      "seed": "Guests drop their party pictures on the home Wi-Fi in HermitStash, and the two of them gather them in one place.",
+      "line": "HermitStash lets party guests drop their photos on the home Wi-Fi."
+    },
+    {
+      "app": "adguardhome",
+      "name": "AdGuard Home",
+      "member": null,
+      "room": "Entry Vestibule",
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "status": "add",
+      "beat": "entry-adguardhome",
+      "seed": "Once the router sends its lookups to the Core, AdGuard Home filters the ad domains for the devices that use it for DNS, with its own rule for each.",
+      "line": "AdGuard Home does the same job as a DNS filter, with its own rules for each device."
+    },
+    {
+      "app": "baserow",
+      "name": "Baserow",
+      "member": "elena",
+      "room": "Loft",
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "status": "add",
+      "beat": "loft-sheet",
+      "seed": "Elena keeps the project's risk list as a table in Baserow, with a view that sorts what to chase first.",
+      "line": "Baserow is a table with views for the stall's stock and orders."
+    },
+    {
+      "app": "kokoro",
+      "name": "Kokoro",
+      "member": "nikolai",
+      "room": "Nursery",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "nursery-voice",
+      "seed": "Nikolai types Mila's favourite rhyme, and Kokoro reads it to her in a synthetic voice made on the Core.",
+      "line": "Kokoro reads a story aloud in a synthetic voice made on the Core."
+    },
+    {
+      "app": "radicale",
+      "name": "Radicale",
+      "member": "nikolai",
+      "room": "The living room",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "status": "swap",
+      "beat": "living-week",
+      "seed": "Story hour reaches Elena's phone through the calendar that Radicale serves from the Core to both phones.",
+      "line": "Radicale serves the family calendar and address book from the Core to the phones on the home Wi-Fi."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-vault",
+      "member": "elena",
+      "chapter": "living",
+      "from": "vaultwarden",
+      "fromName": "VaultWarden",
+      "to": "teampass",
+      "toName": "TeamPass",
+      "service": "LastPass",
+      "serviceId": "lastpass",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Elena swaps the childcare portal's old password for a new one, kept in a TeamPass folder set up for the two of them.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-recipe",
+      "member": "nikolai",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "The dumpling card is typed into Mealie once, scaled to the pot, and the paper card can retire.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-week",
+      "member": "nikolai",
+      "chapter": "living",
+      "from": "nextcloud",
+      "fromName": "Nextcloud",
+      "to": "radicale",
+      "toName": "Radicale",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Story hour reaches Elena's phone through the calendar that Radicale serves from the Core to both phones.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "loft-plan",
+      "member": "elena",
+      "chapter": "loft",
+      "from": "ci-planning",
+      "fromName": "Companion Planning",
+      "to": "super-productivity",
+      "toName": "Super Productivity",
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "loose",
+      "qualifier": "with Nextcloud WebDAV sync, else the tasks sit in the browser",
+      "seed": "Elena moves the review's tasks into the next free blocks in Super Productivity, and the day's plan follows.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-lemons",
+      "member": "nikolai",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "tandoor",
+      "toName": "Tandoor Recipes",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Lemons arrive from the loft: Nikolai adds them to the shopping list in Tandoor Recipes, beside the recipe that needs them.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "nursery-songs",
+      "member": "mila",
+      "chapter": "nursery",
+      "from": "jellyfin",
+      "fromName": "Jellyfin",
+      "to": "navidrome",
+      "toName": "Navidrome",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "seed": "Mila drums along to the old songs that Navidrome plays from the family's own music folder.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "ci-planning",
+      "name": "Companion Planning",
+      "beats": [
+        "loft-plan"
+      ],
+      "retoldAs": [
+        "loft-plan -> Super Productivity"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "vaultwarden",
+      "name": "VaultWarden",
+      "beats": [
+        "living-vault"
+      ],
+      "retoldAs": [
+        "living-vault -> TeamPass"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "kitchenowl",
+      "nextcloud"
+    ],
+    "was": [
+      "kitchenowl",
+      "nextcloud"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "loft-sheet",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "elena",
+      "also": [],
+      "room": "Loft",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "consumer",
+      "app": "baserow",
+      "appName": "Baserow",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Elena keeps the project's risk list as a table in Baserow, with a view that sorts what to chase first."
+    },
+    {
+      "id": "loft-board",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "elena",
+      "also": [],
+      "room": "Loft",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "planka",
+      "appName": "Planka",
+      "with": [],
+      "service": "Trello",
+      "serviceId": "trello",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Elena runs the next milestone as cards on a Planka board and drags each one across as it closes."
+    },
+    {
+      "id": "laundry-rota",
+      "chapter": "laundry",
+      "newChapter": "laundry",
+      "member": "nikolai",
+      "also": [],
+      "room": "Laundry",
+      "roomRole": "laundry",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "donetick",
+      "appName": "Donetick",
+      "with": [],
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nikolai holds his phone to the Donetick tag on the machine, and the nappy wash is marked done."
+    },
+    {
+      "id": "nursery-voice",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "nikolai",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "kokoro",
+      "appName": "Kokoro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nikolai types Mila's favourite rhyme, and Kokoro reads it to her in a synthetic voice made on the Core."
+    },
+    {
+      "id": "kitchen-notes",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "nikolai",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "memos",
+      "appName": "Memos",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nikolai jots the day's small firsts in Memos, one line each, and the notes run as one timeline on the Core."
+    },
+    {
+      "id": "nursery-rhymes",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "mila",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "audiobookshelf",
+      "appName": "Audiobookshelf",
+      "with": [],
+      "service": "Apple Podcasts",
+      "serviceId": "apple-podcasts",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Mila's rhymes play from files the family owns in Audiobookshelf, and the nap chapter resumes where it stopped."
+    },
+    {
+      "id": "nursery-boxes",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "mila",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "toys",
+        "room": "kids"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Mila's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once."
+    },
+    {
+      "id": "kitchen-changedetection",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "changedetection",
+      "appName": "changedetection.io",
+      "with": [],
+      "service": "Visualping",
+      "serviceId": "visualping",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "changedetection.io watches the council's bin-day page and tells the house when it changes."
+    },
+    {
+      "id": "living-monetr",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Family Room & Kitchenette",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "monetr",
+      "appName": "monetr",
+      "with": [],
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The two of them plan the month's bills into envelopes in monetr and see what is left to spend."
+    },
+    {
+      "id": "entry-adguardhome",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Entry Vestibule",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "adguardhome",
+      "appName": "AdGuard Home",
+      "with": [],
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Once the router sends its lookups to the Core, AdGuard Home filters the ad domains for the devices that use it for DNS, with its own rule for each."
+    },
+    {
+      "id": "garden-hermitstash",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "hermitstash",
+      "appName": "HermitStash",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Guests drop their party pictures on the home Wi-Fi in HermitStash, and the two of them gather them in one place."
+    },
+    {
+      "id": "kitchen-searxng",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "searxng",
+      "appName": "SearXNG",
+      "with": [],
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "pairQuality": "loose",
+      "qualifier": "the search engines it asks still see the question",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone asks how a dumpling pleat is folded on the tablet at the kitchen island, and SearXNG asks several search engines at once and returns one plain list."
+    },
+    {
+      "id": "living-miniflux",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Family Room & Kitchenette",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "miniflux",
+      "appName": "Miniflux",
+      "with": [],
+      "service": "Feedly",
+      "serviceId": "feedly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Miniflux follows the neighbourhood paper and the parenting writers, with the read list kept on the Core."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "laundry",
+        "kind": "room",
+        "room": "laundry",
+        "title": "Down in the laundry",
+        "place": "after:kitchen"
+      },
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "The entry vestibule",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "Nikolai in the kitchen",
+        "new": false
+      },
+      {
+        "id": "laundry",
+        "room": "laundry",
+        "title": "Down in the laundry",
+        "new": true
+      },
+      {
+        "id": "loft",
+        "room": "office",
+        "title": "Elena in the loft",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "The entry vestibule",
+        "new": true
+      },
+      {
+        "id": "nursery",
+        "room": "kids",
+        "title": "Mila’s nursery",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "kitchen",
+      "title": "Nikolai in the kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": "the kitchen island and the shelf where the Core sits",
+      "beats": [
+        {
+          "id": "kitchen-shelf",
+          "member": "nikolai",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-lemons",
+          "member": "nikolai",
+          "app": "tandoor",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-barley",
+          "member": "nikolai",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-recipe",
+          "member": "nikolai",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-notes",
+          "member": "nikolai",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-changedetection",
+          "member": null,
+          "app": "changedetection",
+          "service": "Visualping",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-searxng",
+          "member": null,
+          "app": "searxng",
+          "service": "Google Search",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "laundry",
+      "title": "Down in the laundry",
+      "roomRole": "laundry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "laundry-rota",
+          "member": "nikolai",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "loft",
+      "title": "Elena in the loft",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the writing desk in the gable loft",
+      "beats": [
+        {
+          "id": "loft-plan",
+          "member": "elena",
+          "app": "super-productivity",
+          "service": "Todoist",
+          "origin": "swap"
+        },
+        {
+          "id": "loft-paper",
+          "member": "elena",
+          "app": "paperless",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "loft-nettle",
+          "member": "elena",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "loft-files",
+          "member": "elena",
+          "app": "nextcloud",
+          "service": "Dropbox",
+          "origin": "now"
+        },
+        {
+          "id": "loft-sheet",
+          "member": "elena",
+          "app": "baserow",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "loft-board",
+          "member": "elena",
+          "app": "planka",
+          "service": "Trello",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-week",
+          "member": "nikolai",
+          "app": "radicale",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "living-vault",
+          "member": "elena",
+          "app": "teampass",
+          "service": "LastPass",
+          "origin": "swap"
+        },
+        {
+          "id": "living-renewals",
+          "member": "elena",
+          "app": "wallos",
+          "service": "Rocket Money",
+          "origin": "now"
+        },
+        {
+          "id": "living-film",
+          "member": "elena",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-monetr",
+          "member": null,
+          "app": "monetr",
+          "service": "YNAB",
+          "origin": "add"
+        },
+        {
+          "id": "living-miniflux",
+          "member": null,
+          "app": "miniflux",
+          "service": "Feedly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "The entry vestibule",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-adguardhome",
+          "member": null,
+          "app": "adguardhome",
+          "service": "NextDNS",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "nursery",
+      "title": "Mila’s nursery",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the crib and the glider",
+      "beats": [
+        {
+          "id": "nursery-songs",
+          "member": "mila",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "swap"
+        },
+        {
+          "id": "nursery-nap",
+          "member": "nikolai",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "nursery-voice",
+          "member": "nikolai",
+          "app": "kokoro",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "nursery-rhymes",
+          "member": "mila",
+          "app": "audiobookshelf",
+          "service": "Apple Podcasts",
+          "origin": "add"
+        },
+        {
+          "id": "nursery-boxes",
+          "member": "mila",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-beds",
+          "member": "nikolai",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-deck",
+          "member": "elena",
+          "app": "joplin",
+          "service": "Evernote",
+          "origin": "now"
+        },
+        {
+          "id": "garden-hermitstash",
+          "member": null,
+          "app": "hermitstash",
+          "service": "WeTransfer",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-barley",
+      "line": "Nikolai checks Barley's list while Mila eats."
+    },
+    {
+      "at": "morning",
+      "beat": "loft-plan",
+      "line": "Elena drags a moved review into place."
+    },
+    {
+      "at": "midday",
+      "beat": "nursery-boxes",
+      "line": "Outgrown clothes go into labelled boxes."
+    },
+    {
+      "at": "afternoon",
+      "beat": "nursery-songs",
+      "line": "Old songs drum through the afternoon."
+    },
+    {
+      "at": "afternoon",
+      "beat": "loft-nettle",
+      "line": "Five points become the weekly note."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-beds",
+      "line": "Saturday watering is written down."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-hermitstash",
+      "line": "The party pictures land in one place."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Google Photos",
+      "Google Drive",
+      "Dropbox",
+      "iCloud",
+      "LastPass",
+      "Rocket Money",
+      "Plex",
+      "Google Home",
+      "Evernote"
+    ],
+    "servicesFinal": [
+      "Google Photos",
+      "Paprika",
+      "Todoist",
+      "Google Drive",
+      "Dropbox",
+      "Google Calendar",
+      "LastPass",
+      "Rocket Money",
+      "Plex",
+      "Spotify",
+      "Google Home",
+      "Evernote",
+      "Airtable",
+      "Trello",
+      "Tody",
+      "Google Keep",
+      "Apple Podcasts",
+      "Sortly",
+      "Visualping",
+      "YNAB",
+      "NextDNS",
+      "WeTransfer",
+      "Google Search",
+      "Feedly"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "living-vault",
+      "kitchen-lemons",
+      "nursery-boxes",
+      "garden-hermitstash",
+      "entry-adguardhome",
+      "loft-sheet",
+      "nursery-voice",
+      "living-week"
+    ],
+    "mustCarry": {
+      "kitchenowl": [
+        "[note] Learns from your list habits per its manifest."
+      ],
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "tandoor": [
+        "[note] Overlaps Mealie; pick one per story.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "no QA screenshot",
+        "overlaps Mealie (pick one per story)"
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "super-productivity": [
+        "by default tasks live in the browser local storage, not on the Core",
+        "no sync means no custody on the Core"
+      ],
+      "paperless": [
+        "[note] AI features are off by default. If you turn them on they can use a local model.",
+        "[note] Office document conversion is not wired up in this build; OCR and archiving of PDFs and scans works."
+      ],
+      "radicale": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot (the app has a bare web page)",
+        "sync away from home is not claimed",
+        "listing says secure"
+      ],
+      "teampass": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Listing claims secrets never leave the appliance (banned word, banned claim)",
+        "Per-person roles sit close to the cap-multi-user rule: phrase it as the app's folders and permissions",
+        "No QA screenshot"
+      ],
+      "wallos": [
+        "[note] Fetches logos for popular services from outside.",
+        "[claims] Do not promise savings."
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "joplin": [
+        "[note] Joplin Server only; the Joplin apps are separate.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "marketplace: Joplin Server carries its own Personal Use License: not open source and limited for business use."
+      ],
+      "baserow": [
+        "[note] Overlaps NocoDB, Grist and Teable."
+      ],
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "kokoro": [
+        "[note] OpenAI-compatible speech API. No GPU requirement in the listing.",
+        "OpenAI-compatible speech API; web player included.",
+        "No GPU requirement in the listing; no speed claim.",
+        "Capture is real (FastKoko player) on a dark purple background."
+      ],
+      "memos": [],
+      "audiobookshelf": [],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "changedetection": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "monetr": [
+        "[claims] No financial advice.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024.",
+        "marketplace: Licence is the Functional Source License (not open source)."
+      ],
+      "adguardhome": [
+        "[note] Overlaps Pi-hole; pick one per story.",
+        "[claims] Same as Pi-hole: no parental-control promise.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Overlaps Pi-hole: one per household",
+        "Listing mentions adult-content parental controls: never repeat it (sec-safety-people)"
+      ],
+      "hermitstash": [
+        "Listing claims post-quantum encryption and that every field is encrypted: do not repeat (sec-absolute)",
+        "Dark-theme UI",
+        "Public Drop page lets visitors upload without an account"
+      ],
+      "searxng": [
+        "[cloud-link] It queries outside search engines for you. Say \"private search\", not \"offline search\".",
+        "cloud-link: the engines still see the query from the Core",
+        "listing says users are not tracked: do not repeat"
+      ],
+      "miniflux": [
+        "[note] Overlaps FreshRSS.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Integrations push to outside services if switched on (Pocket, Telegram, webhooks)",
+        "No QA screenshot",
+        "Overlaps FreshRSS (utilities slice)"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "changedetection",
+      "display": "changedetection.io",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Visualping",
+        "Distill"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "evidence": "CI-Marketplace apps/changedetection/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "hermitstash",
+      "display": "HermitStash",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "WeTransfer",
+        "Dropbox"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 2",
+      "caveats": [
+        "Listing claims post-quantum encryption and that every field is encrypted: do not repeat (sec-absolute)",
+        "Dark-theme UI",
+        "Public Drop page lets visitors upload without an account"
+      ],
+      "evidence": "CI-Marketplace apps/hermitstash/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "tandoor",
+      "beats": [
+        "kitchen-lemons"
+      ]
+    },
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-recipe"
+      ]
+    },
+    {
+      "app": "radicale",
+      "beats": [
+        "living-week"
+      ]
+    },
+    {
+      "app": "teampass",
+      "beats": [
+        "living-vault"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "nursery-boxes"
+      ]
+    },
+    {
+      "app": "adguardhome",
+      "beats": [
+        "entry-adguardhome"
+      ]
+    },
+    {
+      "app": "miniflux",
+      "beats": [
+        "living-miniflux"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}
