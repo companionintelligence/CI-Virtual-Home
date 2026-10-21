@@ -29,6 +29,12 @@ for these reasons (`story:spline`: `cuts`, `no walkable leg on l1`). `routeBetwe
 will not take) goes up the ladder; the first rung that gives a walk within 24 m wins and `Route.rescued` says which. A walk the planner's grid makes is never touched, so a tour that had no cut
 because of this keeps its bytes (the 24 families that passed are byte-identical).
 
+Two things have changed since that first pass, both from the digest (`assets/features.ts` `archRise`, `assets/shot-world.ts`): the spandrels of a partition's arch are boxed from their crown, not
+from the springline (2.15 to 2.49 m over the floor, above the eye band), so the planner's grid walks those doorways itself and the rung 1 row below for an arch is for a digest made before that, an arched
+head in a facade wall and any other header; and **a walk the planner's grid makes that goes more than 2 cm into a wall or a hard piece of furniture is asked again on the ladder** (`crossesSolid`, `route.ts`:
+the planner's own hard bands, 1.1 to 2.0 m for furniture, 1.2 to 1.8 m for walls; the stretch to a snapped end is the one it does not check) and stands only if the ladder has nothing. In the 30
+families that moves one lock, kovacs' tv-steam walk, whose last hop went through the bird of paradise beside the TV room's arch once the planner could reach that arch.
+
 | Rung | What it reads differently | The cause it answers |
 |---|---|---|
 | 1 | **Doorways opened.** For each doorway of the plan's partitions (`nav.doorsOn`: centre, normal, width) the wall distance of the cells in and in front of the gap is taken again from the wall boxes without the ones hanging over the gap (underside at least 1.2 m up, centred in the gap, no thicker than a wall and not running past the jambs by more than 0.1 m: a long soffit over a whole wall is not a header). The jambs, and any wall that really stands in the gap, stay. | An **arched doorway** is drawn as the arch's bounding boxes: one box across the whole gap from the springline up (an underside 1.4 to 1.5 m over the floor), and the grid's eye band ends at 1.8 m. The mediterranean (kovacs) and onestory (dekker) homes have a dozen of them, and every room behind one was sealed. |

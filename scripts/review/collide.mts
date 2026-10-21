@@ -14,7 +14,7 @@
 //       SAT on convex hulls, the minimum translation distance in centimetres and the shared volume in cm3
 //   door swing: the leaf's boxes at eight poses from closed to open against every item of the storey
 //   slab void: an item whose feet stand over a stairwell or an authored opening;  floor: an item under its room's floor (raised platforms and
-//       pits move it: rooms[].floorOffset);  ceiling: an item through its storey's ceiling
+//       pits move it: rooms[].floorOffset);  ceiling: an item through its storey's ceiling (not a column, not in an outdoor room)
 // What is let through is the placement metadata (content/house-catalog.json `place`) and structure: standing on / resting in (a vertical push
 // under 4 cm), onSurface hosts, wall-mounted, against a wall (2 cm), trim boards, tucks under tables, foliage. `allowed` in the JSON lists
 // each rule, how many contacts it let through and the deepest, with an example.
