@@ -92,28 +92,28 @@
       "title": "The living room"
     },
     {
-      "id": "kitchen",
-      "kind": "room",
-      "room": "kitchen",
-      "title": "The kitchen"
-    },
-    {
       "id": "green",
       "kind": "room",
       "room": "bedroom",
       "title": "Ife’s green bedroom"
     },
     {
-      "id": "loft",
+      "id": "kitchen",
       "kind": "room",
-      "room": "bedroom",
-      "title": "Tobi’s loft"
+      "room": "kitchen",
+      "title": "The kitchen"
     },
     {
       "id": "garage",
       "kind": "room",
       "room": "garage",
       "title": "Kunle’s garage bench"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Tobi’s loft"
     },
     {
       "id": "garden",
@@ -420,123 +420,6 @@
       }
     },
     {
-      "id": "kitchen-fridge",
-      "chapter": "kitchen",
-      "member": "ife",
-      "category": "home",
-      "segment": "consumer",
-      "app": {
-        "id": "homehub",
-        "replaces": [
-          "OurHome"
-        ]
-      },
-      "capability": "a shared household hub with shopping, chores, a recipe book and an expiry tracker",
-      "anchor": {
-        "role": "fridge",
-        "fallback": [
-          {
-            "role": "counter"
-          },
-          {
-            "role": "room",
-            "room": "kitchen",
-            "nth": 0
-          }
-        ]
-      },
-      "camera": {
-        "framing": "close"
-      },
-      "popup": {
-        "title": "Ife dates the leftover chicken",
-        "body": "A tray of baked chicken goes into the fridge on Tuesday. Ife enters it in the HomeHub expiry tracker, so Wednesday’s lunch gets eaten before it turns.",
-        "chips": [
-          "HomeHub",
-          "replaces OurHome"
-        ]
-      }
-    },
-    {
-      "id": "kitchen-market",
-      "chapter": "kitchen",
-      "member": "tobi",
-      "category": "food",
-      "segment": "consumer",
-      "app": {
-        "id": "homehub",
-        "replaces": [
-          "Cozi"
-        ]
-      },
-      "capability": "a shared household hub with shopping, chores, a recipe book and an expiry tracker",
-      "anchor": {
-        "role": "kitchen-island",
-        "fallback": [
-          {
-            "role": "counter"
-          },
-          {
-            "role": "room",
-            "room": "kitchen",
-            "nth": 0
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "right"
-      },
-      "popup": {
-        "title": "Tobi adds the missing ingredient",
-        "body": "At the kitchen island, Tobi opens his gran’s egusi in the HomeHub recipe book. He adds the missing melon seeds to the shopping list, and everyone at home sees it.",
-        "chips": [
-          "HomeHub",
-          "replaces Cozi"
-        ]
-      }
-    },
-    {
-      "id": "kitchen-hours",
-      "chapter": "kitchen",
-      "member": "folake",
-      "category": "small-business",
-      "segment": "small-business",
-      "app": {
-        "id": "akaunting",
-        "replaces": [
-          "QuickBooks"
-        ]
-      },
-      "capability": "invoicing, expenses, customers and profit and loss for a small business",
-      "anchor": {
-        "role": "kitchen-island",
-        "fallback": [
-          {
-            "role": "counter"
-          },
-          {
-            "role": "room",
-            "room": "kitchen",
-            "nth": 0
-          }
-        ]
-      },
-      "camera": {
-        "framing": "close",
-        "from": "left",
-        "side": "left"
-      },
-      "popup": {
-        "title": "Kunle hands over a receipt",
-        "body": "Over breakfast, Kunle hands Folake the receipt for a new oscilloscope probe. She enters the expense in Akaunting at the kitchen island, against his contract work.",
-        "chips": [
-          "Akaunting",
-          "replaces QuickBooks"
-        ]
-      }
-    },
-    {
       "id": "green-revision",
       "chapter": "green",
       "member": "ife",
@@ -656,80 +539,119 @@
       }
     },
     {
-      "id": "loft-play",
-      "chapter": "loft",
-      "member": "tobi",
-      "category": "media",
+      "id": "kitchen-fridge",
+      "chapter": "kitchen",
+      "member": "ife",
+      "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "steam-headless",
+        "id": "homehub",
         "replaces": [
-          "GeForce Now"
+          "OurHome"
         ]
       },
-      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "capability": "a shared household hub with shopping, chores, a recipe book and an expiry tracker",
       "anchor": {
-        "role": "bed",
-        "room": "bedroom",
-        "nth": 0,
+        "role": "fridge",
         "fallback": [
           {
+            "role": "counter"
+          },
+          {
             "role": "room",
-            "room": "bedroom",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Ife dates the leftover chicken",
+        "body": "A tray of baked chicken goes into the fridge on Tuesday. Ife enters it in the HomeHub expiry tracker, so Wednesday’s lunch gets eaten before it turns.",
+        "chips": [
+          "HomeHub",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-market",
+      "chapter": "kitchen",
+      "member": "tobi",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub with shopping, chores, a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
             "nth": 0
           }
         ]
       },
       "camera": {
         "framing": "medium",
-        "from": "behind"
+        "side": "right"
       },
       "popup": {
-        "title": "Tobi opens Steam on the Core",
-        "body": "After lessons, Tobi opens Steam in a browser on his laptop. Steam Headless runs the session on the Core, and his Valve account keeps the library.",
+        "title": "Tobi adds the missing ingredient",
+        "body": "At the kitchen island, Tobi opens his gran’s egusi in the HomeHub recipe book. He adds the missing melon seeds to the shopping list, and everyone at home sees it.",
         "chips": [
-          "Steam Headless",
-          "replaces GeForce Now"
-        ],
-        "note": "Steam needs a Valve account."
-      },
-      "film": true
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
     },
     {
-      "id": "loft-photos",
-      "chapter": "loft",
-      "member": "tobi",
-      "category": "media",
-      "segment": "consumer",
+      "id": "kitchen-hours",
+      "chapter": "kitchen",
+      "member": "folake",
+      "category": "small-business",
+      "segment": "small-business",
       "app": {
-        "id": "immich",
+        "id": "akaunting",
         "replaces": [
-          "Google Photos"
+          "QuickBooks"
         ]
       },
-      "capability": "back up, search and organise your family photos and videos",
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
       "anchor": {
-        "role": "bed",
-        "room": "bedroom",
-        "nth": 0,
+        "role": "kitchen-island",
         "fallback": [
           {
+            "role": "counter"
+          },
+          {
             "role": "room",
-            "room": "bedroom",
+            "room": "kitchen",
             "nth": 0
           }
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "close",
+        "from": "front",
         "side": "left"
       },
       "popup": {
-        "title": "Tobi finds the lake pictures",
-        "body": "His aunt asks to see last summer at the lake. Tobi finds the pictures by searching Immich, which sorted them on the Core.",
+        "title": "Kunle hands over a receipt",
+        "body": "Over breakfast, Kunle hands Folake the receipt for a new oscilloscope probe. She enters the expense in Akaunting at the kitchen island, against his contract work.",
         "chips": [
-          "Immich",
-          "replaces Google Photos"
+          "Akaunting",
+          "replaces QuickBooks"
         ]
       }
     },
@@ -833,29 +755,80 @@
       }
     },
     {
-      "id": "garden-planters",
-      "chapter": "garden",
-      "member": "ife",
-      "category": "home",
+      "id": "loft-play",
+      "chapter": "loft",
+      "member": "tobi",
+      "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
       },
-      "capability": "track your plants, watering and care history across rooms and beds",
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
       "anchor": {
-        "role": "garden",
-        "nth": 5
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
       },
       "camera": {
         "framing": "medium",
-        "eye": "standing"
+        "from": "behind"
       },
       "popup": {
-        "title": "Ife waters the lavender",
-        "body": "Before school on Wednesday, Ife waters the lavender in the planters by the door. She adds the watering to HortusFox, where the lavender has a care history of its own.",
+        "title": "Tobi opens Steam on the Core",
+        "body": "After lessons, Tobi opens Steam in a browser on his laptop. Steam Headless runs the session on the Core, and his Valve account keeps the library.",
         "chips": [
-          "HortusFox"
+          "Steam Headless",
+          "replaces GeForce Now"
+        ],
+        "note": "Steam needs a Valve account."
+      },
+      "film": true
+    },
+    {
+      "id": "loft-photos",
+      "chapter": "loft",
+      "member": "tobi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tobi finds the lake pictures",
+        "body": "His aunt asks to see last summer at the lake. Tobi finds the pictures by searching Immich, which sorted them on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
         ]
       }
     },
@@ -894,6 +867,34 @@
       }
     },
     {
+      "id": "garden-planters",
+      "chapter": "garden",
+      "member": "ife",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds",
+      "anchor": {
+        "role": "garden",
+        "nth": 5
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Ife waters the lavender",
+        "body": "Before school on Wednesday, Ife waters the lavender in the planters by the door. She adds the watering to HortusFox, where the lavender has a care history of its own.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
       "id": "outro-street",
       "chapter": "outro",
       "category": "setup",
@@ -927,6 +928,7 @@
     "Both companions are Hermes. Messages pass through the chat service the family picks: the note rides on ftue-hello, living-marlow and garage-tilly. People read and send every message.",
     "AnythingLLM is named only in green-revision as a with app (its chip replaces ChatGPT would trip cap-parity). Steam Headless carries the Valve account note and no frame rate or title.",
     "Frigate: the drive camera records the family property; the cat is the subject. No claim of prevention. Wingfit logs distances only.",
-    "green-lookup: Readeck, replaces Instapaper only (the catalog also lists Pocket, a retired service, which the story never names). Ife saved the article earlier; the beat claims only that Readeck keeps it on the Core."
+    "green-lookup: Readeck, replaces Instapaper only (the catalog also lists Pocket, a retired service, which the story never names). Ife saved the article earlier; the beat claims only that Readeck keeps it on the Core.",
+    "Camera (story:spline): beats are in walking order; 2 cuts remain, both the house’s: loft-play (44 m of stairs from the garage) and garden-drive (entry 2.8 m up steps). garden-planters looks from the left: the deck is a dead end."
   ]
 }
