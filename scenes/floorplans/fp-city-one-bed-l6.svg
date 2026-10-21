@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="100%" height="100%" class="cad-floorplan-svg">
+  <title>City One-Bedroom — Level 6: Roof</title>
+  <defs>
+    <!-- Blueprint Grid -->
+    <pattern id="cadGridSmall" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(114, 221, 212, 0.05)" stroke-width="0.75"/>
+    </pattern>
+    <pattern id="cadGridLarge" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="url(#cadGridSmall)"/>
+      <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(114, 221, 212, 0.12)" stroke-width="1.2"/>
+    </pattern>
+
+    <!-- Wall / Void Hatch Pattern -->
+    <pattern id="wallHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(114, 221, 212, 0.35)" stroke-width="1.5" />
+    </pattern>
+
+    <!-- Wood Floor Pattern -->
+    <pattern id="woodParquet" width="60" height="20" patternUnits="userSpaceOnUse">
+      <rect width="60" height="20" fill="#0d2433" stroke="rgba(114, 221, 212, 0.12)" stroke-width="0.8"/>
+      <line x1="30" y1="0" x2="30" y2="20" stroke="rgba(114, 221, 212, 0.08)" stroke-width="0.8"/>
+    </pattern>
+
+    <!-- Tile / Stone Floor Pattern -->
+    <pattern id="stoneTile" width="30" height="30" patternUnits="userSpaceOnUse">
+      <rect width="30" height="30" fill="#0a1e2c" stroke="rgba(255, 255, 255, 0.09)" stroke-width="0.8"/>
+    </pattern>
+
+    <!-- Timber Deck Boards -->
+    <pattern id="deckBoards" width="12" height="60" patternUnits="userSpaceOnUse">
+      <rect width="12" height="60" fill="#0f2a2c" stroke="rgba(200, 157, 85, 0.22)" stroke-width="0.8"/>
+    </pattern>
+
+    <!-- Pool Water Shimmer -->
+    <linearGradient id="poolWater" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0077b6" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#0096c7" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#00b4d8" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <!-- Turf Grass Pattern -->
+    <pattern id="turfPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#133827"/>
+      <rect x="0" y="0" width="40" height="20" fill="#194833" opacity="0.6"/>
+    </pattern>
+
+    <filter id="blueprintGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#72ddd4" flood-opacity="0.4"/>
+    </filter>
+
+    <!-- plan area clip (lot boundary is trimmed to it when the sheet zooms in on the building) -->
+    <clipPath id="planClip"><rect x="88.0" y="36.0" width="1424.0" height="806.0"/></clipPath>
+  </defs>
+
+  <!-- Background CAD Sheet -->
+  <rect width="1600" height="1000" fill="#06121e"/>
+  <rect width="1600" height="1000" fill="url(#cadGridLarge)"/>
+
+  <!-- Outer Blueprint Border -->
+  <rect x="25" y="25" width="1550" height="950" fill="none" stroke="#72ddd4" stroke-width="2.5" opacity="0.7"/>
+  <rect x="33" y="33" width="1534" height="934" fill="none" stroke="#72ddd4" stroke-width="0.8" opacity="0.4"/>
+
+<rect class="lot" clip-path="url(#planClip)" x="291.7" y="48" width="1016.6" height="782" fill="none" stroke="#72ddd4" stroke-width="1" stroke-dasharray="10,6" opacity="0.35"/>
+<text x="100" y="846" fill="#a4c2db" font-family="'Space Grotesk', monospace" font-size="10" font-weight="600" text-anchor="start">LOT 26 × 20 m · URBAN</text>
+<g class="level-below" opacity="0.35">
+<line x1="487.2" y1="673.6" x2="1112.8" y2="673.6" stroke="#72ddd4" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="487.2" y1="204.4" x2="1112.8" y2="204.4" stroke="#72ddd4" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="1112.8" y1="204.4" x2="1112.8" y2="673.6" stroke="#72ddd4" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="487.2" y1="204.4" x2="487.2" y2="673.6" stroke="#72ddd4" stroke-width="1" stroke-dasharray="5,5"/>
+</g>
+<g class="floor">
+<rect x="800" y="345.16" width="117.3" height="195.5" fill="url(#stoneTile)"/>
+</g>
+<g class="room-floors"><rect class="room-floor room-floor-white-oak" x="800" y="345.16" width="117.3" height="195.5" fill="url(#woodParquet)"/></g>
+<g class="void"><rect x="860.61" y="412.41" width="43.01" height="46.92" fill="#040f1a"/><rect x="860.61" y="412.41" width="43.01" height="46.92" fill="url(#wallHatch)" stroke="#c89d55" stroke-dasharray="4,4" stroke-width="1.5"/></g><g class="void"><rect x="817.6" y="412.41" width="43.01" height="56.3" fill="#040f1a"/><rect x="817.6" y="412.41" width="43.01" height="56.3" fill="url(#wallHatch)" stroke="#c89d55" stroke-dasharray="4,4" stroke-width="1.5"/></g><g class="void"><rect x="817.6" y="371.36" width="86.02" height="43.01" fill="#040f1a"/><rect x="817.6" y="371.36" width="86.02" height="43.01" fill="url(#wallHatch)" stroke="#c89d55" stroke-dasharray="4,4" stroke-width="1.5"/></g>
+<g class="rooms">
+<rect x="800" y="345.16" width="117.3" height="195.5" fill="none" stroke="#72ddd4" stroke-width="0.6" stroke-dasharray="2,4" opacity="0.35"/>
+</g>
+<g class="furniture">
+</g>
+
+<g class="stairs stairs-U stairs-dn stairs-U" opacity="0.7">
+<polygon class="stair-landing" points="901.66,412.41 819.55,412.41 819.55,373.31 901.66,373.31" fill="rgba(20, 52, 77, 0.6)" stroke="#72ddd4" stroke-width="1.4" stroke-dasharray="4,3"/>
+<polygon points="901.66,478.1 862.56,478.1 862.56,412.41 901.66,412.41" fill="rgba(20, 52, 77, 0.45)" stroke="#72ddd4" stroke-width="1.4" stroke-dasharray="4,3"/><line x1="901.66" y1="468.72" x2="862.56" y2="468.72" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="901.66" y1="459.33" x2="862.56" y2="459.33" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="901.66" y1="449.95" x2="862.56" y2="449.95" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="901.66" y1="440.56" x2="862.56" y2="440.56" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="901.66" y1="431.18" x2="862.56" y2="431.18" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="901.66" y1="421.8" x2="862.56" y2="421.8" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<polygon points="819.55,412.41 858.65,412.41 858.65,468.72 819.55,468.72" fill="rgba(20, 52, 77, 0.45)" stroke="#72ddd4" stroke-width="1.4" stroke-dasharray="4,3"/><line x1="819.55" y1="421.8" x2="858.65" y2="421.8" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="819.55" y1="431.18" x2="858.65" y2="431.18" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="819.55" y1="440.56" x2="858.65" y2="440.56" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="819.55" y1="449.95" x2="858.65" y2="449.95" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/><line x1="819.55" y1="459.33" x2="858.65" y2="459.33" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<polyline points="839.1,468.72 839.1,412.41 839.1,392.86 882.11,392.86 882.11,412.41 882.11,478.1" fill="none" stroke="#ffb900" stroke-width="1.6"/>
+<polygon points="882.11,482.9 886.11,474.9 878.11,474.9" fill="#ffb900"/>
+<text x="839.1" y="472.22" fill="#ffb900" font-family="'Space Grotesk', monospace" font-size="9.5" font-weight="800" text-anchor="middle">DN</text>
+</g>
+
+<g class="walls-ext">
+<line x1="800" y1="540.66" x2="917.3" y2="540.66" stroke="#72ddd4" stroke-width="14.93" stroke-linecap="square"/>
+<line x1="800" y1="345.16" x2="917.3" y2="345.16" stroke="#72ddd4" stroke-width="14.93" stroke-linecap="square"/>
+<line x1="917.3" y1="345.16" x2="917.3" y2="540.66" stroke="#72ddd4" stroke-width="14.93" stroke-linecap="square"/>
+<line x1="800" y1="345.16" x2="800" y2="540.66" stroke="#72ddd4" stroke-width="14.93" stroke-linecap="square"/>
+<line x1="800" y1="540.66" x2="917.3" y2="540.66" stroke="#0e2c40" stroke-width="11.73" stroke-linecap="square"/>
+<line x1="800" y1="345.16" x2="917.3" y2="345.16" stroke="#0e2c40" stroke-width="11.73" stroke-linecap="square"/>
+<line x1="917.3" y1="345.16" x2="917.3" y2="540.66" stroke="#0e2c40" stroke-width="11.73" stroke-linecap="square"/>
+<line x1="800" y1="345.16" x2="800" y2="540.66" stroke="#0e2c40" stroke-width="11.73" stroke-linecap="square"/>
+</g>
+<g class="opening opening-door" data-side="S" data-at="1.5">
+<polygon points="841.05,548.73 876.25,548.73 876.25,532.59 841.05,532.59" fill="#06121e" stroke="none"/>
+<line x1="841.05" y1="540.66" x2="876.25" y2="540.66" stroke="#72ddd4" stroke-width="0.8" opacity="0.5"/><line x1="841.05" y1="540.66" x2="841.05" y2="505.47" stroke="#ffffff" stroke-width="2.5"/><path d="M 841.05 505.47 A 35.19 35.19 0 0 1 876.25 540.66" fill="none" stroke="#72ddd4" stroke-dasharray="3,3" stroke-width="1.2"/>
+</g>
+<g class="opening opening-window" data-side="E" data-at="-0.5">
+<polygon points="925.37,403.81 925.37,435.09 909.23,435.09 909.23,403.81" fill="#06121e" stroke="none"/>
+<line x1="919.65" y1="403.81" x2="919.65" y2="435.09" stroke="#72ddd4" stroke-width="1.5"/><line x1="914.95" y1="403.81" x2="914.95" y2="435.09" stroke="#72ddd4" stroke-width="1.5"/><line x1="923.16" y1="403.81" x2="911.43" y2="403.81" stroke="#72ddd4" stroke-width="1.6"/><line x1="923.16" y1="435.09" x2="911.43" y2="435.09" stroke="#72ddd4" stroke-width="1.6"/>
+</g>
+
+  <g class="room-tag-group" transform="translate(858.65, 442.91) scale(0.7)">
+    <rect x="-114.8" y="-24" width="229.6" height="48" rx="6" fill="rgba(8, 26, 42, 0.88)" stroke="#72ddd4" stroke-width="1.2"/>
+    <text x="0" y="-6" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="12.5" font-weight="800" text-anchor="middle" letter-spacing="0.6">27 / ROOF ACCESS</text>
+    <text x="0" y="12" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="10" font-weight="600" text-anchor="middle">15 m² [161 SQ FT] · ELEV +14.30m</text>
+  </g>
+
+  <g class="cad-dim" opacity="0.75">
+    <line x1="800" y1="334.29" x2="800" y2="289.29" stroke="#72ddd4" stroke-width="0.8"/>
+    <line x1="917.3" y1="334.29" x2="917.3" y2="289.29" stroke="#72ddd4" stroke-width="0.8"/>
+    <line x1="800" y1="299.29" x2="917.3" y2="299.29" stroke="#72ddd4" stroke-width="1.2"/>
+    <line x1="796" y1="295.29" x2="804" y2="303.29" stroke="#72ddd4" stroke-width="1.6"/>
+    <line x1="913.3" y1="295.29" x2="921.3" y2="303.29" stroke="#72ddd4" stroke-width="1.6"/>
+    <text x="858.65" y="293.29" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="11" font-weight="700" text-anchor="middle">9' - 10" [3.0m]</text>
+  </g>
+
+  <g class="cad-dim" opacity="0.75">
+    <line x1="789.13" y1="345.16" x2="744.13" y2="345.16" stroke="#72ddd4" stroke-width="0.8"/>
+    <line x1="789.13" y1="540.66" x2="744.13" y2="540.66" stroke="#72ddd4" stroke-width="0.8"/>
+    <line x1="754.13" y1="345.16" x2="754.13" y2="540.66" stroke="#72ddd4" stroke-width="1.2"/>
+    <line x1="750.13" y1="341.16" x2="758.13" y2="349.16" stroke="#72ddd4" stroke-width="1.6"/>
+    <line x1="750.13" y1="536.66" x2="758.13" y2="544.66" stroke="#72ddd4" stroke-width="1.6"/>
+    <text x="746.13" y="442.91" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 746.13 442.91)">16' - 5" [5.0m]</text>
+  </g>
+
+  <!-- NORTH ARROW -->
+  <g transform="translate(75, 910)">
+    <circle cx="0" cy="0" r="28" fill="#081c2d" stroke="#72ddd4" stroke-width="1.5"/>
+    <polygon points="0,-24 -7,2 0,0" fill="#72ddd4"/>
+    <polygon points="0,-24 7,2 0,0" fill="#ffffff" opacity="0.7"/>
+    <polygon points="0,24 -7,2 0,0" fill="#0a2a40"/>
+    <polygon points="0,24 7,2 0,0" fill="#06121e"/>
+    <text x="0" y="-28" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="13" font-weight="800" text-anchor="middle">N</text>
+  </g>
+
+  <!-- GRAPHIC SCALE -->
+<g class="cad-scale-bar" transform="translate(150, 904)">
+<rect x="0" y="0" width="39.1" height="8" fill="#72ddd4" stroke="#72ddd4" stroke-width="1"/>
+<rect x="39.1" y="0" width="39.1" height="8" fill="#081e30" stroke="#72ddd4" stroke-width="1"/>
+<rect x="78.2" y="0" width="39.1" height="8" fill="#72ddd4" stroke="#72ddd4" stroke-width="1"/>
+<rect x="117.3" y="0" width="39.1" height="8" fill="#081e30" stroke="#72ddd4" stroke-width="1"/>
+<rect x="156.4" y="0" width="39.1" height="8" fill="#72ddd4" stroke="#72ddd4" stroke-width="1"/>
+<text x="0" y="-5" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="10" font-weight="700" text-anchor="middle">0</text>
+<text x="195.5" y="-5" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="10" font-weight="700" text-anchor="middle">5 m</text>
+<text x="97.75" y="24" fill="#a4c2db" font-family="'Space Grotesk', monospace" font-size="9" font-weight="600" text-anchor="middle">SCALE  1 m = 39.1 px  ·  1:49 @ A1</text>
+</g>
+
+  <!-- ARCHITECTURAL TITLE BLOCK -->
+  <g transform="translate(1180, 840)">
+    <rect x="0" y="0" width="380" height="120" fill="#081e30" stroke="#72ddd4" stroke-width="1.8"/>
+    <line x1="0" y1="36" x2="380" y2="36" stroke="#72ddd4" stroke-width="1"/>
+    <line x1="0" y1="76" x2="380" y2="76" stroke="#72ddd4" stroke-width="1"/>
+    <line x1="235.6" y1="36" x2="235.6" y2="120" stroke="#72ddd4" stroke-width="1"/>
+
+    <!-- Row 1: Build Name -->
+    <text x="14" y="16" fill="#a4c2db" font-family="'Space Grotesk', sans-serif" font-size="9" letter-spacing="1">PROJECT / BUILD NAME</text>
+    <text x="14" y="30" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="13.5" font-weight="800" letter-spacing="0.5">CITY ONE-BEDROOM</text>
+
+    <!-- Row 2: Author & Scale -->
+    <text x="14" y="52" fill="#a4c2db" font-family="'Space Grotesk', sans-serif" font-size="9" letter-spacing="1">BUILD AUTHOR</text>
+    <text x="14" y="68" fill="#72ddd4" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="700">COMPANION INTELLIGENCE</text>
+
+    <text x="247.6" y="52" fill="#a4c2db" font-family="'Space Grotesk', sans-serif" font-size="9" letter-spacing="1">SCALE</text>
+    <text x="247.6" y="68" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="600">1:49 @ A1</text>
+
+    <!-- Row 3: Sheet & Discipline -->
+    <text x="14" y="92" fill="#a4c2db" font-family="'Space Grotesk', sans-serif" font-size="9" letter-spacing="1">ARCHITECTURAL SCHEMATIC</text>
+    <text x="14" y="108" fill="#e2f1f8" font-family="'Space Grotesk', sans-serif" font-size="11.5">LEVEL 6 · ROOF</text>
+
+    <text x="247.6" y="92" fill="#a4c2db" font-family="'Space Grotesk', sans-serif" font-size="9" letter-spacing="1">SHEET NO.</text>
+    <text x="247.6" y="110" fill="#ffb900" font-family="'Space Grotesk', monospace" font-size="15" font-weight="900">A-106</text>
+  </g>
+</svg>

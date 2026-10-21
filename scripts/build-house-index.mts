@@ -24,4 +24,5 @@ for (const f of files) {
 }
 fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify({ generated: new Date().toISOString(), houses }, null, 2) + '\n');
 console.log(`\n${houses.length} houses indexed${bad ? `, ${bad} excluded` : ''} → ${rel}/index.json`);
+// (the front page holds no count: scripts/portal-front.mts writes the families word and the count line in words from this list when the portal is built)
 process.exit(bad ? 1 : 0);

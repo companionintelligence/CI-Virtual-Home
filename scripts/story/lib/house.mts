@@ -24,6 +24,8 @@ export interface HouseFacts {
   /** room roles present (living, kitchen, office ...) ; null when casting gives no room list for this house */
   rooms: Set<string> | null;
   roomNames: string[];
+  /** the spec's display name, if it has one (story v2: a lede never names the house) */
+  displayName?: string;
 }
 
 /**
@@ -97,7 +99,7 @@ export function deriveHouseFacts(dir: string, id: string, roles: RolesFile, cast
     }
     if (present.has('deck') || present.has('pool')) rooms.add('patio');
   }
-  return { id, hasSpec: !!spec, hasPlan: !!plan, itemCounts, roleCounts, roles: present, rooms, roomNames };
+  return { id, hasSpec: !!spec, hasPlan: !!plan, itemCounts, roleCounts, roles: present, rooms, roomNames, displayName: typeof spec?.name === 'string' ? spec.name : undefined };
 }
 
 /**

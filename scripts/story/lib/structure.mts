@@ -3,13 +3,16 @@
 import { BETA_LINE, FIRST_PARTY, HERMES_NOTE, INTERNET_NOTE, OPENCLAW_WEB_NOTE, type Beat, type Member, type Story } from '../../../assets/story/types.ts';
 import type { Ctx } from './context.mts';
 import type { Report } from './report.mts';
-import { plain } from './text.mts';
+import { detailStrings, plain } from './text.mts';
+import { CHAT_MIN_AGE, v3Severity } from './v3.mts';
 
+/** Room beats = every beat outside the ftue and the outro chapter. Story v2 widened this from 15 to 24. */
+export const ROOM_BEATS = { min: 15, max: 34 } as const;
 export const FTUE_IDS = ['ftue-delivery', 'ftue-unbox', 'ftue-plug-in', 'ftue-join', 'ftue-pick', 'ftue-hello'] as const;
 const FTUE_REQUIRED = FTUE_IDS.filter((id) => id !== 'ftue-unbox');
 
 /** All text a beat shows or says, for the rules that read prose. */
-export const beatText = (b: Beat): string => [b.popup.title, b.popup.body, ...(b.popup.chips || []), b.popup.note || '', b.popup.phone?.header || '', ...(b.popup.phone?.rows || []), b.say?.text || ''].map(plain).join(' ');
+export const beatText = (b: Beat): string => [b.popup.title, b.popup.body, ...(b.popup.chips || []), b.popup.note || '', b.popup.phone?.header || '', ...(b.popup.phone?.rows || []), b.say?.text || '', ...detailStrings(b)].map(plain).join(' ');
 const prose = (b: Beat): string => plain(`${b.popup.title} ${b.popup.body} ${b.popup.phone ? b.popup.phone.rows.join(' ') : ''}`);
 
 export function checkCasting(story: Story, ctx: Ctx, out: Report): void {
@@ -55,7 +58,11 @@ export function checkMembers(story: Story, ctx: Ctx, out: Report): Map<string, M
 
   const comps = story.members.filter((m) => m.companion);
   if (comps.length < 1 || comps.length > 3) out.E('members', 'companions', `${comps.length} companions (1 to 3)`);
-  for (const m of comps) if (m.age < 13 || ['baby', 'child', 'visitor'].includes(m.role)) out.E('members', m.id, 'children, babies and visitors have no companion');
+  for (const m of comps) {
+    if (['baby', 'child', 'visitor'].includes(m.role)) out.E('members', m.id, 'children, babies and visitors have no companion');
+    // age rule 16 (owner decision 2026-10-19): replaces the under-13 test; an error in a v3 family, a warning in every other
+    if (m.age < CHAT_MIN_AGE) out.add(v3Severity(story), 'age-companion', m.id, `${m.name} is ${m.age} and has a companion (an agent companion needs age ${CHAT_MIN_AGE} or older)`, `Take the companion from ${m.name} (and from the cast plan), or give it to a member of ${CHAT_MIN_AGE} or older.`);
+  }
   const compNames = comps.map((m) => m.companion!.name);
   if (new Set(compNames).size !== compNames.length) out.E('members', 'companions', 'companion names are distinct within a family');
   if (story.members.some((m) => m.age < 13) && !story.beats.some((b) => b.category === 'kids')) out.E('categories', 'kids', 'a household with children needs a kids beat');
@@ -104,7 +111,7 @@ export function checkChapters(story: Story, ctx: Ctx, out: Report): void {
   const outro = story.beats.filter((b) => b.chapter === cs[cs.length - 1].id);
   if (outro.length !== 1) out.E('beats', 'outro', `the outro chapter has ${outro.length} beats (exactly 1)`);
   const roomBeats = story.beats.filter((b) => b.chapter !== cs[0].id && b.chapter !== cs[cs.length - 1].id).length;
-  if (roomBeats < 15 || roomBeats > 24) out.E('beats', 'rooms', `${roomBeats} room beats (15 to 24)`);
+  if (roomBeats < ROOM_BEATS.min || roomBeats > ROOM_BEATS.max) out.E('beats', 'rooms', `${roomBeats} room beats (${ROOM_BEATS.min} to ${ROOM_BEATS.max})`);
 }
 
 export function checkFtue(story: Story, _ctx: Ctx, out: Report): void {
@@ -178,7 +185,14 @@ export function checkAgents(story: Story, ctx: Ctx, out: Report, members: Map<st
   out.stats.sayLines = sayCount;
 
   // Companion Memory: the first mention anywhere in the file reads "Companion Memory (beta)" (claims.json disclosure beta-short)
-  const ordered: [string, string][] = [['family.tagline', plain(story.family.tagline)], ['family.story', plain(story.family.story)], ...story.beats.map((b): [string, string] => [b.id, prose(b)]), ['closing', plain(story.closing.body)]];
+  // (story v2: the house lede and spots, the profiles and the beat details are read in the order a visitor meets them)
+  const f = story.family;
+  const ordered: [string, string][] = [['family.tagline', plain(story.family.tagline)], ['family.story', plain(story.family.story)],
+    ...(f.home ? [['family.home', plain([f.home.lede, ...f.home.spots.map((s) => s.line)].join(' '))] as [string, string]] : []),
+    ...story.members.filter((m) => m.profile).map((m): [string, string] => [`member ${m.id}.profile`, plain(m.profile!.bio)]),
+    ...story.beats.map((b): [string, string] => [b.id, `${prose(b)} ${detailStrings(b).map(plain).join(' ')}`]),
+    ...(f.day || []).map((d, i): [string, string] => [`family.day${i}`, plain(d.line)]),
+    ['closing', plain(story.closing.body)]];
   const firstMem = ordered.find(([, t]) => /Companion Memory/.test(t));
   if (firstMem && !/Companion Memory \(beta\)/.test(firstMem[1])) out.E('disclosure', firstMem[0], 'the first mention of Companion Memory reads "Companion Memory (beta)"');
   if (story.members.some((m) => m.companion?.memory) && !firstMem) out.W('disclosure', 'memory', 'a companion has Companion Memory connected but no beat mentions it');

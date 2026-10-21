@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homes.ci.computer/schema/categories.schema.json",
+  "$comment": "The shape of content/story/categories.json. Checked by scripts/story/lib/schema-lite.mts, so only the keywords it supports are used. What a schema cannot say (every archetype of personas.json in exactly one category, labels unique, sentence case, blurbs of at most 20 words, no dash) is scripts/story/lib/categories.mts.",
+  "title": "Front page categories",
+  "type": "object",
+  "required": ["version", "categories", "typeFilters"],
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string" },
+    "version": { "const": 1 },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "blurb", "personas"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z]+(-[a-z]+){0,3}$", "maxLength": 24, "description": "The filter value (?persona=). Lower case words joined by hyphens, never an archetype id." },
+          "label": { "type": "string", "minLength": 1, "maxLength": 18, "description": "The chip. Sentence case, at most 18 characters, no dash." },
+          "blurb": { "type": "string", "minLength": 1, "maxLength": 160, "description": "One sentence of at most 20 words that ends with a full stop." },
+          "personas": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z]+(-[a-z]+){0,2}$", "description": "An archetype id of content/story/personas.json." }
+          }
+        }
+      }
+    },
+    "typeFilters": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "enum": ["home", "apartment", "office"], "description": "The kind of place." },
+          "label": { "type": "string", "minLength": 1, "maxLength": 18, "description": "Sentence case, no dash." }
+        }
+      }
+    }
+  }
+}

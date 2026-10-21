@@ -16,8 +16,8 @@ import type { StoryTrack } from '../track.js';
 import { trackFrameAt } from '../track.js';
 import { focusRect, leaderTo, type Rect } from '../place.js';
 import { planDoors } from '../../shot-doors.js';
-import { FILM, filmClock, sceneAt, powerForFilm, audioPlacements, captionCues, placeForFilm, formatFor, cardAlpha, ramp, type FilmClock, type FilmFormat, type FilmKey, type Cue, type Placement, type FilmPlace, type Scene } from './layout.js';
-import { measureCard, CARD_LEVELS, drawCard, drawTitle, drawEnd, WEIGHTS, font, type CardLayout, type CardModel, type TitleModel, type EndModel, type Ctx } from './cards.js';
+import { FILM, filmClock, sceneAt, powerForFilm, audioPlacements, captionCues, placeForFilm, formatFor, cardAlpha, ramp, badgeBox, captionBox, canvasCardWidths, canvasVariants, type FilmClock, type FilmFormat, type FilmKey, type Cue, type Placement, type FilmPlace, type Scene } from './layout.js';
+import { measureCard, drawCard, drawTitle, drawEnd, WEIGHTS, font, nativeTracking, auditType, type TypeAudit, type CardLayout, type CardModel, type TitleModel, type EndModel, type Ctx } from './cards.js';
 import { drawBadge, drawCaption, drawLeader, drawDip, cueAt } from './overlay.js';
 
 export type PrepareOpts = {
@@ -29,11 +29,11 @@ export type PrepareOpts = {
   end: EndModel;
   badge: string;
 };
-type BeatPlan = { layout: CardLayout; place: FilmPlace; narr: Placement | null; focus: Rect | null; core: Rect | null; level: number };
+type BeatPlan = { layout: CardLayout; place: FilmPlace; narr: Placement | null; focus: Rect | null; core: Rect | null; variant: number; tag: string };
 type State = {
   rs: RuntimeStory; f: FilmFormat; clock: FilmClock; cues: Cue[]; placements: Placement[];
   g: Ctx; cv: HTMLCanvasElement; gl: HTMLCanvasElement; plans: Map<number, BeatPlan>;
-  title: TitleModel; end: EndModel; badge: string; key: string; frames: number; last: number;
+  title: TitleModel; end: EndModel; badge: string; key: string; frames: number; last: number; audit: TypeAudit;
 };
 let S: State | null = null;
 const W: any = window;
@@ -75,8 +75,8 @@ export function presetFromFilm(THREE: any, rs: RuntimeStory, clock: FilmClock, w
 }
 
 /** Load the fonts the overlay draws with: a canvas does not wait for a face it has not used yet, and the first frame would be drawn in the fallback. */
-async function loadFonts() {
-  await Promise.all(WEIGHTS.map(w => (document as any).fonts.load(font(w, 32), 'Aa Hh 0123 UnCloud')));
+async function loadFonts(sample = '') {
+  await Promise.all(WEIGHTS.map(w => (document as any).fonts.load(font(w, 32), `Aa Hh 0123 UnCloud ${sample} ${sample.toUpperCase()}`)));
   await (document as any).fonts.ready;
   for (const w of WEIGHTS) if (!(document as any).fonts.check(font(w, 32))) throw new Error(`Manrope ${w} did not load`);
 }
@@ -84,47 +84,49 @@ async function loadFonts() {
 export async function prepare(o: PrepareOpts) {
   if (S) end();
   const rs = o.rs, res = o.res ?? 1080, f = formatFor(o.format, res), clock = filmClock(rs);
-  await loadFonts();
+  await loadFonts([o.badge, o.title.heading, o.title.address, o.title.tagline, o.end.signoff, ...o.end.lines, ...rs.members.map(m => m.name)].join(' '));
   const { placements, problems } = audioPlacements(rs, clock);
   if (problems.length) throw new Error(`audio does not fit the film: ${problems.join('; ')}`);
   const names: Record<string, string> = {}; for (const m of rs.members) names[m.id] = m.companion ? m.companion.name : m.name;
   const cues = captionCues(rs, placements, names);
   const cv = document.createElement('canvas'); cv.width = f.w; cv.height = f.h;
-  const g = cv.getContext('2d', { alpha: false })!;
+  const g = cv.getContext('2d', { alpha: false })!, audit = auditType(g, f.k);
   const dbg = W.__houseDebug(), THREE = W.__THREE;
   const key = `house:${dbg.house.id}:film-${o.format}`;
   dbg.presets[key] = presetFromFilm(THREE, rs, clock, W.__houseShotWorld());
   const info = W.__houseRenderBegin({ shot: key, res: String(res), aspect: o.format === '16x9' ? '16:9' : '9:16', fps: clock.fps });
   if (info.w !== f.w || info.h !== f.h || info.frames !== clock.frames) throw new Error(`the page rendered ${info.w}x${info.h} x ${info.frames}, the film wants ${f.w}x${f.h} x ${clock.frames}`);
-  // each flagged beat's card: measured once, placed once against the beat's rest pose (never per frame, so a card cannot swap sides while the camera settles)
+  // each flagged beat's card: measured once, placed once against the beat's rest pose (never per frame, so a card cannot swap sides while the camera settles).
+  // The card is offered as variants (its width and tighter padding, narrower and so taller, the phone screen left out), never in smaller type: the solver refuses a
+  // variant under the 36 design px floor and takes the first that clears the subject (layout.ts placeCanvasCard).
   const plans = new Map<number, BeatPlan>();
+  g.save(); g.font = font(700, badgeBox(f, 0).font); const badgeW = g.measureText(o.badge).width; g.restore();
   for (const p of clock.parts) {
     const b = rs.beats[p.idx], model = modelOf(rs, b);
     const fr = trackFrameAt(rs.track, b.rest, f.aspect);
     const focus = focusRect(fr.eye, fr.target, fr.fov, b.frame.box as any, f.w, f.h);
     const core = rs.track.core ? focusRect(fr.eye, fr.target, fr.fov, rs.track.core as any, f.w, f.h) : null;
-    // the card as designed first; if it would cover the subject, the same card smaller, then without its phone drawing: the first that clears wins
-    let best: BeatPlan | null = null;
-    for (let level = 0; level < CARD_LEVELS; level++) {
-      const base = f.portrait ? f.w - f.safe.left - f.safe.right : (model.phone ? 660 : 620) * f.k * (level === 0 ? 1 : level === 1 ? 0.88 : 0.78);
-      const layout = measureCard(g, model, f, base, level);
-      const place = placeForFilm(f, { focus, core, card: { w: layout.w, h: layout.h } });
-      const cand: BeatPlan = { layout, place, narr: placements.find(x => x.id === b.id) || null, focus, core, level };
-      const cost = (q: FilmPlace) => q.overlapFocus + q.overlapCore + q.overlapBars;
-      if (!best || cost(place) < cost(best.place)) best = cand;
-      if (place.ok) break;
-    }
-    plans.set(p.idx, best!);
+    const widths = f.portrait ? [f.w - f.safe.left - f.safe.right] : canvasCardWidths(f);
+    const vars = canvasVariants(widths, (w, tight, bare) => measureCard(g, model, f, w, tight, bare), { bare: !!model.phone });
+    const place = placeForFilm(f, { focus, core, card: vars[0].size, variants: vars.map(v => v.size), badgeW });
+    plans.set(p.idx, { layout: vars[place.variant].layout, place, narr: placements.find(x => x.id === b.id) || null, focus, core, variant: place.variant, tag: vars[place.variant].size.tag || '' });
   }
-  S = { rs, f, clock, cues, placements, g, cv, gl: dbg.renderer.domElement, plans, title: o.title, end: o.end, badge: o.badge, key, frames: clock.frames, last: -1 };
+  // nothing may sit outside the safe area (a portrait film keeps clear of the bands a phone's own interface covers), and a card has to fit the room it was given:
+  // a canvas cannot scroll. The end card is measured here once, at no opacity.
+  const inside = (r: Rect) => r.x >= f.safe.left - 1 && r.y >= f.safe.top - 1 && r.x + r.w <= f.w - f.safe.right + 1 && r.y + r.h <= f.h - f.safe.bottom + 1;
+  const endRect = drawEnd(g, f, o.end, 0), cb = captionBox(f), unsafe: string[] = [];
+  for (const p of clock.parts) { const pl = plans.get(p.idx)!; if (!inside(pl.place.rect) || pl.layout.h > pl.place.rect.h + 1) unsafe.push(`card ${p.id}`); }
+  if (!inside(endRect)) unsafe.push('end card');
+  if (!inside(cb)) unsafe.push('captions');
+  S = { rs, f, clock, cues, placements, g, cv, gl: dbg.renderer.domElement, plans, title: o.title, end: o.end, badge: o.badge, key, frames: clock.frames, last: -1, audit };
   return {
     w: f.w, h: f.h, fps: clock.fps, frames: clock.frames, duration: clock.duration,
     placements: placements.map(p => ({ id: p.id, kind: p.kind, atS: p.atS, durS: p.durS, endS: p.endS, file: p.clip.file, sha256: p.clip.sha256 })),
     cues: cues.map(c => ({ start: c.start, end: c.end, text: c.text, speaker: c.speaker, clip: c.clip, words: c.words })),
     clock: { title: clock.title, parts: clock.parts, pads: clock.pads, outro: clock.outro, establish: clock.establish, frames: clock.frames, span: clock.span },
     // the card placements the picture uses: for the QA report (a card that covers its subject is a defect to look at)
-    cards: clock.parts.map(p => { const pl = plans.get(p.idx)!; return { id: p.id, slot: pl.place.slot, rect: pl.place.rect, ok: pl.place.ok, level: pl.level, overlapFocus: +pl.place.overlapFocus.toFixed(4), overlapCore: +pl.place.overlapCore.toFixed(4), overlapBars: +pl.place.overlapBars.toFixed(4), alt: pl.place.alt, focus: pl.focus, core: pl.core }; }),
-    poster: Math.round(FILM.posterS * clock.fps),
+    cards: clock.parts.map(p => { const pl = plans.get(p.idx)!; return { id: p.id, slot: pl.place.slot, rect: pl.place.rect, ok: pl.place.ok, variant: pl.variant, tag: pl.tag, type: +pl.layout.type.toFixed(2), height: pl.layout.h, overlapFocus: +pl.place.overlapFocus.toFixed(4), overlapCore: +pl.place.overlapCore.toFixed(4), overlapBars: +pl.place.overlapBars.toFixed(4), alt: pl.place.alt, focus: pl.focus, core: pl.core }; }),
+    end: endRect, unsafe, poster: Math.round(FILM.posterS * clock.fps), tracking: nativeTracking(g) ? 'letterSpacing' : 'glyph by glyph',
   };
 }
 
@@ -140,6 +142,9 @@ export function frame(i: number, quality = 0.95): string {
   st.last = i;
   return cv.toDataURL('image/jpeg', quality).slice(23);
 }
+
+/** The smallest type painted so far, in design units (the floor is 36), the string it was painted for and every size drawn: the render fails the floor on what was painted. */
+export function typeAudit(): TypeAudit { return S ? S.audit : { min: Infinity, text: '', sizes: {}, drawn: 0 }; }
 
 /** The last frame drawn, scaled to `width` pixels across, as a base64 JPEG (the poster). Call straight after frame(). */
 export function posterOf(width: number, quality = 0.82): string {

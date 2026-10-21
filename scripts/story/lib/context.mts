@@ -13,6 +13,8 @@ export interface CatalogApp {
   id: string; name: string; kind: string; replaces: string[]; description: string;
   agent: { link: 'wired' | 'mcp' | 'api' | 'ui' | 'none'; mcpEntry: string | null; hubWiring: string[] };
   storySafe: 'yes' | 'with-caveat' | 'avoid'; caveats: { kind: string; text: string }[];
+  /** story v3 age rule: `chat` marks a chat-model or agent app (age-chat needs a member of 16 or older); absent for every other app */
+  ai?: 'chat';
   qa: 'screenshot' | 'no-screenshot' | 'not-boot-tested'; inLiveStore?: boolean;
 }
 export interface Casting {
@@ -36,11 +38,26 @@ export interface CatalogFile {
   meta?: { top15?: { id: string; name: string; qa?: string }[]; [k: string]: any };
 }
 
+/** One row of content/story/services.json (the registry of replaced services; reference/story/story-v3.md). */
+export interface Service {
+  id: string; name: string; aliases: string[]; category: string;
+  homepage: string; homepageChecked: string; link: 'yes' | 'text-only' | 'never';
+  flags: ('stale' | 'story-excluded' | 'ordinary-word' | 'renamed')[]; alternativeToForm: 'ok' | 'review' | 'blocked'; storyStatus: 'ok' | 'uncurated-only' | 'excluded-only';
+  mark: { mode: 'badge' | 'logo'; glyph: string; logoAllowed: boolean; cleared: boolean; ownedFile: string | null; ownedKind: 'exact' | 'listing-logo' | 'parent' | 'none' };
+  incumbentNameList: boolean;
+  apps: string[]; storyApps: string[]; fleetHomes: string[]; rank: number; top80: boolean;
+}
+export interface ServicesFile { v: number; generated: string; checked: string; services: Service[] }
+/** The registry indexed for the rules: by id, and by name or alias (lower case). An absent file is an empty registry. */
+export interface ServiceIndex { file: ServicesFile | null; byId: Map<string, Service>; byName: Map<string, Service> }
+
 export interface Ctx {
   root: string;
   schema: Schema; claims: ClaimsFile; catalog: CatalogFile; casting: Casting; roles: RolesFile; voices: VoicesFile;
   /** the archetype table (content/story/personas.json) */
   personas: PersonasFile;
+  /** the registry of replaced services (content/story/services.json) */
+  services: ServiceIndex;
   bans: Ban[]; apps: Map<string, CatalogApp>; castBySlug: Map<string, Casting['families'][number]>;
   appMatchers: { id: string; name: string; re: RegExp; ambiguous: boolean }[];
   notInStore: { name: string; re: RegExp }[];
@@ -75,6 +92,7 @@ export function loadContext(root: string = ROOT, over: Partial<{ reviewed: Revie
   const catalog: CatalogFile = J(path.join(S, 'catalog-apps.json'));
   const casting: Casting = J(path.join(over.world ?? S, 'casting.json'));
   const personas: PersonasFile = J(path.join(S, 'personas.json'));
+  const servicesFile: ServicesFile | null = fs.existsSync(path.join(S, 'services.json')) ? J(path.join(S, 'services.json')) : null;
   const housesDir = over.world ? path.join(over.world, 'houses') : path.join(root, 'content', 'houses');
   const roles: RolesFile = J(path.join(S, 'roles.json'));
   const voices: VoicesFile = J(path.join(S, 'voices.json'));
@@ -107,6 +125,8 @@ export function loadContext(root: string = ROOT, over: Partial<{ reviewed: Revie
       : new RegExp(`\\b${escapeRe(n.name)}\\b`, 'i'),
   }));
   const castBySlug = new Map(casting.families.map((f) => [f.slug, f]));
+  const services: ServiceIndex = { file: servicesFile, byId: new Map(), byName: new Map() };
+  for (const sv of servicesFile?.services ?? []) { services.byId.set(sv.id, sv); for (const n of [sv.name, ...sv.aliases]) services.byName.set(n.toLowerCase(), sv); }
   // An app with no QA screenshot cannot be placed without an owner entry in reviewed.json (rule app-qa-screenshot), and the catalog
   // itself names a screenshot-backed fallback for it (mealie -> kitchenowl), so it is not required of the fleet. Assembly decision,
   // flagged for the owner: list three mealie beats in reviewed.json to make it count, or leave it out.
@@ -117,7 +137,7 @@ export function loadContext(root: string = ROOT, over: Partial<{ reviewed: Revie
     if (!houseCache.has(id)) houseCache.set(id, deriveHouseFacts(housesDir, id, roles, castBySlugByHouse(casting, id)));
     return houseCache.get(id)!;
   };
-  return { root, schema, claims, catalog, casting, roles, voices, personas, bans, apps, castBySlug, appMatchers, notInStore, storyRich, reviewedList, reviewed, reviewedProblems, house };
+  return { root, schema, claims, catalog, casting, roles, voices, personas, services, bans, apps, castBySlug, appMatchers, notInStore, storyRich, reviewedList, reviewed, reviewedProblems, house };
 }
 
 function castBySlugByHouse(casting: Casting, houseId: string) { return casting.families.find((f) => f.house === houseId) ?? null; }

@@ -30,6 +30,7 @@ import path from 'node:path';
 import { joinRuntime, inputShas, staleReasons, allClipsReal } from '../../../assets/story/runtime.js';
 import type { Story, VoiceLock, BakeLock } from '../../../assets/story/types.ts';
 import type { ShipCtx } from '../hooks.ts';
+import { appMedia, readMedia } from '../lib/media.mts';
 
 const hash10 = (b: string | Uint8Array): string => crypto.createHash('sha256').update(b).digest('hex').slice(0, 10);
 const readJson = (f: string): any => JSON.parse(fs.readFileSync(f, 'utf8'));
@@ -50,6 +51,7 @@ export default async function shipPlayer(ctx: ShipCtx): Promise<void> {
   const css = `portal/story.css?v=${hash10(fs.readFileSync(cssPath))}`;
   const table = readJson(path.join(ctx.ROOT, 'content', 'story', 'roles.json'));
   const strict = !ctx.partial;           // the production site: every family has a fresh, voiced tour
+  const media = readMedia(ctx.ROOT);     // story v2: the real logos (absent manifest: the card wears none)
   let made = 0, bytes = 0;
   const silent: string[] = [];
   for (const story of ctx.stories as Story[]) {
@@ -92,6 +94,13 @@ export default async function shipPlayer(ctx: ShipCtx): Promise<void> {
       // (the bake's notes name beats and pose problems: they are for the person baking, not the page)
       if (rs.track && rs.track.stats) rs.track.stats.notes = [];
       rs.css = css;
+      // story v2: the real logos of the apps this tour names, so the card can wear one beside the chip that names the app (a screenshot is never in the tour)
+      if (media) {
+        const ids = new Set<string>();
+        for (const b of story.beats) { if (b.app) ids.add(b.app.id); for (const w of b.with || []) ids.add(w); }
+        const entries = [...ids].sort().map(id => [id, appMedia(media, id)] as const).filter(([, a]) => a && a.logo);
+        if (entries.length) rs.media = Object.fromEntries(entries.map(([id, a]) => [id, { name: a!.name, logo: { file: a!.logo!.file, w: a!.logo!.w, h: a!.logo!.h, alt: a!.logo!.alt } }]));
+      }
       const text = JSON.stringify(rs);
       const url = ctx.addFile(`story/${slug}.${hash10(text)}.json`, text);
       ctx.register(slug, 'story', url);

@@ -15,11 +15,18 @@ import type { Story } from '../assets/story/types.ts';
 import { loadContext, ROOT, type Ctx } from './story/lib/context.mts';
 import { validateStory } from './story/lib/validate.mts';
 import { checkSchema, schemaKeywordsUsed, SUPPORTED_KEYWORDS } from './story/lib/schema-lite.mts';
-import { fleetMetrics } from './story/lib/fleet.mts';
+import { FLEET, FLEET_V3, appCap, fleetMetrics } from './story/lib/fleet.mts';
+import { BANDS, HOUSEHOLD_KINDS } from './story/lib/services.mts';
+import { build as buildServices, readInputs, render as renderServices } from './story/build-services.mts';
 import { plain } from './story/lib/text.mts';
-import { CASES } from './story/lib/bad-cases.mts';
+import { CASES, STANDALONE } from './story/lib/bad-cases.mts';
+import { V2_LIMITS, foreignServices } from './story/lib/v2.mts';
+import { ROOM_BEATS } from './story/lib/structure.mts';
 import { castingDisagreements } from './story/lib/house.mts';
 import { applyDiff, diffBlocks, diffCatalog } from './story/lib/catalog-diff.mts';
+import { PHASED_RULES, isV3Story, v3Severity } from './story/lib/v3.mts';
+import { ARCHETYPES as CAST_ARCHETYPES, PREFS, ROOM_PREF } from './story/build-casting.mts';
+import { BLURB_WORDS, LABEL_MAX, categoryOf, checkCategories, loadCategories, repoRules, type CategoriesFile } from './story/lib/categories.mts';
 
 // `ctx` is the shipped content (the schema, claims, catalog and casting as they are). `fx` is the same with the casting and the
 // houses of the test world (test/fixtures/stories/world), so the exemplar and the negative cases stay valid however the shipped
@@ -42,7 +49,7 @@ test('the schema enums equal the constants in assets/story/types.ts', () => {
     ['SEGMENTS', T.SEGMENTS, d.segment.enum], ['ROOM_ROLES', T.ROOM_ROLES, d.roomRole.enum], ['ROLE_IDS', T.ROLE_IDS, d.roleId.enum],
     ['MEMBER_ROLES', T.MEMBER_ROLES, d.member.properties.role.enum], ['CHAPTER_KINDS', T.CHAPTER_KINDS, d.chapter.properties.kind.enum],
     ['COLOURS', T.COLOURS, d.member.properties.colour.enum], ['RUNTIMES', T.RUNTIMES, d.companion.properties.runtime.enum],
-    ['ARCHETYPES', T.ARCHETYPES, d.member.properties.archetype.enum],
+    ['ARCHETYPES', T.ARCHETYPES, d.member.properties.archetype.enum], ['DAY_PARTS', T.DAY_PARTS, d.dayEntry.properties.at.enum],
   ];
   for (const [name, ts, schema] of pairs) assert.deepEqual([...ts], schema, `${name} differs between types.ts and the schema`);
 });
@@ -99,18 +106,23 @@ test('schema-lite: reports each kind of violation and an unsupported keyword', (
 // ---------------------------------------------------------------------------------------------------------------------
 // The exemplar and the negative cases
 // ---------------------------------------------------------------------------------------------------------------------
-test('the exemplar passes with 0 errors, 0 review and 0 warnings', () => {
+// The exemplar is a family written before story v3, so it reports the v3 phase-in rules (PHASED_RULES) as warnings: legacy chips, no services, no persona band.
+// Nothing else is reported, and ok-9-story-v3.json (below) is the whole family that reports nothing at all.
+const phased = new Set<string>(PHASED_RULES);
+const unphased = (r: ReturnType<typeof validateStory>) => r.warn.filter((f) => !phased.has(f.rule));
+test('the exemplar passes with 0 errors, 0 review and 0 warnings apart from the story v3 phase-in rules', () => {
   const r = validateStory(exemplar(), fx);
   assert.deepEqual(r.errors.map((f) => r.line(f)), []);
   assert.deepEqual(r.review.map((f) => r.line(f)), []);
-  assert.deepEqual(r.warn.map((f) => r.line(f)), []);
+  assert.deepEqual(unphased(r).map((f) => r.line(f)), []);
+  assert.deepEqual([...new Set(r.warn.map((f) => f.rule))].sort(), ['chips-legacy', 'pair-budget', 'pair-share', 'persona-band', 'service-missing'], 'a family that is not v3 warns once for each phase-in rule');
 });
 
-const index: { name: string; file: string; expect: string[]; warn?: string[]; absent?: string[] }[] = J(FIX, 'cases.json');
+const index: { name: string; file: string; expect: string[]; warn?: string[]; absent?: string[]; tolerate?: string[] }[] = J(FIX, 'cases.json');
 test('every case in bad-cases.mts has a fixture, and every fixture is exemplar + its mutation (regenerate with make-bad-fixtures.mts)', () => {
   assert.deepEqual(index.map((c) => c.name), CASES.map((c) => c.name));
   for (const c of CASES) {
-    const s = exemplar(); c.mutate(s);
+    const s = c.base ? J(FIX, c.base) as Story : exemplar(); c.mutate(s);
     assert.deepEqual(J(FIX, `${c.name}.json`), s, `${c.name}.json is stale: run node --experimental-strip-types scripts/story/make-bad-fixtures.mts`);
   }
 });
@@ -123,10 +135,87 @@ for (const c of index) {
     for (const w of c.warn || []) assert.ok(r.warn.some((f) => f.rule === w), `expected warning ${w}; got ${r.warn.map((f) => f.rule).join(', ') || 'no warnings'}`);
     if (c.expect.length) assert.ok(r.failed, 'a negative fixture must fail the gate');
     for (const a of c.absent || []) assert.ok(!r.allRuleIds().includes(a), `rule ${a} must not fire (false-positive guard); got ${r.allRuleIds().join(', ')}`);
-    if (!c.expect.length) assert.equal(r.errors.length + r.review.length, 0, [...r.errors, ...r.review].map((f) => r.line(f)).join('\n'));
-    if (!c.expect.length && !c.warn?.length) assert.deepEqual(r.warn.map((f) => r.line(f)), [], 'a clean case has no warnings');
+    const ignored = new Set(c.tolerate ?? []);
+    if (!c.expect.length) assert.equal([...r.errors, ...r.review].filter((f) => !ignored.has(f.rule)).length, 0, [...r.errors, ...r.review].filter((f) => !ignored.has(f.rule)).map((f) => r.line(f)).join('\n'));
+    if (!c.expect.length && !c.warn?.length) assert.deepEqual(unphased(r).filter((f) => !ignored.has(f.rule)).map((f) => r.line(f)), [], 'a clean case has no warnings (but the story v3 phase-in rules of a family that is not v3)');
   });
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Story v2 (reference/story/story-v2.md): optional fields, widened limits, the Brennan sample
+// ---------------------------------------------------------------------------------------------------------------------
+test('story v2: ok-6-story-v2.json (the Brennan family with every new field) validates 0 errors, 0 review, 0 warnings from the test world, by the library and by the CLI', () => {
+  assert.deepEqual([...STANDALONE], ['ok-6-story-v2.json', 'ok-9-story-v3.json']);
+  const s = J(FIX, 'ok-6-story-v2.json') as Story;
+  const r = validateStory(s, fx);
+  // Jean (14) asks Open WebUI and looks things up in Kiwix in this sample, which are warnings under the v3 rules (age-chat, app-avoid) until the Brennans
+  // are rewritten; nothing else is reported
+  assert.deepEqual([...r.errors, ...r.review].map((f) => r.line(f)), []);
+  assert.deepEqual(r.warn.filter((f) => f.rule === 'age-chat' || f.rule === 'app-avoid').map((f) => `${f.rule} ${f.at}`), ['age-chat jean-homework', 'app-avoid jean-lookup']);
+  assert.deepEqual(unphased(r).map((f) => r.line(f)), [], 'and nothing but the story v3 phase-in rules besides');
+  // every field of the contract is present, and every adult or teen persona beat has a detail
+  assert.ok(s.family.home && s.family.home.spots.length >= 2 && s.family.day && s.family.day.length >= 5);
+  assert.ok(s.members.every((m) => m.profile?.bio));
+  for (const b of s.beats) if (b.member && s.members.find((m) => m.id === b.member)!.archetype) assert.ok(b.detail, `${b.id} has a detail`);
+  const j = JSON.parse(cli(path.join(FIX, 'ok-6-story-v2.json'), '--json').stdout);
+  assert.deepEqual([j.totals.errors, j.totals.review, j.totals.warnings], [0, 0, r.warn.length]);
+});
+
+test('story v2: every v2 field is optional (the exemplar has none), the schema holds the contract limits, and unknown keys inside them are refused', () => {
+  const d = ctx.schema.$defs;
+  assert.equal(ctx.schema.properties.chapters.maxItems, 12); assert.equal(ctx.schema.properties.chapters.minItems, 7);
+  assert.equal(ctx.schema.properties.beats.maxItems, 40); assert.equal(ctx.schema.properties.beats.minItems, 22);
+  assert.deepEqual([d.detail.properties.steps.minItems, d.detail.properties.steps.maxItems], [V2_LIMITS.steps.min, V2_LIMITS.steps.max]);
+  assert.deepEqual([d.home.properties.spots.minItems, d.home.properties.spots.maxItems], [V2_LIMITS.spots.min, V2_LIMITS.spots.max]);
+  assert.deepEqual([d.family.properties.day.minItems, d.family.properties.day.maxItems], [V2_LIMITS.day.min, V2_LIMITS.day.max]);
+  for (const k of ['detail', 'home', 'dayEntry', 'profile', 'spot']) assert.equal(d[k].additionalProperties, false, `${k}: additionalProperties false`);
+  for (const [name, def, key] of [['beat.detail', d.beat, 'detail'], ['family.home', d.family, 'home'], ['family.day', d.family, 'day'], ['member.profile', d.member, 'profile']] as const) {
+    assert.ok(def.properties[key], `${name} is in the schema`); assert.ok(!def.required.includes(key), `${name} is optional`);
+  }
+  assert.deepEqual(checkSchema(exemplar(), ctx.schema), []);
+  const s = J(FIX, 'ok-6-story-v2.json'); s.beats[6].detail.extra = 'x'; s.family.home.spots = s.family.home.spots.slice(0, 1); s.family.day = s.family.day.slice(0, 4); s.beats[7].detail.steps = ['one step only'];
+  const errs = checkSchema(s, ctx.schema).join('\n');
+  for (const frag of ['unknown property extra', 'spots: fewer than 2', 'day: fewer than 5', 'steps: fewer than 2']) assert.ok(errs.includes(frag), `expected "${frag}" in:\n${errs}`);
+});
+
+test('story v2: the widened quotas (22 to 40 beats, 7 to 12 chapters, 15 to 34 room beats); the film quotas do not move', () => {
+  assert.deepEqual([ROOM_BEATS.min, ROOM_BEATS.max], [15, 34]);
+  const withRoomBeats = (n: number): Story => {
+    const s = exemplar(); const have = s.beats.filter((b) => b.chapter !== 'ftue' && b.chapter !== 'outro');
+    const proto = have.filter((b) => b.chapter === 'living')[0];
+    const extra = Array.from({ length: n - have.length }, (_, i) => { const b = JSON.parse(JSON.stringify(proto)); b.id = `living-more-${i}`; delete b.film; return b; });
+    const at = s.beats.findIndex((b) => b.id === 'kitchen-list');
+    s.beats.splice(at, 0, ...extra); return s;
+  };
+  const roomRule = (s: Story): string[] => validateStory(s, fx).errors.filter((f) => f.rule === 'beats' && /room beats/.test(f.message)).map((f) => f.message);
+  // the exemplar has six ftue beats and one outro, so 33 room beats make 40; with ftue-unbox (optional) out, 34 room beats make 40
+  const noUnbox = (s: Story): Story => { s.beats = s.beats.filter((b) => b.id !== 'ftue-unbox'); return s; };
+  assert.deepEqual(roomRule(withRoomBeats(33)), [], '33 room beats (40 beats in all) pass');
+  assert.deepEqual(checkSchema(withRoomBeats(33), ctx.schema), []);
+  assert.deepEqual(roomRule(noUnbox(withRoomBeats(34))), [], '34 room beats pass');
+  assert.deepEqual(checkSchema(noUnbox(withRoomBeats(34)), ctx.schema), [], '... at 40 beats in all');
+  // (35 room beats would be 41 beats at least: the schema's 40 stops it first, so the rule's 34 is the same limit seen from the room side)
+  assert.ok(checkSchema(noUnbox(withRoomBeats(35)), ctx.schema).some((m) => /beats: more than 40/.test(m)), '35 room beats fail the schema');
+  assert.ok(checkSchema(withRoomBeats(34), ctx.schema).some((m) => /beats: more than 40/.test(m)), 'the schema stops at 40 beats');
+  const fifteen = exemplar(); fifteen.beats = fifteen.beats.filter((b) => b.id !== 'living-lights');
+  assert.deepEqual(roomRule(fifteen), [], '15 room beats (22 beats in all) pass; with the floor of 22 beats the rule\'s 15 is the same limit seen from the room side');
+  const chapters = (n: number): Story => { const s = exemplar(); const extra = Array.from({ length: n - s.chapters.length }, (_, i) => ({ id: `extra-${i}`, kind: 'room' as const, room: 'office' as const, title: 'Another room' })); s.chapters.splice(s.chapters.length - 1, 0, ...extra); return s; };
+  assert.deepEqual(checkSchema(chapters(12), ctx.schema), [], '12 chapters pass the schema');
+  assert.ok(checkSchema(chapters(13), ctx.schema).some((m) => /chapters: more than 12/.test(m)), '13 do not');
+  assert.equal(ctx.schema.properties.chapters.minItems, 7);
+});
+
+test('story v2: foreignServices names a company only when the beat does not replace it; first names and ordinary words are not services', () => {
+  const people = new Set(['Arlo']);
+  const hits = (t: string, allowed: string[]): string[] => foreignServices(t, allowed, ctx, people);
+  assert.deepEqual(hits('Photos went to Google Photos.', ['Google Photos']), []);
+  assert.deepEqual(hits('Photos went to Google, then to Dropbox.', ['Google Photos']), ['Dropbox'], 'a bare Google is covered by Google Photos');
+  assert.deepEqual(hits('Photos went to Google Drive.', ['Google Photos']), ['Google Drive']);
+  assert.deepEqual(hits('A shared drive, a rented drive and a cloud.', []), []);
+  assert.deepEqual(hits('Arlo watered the ring plants. Make a list.', []), [], 'a family name, "ring" and a sentence-initial "Make" are not services');
+  assert.deepEqual(hits('Files sat in GitLab (SaaS).', ['GitLab (SaaS)']), []);
+  assert.deepEqual(hits('Files sat in GitLab.', []), ['GitLab']);
+});
 
 test('the reference validator and the TypeScript port agree on rule ids for the exemplar and the ported cases', async () => {
   // the reference validator reads one data directory: the shipped inputs, with the test world's casting in place of the shipped one
@@ -226,13 +315,25 @@ test('casting.json: 30 unique slugs, no creator name in a slug, narrators add up
   for (const [k, v] of Object.entries(ctx.voices.voices)) assert.equal(narrators.get(k) || 0, v.narratorFor, `narrator count for ${k}`);
 });
 
+test('every home has a family or is declared without one: the plan\'s homesWithoutFamily is exactly the homes casting.json does not cast', () => {
+  const homes: string[] = J('content', 'houses', 'index.json').houses.map((h: { id: string }) => h.id);
+  const cast = new Set(ctx.casting.families.map((f) => f.house));
+  const without = Object.keys(J('content', 'story', 'cast-plan.json').homesWithoutFamily ?? {}).sort();
+  assert.deepEqual(homes.filter((id) => !cast.has(id)).sort(), without, 'a home with no family is in the plan\'s homesWithoutFamily, and only such a home (story:cast-lint says which)');
+  for (const id of without) assert.ok(homes.includes(id), `${id} is declared without a family but is not a home`);
+  assert.ok(homes.length >= cast.size, 'the story fleet is never larger than the gallery');
+  // casting.json stays the 30 families: the apartments are not in it until a family moves in
+  assert.equal(without.length, homes.length - cast.size);
+});
+
 test('casting.json: signature apps exist in the catalog, are story-safe and were boot-tested', () => {
   for (const f of ctx.casting.families) {
     assert.ok(f.signatureApps.length >= 3, `${f.slug}: at least three signature apps`);
     for (const id of f.signatureApps) {
       const a = ctx.apps.get(id);
       assert.ok(a, `${f.slug}: signature app ${id} is not in the catalog`);
-      assert.notEqual(a!.storySafe, 'avoid', `${f.slug}: ${id} is marked avoid`);
+      // Kiwix is avoid (empty library) but six rows of the unrewritten cast plan still list it; they lose it in the recast (cast-lint warns until then)
+      if (id !== 'kiwix') assert.notEqual(a!.storySafe, 'avoid', `${f.slug}: ${id} is marked avoid`);
       assert.notEqual(a!.qa, 'not-boot-tested', `${f.slug}: ${id} was not boot-tested`);
     }
     assert.ok(ctx.voices.voices[f.narrator], `${f.slug}: narrator ${f.narrator}`);
@@ -336,6 +437,356 @@ test('catalog-apps.json: the first-party trio and the story-rich apps exist, avo
   assert.ok(ctx.catalog.apps.some((a) => a.qa === 'not-boot-tested'), 'not-boot-tested apps are in the catalog so that the app-qa rule has something to refuse');
   assert.ok(ctx.catalog.notInStore.apps.length > 50);
   for (const a of ctx.catalog.notInStore.apps) assert.ok(!ctx.apps.has(a.id), `${a.id} is both in the catalog and not in the store`);
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Story v3 foundation (decisions of 2026-10-19): fourteen archetypes, age rule 16, Kiwix removed
+// ---------------------------------------------------------------------------------------------------------------------
+test('the twenty-six archetypes: the original six, the eight of story v3 in the owner\'s order, then the twelve of the persona expansion, in types.ts, the schema, personas.json and the casting build', () => {
+  const eight = ['tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator'];
+  const twelve = ['money-keeper', 'housemate', 'carer', 'community-lead', 'researcher', 'seller', 'translator', 'archivist', 'traveller', 'athlete', 'collector', 'shift-worker'];
+  assert.deepEqual([...T.ARCHETYPES], ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host', ...eight, ...twelve]);
+  assert.deepEqual([...CAST_ARCHETYPES], [...T.ARCHETYPES], 'scripts/story/build-casting.mts lists the same archetypes as types.ts');
+  assert.deepEqual(Object.keys(ctx.personas.archetypes), [...T.ARCHETYPES], 'personas.json lists them in the same order');
+  for (const k of [...eight, ...twelve]) assert.ok(ctx.personas.archetypes[k as T.Archetype].apps.every((id) => ctx.apps.get(id)!.storySafe !== 'avoid'), `${k}: no avoid app in the pool`);
+});
+
+test('the casting build knows every archetype: anchor and room preferences, and the twelve new ones follow their personas.json row', () => {
+  for (const a of T.ARCHETYPES) {
+    const def = ctx.personas.archetypes[a];
+    assert.ok(PREFS[a]?.length > 0, `${a}: anchor preferences`);
+    assert.ok(ROOM_PREF[a]?.length > 0, `${a}: room preferences`);
+    // an anchor the casting walks is an item role (roles.json items): never a zone, the front door, the Core or "room"
+    for (const r of PREFS[a]) assert.ok(r in ctx.roles.items || r === 'garden', `${a}: ${r} is an item role`);
+  }
+  for (const a of T.ARCHETYPES.slice(14)) {
+    const def = ctx.personas.archetypes[a];
+    assert.deepEqual(ROOM_PREF[a], [...def.rooms, ...def.fallbackRooms], `${a}: the casting's room order is the row's rooms, then its fallback rooms`);
+    const anchors = [...def.anchorRoles, ...def.fallbackAnchorRoles];
+    for (const r of PREFS[a]) assert.ok(anchors.includes(r as T.RoleId), `${a}: ${r} is one of the row's anchor roles`);
+    assert.deepEqual(PREFS[a], def.anchorRoles.filter((r) => r in ctx.roles.items), `${a}: the casting's anchors are the row's item roles, in its order`);
+  }
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The front page's categories (content/story/categories.json, scripts/story/lib/categories.mts)
+// ---------------------------------------------------------------------------------------------------------------------
+const catRules = repoRules(ROOT);
+const catFile = (): CategoriesFile => structuredClone(loadCategories(ROOT));
+const catProblems = (f: unknown): string => checkCategories(f, catRules).join('\n');
+
+test('categories.json: the shipped file passes, every archetype is in exactly one category, ids and labels are unique, labels are short sentence case without a dash', () => {
+  const f = loadCategories(ROOT);
+  assert.deepEqual(checkCategories(f, catRules), []);
+  const held = f.categories.flatMap((c) => c.personas);
+  assert.deepEqual([...held].sort(), [...T.ARCHETYPES].sort(), 'each archetype once');
+  for (const a of T.ARCHETYPES) assert.equal(f.categories.filter((c) => c.personas.includes(a)).length, 1, `${a}: in exactly one category`);
+  assert.equal(new Set(f.categories.map((c) => c.id)).size, f.categories.length, 'ids are unique');
+  assert.equal(new Set(f.categories.map((c) => c.label.toLowerCase())).size, f.categories.length, 'labels are unique');
+  for (const c of f.categories) {
+    assert.ok(c.label.length <= LABEL_MAX, `${c.id}: label at most ${LABEL_MAX} characters`);
+    assert.match(c.label, /^\p{Lu}[^\p{Lu}]*$/u, `${c.id}: label is sentence case`);
+    assert.doesNotMatch(`${c.label} ${c.blurb}`, /[\u2013\u2014]|\s-\s|!/, `${c.id}: no dash and no exclamation mark`);
+    assert.ok(c.blurb.split(/\s+/).length <= BLURB_WORDS && c.blurb.endsWith('.'), `${c.id}: blurb of at most ${BLURB_WORDS} words that ends with a full stop`);
+    assert.ok(!(T.ARCHETYPES as readonly string[]).includes(c.id), `${c.id}: a category id is not an archetype id`);
+  }
+  assert.deepEqual(f.typeFilters.map((t) => t.id), ['home', 'apartment', 'office']);
+  assert.equal(categoryOf(f, 'organiser')!.id, 'household');
+  assert.equal(categoryOf(f, 'host')!.id, 'care');
+});
+
+test('categories.json: the checker names each kind of mistake', () => {
+  const bad = (mutate: (f: CategoriesFile) => void): string => { const f = catFile(); mutate(f); return catProblems(f); };
+  assert.match(bad((f) => { f.categories[0].personas.pop(); }), /translator is in no category/, 'an archetype left out');
+  assert.match(bad((f) => { f.categories[1].personas.push('marketer'); }), /marketer is also in work-from-home/, 'an archetype in two');
+  assert.match(bad((f) => { f.categories[0].personas.push('astronaut'); }), /astronaut is not an archetype/, 'an unknown archetype');
+  assert.match(bad((f) => { f.categories[0].personas.push('marketer'); }), /marketer is listed twice/, 'listed twice in one category');
+  assert.match(bad((f) => { f.categories[1].id = 'work-from-home'; }), /the id is used twice/, 'a duplicate id');
+  assert.match(bad((f) => { f.categories[1].id = 'organiser'; }), /also an archetype id/, 'an id that is an archetype');
+  assert.match(bad((f) => { f.categories[1].label = 'Work from home'; }), /used twice/, 'a duplicate label');
+  assert.match(bad((f) => { f.categories[1].label = 'Run a small business'; }), /longer than 18 characters/, 'a long label');
+  assert.match(bad((f) => { f.categories[1].label = 'Run a Business'; }), /not sentence case/, 'a title case label');
+  assert.match(bad((f) => { f.categories[1].label = 'run a business'; }), /not sentence case/, 'a lower case label');
+  assert.match(bad((f) => { f.categories[1].label = 'Run \u2013 a business'; }), /has a dash/, 'an en dash');
+  assert.match(bad((f) => { f.categories[1].label = 'Run a business!'; }), /exclamation/, 'an exclamation mark');
+  assert.match(bad((f) => { f.categories[1].blurb = 'Shops, trades and stalls \u2014 run from a garage.'; }), /blurb has a dash/, 'an em dash in a blurb');
+  assert.match(bad((f) => { f.categories[1].blurb = 'Shops, trades and stalls'; }), /full stop/, 'a blurb with no full stop');
+  assert.match(bad((f) => { f.categories[1].blurb = Array(21).fill('word').join(' ') + '.'; }), /21 words \(at most 20\)/, 'a long blurb');
+  assert.match(bad((f) => { f.categories[1].blurb = 'Seamless shops, trades and stalls.'; }), /trips the claims rule/, 'a banned phrase');
+  assert.match(bad((f) => { f.typeFilters.reverse(); }), /home, apartment, office, in that order/, 'type filters out of order');
+  assert.match(bad((f) => { f.typeFilters.pop(); }), /home, apartment, office, in that order/, 'a missing type filter');
+  assert.match(catProblems({ version: 1, categories: [], typeFilters: [] }), /fewer than 1/, 'the schema is checked first');
+  assert.match(catProblems({ ...catFile(), extra: 1 }), /unknown property extra/, 'an unknown key');
+});
+
+test('catalog-apps.json: chat and agent apps carry ai "chat" (the age rule), non-chat AI tools do not, and Kiwix is avoid with a claims caveat', () => {
+  const chat = ctx.catalog.apps.filter((a) => a.ai === 'chat').map((a) => a.id).sort();
+  for (const id of ['open-webui', 'ollama', 'anything-llm', 'ci-hermes', 'ci-openclaw', 'ci-memory']) assert.ok(chat.includes(id), `${id} is a chat or agent app`);
+  for (const a of ctx.catalog.apps) assert.ok(a.ai === undefined || a.ai === 'chat', `${a.id}: ai is "chat" or absent`);
+  for (const id of ['libretranslate', 'whisper-webui', 'kokoro', 'stirling-pdf', 'paperless-gpt']) assert.equal(ctx.apps.get(id)?.ai, undefined, `${id} is a tool, not a chat model`);
+  const kiwix = ctx.apps.get('kiwix')!;
+  assert.equal(kiwix.storySafe, 'avoid');
+  assert.ok(kiwix.caveats.some((c) => c.kind === 'claims' && /empty library/.test(c.text)), 'the caveat says why');
+  for (const k of ['learner']) assert.ok(!ctx.personas.archetypes[k as T.Archetype].apps.includes('kiwix'), 'kiwix left the learner pool');
+});
+
+const caseStory = (name: string): Story => { const s = exemplar(); CASES.find((c) => c.name === name)!.mutate(s); return s; };
+const notV3 = (s: Story): Story => { for (const b of s.beats) delete b.service; return s; };
+const ruleAt = (r: ReturnType<typeof validateStory>, rule: string) => ({ error: r.errors.some((f) => f.rule === rule), warn: r.warn.some((f) => f.rule === rule) });
+
+test('isV3Story: true when some beat has a service key; v3Severity is error there and warn elsewhere', () => {
+  const s = exemplar();
+  assert.equal(isV3Story(s), false); assert.equal(v3Severity(s), 'warn');
+  s.beats[7].service = 'google-photos';
+  assert.equal(isV3Story(s), true); assert.equal(v3Severity(s), 'error');
+});
+
+test('age rule 16: age-chat and age-companion are errors in a v3 family and warnings in every other; app-avoid follows the same device', () => {
+  for (const [name, rule] of [['bad-46-age-chat', 'age-chat'], ['bad-47-age-companion', 'age-companion']] as const) {
+    assert.deepEqual(ruleAt(validateStory(caseStory(name), fx), rule), { error: true, warn: false }, `${name} in a v3 family`);
+    assert.deepEqual(ruleAt(validateStory(notV3(caseStory(name)), fx), rule), { error: false, warn: true }, `${name} in a family that is not v3`);
+  }
+  const kiwix = (s: Story): Story => { const b = s.beats.find((x) => x.id === 'kitchen-recipe')!; b.app = { id: 'kiwix', replaces: [] }; b.popup.chips = ['Kiwix']; return s; };
+  assert.deepEqual(ruleAt(validateStory(kiwix(exemplar()), fx), 'app-avoid'), { error: false, warn: true }, 'app-avoid warns in a family that is not v3');
+  const v3Kiwix = kiwix(exemplar()); v3Kiwix.beats[7].service = 'google-photos';
+  assert.deepEqual(ruleAt(validateStory(v3Kiwix, fx), 'app-avoid'), { error: true, warn: false }, 'and fails a v3 family');
+});
+
+test('age-chat: a parent-led beat passes, a minor approving an agent does not, a chat app in `with` counts, and a tool such as LibreTranslate is allowed', () => {
+  const v3 = (s: Story): Story => { s.beats.find((b) => b.id === 'living-photos')!.service = 'google-photos'; s.members.push({ id: 'otto', name: 'Otto', age: 9, role: 'child', colour: 'chart-3' }); return s; };
+  // parent-led: the member is the adult, the child is named in the body as the one being helped
+  const led = v3(exemplar()); const b = led.beats.find((x) => x.id === 'garden-plants')!;
+  b.member = 'mika'; b.app = { id: 'open-webui', replaces: ['ChatGPT'] }; b.popup.chips = ['Open WebUI', 'replaces ChatGPT'];
+  b.popup.body = 'Mika asks a model on the Core in Open WebUI to explain fractions, and reads the answer aloud to Otto at the table.';
+  assert.deepEqual(ruleAt(validateStory(led, fx), 'age-chat'), { error: false, warn: false });
+  // an adult's agent beat approved by a child
+  const approved = v3(exemplar()); approved.beats.find((x) => x.id === 'office-reply')!.approval = 'otto';
+  assert.ok(validateStory(approved, fx).errors.some((f) => f.rule === 'age-chat' && /approving member Otto/.test(f.message)));
+  // a chat app named in `with` is the child's too
+  const withChat = v3(exemplar()); const w = withChat.beats.find((x) => x.id === 'garden-plants')!; w.member = 'otto'; w.with = ['open-webui'];
+  assert.ok(validateStory(withChat, fx).errors.some((f) => f.rule === 'age-chat' && f.at === 'garden-plants'));
+  // a translation tool is not a chat model: a child may use it
+  const tool = v3(exemplar()); const t = tool.beats.find((x) => x.id === 'garden-plants')!; t.member = 'otto'; t.app = { id: 'libretranslate', replaces: ['Google Translate'] }; t.popup.chips = ['LibreTranslate', 'replaces Google Translate'];
+  assert.equal(validateStory(tool, fx).errors.some((f) => f.rule === 'age-chat'), false);
+});
+
+test('age-companion keeps the role part: a child, a baby or a visitor with a companion is an error whatever the family', () => {
+  const s = exemplar(); const e = s.members.find((m) => m.id === 'elias')!;
+  s.members.push({ id: 'otto', name: 'Otto', age: 9, role: 'child', colour: 'chart-3', companion: { ...e.companion!, name: 'Pip', voice: 'v-young-f' } });
+  const r = validateStory(s, fx);
+  assert.ok(r.errors.some((f) => f.rule === 'members' && f.at === 'otto' && /no companion/.test(f.message)), 'the role error is not phased in');
+  assert.ok(r.warn.some((f) => f.rule === 'age-companion' && f.at === 'otto'), 'and the age rule warns in a family that is not v3');
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Story v3: the registry of services, the pair rules, the household and band rules (reference/story/story-v3.md)
+// ---------------------------------------------------------------------------------------------------------------------
+const V3FILE = 'ok-9-story-v3.json';
+const v3base = (): Story => J(FIX, V3FILE) as Story;
+/** the same family told the pass 1 way: no service keys, the chip "replaces <X>" */
+const legacyOf = (s: Story): Story => { for (const b of s.beats) if (b.service !== undefined) { delete b.service; b.popup.chips = [b.popup.chips![0], `replaces ${b.app!.replaces[0]}`]; } return s; };
+const legacyCase = (name: string): Story => { const s = v3base(); CASES.find((c) => c.name === name)!.mutate(s); return legacyOf(s); };
+
+test('story v3 constants: the schema, types.ts and the registry say the same thing', () => {
+  const b = ctx.schema.$defs.beat.properties;
+  assert.equal(b.service.pattern, T.SERVICE_ID_PATTERN);
+  assert.equal(ctx.schema.$defs.popup.properties.chips.items.maxLength, T.CHIP_MAX_LENGTH);
+  assert.equal(T.ALTERNATIVE_CHIP_PREFIX, 'alternative to ');
+  assert.ok(!ctx.schema.$defs.beat.required.includes('service'), 'service is optional');
+  const re = new RegExp(T.SERVICE_ID_PATTERN);
+  for (const s of ctx.services.file!.services) assert.ok(re.test(s.id), `${s.id} matches the id pattern`);
+  // a chip "alternative to " + the longest registry name fits the chip limit
+  for (const s of ctx.services.file!.services) assert.ok(T.ALTERNATIVE_CHIP_PREFIX.length + s.name.length <= T.CHIP_MAX_LENGTH, `${s.name} fits a chip`);
+});
+
+test('services.json: 241 services with the flags kept, every derived column current, every invariant holding (build-services.mts --check)', () => {
+  const inp = readInputs();
+  const built = buildServices(inp);
+  assert.deepEqual(built.problems, []);
+  assert.equal(fs.readFileSync(path.join(ROOT, 'content', 'story', 'services.json'), 'utf8'), renderServices(built.file), 'services.json differs from what the catalog and the families give: run pnpm run story:services');
+  const f = inp.file.services;
+  assert.equal(f.length, 241);
+  assert.equal(f.filter((s) => s.top80).length, 80);
+  assert.deepEqual(f.filter((s) => s.flags.includes('stale')).map((s) => s.id).sort(), ['app-in-the-air', 'mint', 'ourhome', 'pocket'], 'stale services stay in the file with their flag');
+  assert.equal(f.filter((s) => s.flags.includes('story-excluded')).length, 30);
+  assert.equal(f.filter((s) => s.alternativeToForm === 'blocked').length, 4);
+  assert.ok(f.every((s) => s.mark.mode === 'badge' && s.mark.cleared === false), 'no mark is cleared and none is a logo');
+  assert.ok(f.every((s) => !(s.flags.includes('stale') || s.flags.includes('story-excluded') || s.alternativeToForm === 'blocked') || !s.mark.logoAllowed), 'logoAllowed is false for a stale, excluded or blocked service');
+  // every catalog replaces name is a registry name or alias, so every app of the catalog is listed under its services
+  const idx = ctx.services.byName;
+  for (const a of ctx.catalog.apps) for (const r of a.replaces) { const sv = idx.get(r.toLowerCase()); assert.ok(sv, `${a.id}: "${r}" is in the registry`); assert.ok(sv!.apps.includes(a.id), `${sv!.id} lists ${a.id}`); }
+  // storyApps is the catalog subset that is not avoid (Kiwix, marked avoid, left it)
+  assert.ok(!f.some((s) => s.storyApps.includes('kiwix')) && f.find((s) => s.id === 'google-search')!.apps.includes('kiwix'));
+});
+
+test('services.json invariants fail on a registry that breaks them (build-services.mts)', () => {
+  const clone = () => { const i = readInputs(); i.file = JSON.parse(JSON.stringify(i.file)); return i; };
+  const svc = (i: ReturnType<typeof clone>, id: string) => i.file.services.find((s) => s.id === id)!;
+  const problems = (i: ReturnType<typeof clone>, today = '2026-10-19') => buildServices(i, today).problems.join('\n');
+  assert.equal(problems(clone()), '');
+  const dup = clone(); svc(dup, 'notion').aliases = ['Dropbox']; assert.match(problems(dup), /"Dropbox" is also the name or an alias of notion/);
+  const caseOnly = clone(); svc(caseOnly, 'privnote').aliases = ['PrivNote', 'privnote']; assert.equal(problems(caseOnly), '', 'an alias that differs from its own name only by case is allowed');
+  const logo = clone(); svc(logo, 'notion').mark.mode = 'logo'; assert.match(problems(logo), /notion: mark.mode is logo and the mark is not allowed and cleared/); assert.match(problems(logo), /portal\/services\/notion/);
+  const stale = clone(); svc(stale, 'mint').mark.logoAllowed = true; assert.match(problems(stale), /mint: logoAllowed must be false/);
+  const link = clone(); svc(link, 'chatgpt').link = 'yes'; assert.match(problems(link), /chatgpt: link is yes but the homepage check says/);
+  const renamed = clone(); svc(renamed, 'notebooklm').link = 'yes'; svc(renamed, 'notebooklm').homepageChecked = 'ok'; assert.match(problems(renamed), /notebooklm: a renamed service is text-only/);
+  const cat = clone(); svc(cat, 'notion').category = 'cooking'; assert.match(problems(cat), /category "cooking"/);
+  const unresolved = clone(); unresolved.catalog.push({ id: 'imaginary', replaces: ['Nonesuch Cloud'], storySafe: 'yes' }); assert.match(problems(unresolved), /imaginary replaces "Nonesuch Cloud"/);
+  const beat = clone(); beat.families.push({ slug: 'x', beats: [{ id: 'b', service: 'nonesuch' }] }); assert.match(problems(beat), /x\/b: service "nonesuch" is not in the registry/);
+  // the homepage check ages: a warning from thirty days, an error from ninety
+  assert.equal(buildServices(clone(), '2026-11-20').warnings.length > 0, true); assert.equal(problems(clone(), '2026-11-20'), '');
+  assert.match(problems(clone(), '2027-02-01'), /the homepage check is 106 days old/);
+  // derived columns are recomputed, not trusted: a hand-edited rank, a fleet home and an app list are put right
+  const hand = clone(); svc(hand, 'notion').rank = 99; svc(hand, 'notion').fleetHomes = ['nowhere']; svc(hand, 'notion').storyApps = ['affine'];
+  const fixed = buildServices(hand).file.services.find((s) => s.id === 'notion')!;
+  assert.deepEqual([fixed.rank, fixed.fleetHomes.includes('nowhere'), fixed.storyApps.length > 1], [1, false, true]);
+  // a v3 beat names its service in the ledger; a legacy beat names the services its app.replaces holds
+  const ledger = clone(); ledger.families = [{ slug: 'a', beats: [{ id: 'one', service: 'plex', app: { id: 'jellyfin', replaces: ['Plex'] } }, { id: 'two', app: { id: 'immich', replaces: ['Google Photos'] } }] }];
+  const led = buildServices(ledger).file.services;
+  assert.deepEqual([led.find((s) => s.id === 'plex')!.fleetHomes, led.find((s) => s.id === 'google-photos')!.fleetHomes, led.find((s) => s.id === 'notion')!.fleetHomes], [['a'], ['a'], []]);
+});
+
+test('ok-9-story-v3.json: a whole v3 family that reports nothing, by the library and by the CLI', () => {
+  const s = v3base();
+  assert.ok(isV3Story(s));
+  const r = validateStory(s, fx);
+  assert.deepEqual([...r.errors, ...r.review, ...r.warn].map((f) => r.line(f)), []);
+  assert.equal(r.allowed.length, 1, 'one beat is on the allow-list, as in ok-6');
+  const pairs = s.beats.filter((b) => b.service !== undefined);
+  assert.equal(pairs.length, 16);
+  assert.ok(pairs.every((b) => fx.services.byId.has(b.service!) && b.popup.chips!.length === 2 && b.popup.chips![1] === `alternative to ${fx.services.byId.get(b.service!)!.name}`));
+  assert.equal(r.stats.pairShare, 0.8); assert.ok((r.stats.personaPairShare as number) >= 0.8);
+  assert.equal((r.stats.services as string[]).length, 15);
+  const j = JSON.parse(cli(path.join(FIX, V3FILE), '--json').stdout);
+  assert.deepEqual([j.totals.errors, j.totals.review, j.totals.warnings], [0, 0, 0]);
+  // nobody under 16 has a chat model in their own beat or a companion
+  for (const b of s.beats) { const m = s.members.find((x) => x.id === b.member); if (m && m.age < 16) assert.notEqual(fx.apps.get(b.app?.id ?? '')?.ai, 'chat', `${b.id}`); }
+});
+
+test('story v3 rules: an error in a v3 family, a warning in the same family told the pass 1 way', () => {
+  const sev = (s: Story, rule: string) => { const r = validateStory(s, fx); return { error: r.errors.some((f) => f.rule === rule), warn: r.warn.some((f) => f.rule === rule) }; };
+  for (const [name, rule] of [['bad-52-service-missing', 'service-missing'], ['bad-56-persona-band', 'persona-band'], ['bad-57-household-beats', 'household-beats'], ['bad-59-household-doer', 'household-doer'], ['bad-60-pair-share', 'pair-share'], ['bad-60-pair-share', 'pair-budget']] as const) {
+    const s = v3base(); CASES.find((c) => c.name === name)!.mutate(s);
+    assert.deepEqual(sev(s, rule), { error: true, warn: false }, `${rule} in a v3 family (${name})`);
+    // legacy: no service key anywhere, so nothing marks the family v3. (bad-52 loses its service, bad-60 never had one on the beats it changed; every pair beat goes back to the replaces chip)
+    assert.deepEqual(sev(legacyOf(s), rule), { error: false, warn: true }, `${rule} in a family that is not v3 (${name})`);
+  }
+  // chips-legacy: the pass 1 chip is a warning (once, with the count) in a family that is not v3 and an error beat by beat in a v3 family
+  const old = legacyOf(v3base()); const r = validateStory(old, fx);
+  assert.deepEqual(r.errors.map((f) => f.rule), []); assert.equal(r.warn.filter((f) => f.rule === 'chips-legacy').length, 1); assert.match(r.warn.find((f) => f.rule === 'chips-legacy')!.message, /^16 beats use/);
+  const mixed = v3base(); const b = mixed.beats.find((x) => x.id === 'garden-beds')!; b.app!.replaces = []; b.popup.chips = ['HortusFox', 'replaces Google Photos'];
+  assert.ok(validateStory(mixed, fx).errors.some((f) => f.rule === 'chips-legacy' && f.at === 'garden-beds'));
+  // the phase-in covers every legacy sample: the thirty shipped families never have more than warnings (the next test validates them)
+  assert.ok(phased.has('pair-share') && phased.has('chips-legacy') && !phased.has('service-app'));
+});
+
+test('service-status: a stale, an excluded and a blocked service are refused; service-app: the app, the name and the registry must agree', () => {
+  const rules = (s: Story) => validateStory(s, fx).errors.map((f) => `${f.rule} ${f.at}`);
+  const status = v3base(); const b = status.beats.find((x) => x.id === 'living-film')!;
+  // Gmail is story-excluded and Mint is stale; a service the registry refuses cannot be paired whatever the app
+  for (const id of ['gmail', 'mint', 'pocket']) { b.service = id; b.app!.replaces = [ctx.services.byId.get(id)!.name]; assert.ok(rules(status).includes('service-status living-film'), id); }
+  // an alias is the same service: the catalog spells GitLab (SaaS), the registry name is GitLab, and both chips are accepted
+  const alias = v3base(); const g = alias.beats.find((x) => x.id === 'suite-repos')!;
+  g.service = 'gitlab'; g.app!.replaces = ['GitLab (SaaS)']; g.detail!.before = "The day's branch went to GitLab, with the issues and merge requests kept there.";
+  g.popup.chips = ['Forgejo', 'alternative to GitLab']; assert.deepEqual(rules(alias), []);
+  g.popup.chips = ['Forgejo', 'alternative to GitLab (SaaS)']; assert.deepEqual(rules(alias), [], 'the alias app.replaces[0] uses is accepted too');
+  g.popup.chips = ['Forgejo', 'alternative to GitHub']; assert.deepEqual(rules(alias), ['chips suite-repos']);
+  // a service the app does not replace (Forgejo and Google Photos), and an app the registry does not list for the service
+  g.popup.chips = ['Forgejo', 'alternative to Google Photos']; g.service = 'google-photos'; g.app!.replaces = ['Google Photos'];
+  assert.ok(rules(alias).includes('service-app suite-repos'));
+  const unlisted = v3base(); const reg = JSON.parse(JSON.stringify(fx.services.file)); reg.services.find((s: any) => s.id === 'github').apps = [];
+  const fx2 = { ...fx, services: { file: reg, byId: new Map(reg.services.map((s: any) => [s.id, s])), byName: fx.services.byName } } as unknown as Ctx;
+  fx2.services.byName = new Map(); for (const s of reg.services) for (const n of [s.name, ...s.aliases]) fx2.services.byName.set(n.toLowerCase(), s);
+  assert.ok(validateStory(unlisted, fx2).errors.some((f) => f.rule === 'service-app' && /registry does not list/.test(f.message)));
+});
+
+test('household-doer: a possessor or "of Sally" is not a doer; household-kind groups apps that do one job; household-beats allows eight for a couple', () => {
+  const hh = (body: string): Story => { const s = v3base(); const b = s.beats.find((x) => x.id === 'garden-beds')!; delete b.member; b.popup.body = body; return s; };
+  const doer = (s: Story) => validateStory(s, fx).errors.some((f) => f.rule === 'household-doer');
+  assert.equal(doer(hh('The garden journal in HortusFox holds each bed, each watering and a photo, and it sits on the Core by the pool.')), false);
+  assert.equal(doer(hh("Sally's watering rota in HortusFox holds each bed and each watering, and it sits on the Core by the pool.")), false, 'a possessor');
+  assert.equal(doer(hh('The rota that Jean fills in HortusFox holds each bed and each watering, and it sits on the Core by the pool.')), true, 'a subject');
+  assert.equal(doer(hh('The beds on the plan of Jean get watered, and HortusFox keeps the journal on the Core by the pool.')), false, '"of Jean"');
+  // an agent on a household beat
+  const agent = v3base(); const a = agent.beats.find((x) => x.id === 'office-draft')!; delete a.member; assert.ok(validateStory(agent, fx).errors.some((f) => f.rule === 'household-doer' && /agent/.test(f.message)));
+  // kinds: two beats of one group are a warning only
+  const kinds = validateStory(J(FIX, 'bad-58-household-kind.json'), fx);
+  assert.ok(kinds.warn.some((f) => f.rule === 'household-kind' && /list/.test(f.message)) && !kinds.errors.some((f) => f.rule === 'household-kind'));
+  assert.ok(HOUSEHOLD_KINDS['burn-after-reading note'].includes('cryptgeon') && HOUSEHOLD_KINDS['DNS filter'].includes('pi-hole') && HOUSEHOLD_KINDS.calendar.includes('radicale') && HOUSEHOLD_KINDS['notes app'].includes('memos') && HOUSEHOLD_KINDS.reader.includes('miniflux'));
+  // a couple may have eight household beats, a family of four six
+  const couple = (n: number): Story => { const s = exemplar(); s.beats.filter((b) => b.chapter !== 'ftue' && b.chapter !== 'outro').slice(0, n).forEach((b) => { delete b.member; delete b.agent; delete b.approval; }); return s; };
+  const hits = (s: Story) => validateStory(s, fx).warn.filter((f) => f.rule === 'household-beats').length;
+  assert.equal(hits(couple(7)), 0, 'seven and the exemplar\'s own household beat make eight'); assert.equal(hits(couple(8)), 1);
+  const four = v3base(); four.beats.filter((b) => b.chapter !== 'ftue' && b.chapter !== 'outro').slice(0, 6).forEach((b) => { delete b.member; delete b.agent; delete b.approval; });
+  assert.equal(validateStory(four, fx).errors.some((f) => f.rule === 'household-beats'), false, 'six');
+});
+
+test('persona-band: a baby 1 to 3, a child under 13 3 to 7, an adult or teen 4 to 7 (8 for a business organiser), 8 to 11 in a family of three, 10 to 12 in a family of two', () => {
+  const at = (s: Story): string[] => validateStory(s, fx).errors.filter((f) => f.rule === 'persona-band').map((f) => f.at);
+  const four = v3base();
+  assert.deepEqual(at(four), []);
+  assert.deepEqual([BANDS.family4, BANDS.businessOrganiser, BANDS.family3, BANDS.family2, BANDS.child, BANDS.baby], [{ min: 4, max: 7 }, { min: 4, max: 8 }, { min: 8, max: 11 }, { min: 10, max: 12 }, { min: 3, max: 7 }, { min: 1, max: 3 }]);
+  // Sally (a business organiser) may have eight, John only seven
+  const eight = v3base(); const moveTo = (s: Story, id: string, who: string) => { s.beats.find((b) => b.id === id)!.member = who; };
+  moveTo(eight, 'living-scene', 'sally'); assert.deepEqual(at(eight), ['member.john'], 'John falls to three, Sally has eight and is inside her band');
+  moveTo(eight, 'kitchen-rota', 'sally'); assert.ok(at(eight).includes('member.sally'), 'nine is too many');
+  // a family that is not a business has no eight
+  const calm = v3base(); calm.family.business = false; moveTo(calm, 'living-scene', 'sally'); assert.ok(at(calm).includes('member.sally'));
+  // a family of two (the exemplar's people) needs ten to twelve each
+  const two = exemplar(); const m = (id: string) => validateStory(two, fx).warn.filter((f) => f.rule === 'persona-band' && f.at === `member.${id}`).length;
+  assert.equal(m('mika'), 1); assert.equal(m('elias'), 1);
+  // a child under 13 and a baby
+  const kids = v3base(); kids.members.push({ id: 'otto', name: 'Otto', age: 9, role: 'child', colour: 'chart-3' }, { id: 'bea', name: 'Bea', age: 1, role: 'baby', colour: 'chart-5' });
+  const kidAt = (s: Story) => validateStory(s, fx).errors.filter((f) => f.rule === 'persona-band').map((f) => `${f.at}`);
+  assert.deepEqual(kidAt(kids).filter((x) => x.endsWith('otto') || x.endsWith('bea')), ['member.otto', 'member.bea'], 'no beats at all');
+  const give = (s: Story, id: string, who: string) => { s.beats.find((b) => b.id === id)!.member = who; };
+  for (const id of ['garden-beds', 'jean-notes', 'jean-translate']) give(kids, id, 'otto');
+  give(kids, 'steve-photos', 'bea');
+  assert.deepEqual(kidAt(kids).filter((x) => x.endsWith('otto') || x.endsWith('bea')), [], 'three for the child, one for the baby');
+});
+
+test('fleet v3: constants restated, the app cap follows the families present, and the v3 counts gate only when every family is v3', () => {
+  assert.equal(FLEET.appShareMax, 0.4); assert.equal(FLEET.smallBusinessShare, 0.18); assert.equal(FLEET.appsMin, 70);
+  assert.deepEqual({ ...FLEET_V3 }, { appsMin: 100, pairShareMin: 0.8, servicesMin: 70, servicesPerHomeMin: 14, kiwixMax: 6, rareHomes: 8, rareShare: 0.4, v3Required: false });
+  assert.deepEqual([appCap(30), appCap(36), appCap(10), appCap(5)], [12, 14, 4, 2], 'twelve of thirty, fourteen of thirty-six');
+  // a fleet that is not v3 is held to nothing new: the new metrics are informational and the app minimum stays at seventy
+  const old = fleetMetrics([exemplar()], fx, { complete: true });
+  for (const l of ['Distinct services in the fleet', 'Services in each v3 home', 'Room beats with a service, lowest home', 'Families that name Kiwix']) assert.equal(old.metrics.find((m) => m.label === l)!.status, 'partial', l);
+  assert.equal(old.metrics.find((m) => m.label === 'Distinct apps named')!.target, 'at least 70');
+  assert.ok(!old.findings.some((f) => ['fleet-services', 'fleet-pairs', 'fleet-v3'].includes(f.rule)));
+  // one v3 family alone is a v3 fleet: the app minimum is a hundred, services are 70 in the fleet and 14 in each home
+  const v3 = fleetMetrics([v3base()], fx, { complete: true });
+  assert.equal(v3.metrics.find((m) => m.label === 'Distinct apps named')!.target, 'at least 100');
+  assert.ok(v3.findings.some((f) => f.rule === 'fleet-services' && /Distinct services in the fleet: 15 \(need at least 70\)/.test(f.message)));
+  assert.ok(!v3.findings.some((f) => /Services in each v3 home/.test(f.message)), 'the family names fifteen services (fourteen are enough)');
+  assert.ok(!v3.findings.some((f) => f.rule === 'fleet-pairs'));
+  assert.equal(v3.metrics.find((m) => m.label === 'Families told in the v3 shape')!.value, '1 of 1');
+  // fleet-v3 is off until the last home is rewritten
+  const mixed = fleetMetrics([v3base(), variant('okonkwo-reid', () => {})], fx, { complete: true });
+  assert.equal(mixed.metrics.find((m) => m.label === 'Families told in the v3 shape')!.status, 'partial'); assert.ok(!mixed.findings.some((f) => f.rule === 'fleet-v3'));
+  // a v3 home whose room beats are under eighty percent paired is reported
+  const thin = v3base(); delete thin.beats.find((b) => b.id === 'office-paper')!.service;
+  assert.ok(fleetMetrics([thin], fx, { complete: true }).findings.some((f) => f.rule === 'fleet-pairs'));
+  // the rare-app share is information, never a finding
+  assert.ok(!fleetMetrics([v3base()], fx, { complete: true }).findings.some((f) => f.rule === 'fleet-rare'));
+});
+
+test('claims.json (story v3): the third-party text is true for Obsidian and n8n, names-logos-owners is the owners line, and the "alternative to" form is the sanctioned one', () => {
+  const d = (id: string) => ctx.claims.disclosures.find((x) => x.id === id)!;
+  assert.equal(d('third-party-apps').text, 'The other apps in these stories are made by other people, most of them open-source projects. Companion Intelligence did not make them.');
+  assert.doesNotMatch(d('third-party-apps').text, /are open-source projects by other people/);
+  assert.equal(d('names-logos-owners').text, 'Product names, logos and brands are the property of their owners. Naming them does not imply endorsement.');
+  assert.ok(d('names-logos-owners').required && d('names-owners'), 'the earlier line stands until the pages change');
+  const ban = (id: string) => ctx.claims.bannedPhrases.find((b) => b.id === id)! as any;
+  assert.match(ban('incumbent-attack').fix, /<App> is an alternative to <Service>/);
+  assert.match(ban('logo-trademark').scope, /portal\/services\//); assert.equal(ban('logo-trademark').severity, 'error');
+  assert.equal(ctx.claims.bannedPhrases.length, 72, 'no ban was added or removed');
+  // the pattern still bans a third-party logo in authored text
+  assert.ok(ctx.bans.find((b) => b.id === 'logo-trademark')!.re.test('<img src="google.svg" alt="">'));
+  // "alternative to X" passes the banned phrases for every service the registry allows as a second chip (alternativeToForm ok)
+  const bad: string[] = [];
+  for (const s of ctx.services.file!.services.filter((x) => x.alternativeToForm === 'ok')) for (const b of ctx.bans) if (b.severity === 'error' && b.re.test(`${T.ALTERNATIVE_CHIP_PREFIX}${s.name}`)) bad.push(`${s.id}:${b.id}`);
+  assert.deepEqual(bad, []);
 });
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -502,12 +953,13 @@ test('a story naming an app the snapshot marks as gone from the store fails app-
 // The command line
 // ---------------------------------------------------------------------------------------------------------------------
 const cli = (...args: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'validate-stories.mts'), ...args], { encoding: 'utf8', cwd: ROOT });
-test('cli: the exemplar exits 0 with 0 errors, 0 review, 0 warnings in --json; a bad fixture exits 1', () => {
+test('cli: the exemplar exits 0 with 0 errors and 0 review in --json (warnings only for the story v3 phase-in); a bad fixture exits 1', () => {
   const ok = cli(path.join(FIX, 'exemplar.json'), '--json');
   assert.equal(ok.status, 0, ok.stderr);
   const j = JSON.parse(ok.stdout);
   assert.equal(j.ok, true);
-  assert.deepEqual([j.totals.errors, j.totals.review, j.totals.warnings], [0, 0, 0]);
+  assert.deepEqual([j.totals.errors, j.totals.review], [0, 0]);
+  assert.deepEqual(j.families[0].warnings.filter((w: any) => !phased.has(w.rule)), [], 'warnings are only the story v3 phase-in rules');
   assert.equal(j.families[0].slug, 'vance-takahashi');
   const bad = cli(path.join(FIX, 'bad-9-ftue-leak.json'), '--json');
   assert.equal(bad.status, 1);

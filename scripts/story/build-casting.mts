@@ -29,8 +29,14 @@ const S = (...p: string[]): string => path.join(ROOT, 'content', 'story', ...p);
 const readJson = (p: string): any => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 // ---- the plan ---------------------------------------------------------------------------------------------------------
-export type Archetype = 'organiser' | 'builder' | 'gamer' | 'learner' | 'maker' | 'host';
-export const ARCHETYPES: Archetype[] = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host'];
+// The twenty-six archetypes of content/story/personas.json (the first six are the original cast; the next eight are story v3, in the owner's order;
+// the last twelve are the persona expansion of reference/story/personas/index.md). A test keeps this list equal to assets/story/types.ts.
+export type Archetype = 'organiser' | 'builder' | 'gamer' | 'learner' | 'maker' | 'host'
+  | 'tech-family' | 'business-owner' | 'creative' | 'contractor' | 'marketer' | 'lawyer' | 'journalist' | 'educator'
+  | 'money-keeper' | 'housemate' | 'carer' | 'community-lead' | 'researcher' | 'seller' | 'translator' | 'archivist' | 'traveller' | 'athlete' | 'collector' | 'shift-worker';
+export const ARCHETYPES: Archetype[] = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host',
+  'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator',
+  'money-keeper', 'housemate', 'carer', 'community-lead', 'researcher', 'seller', 'translator', 'archivist', 'traveller', 'athlete', 'collector', 'shift-worker'];
 export interface PlanMember {
   id: string; name: string; age: number; role: string; archetype: Archetype | null; work?: string;
   room: string; sleepsIn: string | null; roomLabel?: string; companion?: string;
@@ -41,7 +47,8 @@ export interface PlanFamily {
   reason: string; household_text: string; care: string; fitNote?: string; reviewNeeded?: string[];
   signatureApps: string[]; beatApps?: Partial<Record<Topic, string>>; members: PlanMember[];
 }
-export interface Plan { v: number; generated: string; note: string; households: Record<string, string>; retiredSlugs: string[]; families: PlanFamily[] }
+/** `homesWithoutFamily`: house id → why no family lives there (yet). A home is allowed none only when it is listed (cast-lint.mts): the apartments, reference/APARTMENTS.md. */
+export interface Plan { v: number; generated: string; note: string; households: Record<string, string>; retiredSlugs: string[]; homesWithoutFamily?: Record<string, string>; families: PlanFamily[] }
 
 // ---- anchor preferences per archetype (reference/story/personas.md) -------------------------------------------------------
 /** item roles an archetype stands at, in preference order. The chain always ends in a room role or a universal role. */
@@ -51,15 +58,58 @@ export const PREFS: Record<Archetype, string[]> = {
   gamer: ['tv', 'bed', 'desk', 'couch'],
   learner: ['desk', 'bookshelf', 'couch'],
   maker: ['easel', 'music', 'desk'],
+  // story v3 (reference/story/persona-bible.md 5.3): item roles only; `room` and `core` are not furniture and a zone (`driveway`) is never in a room
+  'tech-family': ['desk', 'counter', 'couch', 'tv'],
+  'business-owner': ['desk', 'dining-table', 'counter', 'bookshelf'],
+  creative: ['easel', 'desk', 'music', 'bookshelf'],
+  contractor: ['desk', 'laundry', 'bookshelf'],
+  marketer: ['desk', 'kitchen-island', 'counter', 'dining-table'],
+  lawyer: ['desk', 'bookshelf', 'dining-table'],
+  journalist: ['desk', 'bookshelf', 'dining-table'],
+  educator: ['dining-table', 'desk', 'bookshelf', 'kitchen-island'],
+  // the persona expansion (reference/story/personas/<id>.md): the persona row's item roles; `pool` and `front-door` are not furniture and `room` is not an item
+  'money-keeper': ['dining-table', 'desk', 'kitchen-island', 'bookshelf'],
+  housemate: ['fridge', 'kitchen-island', 'dining-table', 'couch', 'tv'],
+  carer: ['dining-table', 'desk', 'counter', 'fridge', 'bookshelf'],
+  'community-lead': ['dining-table', 'desk', 'bookshelf', 'counter', 'fridge'],
+  researcher: ['desk', 'bookshelf', 'dining-table'],
+  seller: ['dining-table', 'desk', 'bookshelf'],
+  translator: ['desk', 'bookshelf', 'dining-table'],
+  archivist: ['dining-table', 'bookshelf', 'desk', 'music'],
+  traveller: ['dining-table', 'bookshelf', 'desk'],
+  athlete: ['bicycle', 'bed'],
+  collector: ['bookshelf', 'music', 'tv'],
+  'shift-worker': ['counter', 'fridge', 'dining-table', 'couch'],
   host: ['kitchen-island', 'fridge', 'range', 'garden', 'couch', 'tv'],
 };
 /** the room role a member's chapter is set in, most fitting first, per archetype */
-const ROOM_PREF: Record<Archetype, string[]> = {
+export const ROOM_PREF: Record<Archetype, string[]> = {
   organiser: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
   builder: ['office', 'bedroom', 'living', 'dining', 'garage', 'kitchen'],
   gamer: ['living', 'kids', 'bedroom'],
   learner: ['kids', 'bedroom', 'office', 'living'],
   maker: ['office', 'living', 'bedroom', 'kids'],
+  'tech-family': ['garage', 'office', 'entry', 'living', 'bedroom', 'dining'],
+  'business-owner': ['office', 'dining', 'living', 'kitchen', 'bedroom', 'entry'],
+  creative: ['office', 'living', 'bedroom', 'garage', 'dining', 'kids'],
+  contractor: ['garage', 'office', 'entry', 'laundry', 'dining', 'kitchen', 'living'],
+  marketer: ['office', 'living', 'dining', 'kitchen', 'bedroom'],
+  lawyer: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
+  journalist: ['office', 'dining', 'kitchen', 'living', 'bedroom'],
+  educator: ['dining', 'office', 'living', 'kitchen', 'kids', 'bedroom'],
+  // the persona expansion: the persona row's rooms, then its fallback rooms
+  'money-keeper': ['dining', 'office', 'kitchen', 'living', 'bedroom', 'laundry'],
+  housemate: ['kitchen', 'living', 'dining', 'entry', 'laundry', 'bedroom'],
+  carer: ['dining', 'office', 'kitchen', 'living', 'entry'],
+  'community-lead': ['dining', 'kitchen', 'office', 'living', 'entry', 'bedroom'],
+  researcher: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
+  seller: ['dining', 'office', 'garage', 'kitchen', 'living', 'bedroom', 'entry'],
+  translator: ['office', 'bedroom', 'dining', 'living', 'kitchen'],
+  archivist: ['dining', 'living', 'office', 'bedroom', 'kitchen', 'garage'],
+  traveller: ['dining', 'living', 'office', 'bedroom', 'kitchen', 'entry'],
+  athlete: ['garage', 'entry', 'bedroom', 'living', 'patio', 'garden', 'laundry', 'dining'],
+  collector: ['living', 'office', 'bedroom', 'dining', 'kids'],
+  'shift-worker': ['kitchen', 'dining', 'entry', 'living', 'laundry', 'bedroom', 'patio', 'garden'],
   host: ['kitchen', 'living', 'dining', 'garden'],
 };
 /** furniture the specs place that roles.json does not list under the role it plainly serves (reported, never used in a chain) */
@@ -84,7 +134,7 @@ export const APP_TOPICS: Record<Topic, Set<string>> = {
   productivity: new Set(T('nextcloud libreoffice onlyoffice collabora-online cryptpad ci-planning joplin bookstack obsidian n8n activepieces stirling-pdf vikunja super-productivity baikal planka forgejo gitea jupyterlab code-server open-webui ci-openclaw ci-hermes ci-memory logseq docmost')),
   money: new Set(T('wallos firefly-iii monetr spliit akaunting invio invoice-ninja taxhacker ghostfolio wealthfolio')),
   privacy: new Set(T('vaultwarden pi-hole adguardhome searxng simplelogin cryptgeon privatebin duplicati syncthing open-webui ci-memory forgejo gitea nextcloud paperless netbird')),
-  kids: new Set(T('kiwix libretranslate ci-spellbook koodo-reader steam-headless audiobookshelf jupyterlab habitica donetick obsidian')),
+  kids: new Set(T('libretranslate ci-spellbook koodo-reader booklore kokoro razzia readeck linkwarden steam-headless audiobookshelf jupyterlab habitica donetick obsidian')),
   media: new Set(T('immich photoprism librephotos foldergram jellyfin navidrome mstream audiobookshelf koodo-reader booklore freshrss music-assistant steam-headless')),
   creative: new Set(T('penpot inkscape excalidraw tldraw drawio audiomass blockbench comfyui opencut freecut mazanoke rembg remotion-studio')),
   'small-business': new Set(T('twenty espocrm odoo invoice-ninja invio akaunting kimai solidtime docuseal documenso listmonk keila ghost wordpress nocodb baserow grist metabase opnform formbricks chatwoot papercups postiz mixpost plausible umami matomo medusa prestashop hi-events linkstack n8n activepieces')),
@@ -416,6 +466,17 @@ function renderMd(plan: Plan, casting: any, houses: Map<string, HouseInfo>): str
   L.push('', '## Why each home', '');
   for (const f of fams) {
     L.push(`- \`${f.house}\` (${f.slug}, ${f.household}${f.business ? ', business' : ''}): ${f.reason}${f.fitNote ? ` ${f.fitNote}` : ''}`);
+  }
+  // the homes that are allowed to have no family: the plan lists them (cast-lint.mts holds the list to the homes), and the site gives each a plain card and its own page
+  const without = Object.entries(plan.homesWithoutFamily ?? {}).sort((a, b) => a[0].localeCompare(b[0]));
+  if (without.length) {
+    L.push('', '## Homes without a family', '');
+    L.push(`${without.length} home${without.length === 1 ? '' : 's'} of the gallery have no family yet. The site shows each with a plain card that opens the player, and a page of its own, and no tour; adding a family means a plan entry above and removing the home from \`homesWithoutFamily\` in the plan.`, '');
+    for (const [id, why] of without) {
+      let name = id;
+      try { name = displayName({ id, name: readJson(path.join(ROOT, 'content', 'houses', `${id}.json`)).name }); } catch { /* a listed home with no spec is cast-lint's error, not this file's */ }
+      L.push(`- \`${id}\` (${name}): ${why}`);
+    }
   }
   L.push('');
   return L.join('\n');

@@ -57,6 +57,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as THREE from '../assets/vendor/three/three.module.min.js';
 import { createBuildContext } from '../assets/build-context.js';
+import { isOwnAuthor } from './own-authors.mts';
 import { createMaterialKit } from '../assets/materials.js';
 import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
@@ -415,9 +416,18 @@ test('K: the rig\'s corner camera points are the Node copy\'s, and nothing the p
   console.log(`K: ${cams} corner cameras over the 30 houses and the fixtures, none within 0.3 m of a dress piece (${near} pieces between 0.3 and 0.6 m); lamp census: ${lamps.asks} rooms ask, ${lamps.lampless} lamp-less in the layout, ${lamps.lit} lit by the phase`);
   // the shipped houses' census: 105 of 132 lit before the leaf strips (wave6/dress-lamps.tsv); the strips an open door leaf parks in cost three (bghouse-olcia's Lower Hall, seraphine's
   // Entry Hall, sunnyhome's Kitchen: a lamp stood where the scene check found a leaf swinging into it); the fixtures add their own rooms on top
-  const ship = houses.map(h => lampLit(load(h.file))).reduce((a, l) => ({ asks: a.asks + l.asks, lampless: a.lampless + l.lampless, lit: a.lit + l.lit }), { asks: 0, lampless: 0, lit: 0 });
+  // The census is held for the two sets apart, so a home added to the gallery adds its own line and never moves the first one: the 30 houses the
+  // gallery opened with (a builder's author) and the apartments Companion Intelligence wrote itself (reference/APARTMENTS.md; scripts/own-authors.mts).
+  const census = (hs: typeof houses) => hs.map(h => lampLit(load(h.file))).reduce((a, l) => ({ asks: a.asks + l.asks, lampless: a.lampless + l.lampless, lit: a.lit + l.lit }), { asks: 0, lampless: 0, lit: 0 });
+  const isOwn = (h: (typeof houses)[number]) => isOwnAuthor(load(h.file).author);
+  const ship = census(houses.filter(h => !isOwn(h))), own = census(houses.filter(isOwn));
+  assert.equal(houses.filter(h => !isOwn(h)).length, 30, 'the 30 houses the census was taken on');
   assert.equal(ship.lampless, 132, 'the layout leaves 132 lamp-less rooms in the 30 houses');
   assert.ok(ship.lit >= 102, `the lamp census lost rooms to the keep-outs: ${ship.lit} lit, 105 before the leaf strips`);
+  // the six apartments: 31 lamp-less rooms (the kitchens, the halls and landings of the stair cores, a few passages), the phase lights 24 of them (measured on the baked homes)
+  assert.equal(houses.filter(isOwn).length, 6, 'the six apartments');
+  assert.equal(own.lampless, 31, 'the layout leaves 31 lamp-less rooms in the six apartments');
+  assert.ok(own.lit >= 22, `the lamp census of the apartments lost rooms to the keep-outs: ${own.lit} lit, 24 when they were baked`);
 });
 
 test('K2 (control): a fiddle-leaf in the corner is in the way, a low basket is not, and the 0.3 m ring is where the rig says', () => {

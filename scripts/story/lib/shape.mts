@@ -8,10 +8,10 @@ import { plain, sentences, words } from './text.mts';
 
 export const LIMITS = { title: 6, body: 30, sentence: 20, say: 16, closing: 30 } as const;
 
-const digits = /\d/;
+export const digits = /\d/;
 // Catalog names with a digit (n8n) are the one place a digit may stay in spoken text.
-const digitApps = (ctx: Ctx): string[] => ctx.catalog.apps.map((a) => a.name).filter((n) => digits.test(n));
-const stripDigitApps = (s: string, names: string[]): string => names.reduce((t, n) => t.split(n).join(' '), s);
+export const digitApps = (ctx: Ctx): string[] => ctx.catalog.apps.map((a) => a.name).filter((n) => digits.test(n));
+export const stripDigitApps = (s: string, names: string[]): string => names.reduce((t, n) => t.split(n).join(' '), s);
 
 // Words that start with a capital inside a heading and are still correct in sentence case.
 const PROPER = /^(Companion|Core|Hub|Memory|OS|Agents?|Wi-Fi|OpenClaw|Hermes|USB)$/;

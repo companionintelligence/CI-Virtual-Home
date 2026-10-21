@@ -584,12 +584,12 @@
       "category": "privacy",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "readeck",
         "replaces": [
-          "Google Search"
+          "Instapaper"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "save articles to read later without a hosted bookmarking service",
       "anchor": {
         "role": "desk",
         "room": "bedroom",
@@ -607,11 +607,11 @@
         "side": "left"
       },
       "popup": {
-        "title": "Ife looks up the lake",
-        "body": "Why does the lake rise after rain? Ife looks it up in Kiwix, which serves a Wikipedia file downloaded once, and no search engine is asked.",
+        "title": "Ife reads a saved article",
+        "body": "Ife saved an article on why the lake rises after rain. At her desk she reads it in Readeck, which keeps it on the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Readeck",
+          "replaces Instapaper"
         ]
       },
       "film": true
@@ -926,6 +926,7 @@
     "The Core stands on a credenza in the Living room (no study in the house). Folake works from the couch; Kunle from the Garage bench (anchor room:garage, bicycle for Wingfit).",
     "Both companions are Hermes. Messages pass through the chat service the family picks: the note rides on ftue-hello, living-marlow and garage-tilly. People read and send every message.",
     "AnythingLLM is named only in green-revision as a with app (its chip replaces ChatGPT would trip cap-parity). Steam Headless carries the Valve account note and no frame rate or title.",
-    "Frigate: the drive camera records the family property; the cat is the subject. No claim of prevention. Wingfit logs distances only."
+    "Frigate: the drive camera records the family property; the cat is the subject. No claim of prevention. Wingfit logs distances only.",
+    "green-lookup: Readeck, replaces Instapaper only (the catalog also lists Pocket, a retired service, which the story never names). Ife saved the article earlier; the beat claims only that Readeck keeps it on the Core."
   ]
 }

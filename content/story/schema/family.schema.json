@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://homes.ci.computer/schema/family-v1.json",
   "title": "Family story v1 (authored source: content/families/<slug>.json)",
-  "description": "FINAL contract. Authored by humans and agents; everything generated (voice clips, poses, timeline, track) lives in <slug>.voice.json and <slug>.bake.json, never here. Only the JSON Schema keywords listed in STORY-BIBLE section 12 are used, so a zero-dependency checker can enforce this file. Rules a schema cannot say (word counts, dashes, banned phrases, app and anchor existence, disclosures, cross-field and cross-family rules) are enforced by scripts/validate-stories.mts. Enumerations are mirrored as constants in assets/story/types.ts and a test keeps the two equal.",
+  "description": "FINAL contract (story v2 fields are optional additions: reference/story/story-v2.md). Authored by humans and agents; everything generated (voice clips, poses, timeline, track) lives in <slug>.voice.json and <slug>.bake.json, never here. Only the JSON Schema keywords listed in STORY-BIBLE section 12 are used, so a zero-dependency checker can enforce this file. Rules a schema cannot say (word counts, dashes, banned phrases, app and anchor existence, disclosures, cross-field and cross-family rules) are enforced by scripts/validate-stories.mts. Enumerations are mirrored as constants in assets/story/types.ts and a test keeps the two equal.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "slug", "house", "fictional", "family", "members", "chapters", "beats", "closing"],
@@ -13,8 +13,8 @@
     "fictional": { "const": true },
     "family": { "$ref": "#/$defs/family" },
     "members": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "$ref": "#/$defs/member" } },
-    "chapters": { "type": "array", "minItems": 7, "maxItems": 10, "items": { "$ref": "#/$defs/chapter" } },
-    "beats": { "type": "array", "minItems": 22, "maxItems": 30, "items": { "$ref": "#/$defs/beat" } },
+    "chapters": { "type": "array", "minItems": 7, "maxItems": 12, "items": { "$ref": "#/$defs/chapter" } },
+    "beats": { "type": "array", "minItems": 22, "maxItems": 40, "items": { "$ref": "#/$defs/beat" } },
     "closing": { "$ref": "#/$defs/closing" },
     "notes": { "type": "array", "maxItems": 8, "items": { "type": "string", "maxLength": 240 }, "description": "Build-only notes for reviewers and the owner (for example 'beat X needs owner sign-off'). Never shipped, never displayed." }
   },
@@ -43,7 +43,48 @@
             "place": { "type": "string", "pattern": "^[A-Z][A-Za-z' ]{3,30}$", "description": "An INVENTED town or neighbourhood. Not a real place. Unique across the fleet." }
           }
         },
-        "narrator": { "$ref": "#/$defs/voiceKey" }
+        "narrator": { "$ref": "#/$defs/voiceKey" },
+        "home": { "$ref": "#/$defs/home" },
+        "day": { "type": "array", "minItems": 5, "maxItems": 10, "items": { "$ref": "#/$defs/dayEntry" }, "description": "Optional (story v2). A day in the house: 5 to 10 entries in time order, each pointing at an existing beat. Each adult or teen member appears at least once (warning otherwise)." }
+      }
+    },
+    "home": {
+      "type": "object", "additionalProperties": false, "required": ["lede", "spots"],
+      "description": "Optional (story v2). The house, told true to its spec. No builder, no game, no real place, no address, no numbers: the page derives storeys, area and room count itself.",
+      "properties": {
+        "lede": { "type": "string", "minLength": 40, "maxLength": 420, "description": "At most 50 words (validator counts) in two or three sentences, each at most 22 words. True to the house spec: storeys, materials, rooms, garden, light. No fireplace, TV, crib or island the house lacks; no house name or id." },
+        "spots": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "#/$defs/spot" } }
+      }
+    },
+    "spot": {
+      "type": "object", "additionalProperties": false, "required": ["room", "line"],
+      "properties": {
+        "room": { "type": "string", "minLength": 2, "maxLength": 40, "description": "An exact room name of the house (the validator checks it against the spec)." },
+        "line": { "type": "string", "minLength": 8, "maxLength": 150, "description": "At most 16 words (validator counts), true to that room's furniture." }
+      }
+    },
+    "dayEntry": {
+      "type": "object", "additionalProperties": false, "required": ["at", "beat", "line"],
+      "properties": {
+        "at": { "enum": ["morning", "midday", "afternoon", "after-school", "weekend"], "description": "Part of the day, daylight only. Entries run in this order and never go back." },
+        "beat": { "$ref": "#/$defs/id", "description": "An existing beat id of this file." },
+        "line": { "type": "string", "minLength": 8, "maxLength": 130, "description": "At most 14 words (validator counts); a different sentence from the beat's own title and body." }
+      }
+    },
+    "detail": {
+      "type": "object", "additionalProperties": false, "required": ["before", "after", "steps", "fact"],
+      "description": "Optional (story v2). What a visitor who stays opens up: how it worked with the service it replaces, how it works now, the steps, one true fact. The popup's title and body (the narration, the film, the ads) are not touched.",
+      "properties": {
+        "before": { "type": "string", "minLength": 12, "maxLength": 240, "description": "At most 28 words (validator counts). How it works with the service it replaces: neutral and factual. Names a service only if it is in the beat's app.replaces or the catalog entry's replaces; never an attack on a company." },
+        "after": { "type": "string", "minLength": 12, "maxLength": 240, "description": "At most 28 words. What the person does now and where it lives (the mechanism), not an adjective." },
+        "steps": { "type": "array", "minItems": 2, "maxItems": 4, "items": { "type": "string", "minLength": 3, "maxLength": 110 }, "description": "What the person actually does, in order; each at most 12 words. No UI described as seen on a screen." },
+        "fact": { "type": "string", "minLength": 12, "maxLength": 240, "description": "At most 28 words. One true fact about the app in the words of its catalog description (the validator warns when it shares no word with it)." }
+      }
+    },
+    "profile": {
+      "type": "object", "additionalProperties": false, "required": ["bio"],
+      "properties": {
+        "bio": { "type": "string", "minLength": 20, "maxLength": 360, "description": "At most 45 words (validator counts). Who they are and how they use the Core: third person, present tense, no age (the page shows it), no health, legal or financial claim." }
       }
     },
     "companion": {
@@ -69,8 +110,9 @@
         "role": { "enum": ["parent", "partner", "adult-child", "teen", "child", "baby", "grandparent", "housemate", "visitor"] },
         "work": { "type": "string", "maxLength": 60, "description": "Occupation or school, a short noun phrase: 'bakery owner', 'secondary-school teacher', 'second grade'. Not a medical, legal or financial qualification claim." },
         "colour": { "enum": ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"], "description": "CI-Common chart token for the monogram disc. Distinct within a family where possible. Never a hex." },
-        "archetype": { "enum": ["organiser", "builder", "gamer", "learner", "maker", "host"], "description": "Optional. The job this member does on the family's one Companion Core (reference/story/personas.md, content/story/personas.json): organiser, builder, gamer, learner, maker or host. A member with an archetype needs a beat in one of its rooms and a beat whose app is in its pool; a family with archetypes covers at least two. Members without one are not held to the persona rules." },
-        "companion": { "$ref": "#/$defs/companion", "description": "Optional. At least one member has one; at most three do. Members under 13 never have one; babies and visitors never do." }
+        "archetype": { "enum": ["organiser", "builder", "gamer", "learner", "maker", "host", "tech-family", "business-owner", "creative", "contractor", "marketer", "lawyer", "journalist", "educator", "money-keeper", "housemate", "carer", "community-lead", "researcher", "seller", "translator", "archivist", "traveller", "athlete", "collector", "shift-worker"], "description": "Optional. The job this member does on the family's one Companion Core (reference/story/personas.md, content/story/personas.json): organiser, builder, gamer, learner, maker, host, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator, money-keeper, housemate, carer, community-lead, researcher, seller, translator, archivist, traveller, athlete, collector or shift-worker. A member with an archetype needs a beat in one of its rooms and a beat whose app is in its pool; a family with archetypes covers at least two. Members without one are not held to the persona rules." },
+        "profile": { "$ref": "#/$defs/profile" },
+        "companion": { "$ref": "#/$defs/companion", "description": "Optional. At least one member has one; at most three do. Members under 16 never have one (rule age-companion); babies, children and visitors never do." }
       }
     },
     "chapter": {
@@ -111,7 +153,7 @@
         "kind": { "enum": ["card", "phone"], "description": "'phone' draws a stylised phone with the `phone` rows. Never a screenshot, never an SSID, a password or a pairing code." },
         "title": { "type": "string", "minLength": 3, "maxLength": 48, "description": "At most 6 words (validator counts). Sentence case. A complete thought, not a label." },
         "body": { "type": "string", "minLength": 30, "maxLength": 260, "description": "At most 30 words (validator counts), each sentence at most 20 words, no digits except inside an app name. THIS TEXT IS THE NARRATION: the voice tool reads it word for word and the caption shows it. Third person, present tense." },
-        "chips": { "type": "array", "maxItems": 3, "items": { "type": "string", "maxLength": 28 }, "description": "The app name, then 'replaces <X>' where X is one of the app's catalog `replaces` names. Nothing else." },
+        "chips": { "type": "array", "maxItems": 3, "items": { "type": "string", "maxLength": 48 }, "description": "The app name, then (story v3) 'alternative to <Service>' for a beat that has `service`: exactly two items, the second naming the registry service (content/story/services.json) or the alias app.replaces[0] uses. The pass 1 form 'replaces <X>' (X one of the app's catalog `replaces` names) is accepted with a warning (chips-legacy). Nothing else." },
         "note": { "type": "string", "maxLength": 90, "description": "A required disclosure line for this beat, see STORY-BIBLE section 8 (ftue-pick carries 'Installing apps uses the internet.')." },
         "phone": {
           "type": "object", "additionalProperties": false, "required": ["header", "rows"],
@@ -149,9 +191,11 @@
         },
         "with": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/appId" }, "description": "Other store apps named in this beat's text. Every Hub app named in a beat must be `app.id` or listed here. Companion Memory, Hermes and OpenClaw are exempt (the first-party trio)." },
         "capability": { "type": "string", "minLength": 10, "maxLength": 100, "description": "The ONE thing the app does in this scene, in the words of its catalog description. Build-only audit trail (never shipped). The validator warns when it shares no word with the app's catalog description." },
+        "service": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,38}$", "description": "Optional (story v3). The id of the replaced service this beat's app is the alternative to, from content/story/services.json. At most one. Present exactly when app.replaces is not empty; app.replaces[0] is then the service's name or one of its aliases. A family with at least one beat that has `service` is a v3 family: the v3 rules (age-chat, age-companion, app-avoid, service-missing, household-beats, household-doer, persona-band, pair-share, pair-budget, chips-legacy) are errors there and warnings in every other family (scripts/story/lib/v3.mts isV3Story). reference/story/story-v3.md." },
         "anchor": { "$ref": "#/$defs/anchor" },
         "camera": { "$ref": "#/$defs/camera" },
         "popup": { "$ref": "#/$defs/popup" },
+        "detail": { "$ref": "#/$defs/detail" },
         "say": { "$ref": "#/$defs/say" },
         "emphasis": { "type": "object", "additionalProperties": false, "properties": { "ring": { "type": "boolean" }, "wake": { "type": "boolean", "description": "FTUE plug-in beat only: the Core's LED, fan and screen wake." } } },
         "film": { "type": "boolean", "description": "In the film (see STORY-BIBLE section 7 for the film quota)." },

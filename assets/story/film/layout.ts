@@ -9,11 +9,12 @@
 //                         captions and the WebVTT file are made from the same cues, so they cannot disagree.
 //   formatFor             the two frames, 16:9 (1920 x 1080) and 9:16 (1080 x 1920), their safe areas and type scale
 //   placeForFilm          the popup card's place in a frame, from story-bake's solver (assets/story/place.ts): the SAME function the live popup calls
+//   placeCanvasCard       the one placement both canvases (the film and the ad cuts) share: variants of a card (padding and width, never smaller type), the 36 design px floor
 //
 // Nothing here reads a clock or a file: the film is a pure function of the runtime story. Owner: video-tool.
 import type { RuntimeStory, RuntimeBeat, RuntimeClip } from '../runtime.js';
 import { FILM_PAD_S } from '../track.js';
-import { placePopup, inter, type Rect, type PlaceOut } from '../place.js';
+import { placePopup, inter, CANVAS_TYPE_MIN, type Rect, type PlaceOut } from '../place.js';
 
 // ---- the numbers -------------------------------------------------------------------------------------------------------------------
 export const FILM = {
@@ -309,45 +310,93 @@ export function formatFor(key: FilmKey, res = 1080): FilmFormat {
   return { key, res, w, h, aspect: w / h, portrait, k, safe };
 }
 
-/** Where the caption strip sits and how tall it is reserved to be (two lines of the caption type plus its padding): the popup stays out of it. */
-export function captionBox(f: FilmFormat): Rect & { font: number; line: number; pad: number } {
-  const font = Math.round((f.portrait ? 40 : 44) * f.k), line = Math.round(font * 1.32), pad = Math.round(20 * f.k);
+/** Where the caption strip sits and how tall it is reserved to be (two lines of the caption type plus its padding, and the row an agent's line adds for its speaker):
+ *  the popup stays out of it. The caption type (40 and 44 design px) is above the canvas floor (36). */
+export function captionBox(f: FilmFormat): Rect & { font: number; line: number; pad: number; tag: number } {
+  const font = Math.round((f.portrait ? 40 : 44) * f.k), line = Math.round(font * 1.32), pad = Math.round(20 * f.k), tag = Math.round(CANVAS_TYPE_MIN * 1.5 * f.k);
   const width = f.portrait ? f.w - f.safe.left - f.safe.right : Math.min(f.w - f.safe.left - f.safe.right, Math.round(1320 * f.k));
-  const hh = line * CAPTION.maxLines + 2 * pad;
-  return { x: Math.round((f.w - width) / 2), y: Math.round(f.h - f.safe.bottom - hh), w: width, h: hh, font, line, pad };
+  const hh = line * CAPTION.maxLines + 2 * pad + tag;
+  return { x: Math.round((f.w - width) / 2), y: Math.round(f.h - f.safe.bottom - hh), w: width, h: hh, font, line, pad, tag };
 }
-/** The corner mark ("Fictional family. Real software."): top left inside the safe area. */
+/** The corner mark ("Fictional family. Real software."): top left inside the safe area, at the canvas floor (36 design px, it was 26). */
 export function badgeBox(f: FilmFormat, textW: number): Rect & { font: number } {
-  const font = Math.round(26 * f.k), padX = Math.round(18 * f.k), hh = Math.round(font * 1.9);
+  const font = CANVAS_TYPE_MIN * f.k, padX = Math.round(20 * f.k), hh = Math.round(font * 1.7);   // (not rounded: a rounded size can fall a hair under the floor)
   return { x: Math.round(f.safe.left), y: Math.round(f.safe.top), w: Math.round(textW + 2 * padX + font * 0.9), h: hh, font };
 }
 
-export type FilmPlace = PlaceOut & { alt: 'top' | null };
-/** The popup card's rectangle in a film frame. Landscape: story-bake's solver, as the live popup uses it. Portrait: the bottom sheet it gives, kept to the
- *  safe area and above the captions, and, if that would cover the subject, a card under the top margin instead. `badge` is kept clear in both. */
-export function placeForFilm(f: FilmFormat, inp: { focus: Rect | null; core: Rect | null; card: { w: number; h: number } }): FilmPlace {
-  const cap = captionBox(f);
-  const bars: Rect[] = [{ x: cap.x, y: cap.y, w: cap.w, h: cap.h }];
-  const badge: Rect = { x: f.safe.left, y: f.safe.top, w: Math.round(560 * f.k), h: Math.round(50 * f.k) };
-  if (!f.portrait) {
-    bars.push(badge);
-    const p = placePopup({ vw: f.w, vh: f.h, safe: { top: f.safe.top, right: f.safe.right, bottom: f.safe.bottom, left: f.safe.left }, focus: inp.focus, core: inp.core, bars, card: inp.card, gap: 18 * f.k });
-    return { ...p, alt: null };
+// ---- the canvas card: one placement for the film and the ad cuts -----------------------------------------------------------------------------
+/**
+ * THE CANVAS TYPE FLOOR. A film or ad canvas is a picture, shown scaled down (a 1080 px canvas is about 390 px wide on a phone), so its type floor is not the live cards' 25.5 px:
+ * it is 36 design px at a 1080 px short edge (`CANVAS_TYPE_MIN`, assets/story/place.ts), times the frame's k. Like the live card, a canvas card never shrinks its type to fit: it is
+ * offered as VARIANTS (the card at its width, with tighter padding, narrower and so taller, without its phone drawing), each with the smallest type in it, and the solver
+ * refuses a variant under the floor and finds the slot and variant that keep off the subject. A card cannot scroll on a canvas: one taller than its room is not ok.
+ */
+export type CanvasFrame = { w: number; h: number; k: number; safe: Safe; sheet: boolean };
+export type CanvasVariant = { w: number; h: number; /** the smallest type in the card, px of this canvas (undefined: not judged) */ type?: number; /** the cost of choosing it (0 is the card as designed) */ cost?: number; tag?: string };
+export type CanvasPlace = PlaceOut & { alt: 'top' | null; variant: number; scrolls: boolean; refused: number };
+/** The card's wanted width in design units: about a third of the canvas (the live cards' 32 %), and never narrower than 18 em of the floor's type (the live card at 1440 is 18 em wide). */
+export const CARD_EM = 18;
+export function canvasCardWidth(f: { w: number; k: number }): number {
+  const k = f.k, third = 0.32 * f.w, em = CARD_EM * CANVAS_TYPE_MIN * k;
+  return Math.round(Math.min(0.62 * f.w, Math.max(third, em)));
+}
+/** The widths a floating card may take: the wanted one, then 92, 85, 78 and 72 % of it, never under 12.5 em of the floor's type (a layout whose chip or longest word is wider than its text column is dropped by `canvasVariants`). */
+export function canvasCardWidths(f: { w: number; k: number }): number[] {
+  const w0 = canvasCardWidth(f), min = 12.5 * CANVAS_TYPE_MIN * f.k, out = [w0];
+  for (const s of [0.92, 0.85, 0.78, 0.72]) { const w = Math.round(w0 * s); if (w >= min && !out.includes(w)) out.push(w); }
+  return out;
+}
+/** The tight padding costs little; a narrower card more; leaving the phone drawing out the most (it is the story's own picture of a first-run step). */
+export const COST_TIGHT = 0.03, COST_NARROWER = 0.4, COST_BARE = 0.8;
+/** The variants of a card in the order the solver prefers them: for each way of leaving the drawing out, each width, each padding. `measure` lays the card out and returns its size. */
+export function canvasVariants<L extends { w: number; h: number; type: number; bad?: boolean }>(widths: number[], measure: (w: number, tight: boolean, bare: boolean) => L, o: { bare?: boolean } = {}): Array<{ layout: L; size: CanvasVariant }> {
+  const out: Array<{ layout: L; size: CanvasVariant }> = [];
+  for (const bare of o.bare ? [false, true] : [false]) widths.forEach((w, wi) => { for (const tight of [false, true]) {
+    const layout = measure(w, tight, bare);
+    if (layout.bad && (wi > 0 || tight || bare)) continue;      // a chip or a word wider than the column: not a way to set this card (the first is kept so there is always one)
+    out.push({ layout, size: { w: layout.w, h: layout.h, type: layout.type, cost: wi * COST_NARROWER + (tight ? COST_TIGHT : 0) + (bare ? COST_BARE : 0), tag: `${wi ? `w${wi}` : 'w0'}${tight ? ' tight' : ''}${bare ? ' bare' : ''}` } });
+  } });
+  return out;
+}
+/**
+ * Where a card (or the hook's panel) goes in a canvas. `cap` is the caption strip's reserved box, `badge` the corner mark's.
+ *  Sheet frames (9:16, 4:5): a sheet across the safe width sitting on the captions, or, if that would cover the subject, under the corner mark; the variants are tried in order.
+ *  Others (16:9, 1:1): story-bake's solver, the same function the live popup calls, with the captions and the corner mark as bars and the floor of this canvas.
+ */
+export function placeCanvasCard(fr: CanvasFrame, inp: { focus: Rect | null; core: Rect | null; variants: CanvasVariant[]; cap: Rect; badge: Rect }): CanvasPlace {
+  const k = fr.k, floor = CANVAS_TYPE_MIN * k, eps = 0.06, bars: Rect[] = [{ x: inp.cap.x, y: inp.cap.y, w: inp.cap.w, h: inp.cap.h }];
+  const vs = inp.variants.map((v, i) => ({ ...v, i, cost: v.cost ?? i * COST_NARROWER })), allowed = vs.filter(v => v.type === undefined || v.type + eps >= floor), refused = vs.length - allowed.length;
+  const stuck = !allowed.length, pool = stuck ? [vs[0]] : allowed;
+  if (!fr.sheet) {
+    bars.push({ x: inp.badge.x, y: inp.badge.y, w: inp.badge.w, h: inp.badge.h });
+    const p = placePopup({
+      vw: fr.w, vh: fr.h, safe: { ...fr.safe }, focus: inp.focus, core: inp.core, bars, card: { w: vs[0].w, h: vs[0].h },
+      variants: vs.map(v => ({ w: v.w, h: v.h, full: v.h, type: v.type, cost: v.cost, tag: v.tag })), floor, gap: 18 * k, phone: false,
+    });
+    return { ...p, ok: p.ok && !p.scrolls, alt: null };
   }
-  // portrait: a sheet across the safe width, sitting on the caption strip
-  const w = f.w - f.safe.left - f.safe.right, h = Math.min(inp.card.h, Math.round(f.h * 0.38));
-  const rect: Rect = { x: f.safe.left, y: Math.max(f.safe.top, cap.y - Math.round(16 * f.k) - h), w, h };
-  const meas = (r: Rect) => ({
+  const w = fr.w - fr.safe.left - fr.safe.right, meas = (r: Rect) => ({
     overlapFocus: inp.focus ? inter(r, inp.focus) / Math.max(1, inp.focus.w * inp.focus.h) : 0,
     overlapCore: inp.core ? inter(r, inp.core) / Math.max(1, inp.core.w * inp.core.h) : 0,
     overlapBars: bars.reduce((a, b) => a + inter(r, b), 0) / Math.max(1, r.w * r.h),
   });
-  const m = meas(rect), ok = m.overlapFocus < 0.02 && m.overlapCore < 0.02 && m.overlapBars === 0;
-  if (ok) return { slot: 'sheet', mode: 'sheet', rect, leader: null, ...m, ok, score: 0, alt: null };
-  const top: Rect = { x: f.safe.left, y: Math.round(f.safe.top + badge.h + 14 * f.k), w, h };
-  const mt = meas(top), okTop = mt.overlapFocus < 0.02 && mt.overlapCore < 0.02 && mt.overlapBars === 0;
-  if (okTop || mt.overlapFocus + mt.overlapCore < m.overlapFocus + m.overlapCore) return { slot: 'sheet', mode: 'sheet', rect: top, leader: null, ...mt, ok: okTop, score: 0, alt: 'top' };
-  return { slot: 'sheet', mode: 'sheet', rect, leader: null, ...m, ok, score: 0, alt: null };
+  let best: CanvasPlace | null = null, bestCost = Infinity;
+  for (const v of pool) for (const where of ['bottom', 'top'] as const) {
+    const rect: Rect = where === 'bottom' ? { x: fr.safe.left, y: inp.cap.y - Math.round(16 * k) - v.h, w, h: v.h } : { x: fr.safe.left, y: Math.round(fr.safe.top + inp.badge.h + 14 * k), w, h: v.h };
+    const m = meas(rect), fits = rect.y >= fr.safe.top - 1 && rect.y + rect.h <= inp.cap.y - (where === 'bottom' ? 0 : 8 * k) + 1;
+    const good = fits && m.overlapFocus < 0.02 && m.overlapCore < 0.02 && m.overlapBars === 0;
+    const cost = good ? v.cost + (where === 'top' ? 0.05 : 0) : 10 + m.overlapFocus + m.overlapCore + m.overlapBars * 10 + (fits ? 0 : 5) + v.cost;
+    if (cost < bestCost - 1e-9) { bestCost = cost; best = { slot: 'sheet', mode: 'sheet', rect, leader: null, ...m, ok: good && !stuck, score: -cost, alt: where === 'top' ? 'top' : null, variant: v.i, scrolls: false, refused }; }
+  }
+  return best!;
+}
+
+export type FilmPlace = CanvasPlace;
+/** The popup card's rectangle in a film frame: `placeCanvasCard` (above) with the film's caption strip and corner mark. `variants` are the ways the card can be set (padding, width, the
+ *  phone drawing left out; none under the 36 design px floor); a lone `card` is one variant that is not judged. `badgeW` is the corner mark's text width (default: its 32 characters). */
+export function placeForFilm(f: FilmFormat, inp: { focus: Rect | null; core: Rect | null; card: { w: number; h: number }; variants?: CanvasVariant[]; badgeW?: number }): FilmPlace {
+  const cap = captionBox(f), bb = badgeBox(f, inp.badgeW ?? 640 * f.k), badge: Rect = { x: bb.x, y: bb.y, w: bb.w, h: bb.h };
+  return placeCanvasCard({ w: f.w, h: f.h, k: f.k, safe: f.safe, sheet: f.portrait }, { focus: inp.focus, core: inp.core, variants: inp.variants ?? [{ w: inp.card.w, h: inp.card.h }], cap: { x: cap.x, y: cap.y, w: cap.w, h: cap.h }, badge });
 }
 
 // ---- small shared helpers ----------------------------------------------------------------------------------------------------------------

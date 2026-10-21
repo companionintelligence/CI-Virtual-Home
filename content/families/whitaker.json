@@ -763,12 +763,10 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "kokoro",
+        "replaces": []
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "turn text into natural speech on your own Core",
       "anchor": {
         "role": "desk",
         "room": "kids",
@@ -786,11 +784,10 @@
         "side": "left"
       },
       "popup": {
-        "title": "Nell asks how a rainbow forms",
-        "body": "Nell sees a rainbow and asks how it forms. Callum looks it up with her in Kiwix. Its Wikipedia file was downloaded once, so no search engine hears her ask.",
+        "title": "Nell hears her spelling words",
+        "body": "Nell has a card of spelling words for Friday. Callum types each into Kokoro, which makes the speech on the Core, and Nell says every word back.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Kokoro"
         ]
       },
       "film": true

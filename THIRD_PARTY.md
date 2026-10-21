@@ -88,7 +88,7 @@ External tools the scripts call but this repository does not include: **ffmpeg**
 
 Four sections follow: what the family pages ship, what the voice-over tool builds with, what the films are built with, and
 what was considered and refused. In short: the site loads nothing from a third party at run time; the player adds no dependency; the only
-third-party **material** the site ships is Archivo Black (OFL-1.1) and the generated audio; Kokoro-82M, espeak-ng and FFmpeg are build-time
+third-party **material** the site ships is Archivo Black (OFL-1.1), the generated audio and, in the app media below, the apps' own logos and real screenshots of them; Kokoro-82M, espeak-ng and FFmpeg are build-time
 tools whose **output** ships. Voice-over is generated locally; no cloud text-to-speech service or API key is used anywhere. Open
 questions for counsel are listed in the voice and film sections.
 
@@ -104,13 +104,32 @@ loaded from a third party at run time: the site makes no third-party request.
 | The first-run drawings and the monogram discs | first-party | — | `scripts/story/pages.mts` (inline SVG) | — |
 
 The pictures on the site (thumbnails, posters, link previews, the hero) are renders of our own HouseSpecs; the link previews
-are drawn by `scripts/story/build-og.mts` over them. No photograph, portrait, logo of a third-party app or app screenshot is used:
-third-party apps are named in text only.
+are drawn by `scripts/story/build-og.mts` over them. No photograph or portrait is used. A third-party app's logo and real screenshots of it appear
+only as the app media below (a logo beside the app it names, a screenshot with its label); nothing is drawn, mocked up or composited.
 
 **Considered and not used.** [axe-core](https://github.com/dequelabs/axe-core) (the accessibility checker) is **MPL-2.0**, which
 is outside the licence list this repository takes (MIT, BSD, ISC, Apache-2.0, CC0), so `pnpm run portal:test` carries its own
 audit of the tour's interface (`AUDIT` in `scripts/story/portal-tests/player.mts`: names, labels, ids, contrast). If the owner approves MPL-2.0 for a
 test-only devDependency, it can be added beside it.
+
+<!-- ---- app media ---- -->
+### Story site: app media
+
+The real logos and screenshots the pages show (`pnpm run story:media` → `portal/apps/<id>/` and `portal/ci/`, one manifest, `content/story/app-media.json`;
+the contract is [`reference/story/story-v2.md`](reference/story/story-v2.md) "App media"). They are read with `git cat-file` from the sibling repos at pinned commits
+(the manifest's `sources`), scaled and re-encoded to WebP by FFmpeg, and shipped under a hash of their bytes. Nothing is edited, drawn over or composited: a logo
+is scaled to 128 px and centred on a transparent square, a screenshot is scaled to 960 px wide. Every screenshot carries its label on the page; the manifest lists
+what was left out and why (`rejected`). Nothing here is loaded from a third party at run time.
+
+| Source | What it is | Used for | Rights |
+|---|---|---|---|
+| **App logos and QA screenshots**: [CI-Marketplace](https://github.com/companionintelligence/CI-Marketplace) `apps/<id>/metadata/logo.*` and `e2e/screenshots/<id>.png` at `e947721966952d762deec382e64fd55a8f2db3fb` (80 logos, 46 screenshots of the apps the 30 families use) | Each logo is the app's own mark as it is in the Companion Hub store listing; each screenshot is a real capture of the app's first screen from a Companion Hub QA run (`e2e/`, Playwright against a running install) | A logo is shown only to identify the app named beside it; a screenshot is shown whole with "Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family." | The marks and the apps' interfaces belong to their owners and projects and stay theirs; each app has its own licence (its CI-Marketplace listing names it) and a few are not open source (Obsidian and Steam, for example). Shown to identify the software, not to suggest endorsement. **For counsel:** nominative use of the marks, and the licences of the apps' interface artwork, have not been checked app by app |
+| **Companion Hub screenshots**: [CI-Hub](https://github.com/companionintelligence/CI-Hub) `videos/ci-tutorial-video/public/screens/` at `860b47a7a84c53d305be8b7696fc390463fcbb96` (4) | Real captures of our own product (Lifescope Inc.): the store, an app's page, the setup screen and the home | Companion Hub section of a family page | First-party. The captures are taken on the Hub repo's tutorial capture stage, which seeds a sample catalogue and sample data (the label says so) |
+| **Companion account page screenshots**: the same CI-Hub folder (3: the store, the naming of a device, the home with one device); [CI-Portal](https://github.com/companionintelligence/CI-Portal) is pinned in the manifest (`ff8777c623760ca471ebd89a7881b0aa0f6018e7`) and every candidate there was looked at and left out | Real captures of our own product (Lifescope Inc.) | Companion account page section | First-party, with the same sample data. The third-party apps' icons inside these captures are the store's own listing |
+
+The tool is FFmpeg 8.0.1 with libwebp (Ubuntu build; build-time only, not shipped; the same note as for the film's FFmpeg above): the site's WebP files are its output.
+No image library was added. Counts and sizes are checked by `scripts/test-app-media.mts` (`pnpm run story:media:test`, part of `test:node`).
+<!-- ---- end app media ---- -->
 
 ### Story site: voice
 

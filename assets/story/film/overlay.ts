@@ -2,16 +2,16 @@
 // Everything is a pure function of the film second, the cue list and the frame's format: draw frame i twice and the pixels are the same.
 // Owner: video-tool.
 import { captionBox, badgeBox, type Cue, type FilmFormat, type CueWord } from './layout.js';
-import { INK, FG, SAGE, GLASS, EDGE, font, rrect, type Ctx } from './cards.js';
+import { INK, FG, SAGE, GLASS, EDGE, TYPE, font, rrect, type Ctx } from './cards.js';
 
 /** the colour of a word still to be spoken: solid, so its contrast on the glass is the same wherever the scene behind is bright */
 const UPCOMING = '#9db4ba';
 
-/** "Fictional family. Real software." in the top left, on every frame except the ones that carry the line big (the title and the end card). */
+/** "Fictional family. Real software." in the top left, on every frame except the ones that carry the line big (the title and the end card), at the canvas floor (36 design px). */
 export function drawBadge(g: Ctx, f: FilmFormat, text: string, alpha: number) {
   if (alpha <= 0.002) return;
   g.save(); g.globalAlpha *= alpha;
-  g.font = font(700, Math.round(26 * f.k));
+  g.font = font(700, badgeBox(f, 0).font);
   const b = badgeBox(f, g.measureText(text).width), r = b.h / 2;
   rrect(g, b.x, b.y, b.w, b.h, r); g.fillStyle = GLASS; g.fill(); g.lineWidth = Math.max(1, 2 * f.k); g.strokeStyle = EDGE; g.stroke();
   g.beginPath(); g.arc(b.x + r * 0.95, b.y + r, b.font * 0.2, 0, Math.PI * 2); g.fillStyle = SAGE; g.fill();
@@ -51,19 +51,21 @@ export function drawCaption(g: Ctx, f: FilmFormat, cue: Cue | null, ft: number, 
   g.font = font(700, px); g.textBaseline = 'alphabetic'; g.textAlign = 'left';
   const innerW = cb.w - 2 * pad - 8 * f.k;
   const { placed, lines } = layoutWords(g, cue.words, innerW);
-  const tag = cue.speaker ? lh * 0.9 : 0;
+  const tag = cue.speaker ? cb.tag : 0, tpx = TYPE.read * f.k;
   const h = lines.length * lh + 2 * pad + tag, w = Math.min(cb.w, Math.max(...lines) + 2 * pad + 8 * f.k);
   const x = Math.round((f.w - w) / 2), y = cb.y + cb.h - h;
   rrect(g, x, y, w, h, 22 * f.k); g.fillStyle = 'rgba(4,22,32,0.86)'; g.fill(); g.lineWidth = Math.max(1, 2 * f.k); g.strokeStyle = EDGE; g.stroke();
   let top = y + pad;
   if (cue.speaker) {
-    g.font = font(700, px * 0.62); g.fillStyle = SAGE;
-    const label = `${cue.speaker}`, lw = g.measureText(label).width;
-    g.fillText(label, x + pad + 4 * f.k, top + px * 0.62);
-    const tx = x + pad + 4 * f.k + lw + 14 * f.k, th = px * 0.62 * 1.5;
-    g.font = font(600, px * 0.5); const sw = g.measureText('Scripted').width + 22 * f.k;
-    rrect(g, tx, top + px * 0.62 - th * 0.78, sw, th, th / 2); g.lineWidth = Math.max(1, 1.6 * f.k); g.strokeStyle = 'rgba(197,232,220,0.7)'; g.stroke();
-    g.fillStyle = SAGE; g.fillText('Scripted', tx + 11 * f.k, top + px * 0.62 - th * 0.1);
+    // the speaker and the word "Scripted", each at the canvas floor (36 design px)
+    g.font = font(700, tpx); g.fillStyle = SAGE;
+    const label = `${cue.speaker}`, lw = g.measureText(label).width, by = top + tag * 0.5;
+    g.textBaseline = 'middle'; g.fillText(label, x + pad + 4 * f.k, by + tpx * 0.03);
+    const tx = x + pad + 4 * f.k + lw + 16 * f.k, th = tpx * 1.4;
+    g.font = font(600, tpx); const sw = g.measureText('Scripted').width + 28 * f.k;
+    rrect(g, tx, by - th / 2, sw, th, th / 2); g.lineWidth = Math.max(1, 1.6 * f.k); g.strokeStyle = 'rgba(197,232,220,0.7)'; g.stroke();
+    g.fillStyle = SAGE; g.fillText('Scripted', tx + 14 * f.k, by + tpx * 0.03);
+    g.textBaseline = 'alphabetic';
     top += tag;
   }
   g.font = font(700, px);

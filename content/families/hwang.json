@@ -734,12 +734,10 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "kokoro",
+        "replaces": []
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "turn text into natural speech on your own Core",
       "anchor": {
         "role": "bookshelf",
         "room": "kids",
@@ -756,11 +754,10 @@
         "side": "right"
       },
       "popup": {
-        "title": "Yuna asks what otters eat",
-        "body": "Yuna checks Kiwix to learn what an otter eats. Its Wikipedia file was downloaded once, and the Core serves it, so no search engine is asked.",
+        "title": "Yuna hears her otter story",
+        "body": "Yuna types three lines about the otter on the terrace. Kokoro on the Core speaks them back, and she fixes the funniest sentence.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Kokoro"
         ]
       },
       "film": true
@@ -847,13 +844,13 @@
       },
       "popup": {
         "title": "One Core on the knoll",
-        "body": "A manual, a camera, code and a child’s questions, on one Companion Core on the knoll."
+        "body": "A manual, a camera, code and an otter story read aloud, on one Companion Core on the knoll."
       },
       "film": true
     }
   ],
   "closing": {
-    "body": "Your house manual, camera clips, code and a child’s questions can sit on a Companion Core. Browse the Companion Hub store and pick your first apps.",
+    "body": "Your house manual, camera clips, code and read-aloud stories can sit on a Companion Core. Browse the Companion Hub store and pick your first apps.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"
@@ -865,8 +862,8 @@
     "The Study has a desk and a laptop only; no monitor or screen is named. The Kids Room has a bookshelf and no desk: Yuna's beats anchor the bookshelf or the room.",
     "Both companions are Hermes. Memory is not connected, so Companion Memory is never named. Poppy and Linnet only draft; Minjung sends, Jiho pastes.",
     "Pi-hole covers only the devices that use it for DNS; the beat says so and is not parental control. Frigate: the camera is the family's own, over their own terrace.",
-    "Kiwix and LibreTranslate beats carry downloaded once. Donetick is told without its Telegram or Pushover notifications. Home Assistant needs a network smart plug for the pump; no Zigbee stick is implied.",
-    "Duplicati names a local disk as the destination. Paperless-ngx is scans only.",
+    "The LibreTranslate beat carries downloaded once. Donetick is told without its Telegram or Pushover notifications. Home Assistant needs a network smart plug for the pump; no Zigbee stick is implied.",
+    "Duplicati names a local disk as the destination. Paperless-ngx is scans only. Kokoro speaks only the text typed into it; it answers no questions and no voice or language is named.",
     "Jiho's tide table app is a personal project: no employer code is implied."
   ]
 }

@@ -774,15 +774,15 @@
       "id": "loft-lookup",
       "chapter": "loft",
       "member": "selam",
-      "category": "privacy",
+      "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "booklore",
         "replaces": [
-          "Google Search"
+          "Kindle"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "manage and read books, comics and PDFs, with covers and details filled in",
       "anchor": {
         "role": "bookshelf",
         "room": "living",
@@ -800,12 +800,13 @@
         "side": "left"
       },
       "popup": {
-        "title": "Who wrote this poem?",
-        "body": "For Spanish class, Selam looks up her poem's author in Kiwix. The Wikipedia file was downloaded once, so the Core serves it, and no search engine is asked.",
+        "title": "Selam opens her poetry book",
+        "body": "Selam's Spanish poem is due on Friday. She opens the poetry collection in BookLore and turns to the poem's page. BookLore keeps the books on the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
-        ]
+          "BookLore",
+          "replaces Kindle"
+        ],
+        "note": "BookLore fetches covers and details from outside."
       },
       "film": true
     },
@@ -879,7 +880,7 @@
     "Chapter order is the walk: kitchen, loggia, the balcony planter off the primary bedroom, then salon, den and the loft. The garden anchor is the bedroom-floor balcony, not the pool terrace.",
     "Open WebUI sits in with, never as the beat app: its chip replaces ChatGPT trips cap-parity. Gitea carries the replaces chip in kitchen-model.",
     "Fennel is Hermes with Companion Memory connected; Bramble is OpenClaw. No cloud key anywhere. Dawit's boat rota is a lake club side project, never employer code.",
-    "Home Assistant: the lamps are network devices only; no Zigbee, no energy claim. Kiwix and LibreTranslate beats carry downloaded once. Navidrome scans a music folder; it has no upload.",
+    "Home Assistant: the lamps are network devices only; no Zigbee, no energy claim. The LibreTranslate beat carries downloaded once. Navidrome scans a music folder; it has no upload.",
     "Film (eight beats): delivery, plug-in, hello, kitchen-gitea, living-photos, den-tasks, loft-lookup, outro. Companion Memory is not named in the film. Obsidian is Bruk's only; Selam's reading-list beat was cut."
   ]
 }

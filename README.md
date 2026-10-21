@@ -15,9 +15,11 @@ compiled from it:
 | **Web portal** — a gallery of the homes and a live player to fly their camera paths | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages, deployed from `main`; see [Deploying](#deploying)) |
 | **Family stories**: a fictional family in every home, each member doing their job on one Companion Core, told as the case for uncloud: a page and a narrated tour per family | `content/families/<slug>.json` (the contract: [`reference/story/personas.md`](reference/story/personas.md)), `content/story/`, `scripts/story/`, `assets/story/` | `family/<slug>` and `room-creator?mode=view&house=<id>&family=<slug>` on the same site (see [The family stories](#the-family-stories)) |
 
-30 houses ship today, each a spec in `content/houses/<id>.json`. The specs' `author` and `source` fields are internal records
-of where each one came from: they stay in the repository and are never shown or shipped (see [Credits](#credits-none-on-the-site)).
-Each house is also the home of a fictional family (see [The family stories](#the-family-stories)).
+36 homes ship today, each a spec in `content/houses/<id>.json`: 30 houses, and six apartments that Companion Intelligence wrote itself
+(a unit in a block, [`reference/APARTMENTS.md`](reference/APARTMENTS.md)). The specs' `author` and `source` fields are internal records
+of where each one came from: they stay in the repository and are never shown or shipped (see [Credits](#credits-none-on-the-site)); the
+apartments' author is the company's own name, which the credit guard knows is not a builder (`scripts/own-authors.mts`).
+Each of the 30 houses is also the home of a fictional family (see [The family stories](#the-family-stories)); the six apartments have none yet.
 
 ## Quickstart
 
@@ -47,19 +49,19 @@ the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308);
 |---|---|
 | `pnpm run build` | Type-strips `assets/**/*.ts` to the `.js` the browser loads (esbuild `transform`, not a bundle). Run after any asset edit; `check` runs it first. |
 | `pnpm run typecheck` | `tsc` over `scripts/` (Node) and over `assets/` (browser). |
-| `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
+| `pnpm run validate` | All 36 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` and `scripts/test-stories.mts` under `node --test`: the floor-plan graph, mitres, and the wall compiler over every spec; the story validator against its good and bad fixtures. Needs `build`. |
 | `pnpm run check` | **The gate** — every check below, in order (`pnpm run typecheck` is separate). `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
-| `pnpm run check:quick` | assets + specs + shots, and the 31 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site, the story validator, bake, voice locks and film …): the fast loop while editing. |
-| `pnpm run test:node` | Only those 31 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
+| `pnpm run check:quick` | assets + specs + shots, and the test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site, the story validator, bake, voice locks and film …): the fast loop while editing. |
+| `pnpm run test:node` | Only those quick tests (every `scripts/test-*.mts` marked `@check-house quick`, found by glob, so the number moves: the run lists them): pure Node, no browser, no GPU (a few minutes). CI runs it. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
-| `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
+| `pnpm run goldens` / `goldens:update` | Compare the committed baselines (150 frames: five for each of the 30 houses) / re-bless them. A home with no baseline (the six apartments, until `goldens:update --house <ids>` is run on the Mac) is named, not rendered and not blessed, and the run fails: a frame nobody has blessed is a frame nobody is checking. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
-| `pnpm run test:twins` | The Python twins (`generate_floor_plans.py`, `generate_house_iso.py`) on the 30 houses and every fixture: they must run, reproduce the committed sheets, isometrics and Lotties byte for byte on the 30, and draw what S2's fixtures show (porches, bays, L/U stairs, floor patterns …) from `<id>.plan.json`'s `arch` key. `check` runs it; ~2 min, needs a GPU for the fixtures' plans. |
+| `pnpm run test:twins` | The Python twins (`generate_floor_plans.py`, `generate_house_iso.py`) on the 36 homes and every fixture: they must run, reproduce the committed sheets, isometrics and Lotties byte for byte on the homes, and draw what S2's fixtures show (porches, bays, L/U stairs, floor patterns …) from `<id>.plan.json`'s `arch` key. `check` runs it; ~2 min, needs a GPU for the fixtures' plans. |
 | `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless your own fixture, `--record <stream>` for another's frame your branch moves). |
 | `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only, with each number's Δ against the committed `test/perf/baseline.json` (`--house`, `--all`, `--baseline` to rewrite it at integration). |
 | `pnpm run perf:player` | Advisory timing of the live player (`room-creator.html?mode=view`) in Chromium on the real GPU: presented frame times, CPU and GPU time of `renderer.render`, draw calls, programs. Modes `bench` (default) `attr` `load` `raf` `profile` `census`; `--houses a,b`, `--defaults 1,2`, `--dpr 2`, `--throttle 4`, `--runs N`, `--query no=glass,…` (appended to the player URL, for A/B of a live-only feature), `--out <file.md>` (rows plus the header line with commit and `uptime`), `--json <file>`. Not part of `check` or CI: timings depend on the machine's load. See *Player performance*. |
-| `pnpm run shot-planner` | Spline planner v2 on all 30 houses and S5's five fixtures (`assets/shot-planner.ts`): planned twice byte-identical, QA v2, the fleet camera targets (outside share, door speed, view rate, look error against each beat's subject, the press, rooms seen, the Core's height and place, the establishing styles, the orbit — strict: every house with a sound way to 90° flies it — the finale and establishing lenses against the plan's, the film's length against its budget and against the plan's own 12 s), the page's track hash equal to Node's (`--parity`: three houses and the spiral and upper-entry fixtures), every world's three films planned in Node and in Chromium's engine with the whole track's hash compared, the recorded `test/shots/<id>.track.json` hashes equal to what the planner bakes now (a drift fails, like a golden: `--update` records them in the commit that moves them), the planning and QA budgets (QA v2 and its four aspect passes), a custom `shots[].establish` pose that plans. Worlds come from `test/qa/shot-worlds/` (built in the page once, `--rebuild-worlds` / `--stale-ok`). |
+| `pnpm run shot-planner` | Spline planner v2 on all 36 homes and S5's five fixtures (`assets/shot-planner.ts`): planned twice byte-identical, QA v2, the fleet camera targets (outside share, door speed, view rate, look error against each beat's subject, the press, rooms seen, the Core's height and place, the establishing styles, the orbit — strict: every house with a sound way to 90° flies it — the finale and establishing lenses against the plan's, the film's length against its budget and against the plan's own 12 s), the page's track hash equal to Node's (`--parity`: three houses and the spiral and upper-entry fixtures), every world's three films planned in Node and in Chromium's engine with the whole track's hash compared, the recorded `test/shots/<id>.track.json` hashes equal to what the planner bakes now (a drift fails, like a golden: `--update` records them in the commit that moves them), the planning and QA budgets (QA v2 and its four aspect passes), a custom `shots[].establish` pose that plans. Worlds come from `test/qa/shot-worlds/` (built in the page once, `--rebuild-worlds` / `--stale-ok`). |
 | `pnpm run shot-qa` | A fault injected for every QA v2 code (85), for the plan's own caps, lenses and a window pane (with no thickness too) or a trunk on the way, for each check a mutation review found loosenable (the glass pad, the outside beats' site test, the beat's median look error, the door zone, the fixed subjects, the yaw slack, the film budget), and for every fleet check (the orbit's gate strict: one house short fails it), on two frozen worlds (`test/shots/worlds/`): each must be caught. No browser. |
 | `pnpm run camera-audit` | A contact strip per house and planner (twelve frames, the plan with the path by beat), the camera metrics of v1 and v2 side by side → `test/qa/camera-audit/index.html` (`--house`, `--planner v1,v2`, `--fixtures`). The check step also runs planner v2's door-to-core, hero-reveal and walkthrough through QA v2 in the page (`shots:v2`) and its frames through the determinism test (`determinism:v2`). |
 | `pnpm run fleet-audit` | The fleet sameness metrics (door colours, claddings, lighting, furniture repetition, planting …) → `test/qa/fleet-audit.md`, beside the committed baseline `test/fleet/baseline.json`. `--built` measures what this tree's builders generate (plans rebuilt into `test/qa/plans/`); `--baseline` rewrites the baseline (integration only). |
@@ -71,20 +73,23 @@ the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308);
 | `pnpm run index` | Validate every spec and rebuild `content/houses/index.json` (the page's house list). |
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
 | `pnpm run export:core` | The Companion Core as glTF (`--finish`, `--pose`) → `dist/models/`. |
-| `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
+| `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--no-hero`, `--hero-tod`, `--max-kb`, and `--gl default` on Linux for the machine's own GPU instead of SwiftShader; a tall block has its framing in `FRAME`). Needs a GPU; commit the output. One new home: `--house <id> --no-hero`. |
 | `pnpm run portal:icons` | Render the site's raster icons (`portal/icons/`: `favicon.ico`, the manifest's 192 and 512 px PNGs, the 180 px apple-touch-icon) from the brand mark with Chromium. Commit the output. |
 | `pnpm run story:validate` | The family stories (`content/families/<slug>.json`) against the schema, the Uncloud voice, `claims.json`, the app catalog, the persona rules, the cast plan (the people, their archetypes and companions, the planned apps) and each beat's own house. `-- <slug>` for one, `-- --complete` for the whole set of thirty and the fleet counts. No GPU. See [`reference/story/validator.md`](reference/story/validator.md). |
-| `pnpm run story:cast` / `story:cast-lint` | Who lives where: `content/story/cast-plan.json` (the authored decisions: 30 families, members, archetypes, rooms, signature apps) plus the house files and `roles.json` give `content/story/casting.json` and `reference/story/cast.md` (`story:cast --check` fails when either is stale). The lint holds the plan to the fleet rules (the Brennan flagship, unique names, at least 70 apps, no app in more than 12 of 30 families). No GPU. [`reference/story/cast.md`](reference/story/cast.md) |
+| `pnpm run story:cast` / `story:cast-lint` | Who lives where: `content/story/cast-plan.json` (the authored decisions: 30 families, members, archetypes, rooms, signature apps; and `homesWithoutFamily`, the homes that have none yet: the six apartments, which the lint lets stand without a family and no other home) plus the house files and `roles.json` give `content/story/casting.json` and `reference/story/cast.md` (`story:cast --check` fails when either is stale). The lint holds the plan to the fleet rules (the Brennan flagship, unique names, at least 70 apps, no app in more than 12 of 30 families). No GPU. [`reference/story/cast.md`](reference/story/cast.md) |
+| `pnpm run story:services` / `story:services:check` | The registry of the services the stories' apps are the alternative to (`content/story/services.json`): recompute its derived columns from the catalog and the families, or fail when they are stale or an invariant breaks. No network. [`reference/story/story-v3.md`](reference/story/story-v3.md) |
 | `pnpm run story:bake` | Each family's camera: a safe pose per beat, the walks between them and the tour's track → `content/families/<slug>.bake.json` (`-- <slug>`, `-- --all`, `--check`, `--stills <dir>` renders contact sheets on one GPU process). Run it after the voice, so the durations are the voice's. [`reference/story/bake.md`](reference/story/bake.md) |
 | `pnpm run story:voice` | The narration, generated **locally** with Kokoro-82M (no cloud service, no key) → `content/families/<slug>.voice.json` and `<slug>/audio/<clip>.<hash10>.m4a` (`-- <slug>`, `-- --all`, `--stale`, `--dry-run`, `--sheet`). [`reference/story/voice.md`](reference/story/voice.md) |
 | `pnpm run test:voiceover` | Every committed voice lock: clips hashed and intact, loudness, word timings, the family budget. Also part of `check:quick`. |
 | `pnpm run story:film` | One film per family in 16:9 and 9:16, from the tour's own camera and voice (`-- <slug>`, `-- --all`, `--dry-run`, `--stills <dir>`). One GPU process; the films are hosted outside Pages. [`reference/story/film.md`](reference/story/film.md) |
 | `pnpm run story:ads` | The persona ad cuts: one member's story as a silent 15 to 25 s vertical ad (also 1:1, 4:5, 16:9) from the family's story and bake lock; refreshes `content/story/ads.json` (`--manifest`, `--check`, `--dry-run`, `--stills <dir>`, `--family`, `--member`, `--aspect`, `--res`, `--gl default\|software`). Videos go to `video/ads/` (gitignored). [`reference/story/ads.md`](reference/story/ads.md) |
 | `pnpm run story:ads:test` | The ad kit's pure-Node tests (the plan, the manifest, the safe areas, the encode flags). Also part of `test:node`. |
+| `pnpm run story:media` | The real app logos (128 px) and screenshots (960 px wide) of the apps the families use, of Companion Hub and of the Companion account page → `portal/apps/<id>/` and `portal/ci/` (content-hashed WebP) and `content/story/app-media.json`, read with `git cat-file` from CI-Marketplace, CI-Hub and CI-Portal beside this repo at the commits the manifest pins; ffmpeg with libwebp only (`--check`, `--update-sources`, `--fetch`, `--apps`, `--out`, `--verbose`). Commit the output. [`reference/story/story-v2.md`](reference/story/story-v2.md) |
+| `pnpm run story:media:test` | The media's quick Node test (the manifest, hashes, sizes, captions, rejections, the tree, the page rules, the encoder and, where the sibling repos are, a build twice into temp dirs). Also part of `test:node`. |
 | `pnpm run portal:og` | Draw the families' link-preview images → `portal/og/<slug>.jpg`, with `portal/og/manifest.json` (Chromium's 2D canvas, no GPU; `--only`, `--families`). Re-run it when a family's text or its preview picture changes: a stale one is not shipped (that page uses its home's own picture) and is an error with `--strict-families`. Commit the output. |
 | `pnpm run portal:build` | Assemble the site in `dist/` (only what it loads, the specs redacted: no author, no source) and check its links and that nothing credits a builder ([Credits](#credits-none-on-the-site)). Needs `build`. `--families <dir>` reads other family files; `--strict-families` makes a stale family an error (see [The family stories](#the-family-stories)); `--stale-report` lists every reason. |
-| `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
-| `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`, `--only <legs>`), the campaign's tags (the `campaign` leg), the family pages and the narrated tour (the `hooks` leg, `scripts/story/portal-tests/`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
+| `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). `-- --tailscale` also listens on this machine's Tailscale address (the one `tailscale ip -4` prints), so a phone or laptop on the same tailnet opens `http://<that address>:<port>/ci-virtual-home/` (the command prints it and the MagicDNS name); never on `0.0.0.0`, so the local network does not see it. `-- --host <ipv4>` listens on that one address instead. The preview stops with Ctrl-C. |
+| `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium (on Linux with a GPU, `PORTAL_GL=default` uses it instead of SwiftShader): gallery, player, fly, share, the editor (`--house`, `--shots`, `--only <legs>`), the campaign's tags (the `campaign` leg), the family pages and the narrated tour (the `hooks` leg, `scripts/story/portal-tests/`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
 | `pnpm run test:campaign` | `portal/campaign.js` run in a tiny DOM stub, and the pages that load it (no browser): the tags captured, only the listed ones, the right links rewritten and no others, no double append, storage blocked, links added later, an organic visit. A quick Node test. |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
 | `pnpm run test:light` | The interior-light gate (a GPU, minutes; the product code must be committed): the four `light-*` fixtures at day, dusk and night, and with `-- --bench` the 19 luma checks of the plan on the five bench rooms (clipped highlights, crushed shadows, ceiling and range against `before.metrics.json`), `-- --leak` every room's pool against its neighbours (409 rooms), `-- --lamps` the lamp census (every glowing lamp, whether its room has a pool, the 16-light cap), and the tuning modes `--portal` `--hitch` `--steady` `--closeups` `--mood` `--probe`. |
@@ -92,6 +97,7 @@ the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308);
 | `node --experimental-strip-types scripts/compose-house.mts --house <id> --dress [--write]` | The dress phase alone (`assets/room-dress.ts`): add the `src: 'dress@1'` small goods, lamps, towels and café curtains of each room's recipe (`--level`, `--rooms`), over a frozen layout; `--undress` strips them again and gives the file back byte for byte; `--dress` twice writes what once did. Pass 6 baked all 30 houses with it. |
 | `pnpm run dress-project` / `dress-census` / `dress-cost` / `dress-fleet` / `dress-reach` | What the phase would add (items per program, lamp coverage, meshes and triangles, `--lamps` table), the census of the specs (never-bare rules, blank walls; `census.json` is the frozen BEFORE), the draw-call sub-gate on the dress fixtures (at most ×1.12), the five fleet gates measured on the built meshes of the 30 baked houses (curtain-vs-item, curtain-vs-curtain, neighbour gap, corner camera, curtain-window), and REACH measured over 1,000 seeds (`--check`). |
 | `pnpm run review:capture` / `review:luma` / `review:sheets` / `review:ab` / `review:cost` / `review:verify` | The review rig (`scripts/review/`): 92 frames of the 24 review rooms at the rig's corner cameras (1.5 m eye, 60°, NW and SE, 1280 × 720 through the composer; dusk and night on the five bench rooms; a 1.7 m mannequin for scale), luma metrics, before/after sheets, the blind A/B pair generator and scorer, the cost census (`--compare` against `test/review/baselines/cost.json`: draw calls, meshes, triangles, texture memory, lights) and the determinism check. Outside git, in `REVIEW_DIR` (`scripts/review/lib.mts`). |
+| `pnpm run review:zfight` / `review:collide` | The geometry detectors (README → Geometry detectors): `--house <id[,id]>` `--out <dir>` `--gl default\|software`; z-fighting found by experiment (and named), and props that intersect props, walls, doors, stairs or voids in the meshes a house really builds. `review:geometry-selftest` plants a defect and proves each finds it. |
 | `pnpm run prop-drift` / `test:neutrality` | A type rebuilt in place keeps its box (`prop-boxes.json`), and a change moves only the object classes it declared (`--changed item:a,role:b`; `--query dress=0`). |
 | `pnpm run soft-sheet` / `soft-rooms` | SOFT's prop sheet (one column per seed) and the soft fixture house seen from inside at the rig's cameras. |
 | `node --experimental-strip-types scripts/bake/bake.mts` | The 3Dinside bake: `models/manifest.json` plus a source pack outside git → `assets/props/baked/<family>.ts` (Blender, deterministic; `--check` needs neither, `--verify-repro` bakes twice). `scripts/bake/attribution.mts [--check]` writes `ATTRIBUTION.md` byte for byte; `scripts/bake/sheet.mts` renders review sheets (`--compare` procedural against baked). |
@@ -110,8 +116,8 @@ portal/                    the portal's styles and scripts, thumbs/<id>.webp and
                            page), story.css (the tour), fonts/ (Archivo Black), og/ (the families' link previews, derived, committed)
 content/families/          the authored stories, <slug>.json (the writers' files; the voice and bake locks sit beside them)
 content/story/             cast-plan.json (who lives where; casting.json, slug <-> house, is derived from it), personas.json, claims.json,
-                           catalog-apps.json, the schema: the story system's inputs
-reference/story/           personas.md (the contract), cast.md (derived), validator.md, bake.md, voice.md, player.md, film.md
+                           catalog-apps.json, services.json (the replaced services), the schema: the story system's inputs
+reference/story/           personas.md (the contract), story-v3.md (the services and pairs), cast.md (derived), validator.md, bake.md, voice.md, player.md, film.md
 scripts/story/             site.mts (the story part of portal:build), pages.mts (a family's page), check-leaks.mts, check-copy.mts,
                            build-og.mts, hooks.ts (the seams: ship/*.mts at build, portal-tests/*.mts at test), lib/ (the validator)
 assets/story/              the narrated tour: director, popups, captions, audio, the baked camera track (loaded only for ?family=)
@@ -135,7 +141,7 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
   viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
                            calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
-content/houses/            <id>.json — the 30 HouseSpecs (source; pass 6 baked each room's dress@1 items into them); <id>.plan.json and index.json — derived
+content/houses/            <id>.json — the 36 HouseSpecs (source; pass 6 baked each room's dress@1 items into them); <id>.plan.json and index.json — derived
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
@@ -148,9 +154,10 @@ scripts/bake/              the bake pipeline (Blender), the attribution generato
 scripts/review/            the review rig: capture, luma, sheets, A/B, cost, verify, the committed baselines' tools
 test/review/baselines/     the rig's frozen BEFORE and the stability baselines (before.manifest.json, before.metrics.json, cost.json, census.json,
                            prop-boxes.json, build-neutrality.json, compose-fixtures.json)
-reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
+reference/                 HOUSE-SPEC.md (the schema), APARTMENTS.md (a unit in a block: the recipe, the six, what adding a home changes),
+                           PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
-test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
+test/goldens/macos-metal/  150 committed baseline frames of the first 30 homes (Git LFS; the apartments' come with `goldens:update --house`) + PROFILE.json (the renderer that made them)
 test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the frames it moves and why, and
                            <stream>/<profile>/ what each golden moved to (see How verification works)
 test/fixtures/houses/      fixture specs each stream proves its features on; hashes/<profile>/<id>.json their frame hashes
@@ -329,19 +336,31 @@ in a script, a stylesheet, a spec or a data file. The pieces are our own, so the
 Every URL in the site is relative, so the same tree works at the root of any host (the live site, a preview's
 `pages.dev` address) and under a sub-path; `portal:preview` and `portal:test` serve it at `/ci-virtual-home/` to
 prove it. `portal:build` copies only what the site loads into `dist/` (and refuses stale compiled assets, a missing
-spec or thumbnail, a link to a file it does not ship, a root-relative URL, hero figures in `index.html` that
-disagree with `index.json`, a written-out count ("thirty") that is not the number of homes, and a built page without the four
+spec or thumbnail, a link to a file it does not ship, a root-relative URL, a count typed in
+`index.html` (the lander writes its counts as words from the data), a lander that breaks its own checks (`scripts/story/lib/lander-check.mts`), and a built page without the four
 links above, a `<script>` without `data-cfasync="false"`, a second `<h1>` or invalid JSON-LD); CI runs it on every PR. Nothing renders in CI: when a house's look changes, re-run
 `pnpm run portal:thumbs --house <id>` on a GPU and commit the new thumbnail and preview with the change.
 `portal:test` is the check to run before pushing portal work.
 
+**What CI runs of it, and what stays by hand.** `ci.yml` runs the copy lint over the built `dist/` and, without blocking yet, `portal:test --only gallery,pages,previews,caching,failures,campaign,hooks,webkit` on
+Chromium and software GL (and on WebKit when Playwright's build is installed; there is no Firefox leg). The player, motion and editor legs need a GPU and stay with you: run `pnpm run portal:test` on one
+before a push that touches them. Paid traffic lands in engines no leg covers, so before each campaign someone records a pass on real devices, and writes the result in the pull request:
+
+| Device or app | Open | Pass when |
+|---|---|---|
+| iOS Safari | the front page, a family page, `family/<slug>` then "Take the tour" | the page reads, the tour starts or ends on the failure card with a way back, the links to ci.computer open |
+| Instagram, Facebook and TikTok in-app browsers (iOS and Android) | a family page from an ad link with `utm_source` set | the page reads without script, the tour starts or says why not, the campaign tags ride on the Core and Download links |
+| Android Chrome | the same three | the same, and the seek bar and the tour card are 44 px targets |
+| A desktop browser with WebGL off | `room-creator?mode=view&house=aurora&family=brennan` | the failure card, with "Read the family's story" |
+
 The site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
-compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
+compiled engine (`assets/**/*.js`), three.js, the fonts and the 36 specs.
 
 ### The family stories
 
-<a id="the-family-stories"></a>Every one of the thirty homes is lived in by a **fictional family**: two to six people, each with an archetype, the job they
-do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host). A room tells that member's story: what they
+<a id="the-family-stories"></a>Each of the thirty houses is lived in by a **fictional family** (the six apartments have none yet: they are listed in the cast plan's `homesWithoutFamily`, keep a plain card that opens the player and a page of their own, and `portal:build` says so; a home with neither a family nor a line there is `story:cast-lint`'s error): two to six people, each with an archetype, the job they
+do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator, and twelve more; the list and the eight front-page categories that group them are in [`reference/story/personas/index.md`](reference/story/personas/index.md)). A room tells that member's story: what they
+
 do there, which Companion Hub store app does it and which cloud service it replaces. The tour is the argument for uncloud: the same life,
 on your own hardware. The contract for the writers, the validator and the film is
 [`reference/story/personas.md`](reference/story/personas.md); the label is "Fictional family. Real software." and the campaign's rules
@@ -377,6 +396,31 @@ on your own hardware. The contract for the writers, the validator and the film i
   (`?lighting=day` on the editor page: the houses' own dusk is never used), the overlay is the canon's light set, and the GPU is the machine's own through ANGLE (`--gl default`, `PERSONA_CUT_GL`). Hook rule, aspects,
   safe areas, disclosures, determinism, hosting and the open items: [`reference/story/ads.md`](reference/story/ads.md).
 <!-- ---- end ad kit ---- -->
+<!-- ---- app media ---- -->
+- **App media** are the real logos and screenshots the pages may show (`pnpm run story:media`; the manifest is `content/story/app-media.json`, the files `portal/apps/<id>/` and `portal/ci/`). A logo
+  stands beside the app it names; a screenshot is real, unedited, shown whole with its label ("Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family.") and never put
+  into a scene, the tour or an ad cut. Each screenshot was looked at by eye; the ones left out, and why, are the manifest's `rejected` list. `portal:build` ships only what the manifest names, fails
+  on a missing file, missing alt text or a missing caption, and warns when an app a family uses has no entry. Licence rows: [THIRD_PARTY.md](THIRD_PARTY.md) "Story site: app media".
+<!-- ---- end app media ---- -->
+<!-- ---- layout (story v2) ---- -->
+- **The layout of the story's pages (story v2)** puts the new fields and the real media to work, build-time static HTML first and a few lines of script on top (nothing needs it to be read). A **family's page**
+  has a sticky nav of its people (a chip each: monogram, name, archetype word; the one being read gets `aria-current`), then for each person their bio, the card "Rented before, on the Core now" (the services
+  their moments replace against the apps that do the job, with the apps' real logos), their moments with "More about this moment" (a native `<details>`: before, now, the steps, one fact about the app),
+  a strip of up to three real screenshots of their apps (each opens larger in a native `<dialog>`: `portal/shots.js`), then "A day in the house" (`family.day` as a timeline), "The home" (the lede, the spots,
+  the storeys, the floor area and the rooms from the spec, and a schematic floor plan with a pin for each person: `scripts/story/lib/plan-map.mts`) and "How it runs" (real Companion Hub and Companion
+  account screenshots). The **front page** shows none of this media (it names apps in text; see the front page bullet below). The **tour's card** wears the app's logo on its chip and has a "More"
+  toggle that opens the beat's before and after (`reference/story/player.md`). The Brennan family (`content/families/brennan.json`) is the showcase and the model for the other families' details, home, day and bios.
+  Node tests: `scripts/test-story-pages.mts` (the page writer and the plan); browser tests: `family-v2.mts`, `lander.mts` and `player-more.mts` in `scripts/story/portal-tests/` (`pnpm run portal:test -- --only hooks`).
+<!-- ---- end layout (story v2) ---- -->
+<!-- ---- type scale (live pass 3) ---- -->
+- **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a
+  modal (card, start and end cards, About, failure card, the family page's screenshot dialog) **1.5rem = 25.5 px at 768 px and wider, `clamp(20px, 5.4vw, 25.5px)` on a phone**, a card's title 2.25rem, the start and end cards'
+  heading 2.6rem; Manrope 400 body, 500 controls, 600 chips, 700 titles and names (no 800), 0.2pt tracking. The tokens are `--st-min`, `--st-title` and `--st-hook` in `portal/viewer.css`; every size in the tour's CSS is one of them.
+  A card is `clamp(420px, 32vw, 560px)` wide, a phone's sheet up to 55 % of the height; the placement solver (`assets/story/place.ts`) may shrink padding, choose another slot or a narrower and taller card, and never shrinks type.
+  **A person's name is a kicker** on every card, dialog and family-page label: all capitals by CSS (the text and aria-labels stay as written), 700, 0.2em of tracking, in the accent; "THE BRENNAN FAMILY" the same. Film and ad
+  canvases keep 36 design px (a canvas is shown scaled down). Details and the table: `reference/story/player.md`, "Type and size". Tests: `scripts/test-story-place.mts`, `scripts/test-story-pages.mts`, `typography.mts`
+  (`pnpm run portal:test -- --only hooks`).
+<!-- ---- end type scale (live pass 3) ---- -->
 - **Stale families.** A family is shipped only when it is current: in the casting, in a house that exists, its apps in the live store, the validator clean,
   its words clean. A family written for a house that has since been re-laid, or one the casting no longer names, is stale: no page, no tour, and the build
   names it with its first reason (`--stale-report` lists them all) and carries on. A tour whose lock no longer matches (a bake or voice recorded from older
@@ -385,27 +429,23 @@ on your own hardware. The contract for the writers, the validator and the film i
 - **The tests do not depend on a shipped home or family.** The validator's run on a small test world (`test/fixtures/stories/world/`, with the exemplar
   `test/fixtures/stories/exemplar.json`), the bake's on a frozen copy of the pre-re-lay `aurora` (`test/fixtures/stories/bake-world/houses/`), so a
   re-lay of a shipped home cannot fail them. What does read the shipped data: every role the casting lists must resolve in its home and the universal
-  roles in all thirty, `story:cast --check` (the casting is derived and current), and `every content/families/<slug>.json validates`, which fails
+  roles in all thirty families' homes, `story:cast --check` (the casting is derived and current), and `every content/families/<slug>.json validates`, which fails
   while a family file is one of the retired slugs.
 - **The order after an edit:** `pnpm run story:validate -- <slug>`, `story:voice -- <slug> --stale`, `story:bake -- <slug>`, `portal:og`, then `portal:build` and `portal:test`.
   The `.voice.json`, `.bake.json`, audio and link-preview images are generated and committed; never hand-edit them.
 <!-- front page -->
-- **The front page** (`index.html`, `portal/gallery.js`, `portal/gallery.css`, `scripts/portal-front.mts`, the `front page` blocks of `scripts/build-portal.mts`)
-  is the story's lander. The hero says "Thirty homes. Each family's life, on one Companion Core.", the label "Fictional family. Real software.", who
-  lives there in a line (Sally's planner, John's code, Steve's games, Jean's homework), one action (`Take the tour`: the Brennan family's tour in the
-  player) and a pointer to the one Core band (`See Companion Core`); the band, the header and the footer keep `Buy Companion Core` and `Download
-  Companion`, and the beta line sits with every software claim. Under it, one card for each current family (`story.built`, flagship first): the home's picture,
-  "The Brennan family", the home's display name, who lives there as monogram discs with the job each does (organiser, builder, gamer, learner, maker,
-  host), the two or three apps that tell the story (one per person, `<app> replaces <service>`, from `content/story/personas.json`'s pools; a line
-  that `claims.json` would stop is left off) and `Take the tour`, which goes to the family's page (`family/<slug>`, where `Open in 3D` goes on to
-  the player). A home with no current family keeps its plain card (the player). **The cards are written into `index.html` as static HTML at build
-  time** (`scripts/portal-front.mts`, step 5d), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them;
-  `gallery.js` adopts them and draws a card only for a home with no family. Filters: what they do (`?persona=organiser|builder|gamer|learner|maker|host`,
-  worded Work from home, Code, Play, Study, Make, Host; a button only for a job some current family does), the search (a family, a person, a job, an app
-  or what it replaces, a home), and, in a `<details>` that is open on a wide screen, storeys and home style; the address carries them and keeps every
-  parameter that is not theirs. A phone's hero picture is the 640 px thumbnail of the family's home (about 50 KB), a wide screen's the 1200 px preview.
-  A home's page (`homes/<id>`) has "Meet the family" when a current family lives there. The hero tours `HERO` (`scripts/portal-front.mts`: the
-  Brennans at Seraphine); when that family is not current the hero plays the home.
+- **The front page** (`index.html`, `portal/gallery.js`, `portal/gallery.css`, `scripts/portal-front.mts`, `scripts/story/lib/lander.mts`, `pairs.mts` and `lander-check.mts`, the plan `content/story/lander.json`, the `lander` blocks of
+  `scripts/build-portal.mts`; the contract is [`reference/story/lander.md`](reference/story/lander.md)) is the Companion Core's lander. It says what a Core is in the hero ("Stop renting your intelligence."; a small personal server
+  that runs the household's apps and local AI at home; "Fictional family. Real software." and the full beta line; one action, `Take the tour`, the Brennan family's tour in the player), argues in three steps ("From rented to kept",
+  `claims.json`'s own words), shows one pair in full (a beat of the Brennan file, with `Watch this moment` into the tour), offers the Core in one band (the claims, the engine's stylised Core, `Buy Companion Core`, `Download Companion`,
+  the docs, what a Core is not), and then lets a visitor choose by the service they rent ("What do you rent today?": a chip for each service with the app that is an alternative to it, a chip for each job, a search, and the kind of
+  place when there is more than one), under six featured families and, in a native `<details>`, every other family and home. The Core's offer is about 1.5 screens down on a desktop and 2.4 on a phone (the page it replaced:
+  9.6 and 23.5). Every claim and line of fine print is `claims.json`'s, written at a marker; the cards, the proof and the chips are written into `index.html` as static HTML at build time (a crawler, a visitor without JavaScript and an
+  in-app browser with a slow script read them; the chooser's controls are `disabled` until `gallery.js` runs). A pair reads "<app>, alternative to <service>"; the six counsel has not cleared are on the plan's `hold` list and
+  appear nowhere on the page. Featured families pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day), so only a few of the thirty can be featured today. Counts are words ("Thirty fictional
+  families in thirty-six homes."), written from the data. The filters live in the address (`?service=<id>&persona=<category>&type=<kind>&q=`), keep every parameter that is not theirs, and let an ad link to the exact pair
+  (`/?service=google-photos`). The Core's picture is `pnpm run portal:thumbs -- --stage`. A home's page (`homes/<id>`) has "Meet the family" when a current family lives there. The hero tours the plan's `hero` (the Brennans at
+  Seraphine); when that family is not current the hero plays the home. The headline's claim, `rent-line`, is on hold in `claims.json` until the owner signs it off, so a push to main fails until then.
 - **Campaign passthrough** (`portal/campaign.js`, `scripts/test-campaign.mts`, `pnpm run test:campaign`; the `campaign` leg of `portal:test`). An ad's
   `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `fbclid`, `ttclid`, `gclid` and `msclkid` are read from the address, kept in
   `sessionStorage` under `ci-campaign` and put, **in the browser only** (the built hrefs stay exactly `https://ci.computer`, `/core` and `/download`: step 7
@@ -413,9 +453,20 @@ on your own hardware. The contract for the writers, the validator and the film i
   family cards, a family's way into the tour, a home's page), so a campaign survives front page → family page → tour. Every page loads it with
   `<script src="./portal/campaign.js" defer data-cfasync="false"></script>` (`../portal/` in `homes/` and `family/`; the 404, served at any depth, by the site's
   absolute address), before `gallery.js`; `portal:build` adds `?v=<hash>` and fails when a page lacks it. With storage blocked it still works from the
-  address. `window.CICampaign.decorate(url)` is there for a script that sets an address itself. The player (`assets/viewer.ts` `url()`) rebuilds its query from
-  `mode`, `house`, `family`, `shot`, `t` and `tod` and so drops these tags on its first address sync; the live `https://ci.computer/core` redirect may drop the query
+  address. `window.CICampaign.decorate(url)` is there for a script that sets an address itself. The player (`assets/viewer.ts` `url()`) writes its own parameters
+  (`OWN_PARAMS`, the same list as `assets/story/url.ts`) and keeps every other one, a campaign's tags included; the live `https://ci.computer/core` redirect may drop the query
   (see the report).
+- **The player and the Buy link: campaign tags and link rules** (`portal/campaign.js`, `portal/campaign.json`). The player is `room-creator.html`, which is main's and
+  is not edited; `portal:build` adds the same `campaign.js` tag (hashed, `defer`, `data-cfasync="false"`, ahead of the module that writes the address) to the built
+  page's head, so the end card, the About panel and the header, which the player draws after load, are tagged as they arrive and when clicked (step 7 checks the tag;
+  `scripts/story/portal-tests/campaign-player.mts` drives it; `scripts/test-campaign.mts` has the stub). The same build step shows only the message under the `<noscript>`
+  when JavaScript is off. **Link rules** (`portal/campaign.json`, shipped EMPTY) are the mechanism for the owner's decision on where Buy Companion Core should go (the live
+  `https://ci.computer/core` redirect drops the query): `{"version": 1, "rules": [{"match": "https://ci.computer/core", "to": "https://...", "from": "YYYY-MM-DD", "until": "YYYY-MM-DD"}]}`.
+  `campaign.js` reads it with one same-origin fetch and, between `from` and `until` (UTC, both days included), maps a link to `match` (only `https://ci.computer`, `/core` or
+  `/download`; never the docs, privacy, terms or hub links) to `to`, keeping the link's own query and fragment and adding the visitor's tags when `to` is on ci.computer
+  (a campaign's click ids are not sent to another host). The built pages never change, and a failed or missing file changes nothing. `portal:build` copies the file and holds it to
+  `CICampaign.validate()`: an expired rule, one longer than 180 days, two overlapping rules on one address, an unknown key or a bad address fail the build, so a stale rule cannot
+  live on. `pnpm run test:campaign` proves a rule applies, expires and leaves the docs, privacy and terms links alone.
 <!-- end front page -->
 
 **The first preview deploy must confirm** (not verifiable from here): that Pages serves `family/<slug>.html` at `/family/<slug>` without an extension, as it does
@@ -567,18 +618,18 @@ How to take a number that means something:
 `pnpm run check` runs these checks in order; only the goldens depend on an earlier one (they are skipped when a determinism check fails):
 
 1. **assets** — compile `assets/**/*.ts`.
-2. **specs** — validate the 30 HouseSpecs.
+2. **specs** — validate the 36 HouseSpecs.
 3. **shots** — build every house headless and walk the door-to-core, orbit, hero-reveal and core-orbit camera
    paths against its geometry: through a wall, under a floor or a flight of stairs, in through a window instead
    of the door, ending outside the hero room, Core out of frame — and through the push-in and the orbit round the
    Core, every frame keeps it framed and in sight. Sampled again at 60/s: whip pans before the orbit, and the eye
    swinging round the Core one way before the orbit sweeps it back. Also a scene check per house (dressing present, nothing buried in a wall, planting
-   not on a grid). 120 shots, 30 scenes; errors fail, warnings are reported.
+   not on a grid). 144 shots, 36 scenes; errors fail, warnings are reported.
 4. **determinism** — render frames 0, 200 and 719 of aurora's door-to-core, and 0, 240 and 479 of its core-orbit,
    in two fresh browser contexts and compare raw pixels. Frames are random access (`__houseRenderFrames(i)` renders frame *i* from scratch), and
    nothing a frame depends on may use `Math.random` or the clock — every seed comes from mulberry32 / fnv1a in
    `assets/materials.ts`.
-5. **goldens** — render 150 frames (per house: the door-to-core, orbit and core-orbit posters and the
+5. **goldens** — render 150 frames (per home that has a baseline: the door-to-core, orbit and core-orbit posters and the
    door-to-core and hero-reveal final frames, at 640 × 360 through the full composer) and compare them to `test/goldens/<profile>/` with pixelmatch plus a
    mean-absolute-difference bar, so both "something moved" and "everything shifted a little" fail. Skipped if
    determinism failed, because a baseline compared against a renderer that disagrees with itself is noise.
@@ -598,7 +649,7 @@ How to take a number that means something:
    spec against `HouseSpec`), `test-spec-merge.mts` (the fragment merge rule), `test-validate-plugins.mts` (a
    plugin's `extend` and `replaces`), `test-builder-seams.mts` (what the catalog and the validator read off the
    builders) and `test-visibility.mts` (the wall roles, the shot's clock and its `shotHidden` / `shotPose` hooks);
-   `test-room-composer.mts` (the room composer on the 30 specs in a dry run: overlaps, lanes, essentials by role, authored
+   `test-room-composer.mts` (the room composer on the 36 specs in a dry run: overlaps, lanes, essentials by role, authored
    pieces filling their roles, repetition, variety by seed and style, the catalog) and `test-compose-parity.mts` (the page
    and Node compose the S3 fixtures alike, as blessed in `test/fixtures/compose/`, and every composed item builds to the
    box the composer had for it).
@@ -606,12 +657,13 @@ How to take a number that means something:
    report-only, it never fails the gate.
 
 Baselines belong to a renderer profile (GPU + Chromium build), which is why `playwright` is pinned exactly.
+The pin is a pre-release build (`1.64.0-alpha-…` in `package.json`) because that is the Chromium the baselines were blessed on. If the registry prunes it, every `pnpm install` fails: the way out is to move the pin to the nearest release on the profile machine and re-bless once, on purpose (`PROFILE.json` records the build), never to loosen the range. The CI browser job installs Chromium for it with `pnpm exec playwright install --with-deps chromium` and is allowed to fail until that is proven on a runner.
 They are re-blessed **only on purpose** — `pnpm run goldens:update` after a change meant to alter the look,
 reviewed frame by frame, committed with that change. Failing runs leave `*.actual/expected/diff.png` in
 `test/diff/`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs what needs no GPU: install, build, typecheck,
-spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 31 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
+spec validation, the floor-plan-graph tests, `pnpm run test:node` (the quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
 part of an hour of runner time per push, so the render gate runs locally before you push, as it did in
 CI-Common.
 
@@ -625,7 +677,7 @@ builders now; nothing below needs a flag except the two switches that turn a lay
 | **LIGHT** | `fixtures.ts`, `room-clip.ts`, `environment.ts`, `house-scheme.ts` | One room-bounded pool per lamp room (a spot clipped to the room's walls), a soft fill where there is no lamp, the ceiling bounce, the house's lamp temperature and finish scheme, GTAO 0.25 inside, an interior-aware day grade; at most 16 dynamic lights a house | `pnpm run test:light` |
 | **SOFT** | `props/soft*.ts`, `props/windows.ts` | Bedding, curtains, blinds, towels, sofas, armchairs and plants rebuilt in place (same boxes: `prop-drift`) | `test-softkit`, `prop-drift`, `soft-sheet` |
 | **SMALL** | `props/dress-*.ts`, `props/tableware.ts`, `props/dress-kit.ts` | The small goods a room is dressed with (counter kits, table settings, vanity sets, lamps, a café curtain …): dormant types the dress phase places | `test-dress-kit` |
-| **DRESS** | `room-dress.ts`, `room-dress-hosts.ts`, `dress-recipes.ts`, `dress-curtains.ts`, `dress-leaves.ts` | The dress phase: a second pass over a frozen layout that puts those goods on the hosts the layout made. **Baked into the 30 houses** as `src: 'dress@1'` items | `test-dress-phase`, `test:dress-hosts`, `test:dress-neutral`, `dress-fleet` |
+| **DRESS** | `room-dress.ts`, `room-dress-hosts.ts`, `dress-recipes.ts`, `dress-curtains.ts`, `dress-leaves.ts` | The dress phase: a second pass over a frozen layout that puts those goods on the hosts the layout made. **Baked into the 36 homes** as `src: 'dress@1'` items | `test-dress-phase`, `test:dress-hosts`, `test:dress-neutral`, `dress-fleet` |
 | **BAKE** | `props/baked/`, `models/`, `scripts/bake/` | 3Dinside derivatives (geometry plus role-named flat materials; no image or texture), three pilot types, **dormant**: nothing in a house references one yet | `test-baked`, `test-no-third-party-bytes` |
 | **RIG** | `scripts/review/` | The review rig and the frozen BEFORE (`test/review/baselines/`) | `test-review-tools` |
 
@@ -646,6 +698,22 @@ lights per house), `review:ab generate` for the blind pairs. Run them one GPU jo
 
 **Third-party models.** The owner's 3Dinside collection (22 packs) may appear only as baked derivatives (CLAUDE.md → Licensing); `ATTRIBUTION.md` is generated and must be current
 (`scripts/bake/attribution.mts --check`, run by `test-baked`), and `test-no-third-party-bytes` fails on any model, image or archive file under `assets/props/` or `models/`.
+
+## Geometry detectors
+
+Two detectors find, in the meshes a home really builds, what a viewer sees as "collisions and z-fighting on props and walls". Both open the editor page in headless Chromium (the GPU through ANGLE's default backend; `--gl software` is SwiftShader, about 45 times slower and with a different depth format, so a different set of ties), write JSON and pictures under `<out>/zfight` and `<out>/collide` (`--out`, else `$GEOM_OUT`, else `$TMPDIR/vh-geometry`), and write the same bytes twice (but their timings). Where Playwright's pinned Chromium is not installed, point `PLAYWRIGHT_BROWSERS_PATH` at a directory that has the build under the name Playwright asks for. Nothing in them touches the product: the page library (`scripts/review/geom-page.mts`) puts back every material, camera setting and renderer state it changes.
+
+```bash
+pnpm run review:zfight  -- --house aurora,seraphine --out /tmp/geo     # 95-150 s a house on the Intel iGPU (load dependent)
+pnpm run review:collide -- --house aurora,seraphine --out /tmp/geo     # 50-75 s a house
+pnpm run review:geometry-selftest                                       # plant a defect, prove each detector finds it and a clean plan does not
+node --experimental-strip-types scripts/test-geometry-detectors.mts     # the pure geometry (a quick test, in `test:node`)
+```
+
+- **zfight** (`zfight.mts`, `geom-lib.mts`). Two surfaces at the same depth quantise differently under a different depth mapping, so a frame drawn twice with a different far plane is the same picture except where the depth test is a coin toss (x and y of the projection do not depend on far, and near stays put, so nothing moves). Per camera spot (the rig's corner cameras of every room at 1.5 m via `cornerCam`, 12 samples of the orbit, 14 of door-to-core, four cutaway overviews) it renders the beauty frame through the composer the goldens use at far x1, x0.94 and x1.07, and an ID pass (every mesh one flat colour with its own depth state, no lights, fog or antialiasing) at the same three. A pixel whose mesh id differs is a candidate; the two ids are the two surfaces, named with their userData class, item, room, material and chain of groups, the plane normal and the gap along a few pixel rays against the depth buffer's quantum at that distance. `vis` counts the candidates where the beauty frames also differ. `--geom` (default on) finds coplanar overlap geometrically (triangle planes within 2 mm, same facing, overlapping, not buried in another solid) and marks which pairs the renders saw. Contact images (`zfight-NN-*.png`: the frame with the candidates in magenta, boxes round the worst pairs, and 4x crops of the worst one at two depth settings and their difference).
+- **collide** (`collide.mts`, `collide-lib.mts`). Groups the visible meshes under the object the builders `put` (userData `role`, `itemType`, `room`, `onSurface`, `mounted`, `foliage`, `dress`, `stair`, `isWall`), builds a convex hull per mesh (an oriented box exactly; quickhull otherwise; a concave mesh is measured by its own vertices too) and reports, ranked by penetration depth in cm (the minimum translation distance, SAT) with the shared volume in cm3: prop vs prop, prop vs wall (body, paint overlay, trim), window (frame, pane, stool), door (jamb, leaf), stair and rail; a door's swing (the leaf at eight poses) against the items of its storey; an item over a slab void, under its floor or through its ceiling. What it lets through is the placement metadata (`content/house-catalog.json` `place`) and structure, each rule named and counted under `allowed` in the JSON (`--show-allowed`): resting (a vertical push under 4 cm), rug piles, on-surface hosts, wall-mounted, against a wall (2 cm), trim, tucks, foliage (12 cm), cable plugs. Each of the worst findings gets a picture (`collide-NN-*.png`: the two things tinted red and blue, the shared box in magenta).
+
+Both are measuring tools, not gates: they are not in `check`, a finding is a lead to read (the picture, the two labels, the depth), and the thresholds are written in each tool's header (zfight: far x0.94 / x1.07, 2 mm coplanar tolerance, 10/255 beauty difference; collide: 1 cm contact, 1 cm minimum depth).
 
 ## Where it came from
 

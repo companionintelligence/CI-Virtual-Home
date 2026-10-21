@@ -39,6 +39,9 @@
     "amd-gpu": "AMD ROCm accelerator.",
     "note": "Other."
    },
+   "ai": {
+    "chat": "Story v3 age rule (owner decision 2026-10-19): a chat-model app or an agent app, where a person talks to a language model or an agent. A beat whose app is tagged ai chat needs a member of age 16 or older (rule age-chat); a non-chat AI tool (LibreTranslate, Whisper-WebUI, Kokoro, Stirling-PDF OCR, Paperless-GPT) carries no tag and is allowed for younger members."
+   },
    "tags": "consumer, small-business, kids, IoT, productivity, food, home-life, privacy, money, health-adjacent, creative, learning, pets, garden, energy, security, plus: elders, travel, hobby, remote-work, communication, media, gaming"
   },
   "counts": {
@@ -359,6 +362,7 @@
    "id": "ci-memory",
    "name": "Companion Memory",
    "kind": "first-party",
+   "ai": "chat",
    "storeCategories": [
     "companion-intelligence",
     "ai",
@@ -420,6 +424,7 @@
    "id": "ci-hermes",
    "name": "Hermes",
    "kind": "first-party",
+   "ai": "chat",
    "storeCategories": [
     "companion-intelligence",
     "agents",
@@ -486,6 +491,7 @@
    "id": "ci-openclaw",
    "name": "OpenClaw WebCLI",
    "kind": "first-party",
+   "ai": "chat",
    "storeCategories": [
     "companion-intelligence",
     "agents",
@@ -701,6 +707,7 @@
    "id": "ci-spatial-companion-webxr",
    "name": "Spatial Companion",
    "kind": "first-party",
+   "ai": "chat",
    "storeCategories": [
     "companion-intelligence",
     "ai"
@@ -839,6 +846,7 @@
    "id": "ci-ha-voice",
    "name": "Home Assistant Voice",
    "kind": "first-party",
+   "ai": "chat",
    "storeCategories": [
     "companion-intelligence",
     "ai",
@@ -1770,6 +1778,7 @@
    "id": "smartest-tv-mcp",
    "name": "Smartest TV MCP",
    "kind": "mcp-server",
+   "ai": "chat",
    "storeCategories": [
     "mcp",
     "utilities"
@@ -2190,6 +2199,7 @@
    "id": "brewers-almanack-mcp",
    "name": "Brewers Almanack MCP",
    "kind": "mcp-server",
+   "ai": "chat",
    "storeCategories": [
     "mcp",
     "data",
@@ -7151,6 +7161,7 @@
    "id": "opencode",
    "name": "OpenCode",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "development",
     "ai",
@@ -7215,6 +7226,7 @@
    "id": "aider",
    "name": "Aider",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "development",
     "agents",
@@ -7279,6 +7291,7 @@
    "id": "ollama",
    "name": "Ollama",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai",
     "featured"
@@ -7336,6 +7349,7 @@
    "id": "open-webui",
    "name": "Open WebUI",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai",
     "featured"
@@ -7393,6 +7407,7 @@
    "id": "anything-llm",
    "name": "AnythingLLM",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai",
     "utilities"
@@ -7442,6 +7457,7 @@
    "id": "open-notebook",
    "name": "Open Notebook",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai",
     "data",
@@ -7492,6 +7508,7 @@
    "id": "surfsense",
    "name": "SurfSense",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai",
     "data",
@@ -8079,6 +8096,7 @@
    "id": "vane",
    "name": "Vane",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai"
    ],
@@ -8899,11 +8917,11 @@
     "mcpEntry": null,
     "hubWiring": []
    },
-   "storySafe": "yes",
+   "storySafe": "avoid",
    "caveats": [
     {
-     "kind": "note",
-     "text": "Needs content files (ZIM) downloaded once."
+     "kind": "claims",
+     "text": "Ships with an empty library and the Hub has no way to add one (its own QA capture shows \"No result\"): no story may show a look-up, a Wikipedia file or an answer from it. Its replaces (Google Search, Bing) is also stretched: it serves a content snapshot, not a search engine."
     }
    ],
    "qa": "screenshot",
@@ -8924,6 +8942,7 @@
    "id": "project-nomad",
    "name": "Project N.O.M.A.D.",
    "kind": "third-party",
+   "ai": "chat",
    "storeCategories": [
     "ai",
     "books",
@@ -9691,6 +9710,7 @@
    "id": "lego-oracle-mcp",
    "name": "LEGO Oracle MCP",
    "kind": "mcp-server",
+   "ai": "chat",
    "storeCategories": [
     "mcp",
     "data",
@@ -9741,6 +9761,7 @@
    "id": "chess-mcp",
    "name": "MCP Chess",
    "kind": "mcp-server",
+   "ai": "chat",
    "storeCategories": [
     "mcp",
     "ai",

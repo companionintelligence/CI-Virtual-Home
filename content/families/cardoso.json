@@ -404,12 +404,10 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "kokoro",
+        "replaces": []
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "turn text into natural speech on your own Core",
       "anchor": {
         "role": "toys",
         "room": "kids",
@@ -426,11 +424,10 @@
         "side": "left"
       },
       "popup": {
-        "title": "Leo asks where snails go",
-        "body": "After school, Leo asks where snails go in the rain. Tiago looks it up in Kiwix, whose Wikipedia file was downloaded once, so no search engine sees the question.",
+        "title": "Leo hears the snail story",
+        "body": "After school, Leo asks for the snail story Tiago made up at breakfast. Tiago typed it, and Kokoro on the Core speaks it while Leo plays in the tent.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Kokoro"
         ]
       },
       "film": true
@@ -778,7 +775,7 @@
       },
       "popup": {
         "title": "One cottage, one Core",
-        "body": "Rotas, renewals, shopping lists and snail questions run on one Companion Core in a small cottage."
+        "body": "Rotas, renewals, shopping lists and a snail story read aloud run on one Companion Core in a small cottage."
       },
       "film": true
     }
@@ -792,7 +789,7 @@
   },
   "notes": [
     "The only desk is the Core’s own, in the family bedroom. Beatriz’s desk beats anchor on the Core; the bed beats use the double bed and the loft bed. No second desk, no bookshelf, no fireplace.",
-    "Leo has no screen of his own: his beats sit at the play tent, the kids table and the loft bed, and an adult does the lookup with him. No agent for a six-year-old.",
+    "Leo has no screen of his own: his beats sit at the play tent, the kids table and the loft bed, and an adult sits with him. kids-snail is Kokoro (no replaces chip); the text never says what plays the sound.",
     "Both companions are Hermes. Beatriz and Tiago message the agent through the chat service the family picks; the note rides on the ftue and on each agent beat.",
     "BentoPDF runs in the browser (listing: nothing is uploaded). The beat says it runs from the Core and never claims the saved file lands anywhere.",
     "Wallos fetches logos from outside (catalog caveat); no beat says nothing leaves the Core and no beat promises savings.",

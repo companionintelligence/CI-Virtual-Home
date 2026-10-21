@@ -336,7 +336,7 @@
       },
       "popup": {
         "title": "Lea and Claire share a novel",
-        "body": "After school, Lea and Claire share the chesterfield and one novel. Koodo Reader opens the family’s ebooks in a browser, and the highlights Lea makes stay on the Core.",
+        "body": "After school, Lea and Claire share the chesterfield and one novel. Koodo Reader opens the family’s ebooks in a browser, from a library that sits on the Core.",
         "chips": [
           "Koodo Reader",
           "replaces Amazon Kindle"
@@ -792,18 +792,18 @@
       }
     },
     {
-      "id": "lea-lookup",
+      "id": "lea-saved-article",
       "chapter": "lea",
       "member": "lea",
       "category": "privacy",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "readeck",
         "replaces": [
-          "Google Search"
+          "Instapaper"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "save articles to read later; the saved copies live on your Core, not in a hosted bookmarking service",
       "anchor": {
         "role": "bookshelf",
         "room": "kids",
@@ -821,11 +821,11 @@
         "side": "left"
       },
       "popup": {
-        "title": "The balloon question gets answered",
-        "body": "Lea looks up how a hot-air balloon rises in Kiwix. The Wikipedia file was downloaded once, so the Core answers and no search engine sees the question.",
+        "title": "Lea finds the article she saved",
+        "body": "Lea’s science homework asks how a hot-air balloon rises. Readeck kept the readable text of the article she saved earlier, and the copy sits on the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Readeck",
+          "replaces Instapaper"
         ]
       },
       "film": true
@@ -889,7 +889,7 @@
     }
   ],
   "closing": {
-    "body": "Your paperwork, code and homework questions can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "body": "Your paperwork, code and homework reading can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"

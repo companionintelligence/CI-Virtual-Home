@@ -1,9 +1,11 @@
 # ci-virtual-home — the checks that need no GPU.
 # ============================================================================
 # Install, compile the three.js engine (assets/**/*.ts → .js), typecheck scripts/ and assets/, validate the 30
-# HouseSpecs, run the pure-Node tests (the floor-plan graph, and the quick test scripts: spec types, kit, composer, shot QA, site …), and assemble the portal
-# site, whose build refuses a broken link, a missing thumbnail or stale compiled assets. That site is kept as an
-# artifact: deploy.yml publishes it to Cloudflare Pages once this workflow has passed, and never builds or runs
+# HouseSpecs, run the pure-Node tests (the floor-plan graph, and the quick test scripts: spec types, kit, composer, shot QA, site …), run the
+# story gates (every family against the validator, the cast, the services registry, the bake locks, the ad plan), assemble the portal
+# site, whose build refuses a broken link, a missing thumbnail or stale compiled assets, and lint every word of that built site against
+# content/story/claims.json (scripts/story/check-copy.mts: the front page, the homes' pages, the family pages, the 404, the player, the tours).
+# That site is kept as an artifact: deploy.yml publishes it to Cloudflare Pages once this workflow has passed, and never builds or runs
 # anything from the repository itself.
 #
 # The render gate — shot QA, determinism and the 120 golden frames — is deliberately NOT here: through a
@@ -31,6 +33,8 @@ jobs:
   check:
     name: build · typecheck · validate · test
     runs-on: ubuntu-latest
+    # a hung browser or a stuck install must not hold a runner for the default six hours (deploy.yml's jobs have a limit too)
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -59,9 +63,32 @@ jobs:
       - name: Floor-plan graph + wall compiler tests
         run: pnpm run test
 
-      # the 24 quick test scripts (scripts/test-*.mts marked `@check-house quick`): spec types, the kit's rules, QA v2's fault
-      # injection, the room composer, the site and species builders, the validator plugin seam … pure Node, no browser, no GPU,
-      # a few minutes in all. A pull request that breaks one is red here, before deploy.yml can publish it.
+      # the story gates (reference/story/validator.md): a family file that fails the validator, a cast, a services registry
+      # or a bake lock that is not what the files make now is red here, not live. None needs a browser or a GPU. The families are checked one
+      # after another by `story:validate`; its errors fail, its warnings (the phase-in of the v3 rules, reference/story/story-v3.md) print.
+      - name: Story gates (every family file, the cast, the services registry, the bake locks)
+        run: |
+          pnpm run story:validate
+          pnpm run story:cast -- --check
+          pnpm run story:cast-lint
+          pnpm run story:services:check
+          pnpm run story:bake -- --check --all
+
+      # Two story gates that are red while the fleet is being rewritten as story v3 (the cap on one app in 40 percent of the families, the small
+      # business share, and the ad plan of the three Brennan families, which `pnpm run story:ads -- --manifest` regenerates). They run and show
+      # in the log; they do not stop the workflow yet. Remove `continue-on-error` from each the day it is green on main.
+      - name: Story gate, not yet blocking (the whole fleet, --complete)
+        continue-on-error: true
+        run: pnpm run story:validate -- --complete
+
+      - name: Story gate, not yet blocking (content/story/ads.json is what the families make now)
+        continue-on-error: true
+        run: pnpm run story:ads -- --check
+
+      # every scripts/test-*.mts marked `@check-house quick` (found by glob, so the count moves; `pnpm run test:node` lists them): spec types,
+      # the kit's rules, QA v2's fault injection, the room composer, the site and species builders, the validator plugin seam, the copy lint
+      # and the story pages … pure Node, no browser, no GPU, a few minutes in all. A pull request that breaks one is red here, before
+      # deploy.yml can publish it.
       - name: Node-only tests (spec types, kit, composer, shot QA, site …)
         run: pnpm run test:node
 
@@ -70,10 +97,21 @@ jobs:
       # not only on the push to main. It also assembles the site deploy.yml publishes. A pull request's is assembled
       # for its own preview address (the same one deploy.yml uses: pr-<number>.ci-virtual-home.pages.dev), so its link
       # previews name the preview; every other run takes build-portal.mts's default, the live site.
+      # On a push (to main: the push trigger is main alone) the build is strict (CI_STORY_STRICT, README → Deploying): a family that is stale
+      # or fails the validator, a casting family with no file, or a note from a ship step fails the build instead of dropping the family's page,
+      # tour and sitemap entry in silence. A pull request keeps the lenient build, so a draft family can still be previewed.
       - name: Assemble the portal (link and staleness checks)
         env:
           SITE_URL: ${{ github.event_name == 'pull_request' && format('https://pr-{0}.ci-virtual-home.pages.dev/', github.event.pull_request.number) || '' }}
+          CI_STORY_STRICT: ${{ github.event_name == 'push' && '1' || '' }}
         run: pnpm run portal:build
+
+      # every word of the built site against content/story/claims.json: the front page, each home's page, each family's page, the 404, the
+      # player's HTML, the tours' data, the cards and the strings of the player's source. A banned phrase, a heading that is not sentence case or a
+      # disclosure claims.json owes a kind of page that is missing is red here. Disclosures nothing prints yet are listed, not failed, until
+      # `--strict` (README, the `story:copy` row).
+      - name: Copy lint over the built site
+        run: pnpm run story:copy -- dist
 
       # Kept for deploy.yml, which runs after this workflow and treats it as files to upload, never as anything to run.
       # A fork's pull request is never published, so it keeps nothing. overwrite: a re-run of this job replaces it.
@@ -85,4 +123,30 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 14
+          overwrite: true
+
+      # The browser suite for the marketing surface, on Chromium and software GL (no GPU): the front page, the homes' and family pages, the link
+      # previews, the caching and the failure cards, the campaign passthrough and the story's own checks (accessibility, contrast, layout shift,
+      # 44 px targets). It runs after the site is kept, and it does not stop the workflow yet: the pinned Playwright is a pre-release build whose
+      # browser may not be downloadable from a runner, and a first run on a runner is the proof the legs hold there. Remove `continue-on-error` from
+      # both steps when they are green on main. The player, motion and editor legs need a GPU and stay with `pnpm run portal:test` on one; the
+      # engines paid traffic lands in (iOS Safari, the in-app browsers) are a by-hand pass before a campaign (README, "What CI runs of it").
+      - name: Install Chromium and WebKit for the portal tests
+        id: playwright
+        continue-on-error: true
+        run: pnpm exec playwright install --with-deps chromium webkit
+
+      - name: Portal browser tests (gallery, pages, previews, caching, failures, campaign, hooks)
+        if: steps.playwright.outcome == 'success'
+        continue-on-error: true
+        run: pnpm run portal:test -- --dir dist --shots portal-test-shots --only gallery,pages,previews,caching,failures,campaign,hooks,webkit
+
+      - name: Keep the portal test screenshots
+        if: always() && steps.playwright.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: portal-test-shots
+          path: portal-test-shots/
+          if-no-files-found: ignore
+          retention-days: 7
           overwrite: true

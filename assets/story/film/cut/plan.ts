@@ -18,8 +18,8 @@
 // Nothing here reads a clock or a file. Owner: ad-kit.
 import type { Story, Beat } from '../../types.js';
 import { estimateMs } from '../../runtime.js';
-import { chunkTokens, CAPTION, type Cue, type CueWord } from '../layout.js';
-import { placePopup, inter, type Rect, type PlaceOut } from '../../place.js';
+import { chunkTokens, placeCanvasCard, CAPTION, type Cue, type CueWord, type CanvasVariant, type CanvasPlace } from '../layout.js';
+import { CANVAS_TYPE_MIN, type Rect } from '../../place.js';
 
 // ---- the numbers -----------------------------------------------------------------------------------------------------------------------
 export const CUT = {
@@ -110,47 +110,29 @@ export function cutFormat(key: CutKey, res = 1080): CutFormat {
   return { key, out, page, crop, w, h, aspect: w / h, compose: key === '4x5' ? 9 / 16 : w / h, k, sheet, portrait: sheet, safe, res };
 }
 
-/** The caption strip's place and the room it reserves: two lines of the caption's type and its padding, on the bottom margin. */
+/** The caption strip's place and the room it reserves: two lines of the caption's type and its padding, on the bottom margin. The caption type (42 and 44 design px) is above the canvas floor (36). */
 export function cutCaptionBox(f: CutFormat): Rect & { font: number; line: number; pad: number } {
   const font = Math.round((f.sheet ? 42 : 44) * f.k), line = Math.round(font * 1.32), pad = Math.round(20 * f.k);
   const width = f.sheet || f.key === '1x1' ? f.w - f.safe.left - f.safe.right : Math.min(f.w - f.safe.left - f.safe.right, Math.round(1320 * f.k));
   const hh = line * CAPTION.maxLines + 2 * pad;
   return { x: Math.round((f.w - width) / 2), y: Math.round(f.h - f.safe.bottom - hh), w: width, h: hh, font, line, pad };
 }
-/** The corner mark's size: the label at 30 design units (a ground-up size for a phone: 11 points on a 390 point screen), top left inside the safe area. */
+/** The corner mark's size: the label at the canvas floor, 36 design units (it was 28 to 31), top left inside the safe area. */
 export function cutBadgeBox(f: CutFormat, textW: number): Rect & { font: number } {
-  const font = Math.round((f.sheet || f.key === '1x1' ? 31 : 28) * f.k), padX = Math.round(20 * f.k), hh = Math.round(font * 1.9);
+  const font = CANVAS_TYPE_MIN * f.k, padX = Math.round(20 * f.k), hh = Math.round(font * 1.7);   // (not rounded: a rounded size can fall a hair under the floor)
   return { x: Math.round(f.safe.left), y: Math.round(f.safe.top), w: Math.round(textW + 2 * padX + font * 0.9), h: hh, font };
 }
 
-export type CutPlace = PlaceOut & { alt: 'top' | null };
+export type CutPlace = CanvasPlace;
 /**
- * Where a card (or the hook's panel) goes in a frame, from the subject's rect at the beat's rest pose.
+ * Where a card (or the hook's panel) goes in a frame, from the subject's rect at the beat's rest pose: `placeCanvasCard` (layout.ts), the placement the family film shares.
  * Sheet frames (9x16, 4x5): a sheet across the safe width sitting on the caption strip; if that would cover the subject, under the corner mark.
  * 1x1 and 16x9: story-bake's solver (assets/story/place.ts), the same function the live popup calls, with the caption strip and the corner mark as bars.
+ * The card is offered as `variants` (its width, tighter padding, narrower and taller), none with type under 36 design px; a lone `card` is one variant that is not judged.
  */
-export function placeForCut(f: CutFormat, inp: { focus: Rect | null; core: Rect | null; card: { w: number; h: number }; badgeW?: number }): CutPlace {
-  const cap = cutCaptionBox(f), k = f.k;
-  const bw = inp.badgeW ?? 600 * k, bb = cutBadgeBox(f, bw), badge: Rect = { x: bb.x, y: bb.y, w: bb.w, h: bb.h };
-  const bars: Rect[] = [{ x: cap.x, y: cap.y, w: cap.w, h: cap.h }];
-  if (!f.sheet) {
-    bars.push(badge);
-    const p = placePopup({ vw: f.w, vh: f.h, safe: { ...f.safe }, focus: inp.focus, core: inp.core, bars, card: inp.card, gap: 18 * k, phone: false });
-    return { ...p, alt: null };
-  }
-  const w = f.w - f.safe.left - f.safe.right, h = Math.min(inp.card.h, Math.round(f.h * 0.38));
-  const rect: Rect = { x: f.safe.left, y: Math.max(f.safe.top, cap.y - Math.round(16 * k) - h), w, h };
-  const meas = (r: Rect) => ({
-    overlapFocus: inp.focus ? inter(r, inp.focus) / Math.max(1, inp.focus.w * inp.focus.h) : 0,
-    overlapCore: inp.core ? inter(r, inp.core) / Math.max(1, inp.core.w * inp.core.h) : 0,
-    overlapBars: bars.reduce((a, b) => a + inter(r, b), 0) / Math.max(1, r.w * r.h),
-  });
-  const m = meas(rect), ok = m.overlapFocus < 0.02 && m.overlapCore < 0.02 && m.overlapBars === 0;
-  if (ok) return { slot: 'sheet', mode: 'sheet', rect, leader: null, ...m, ok, score: 0, alt: null };
-  const top: Rect = { x: f.safe.left, y: Math.round(f.safe.top + badge.h + 14 * k), w, h };
-  const mt = meas(top), okTop = mt.overlapFocus < 0.02 && mt.overlapCore < 0.02 && mt.overlapBars === 0;
-  if (okTop || mt.overlapFocus + mt.overlapCore < m.overlapFocus + m.overlapCore) return { slot: 'sheet', mode: 'sheet', rect: top, leader: null, ...mt, ok: okTop, score: 0, alt: 'top' };
-  return { slot: 'sheet', mode: 'sheet', rect, leader: null, ...m, ok, score: 0, alt: null };
+export function placeForCut(f: CutFormat, inp: { focus: Rect | null; core: Rect | null; card: { w: number; h: number }; variants?: CanvasVariant[]; badgeW?: number }): CutPlace {
+  const cap = cutCaptionBox(f), bw = inp.badgeW ?? 640 * f.k, bb = cutBadgeBox(f, bw);
+  return placeCanvasCard({ w: f.w, h: f.h, k: f.k, safe: f.safe, sheet: f.sheet }, { focus: inp.focus, core: inp.core, variants: inp.variants ?? [{ w: inp.card.w, h: inp.card.h }], cap: { x: cap.x, y: cap.y, w: cap.w, h: cap.h }, badge: { x: bb.x, y: bb.y, w: bb.w, h: bb.h } });
 }
 
 // ---- the words ----------------------------------------------------------------------------------------------------------------------------

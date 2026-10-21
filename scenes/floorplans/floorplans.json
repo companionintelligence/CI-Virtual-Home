@@ -2618,6 +2618,318 @@
       ]
     },
     {
+      "id": "city-one-bed",
+      "title": "City One-Bedroom",
+      "author": "Companion Intelligence",
+      "style": "A mid-rise of pale render on a city street, five floors under a flat roof with a stair head, shops behind tall shopfront glass on the ground floor, a teal lobby door in the stair core, charcoal-framed windows and a steel-railed balcony band on every floor above; the one-bedroom apartment is the street-side bay of the first floor up, about 58 square metres for a couple who both work from home, with a short entry hall, an open living room and kitchen that open onto the street balcony, a desk nook by a west window, a bedroom and bathroom at the back and a laundry closet, its neighbours' flats closed beside it and behind it",
+      "total_area_sqm": 58.0,
+      "total_area_sqft": 624,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-city-one-bed-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Shop West",
+              "area_sqm": 96.0,
+              "elev": "±0.00m",
+              "items": []
+            },
+            {
+              "no": "02",
+              "name": "Entrance Lobby",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Runner Rug",
+                "Sofa Table",
+                "Table Lamp",
+                "Sculpture",
+                "Round Mirror",
+                "Pampas Vase"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Shop East",
+              "area_sqm": 60.0,
+              "elev": "±0.00m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "First Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-city-one-bed-l2.svg",
+          "rooms": [
+            {
+              "no": "04",
+              "name": "Bedroom",
+              "area_sqm": 12.3,
+              "elev": "+3.50m",
+              "items": [
+                "Sleigh Bed",
+                "Bedside Cabinet ×2",
+                "Table Lamp ×2",
+                "Wall Art",
+                "Dresser",
+                "Column Lamp",
+                "Table Clock",
+                "Arch Mirror",
+                "Rubber Plant"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Laundry Closet",
+              "area_sqm": 3.9,
+              "elev": "+3.50m",
+              "items": [
+                "Washing Machine",
+                "Dryer",
+                "Wall Hooks"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Bath",
+              "area_sqm": 4.8,
+              "elev": "+3.50m",
+              "items": [
+                "Shower Cubicle",
+                "Toilet",
+                "Pedestal Sink",
+                "Heated Towel Rail",
+                "Bath Rug"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Entry Hall",
+              "area_sqm": 4.4,
+              "elev": "+3.50m",
+              "items": [
+                "Wall Hooks",
+                "Side Table",
+                "Table Lamp",
+                "Runner Rug"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Kitchen",
+              "area_sqm": 6.6,
+              "elev": "+3.50m",
+              "items": [
+                "Counter Run ×2",
+                "Range",
+                "Fridge",
+                "Sink Run",
+                "Corner Run",
+                "Aloe Pot"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Living Room",
+              "area_sqm": 15.8,
+              "elev": "+3.50m",
+              "items": [
+                "Sofa",
+                "Area Rug",
+                "Trunk Coffee Table",
+                "Club Chair",
+                "Tripod Floor Lamp",
+                "Tall Cactus"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Desk Nook",
+              "area_sqm": 9.7,
+              "elev": "+3.50m",
+              "items": [
+                "Writing Desk",
+                "Task Chair",
+                "Laptop",
+                "Desk Lamp",
+                "Ladder Shelf",
+                "Tall Cactus"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Street Balcony",
+              "area_sqm": 6.8,
+              "elev": "+3.50m",
+              "items": [
+                "Bistro Table",
+                "Lantern",
+                "Bentwood Chair ×2",
+                "Snake Plant",
+                "Zz Plant"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Rear Flat Two",
+              "area_sqm": 38.4,
+              "elev": "+3.50m",
+              "items": []
+            },
+            {
+              "no": "13",
+              "name": "East Flat Two",
+              "area_sqm": 60.0,
+              "elev": "+3.50m",
+              "items": []
+            },
+            {
+              "no": "14",
+              "name": "Common Two",
+              "area_sqm": 36.0,
+              "elev": "+3.50m",
+              "items": [
+                "Console Table",
+                "Table Lamp",
+                "Ceramic Bowl",
+                "Wall Art",
+                "Rubber Plant"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Floor Three",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-city-one-bed-l3.svg",
+          "rooms": [
+            {
+              "no": "15",
+              "name": "Front Flat Three",
+              "area_sqm": 57.6,
+              "elev": "+6.20m",
+              "items": []
+            },
+            {
+              "no": "16",
+              "name": "Rear Flat Three",
+              "area_sqm": 38.4,
+              "elev": "+6.20m",
+              "items": []
+            },
+            {
+              "no": "17",
+              "name": "East Flat Three",
+              "area_sqm": 60.0,
+              "elev": "+6.20m",
+              "items": []
+            },
+            {
+              "no": "18",
+              "name": "Common Three",
+              "area_sqm": 36.0,
+              "elev": "+6.20m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "title": "Floor Four",
+          "sheet": "A-104",
+          "svg": "scenes/floorplans/fp-city-one-bed-l4.svg",
+          "rooms": [
+            {
+              "no": "19",
+              "name": "Front Flat Four",
+              "area_sqm": 57.6,
+              "elev": "+8.90m",
+              "items": []
+            },
+            {
+              "no": "20",
+              "name": "Rear Flat Four",
+              "area_sqm": 38.4,
+              "elev": "+8.90m",
+              "items": []
+            },
+            {
+              "no": "21",
+              "name": "East Flat Four",
+              "area_sqm": 60.0,
+              "elev": "+8.90m",
+              "items": []
+            },
+            {
+              "no": "22",
+              "name": "Common Four",
+              "area_sqm": 36.0,
+              "elev": "+8.90m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "title": "Floor Five",
+          "sheet": "A-105",
+          "svg": "scenes/floorplans/fp-city-one-bed-l5.svg",
+          "rooms": [
+            {
+              "no": "23",
+              "name": "Front Flat Five",
+              "area_sqm": 57.6,
+              "elev": "+11.60m",
+              "items": []
+            },
+            {
+              "no": "24",
+              "name": "Rear Flat Five",
+              "area_sqm": 38.4,
+              "elev": "+11.60m",
+              "items": []
+            },
+            {
+              "no": "25",
+              "name": "East Flat Five",
+              "area_sqm": 60.0,
+              "elev": "+11.60m",
+              "items": []
+            },
+            {
+              "no": "26",
+              "name": "Common Five",
+              "area_sqm": 36.0,
+              "elev": "+11.60m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "title": "Roof",
+          "sheet": "A-106",
+          "svg": "scenes/floorplans/fp-city-one-bed-l6.svg",
+          "rooms": [
+            {
+              "no": "27",
+              "name": "Roof Access",
+              "area_sqm": 15.0,
+              "elev": "+14.30m",
+              "items": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "cocoon",
       "title": "Cocoon Base Game",
       "author": "Schnuck01",
@@ -2908,6 +3220,281 @@
                 "Ginger Lamp",
                 "Flower Jug"
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "corner-penthouse",
+      "title": "Corner Penthouse",
+      "author": "Companion Intelligence",
+      "style": "A white-rendered penthouse pavilion with a deep flat roof overhang and floor-to-ceiling glass stands at the corner of a two-storey stone podium on a city street, a corner shop, a bike store, two flats and a stair lobby beneath it; the podium roof is a stone-floored terrace wrapping the pavilion behind glass rails, reached from the pavement by one long garden stair or by the private stair from the lobby, and the penthouse apartment inside is a long living room with a hearth, an island kitchen, a primary suite, two further bedrooms, an office and a book-lined nook",
+      "total_area_sqm": 134.0,
+      "total_area_sqft": 1442,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Podium Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-corner-penthouse-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Corner Shop",
+              "area_sqm": 99.4,
+              "elev": "±0.00m",
+              "items": []
+            },
+            {
+              "no": "02",
+              "name": "Bike Store",
+              "area_sqm": 99.4,
+              "elev": "±0.00m",
+              "items": []
+            },
+            {
+              "no": "03",
+              "name": "Entrance Lobby",
+              "area_sqm": 53.2,
+              "elev": "±0.00m",
+              "items": [
+                "Storage Bench",
+                "Rubber Plant",
+                "Flatweave Rug",
+                "Demilune Console",
+                "Column Lamp",
+                "Table Clock",
+                "Round Mirror",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Bin Store",
+              "area_sqm": 46.2,
+              "elev": "±0.00m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Podium First Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-corner-penthouse-l2.svg",
+          "rooms": [
+            {
+              "no": "05",
+              "name": "Flat West",
+              "area_sqm": 99.4,
+              "elev": "+3.04m",
+              "items": []
+            },
+            {
+              "no": "06",
+              "name": "Flat East",
+              "area_sqm": 99.4,
+              "elev": "+3.04m",
+              "items": []
+            },
+            {
+              "no": "07",
+              "name": "Upper Stair Hall",
+              "area_sqm": 53.2,
+              "elev": "+3.04m",
+              "items": [
+                "Flatweave Rug",
+                "Demilune Console",
+                "Column Lamp",
+                "Sculpture",
+                "Wall Hanging",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Flat North",
+              "area_sqm": 46.2,
+              "elev": "+3.04m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Penthouse",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-corner-penthouse-l3.svg",
+          "rooms": [
+            {
+              "no": "09",
+              "name": "Primary Suite",
+              "area_sqm": 16.4,
+              "elev": "+6.08m",
+              "items": [
+                "Upholstered Bed",
+                "Drum Nightstand ×2",
+                "Column Lamp ×2",
+                "Hide Rug",
+                "Chest Of Drawers",
+                "Table Lamp",
+                "Vase",
+                "Plant Stand"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Ensuite",
+              "area_sqm": 7.0,
+              "elev": "+6.08m",
+              "items": [
+                "Shower Cubicle",
+                "Double Vanity",
+                "Toilet",
+                "Towel Rail",
+                "Bath Runner"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Bedroom Two",
+              "area_sqm": 9.5,
+              "elev": "+6.08m",
+              "items": [
+                "Headboard Bed",
+                "Side Table ×2",
+                "Wall Sconce ×2",
+                "Wall Hanging"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Family Bath",
+              "area_sqm": 6.0,
+              "elev": "+6.08m",
+              "items": [
+                "Shower Cubicle",
+                "Vanity Sink",
+                "Toilet",
+                "Heated Towel Rail",
+                "Bath Runner"
+              ]
+            },
+            {
+              "no": "13",
+              "name": "Office",
+              "area_sqm": 8.8,
+              "elev": "+6.08m",
+              "items": [
+                "Standing Desk",
+                "Shell Chair",
+                "Desk Lamp",
+                "Table Clock",
+                "Canvas Art",
+                "Ladder Shelf",
+                "Hide Rug",
+                "Plant Stand"
+              ]
+            },
+            {
+              "no": "14",
+              "name": "Bedroom Three",
+              "area_sqm": 8.4,
+              "elev": "+6.08m",
+              "items": [
+                "Headboard Bed",
+                "Side Table ×2",
+                "Mushroom Lamp",
+                "Tripod Table Lamp",
+                "Wall Hanging",
+                "Rubber Plant"
+              ]
+            },
+            {
+              "no": "15",
+              "name": "Gallery",
+              "area_sqm": 9.3,
+              "elev": "+6.08m",
+              "items": []
+            },
+            {
+              "no": "16",
+              "name": "Living Room",
+              "area_sqm": 32.8,
+              "elev": "+6.08m",
+              "items": [
+                "Fireplace",
+                "Mid Century Sofa",
+                "Round Coffee Table",
+                "Lounge Chair",
+                "Ladder Shelf",
+                "Floor Lamp",
+                "Olive Tree Pot",
+                "Ponytail Palm"
+              ]
+            },
+            {
+              "no": "17",
+              "name": "Library Nook",
+              "area_sqm": 6.8,
+              "elev": "+6.08m",
+              "items": [
+                "Ladder Shelf ×2",
+                "Lounge Chair",
+                "Writing Desk",
+                "Task Chair",
+                "Desk Lamp",
+                "Table Clock"
+              ]
+            },
+            {
+              "no": "18",
+              "name": "Entry Hall",
+              "area_sqm": 6.5,
+              "elev": "+6.08m",
+              "items": [
+                "Runner Rug",
+                "Coat Rack"
+              ]
+            },
+            {
+              "no": "19",
+              "name": "Kitchen",
+              "area_sqm": 15.6,
+              "elev": "+6.08m",
+              "items": [
+                "Washing Machine",
+                "Range",
+                "Fridge",
+                "Dishwasher",
+                "Sink Run",
+                "Range Hood",
+                "Upper Cabinets",
+                "Breakfast Bar",
+                "Wood Stool ×3",
+                "Flower Jug"
+              ]
+            },
+            {
+              "no": "20",
+              "name": "Stair Hall",
+              "area_sqm": 7.4,
+              "elev": "+6.08m",
+              "items": [
+                "Console Table",
+                "Column Lamp",
+                "Table Clock",
+                "Plate Set",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "21",
+              "name": "Terrace",
+              "area_sqm": 1.0,
+              "elev": "+6.08m",
+              "items": []
             }
           ]
         }
@@ -3710,6 +4297,194 @@
                 "Wall Hooks",
                 "Storage Bench"
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "garden-flat",
+      "title": "Garden Flat",
+      "author": "Companion Intelligence",
+      "style": "A low two-storey block of vertical timber on a stone plinth under one long mono-pitch roof, with a charcoal stair core at its west end; the ground-floor apartment takes the east twelve metres, level from the street gate to every room, with a wide glazed living and dining room opening onto its own fenced garden terrace, a study on the front door's axis, two bedrooms and a bathroom with a level-access shower along a central passage, and a closed maisonette above",
+      "total_area_sqm": 96.0,
+      "total_area_sqft": 1033,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Garden Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-garden-flat-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living & Dining",
+              "area_sqm": 23.4,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "TV Stand",
+                "Sofa",
+                "Shag Rug",
+                "C Table",
+                "Globe Lamp",
+                "Round Dining Table",
+                "Dining Chair ×3",
+                "Concentric Rug",
+                "Pendant Lamp",
+                "Ceramic Bowl",
+                "Ladder Shelf",
+                "Tall Cactus"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 11.9,
+              "elev": "±0.00m",
+              "items": [
+                "Counter Run ×2",
+                "Range",
+                "Fridge",
+                "Dishwasher",
+                "Sink Run",
+                "Corner Run",
+                "Upper Cabinets ×3",
+                "Range Hood",
+                "Microwave",
+                "Jade Plant"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Entry Hall",
+              "area_sqm": 8.6,
+              "elev": "±0.00m",
+              "items": [
+                "Sofa Table",
+                "Table Lamp",
+                "Ceramic Bowl",
+                "Framed Print",
+                "Coat Rack"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Passage",
+              "area_sqm": 14.1,
+              "elev": "±0.00m",
+              "items": [
+                "Demilune Console",
+                "Pampas Vase"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Study",
+              "area_sqm": 7.6,
+              "elev": "±0.00m",
+              "items": [
+                "Ladder Shelf",
+                "Rubber Plant"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Utility",
+              "area_sqm": 4.5,
+              "elev": "±0.00m",
+              "items": [
+                "Washing Machine",
+                "Dryer",
+                "Laundry Hamper",
+                "Wall Hooks"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Bathroom",
+              "area_sqm": 5.9,
+              "elev": "±0.00m",
+              "items": [
+                "Vanity Sink",
+                "Toilet",
+                "Shower Cubicle",
+                "Heated Towel Rail",
+                "Bath Rug"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Grandchild's Bedroom",
+              "area_sqm": 8.4,
+              "elev": "±0.00m",
+              "items": [
+                "Single Bed",
+                "Kids Desk",
+                "Cube Storage",
+                "Floor Cushion"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Primary Bedroom",
+              "area_sqm": 12.0,
+              "elev": "±0.00m",
+              "items": [
+                "Headboard Bed",
+                "Side Table ×2",
+                "Column Lamp",
+                "Ginger Lamp",
+                "Cushioned Bench",
+                "Chest Of Drawers",
+                "Globe Lamp",
+                "Record Player",
+                "Canvas Art",
+                "Rubber Plant"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Garden Terrace",
+              "area_sqm": 16.2,
+              "elev": "±0.00m",
+              "items": [
+                "Patio Set",
+                "Fire Bowl"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Core Hall",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Demilune Console",
+                "Storage Bench",
+                "Calathea"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-garden-flat-l2.svg",
+          "rooms": [
+            {
+              "no": "12",
+              "name": "Upper Flat",
+              "area_sqm": 96.4,
+              "elev": "+2.70m",
+              "items": []
+            },
+            {
+              "no": "13",
+              "name": "Upper Landing",
+              "area_sqm": 30.0,
+              "elev": "+2.70m",
+              "items": []
             }
           ]
         }
@@ -6991,6 +7766,186 @@
       ]
     },
     {
+      "id": "studio-loft",
+      "title": "Warehouse Loft",
+      "author": "Companion Intelligence",
+      "style": "A converted brick warehouse on a city street, three storeys of red brick with soldier-course arches over tall steel-framed windows, a deep parapet and a stair core with its own street door; the loft apartment takes the west bay of the first two floors, one tall open room with a steel-railed sleeping platform on a ladder-stair, a kitchen run along the back wall and a workbench by the street door, with its neighbours' bays closed beside it and a steel balcony over the walled back court",
+      "total_area_sqm": 52.0,
+      "total_area_sqft": 560,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Loft Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-studio-loft-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Loft",
+              "area_sqm": 20.0,
+              "elev": "±0.00m",
+              "items": [
+                "Mid Century Sofa",
+                "Ottoman",
+                "Hide Rug",
+                "Bookshelf",
+                "Tripod Floor Lamp",
+                "Plant Stand ×2"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Desk & Workshop",
+              "area_sqm": 12.5,
+              "elev": "±0.00m",
+              "items": [
+                "Workbench",
+                "Ladder Shelf"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Kitchen",
+              "area_sqm": 12.3,
+              "elev": "±0.00m",
+              "items": [
+                "Range",
+                "Sink Run",
+                "Counter Run",
+                "Fridge",
+                "Range Hood",
+                "Upper Cabinets",
+                "Breakfast Bar",
+                "Saddle Stool ×3",
+                "Flower Jug"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Bath",
+              "area_sqm": 7.2,
+              "elev": "±0.00m",
+              "items": [
+                "Vanity Sink",
+                "Toilet",
+                "Shower Cubicle",
+                "Heated Towel Rail",
+                "Bath Rug",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Neighbour Loft",
+              "area_sqm": 40.0,
+              "elev": "±0.00m",
+              "items": []
+            },
+            {
+              "no": "07",
+              "name": "Stair Hall",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Storage Bench",
+                "Rubber Plant",
+                "Flatweave Rug",
+                "Console Table",
+                "Ginger Lamp",
+                "Sculpture",
+                "Plate Set",
+                "Peace Lily"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Platform Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-studio-loft-l2.svg",
+          "rooms": [
+            {
+              "no": "05",
+              "name": "Sleeping Platform",
+              "area_sqm": 19.5,
+              "elev": "+2.90m",
+              "items": [
+                "Tall Cabinet",
+                "Sleigh Bed",
+                "Nightstand ×2",
+                "Ginger Lamp ×2",
+                "Canvas Art",
+                "Area Rug",
+                "Chest",
+                "Lowboy Dresser",
+                "Globe Lamp",
+                "Record Player",
+                "Plant Stand"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Back Balcony",
+              "area_sqm": 2.2,
+              "elev": "+2.90m",
+              "items": []
+            },
+            {
+              "no": "10",
+              "name": "Neighbour Platform",
+              "area_sqm": 40.0,
+              "elev": "+2.90m",
+              "items": []
+            },
+            {
+              "no": "08",
+              "name": "Upper Stair Hall",
+              "area_sqm": 36.0,
+              "elev": "+2.90m",
+              "items": [
+                "Flatweave Rug",
+                "Console Table",
+                "Table Lamp",
+                "Sculpture",
+                "Plate Set",
+                "Peace Lily"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Top Floor",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-studio-loft-l3.svg",
+          "rooms": [
+            {
+              "no": "11",
+              "name": "Upper Loft West",
+              "area_sqm": 52.0,
+              "elev": "+5.80m",
+              "items": []
+            },
+            {
+              "no": "12",
+              "name": "Upper Loft East",
+              "area_sqm": 40.0,
+              "elev": "+5.80m",
+              "items": []
+            },
+            {
+              "no": "13",
+              "name": "Top Stair Hall",
+              "area_sqm": 36.0,
+              "elev": "+5.80m",
+              "items": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "sunnyhome",
       "title": "Base Game Sunny Home",
       "author": "MadamRedo",
@@ -7173,6 +8128,216 @@
                 "Bookshelf",
                 "Bird Of Paradise"
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "two-bed-flat",
+      "title": "Two-Bedroom Flat",
+      "author": "Companion Intelligence",
+      "style": "A three-storey walk-up tenement block on a city street, warm yellow stock brick with white sash windows under stone lintels, a pair of stacked canted bay windows, a stone stoop up to the stair core's oxblood street door and a slate hip roof with two dormers and a brick stack; the family's two-bedroom apartment is the whole first floor up, an entry hall and a passage that run back to a study alcove, a living room with a hearth and French doors onto an iron balcony over the street, a bay-windowed dining room, a closed kitchen with a terracotta floor, two bedrooms, a bathroom and a laundry along the back, with a ground-floor flat below and another flat above, both closed behind their blinds, and a walled brick court behind the block",
+      "total_area_sqm": 84.0,
+      "total_area_sqft": 904,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-two-bed-flat-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Stair Lobby",
+              "area_sqm": 27.9,
+              "elev": "+0.54m",
+              "items": [
+                "Sofa Table",
+                "Column Lamp",
+                "Table Clock",
+                "Wall Hanging",
+                "Pampas Vase"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Ground Flat",
+              "area_sqm": 83.7,
+              "elev": "+0.54m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "First Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-two-bed-flat-l2.svg",
+          "rooms": [
+            {
+              "no": "03",
+              "name": "Entry Hall",
+              "area_sqm": 4.5,
+              "elev": "+3.34m",
+              "items": []
+            },
+            {
+              "no": "04",
+              "name": "Passage",
+              "area_sqm": 5.7,
+              "elev": "+3.34m",
+              "items": [
+                "Gallery Wall"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Study Alcove",
+              "area_sqm": 3.3,
+              "elev": "+3.34m",
+              "items": [
+                "Writing Desk",
+                "Task Chair",
+                "Bookshelf",
+                "Flatweave Rug"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Living Room",
+              "area_sqm": 17.6,
+              "elev": "+3.34m",
+              "items": [
+                "Chesterfield Sofa",
+                "Trunk Coffee Table",
+                "Patterned Rug",
+                "Floor Lamp",
+                "Rubber Plant",
+                "Framed Print"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Dining Room",
+              "area_sqm": 9.6,
+              "elev": "+3.34m",
+              "items": [
+                "Glass Dining Table",
+                "Windsor Chair ×2",
+                "Chandelier",
+                "Ceramic Bowl"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Kitchen",
+              "area_sqm": 8.8,
+              "elev": "+3.34m",
+              "items": [
+                "Fridge",
+                "Counter Run ×2",
+                "Range",
+                "Range Hood",
+                "Upper Cabinets ×2",
+                "Sink Run",
+                "Tall Cabinet"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Primary Bedroom",
+              "area_sqm": 11.4,
+              "elev": "+3.34m",
+              "items": [
+                "Armoire",
+                "Four Poster Bed",
+                "Side Table",
+                "Column Lamp ×2",
+                "Flatweave Rug",
+                "Chest",
+                "Chest Of Drawers",
+                "Candelabra",
+                "Plant Stand"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Kids' Room",
+              "area_sqm": 11.4,
+              "elev": "+3.34m",
+              "items": [
+                "Kids Desk",
+                "Loft Bed",
+                "Bedside Cabinet",
+                "Desk Lamp",
+                "Canvas Art",
+                "Play Rug",
+                "Chest",
+                "Easel",
+                "Floor Cushion"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Bathroom",
+              "area_sqm": 5.7,
+              "elev": "+3.34m",
+              "items": [
+                "Shower Cubicle",
+                "Toilet",
+                "Pedestal Sink",
+                "Towel Ladder",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Laundry",
+              "area_sqm": 5.7,
+              "elev": "+3.34m",
+              "items": [
+                "Washing Machine",
+                "Dryer",
+                "Tall Cabinet",
+                "Wall Hooks"
+              ]
+            },
+            {
+              "no": "13",
+              "name": "Front Balcony",
+              "area_sqm": 3.8,
+              "elev": "+3.34m",
+              "items": []
+            },
+            {
+              "no": "14",
+              "name": "Landing",
+              "area_sqm": 27.9,
+              "elev": "+3.34m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Top Floor",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-two-bed-flat-l3.svg",
+          "rooms": [
+            {
+              "no": "15",
+              "name": "Top Flat",
+              "area_sqm": 83.7,
+              "elev": "+6.14m",
+              "items": []
+            },
+            {
+              "no": "16",
+              "name": "Top Landing",
+              "area_sqm": 27.9,
+              "elev": "+6.14m",
+              "items": []
             }
           ]
         }
@@ -7426,6 +8591,268 @@
                 "Rocking Horse",
                 "Bean Bag"
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "walkup-duplex",
+      "title": "Walk-up Duplex",
+      "author": "Companion Intelligence",
+      "style": "A four-storey dark brick block on a city street with white-railed access walkways across its face, a long flight of steps up to the first of them, a stair tower at one end and parking and stores on the ground floor; the family's duplex apartment takes the middle bay of the second and third floors, a kitchen and dining room opening onto a balcony over the back court, a living room with a desk against a brick wall, the family stair rising to three bedrooms, a bath and a study landing, with its neighbours' flats closed on either side and a flat roof above",
+      "total_area_sqm": 110.0,
+      "total_area_sqft": 1184,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-walkup-duplex-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Parking West",
+              "area_sqm": 26.6,
+              "elev": "±0.00m",
+              "items": []
+            },
+            {
+              "no": "02",
+              "name": "Parking Centre",
+              "area_sqm": 54.8,
+              "elev": "±0.00m",
+              "items": []
+            },
+            {
+              "no": "03",
+              "name": "Tower Lobby",
+              "area_sqm": 22.2,
+              "elev": "±0.00m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Gallery Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-walkup-duplex-l2.svg",
+          "rooms": [
+            {
+              "no": "04",
+              "name": "Entry",
+              "area_sqm": 3.1,
+              "elev": "+3.04m",
+              "items": []
+            },
+            {
+              "no": "05",
+              "name": "Stair Hall",
+              "area_sqm": 6.5,
+              "elev": "+3.04m",
+              "items": [
+                "Flatweave Rug",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Living Room",
+              "area_sqm": 14.4,
+              "elev": "+3.04m",
+              "items": [
+                "Tuxedo Sofa",
+                "Round Coffee Table",
+                "Area Rug",
+                "Open Shelving"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Kitchen & Dining",
+              "area_sqm": 28.1,
+              "elev": "+3.04m",
+              "items": [
+                "Sink Run",
+                "Counter Run",
+                "Range",
+                "Fridge",
+                "Oval Dining Table",
+                "Shell Chair ×2",
+                "Flatweave Rug",
+                "Pendant Lamp",
+                "Ceramic Bowl ×2",
+                "Breakfast Bar",
+                "Bar Stool ×3"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Powder Room",
+              "area_sqm": 2.7,
+              "elev": "+3.04m",
+              "items": [
+                "Pedestal Sink",
+                "Toilet",
+                "Bath Mat"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Back Balcony",
+              "area_sqm": 3.1,
+              "elev": "+3.04m",
+              "items": [
+                "Bistro Table",
+                "Bentwood Chair ×2"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Neighbour Flat West",
+              "area_sqm": 26.6,
+              "elev": "+3.04m",
+              "items": []
+            },
+            {
+              "no": "11",
+              "name": "Tower Gallery Hall",
+              "area_sqm": 22.2,
+              "elev": "+3.04m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Bedroom Floor",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-walkup-duplex-l3.svg",
+          "rooms": [
+            {
+              "no": "12",
+              "name": "Primary Bedroom",
+              "area_sqm": 11.3,
+              "elev": "+6.08m",
+              "items": [
+                "Upholstered Bed",
+                "Bedside Table ×2",
+                "Wall Sconce ×2",
+                "Gallery Wall",
+                "Flatweave Rug",
+                "Bench",
+                "Chest Of Drawers",
+                "Mushroom Lamp",
+                "Vase"
+              ]
+            },
+            {
+              "no": "13",
+              "name": "Bedroom Three",
+              "area_sqm": 10.2,
+              "elev": "+6.08m",
+              "items": [
+                "Upholstered Bed",
+                "Drum Nightstand ×2",
+                "Mushroom Lamp ×3",
+                "Flatweave Rug",
+                "Chest Of Drawers",
+                "Flower Jug",
+                "Rubber Plant"
+              ]
+            },
+            {
+              "no": "14",
+              "name": "Upper Hall",
+              "area_sqm": 7.0,
+              "elev": "+6.08m",
+              "items": [
+                "Flatweave Rug"
+              ]
+            },
+            {
+              "no": "15",
+              "name": "Bedroom Two",
+              "area_sqm": 10.6,
+              "elev": "+6.08m",
+              "items": [
+                "Headboard Bed",
+                "Drum Nightstand ×2",
+                "Wall Sconce ×2",
+                "Flatweave Rug"
+              ]
+            },
+            {
+              "no": "16",
+              "name": "Family Bath",
+              "area_sqm": 5.8,
+              "elev": "+6.08m",
+              "items": [
+                "Shower Cubicle",
+                "Toilet",
+                "Pedestal Sink",
+                "Towel Rail",
+                "Bath Mat",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "17",
+              "name": "Study Landing",
+              "area_sqm": 7.4,
+              "elev": "+6.08m",
+              "items": [
+                "Writing Desk",
+                "Shell Chair",
+                "Desk Lamp",
+                "Laptop",
+                "Open Shelving",
+                "Plant Stand"
+              ]
+            },
+            {
+              "no": "18",
+              "name": "Upper Flat West",
+              "area_sqm": 26.6,
+              "elev": "+6.08m",
+              "items": []
+            },
+            {
+              "no": "19",
+              "name": "Tower Upper Hall",
+              "area_sqm": 22.2,
+              "elev": "+6.08m",
+              "items": []
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "title": "Top Floor",
+          "sheet": "A-104",
+          "svg": "scenes/floorplans/fp-walkup-duplex-l4.svg",
+          "rooms": [
+            {
+              "no": "20",
+              "name": "Top Flat West",
+              "area_sqm": 26.6,
+              "elev": "+9.12m",
+              "items": []
+            },
+            {
+              "no": "21",
+              "name": "Top Flat Centre",
+              "area_sqm": 54.8,
+              "elev": "+9.12m",
+              "items": []
+            },
+            {
+              "no": "22",
+              "name": "Tower Top Hall",
+              "area_sqm": 22.2,
+              "elev": "+9.12m",
+              "items": []
             }
           ]
         }

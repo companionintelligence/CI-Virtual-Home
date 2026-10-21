@@ -17,22 +17,22 @@ import type { StoryTrack } from '../../track.js';
 import { trackFrameAt } from '../../track.js';
 import { focusRect, leaderTo, type Rect } from '../../place.js';
 import { planDoors } from '../../../shot-doors.js';
-import { establishSeconds, ramp, cardAlpha } from '../layout.js';
+import { establishSeconds, ramp, cardAlpha, canvasCardWidths, canvasVariants } from '../layout.js';
 import { cutFormat, placeForCut, sceneAt, cutCues, cutCaptionChars, hookAlpha, cutCaptionBox, type CutPlan, type CutKey, type CutFormat, type CutPlace } from './plan.js';
-import { font } from '../cards.js';
+import { font, auditType, nativeTracking, FLOOR, type TypeAudit } from '../cards.js';
 import {
-  WEIGHTS, drawCutBadge, badgeTextWidth, measureHook, drawHook, measureCard, drawCard, CARD_LEVELS, drawCaption, cueAt, drawLeader, drawDip, drawCutEnd,
+  WEIGHTS, drawCutBadge, badgeTextWidth, measureHook, hookSizes, drawHook, measureCard, drawCard, drawCaption, cueAt, drawLeader, drawDip, drawCutEnd,
   type HookLayout, type CardLayout, type CardModel, type EndModel,
 } from './draw.js';
 
 export type CutPrepare = { rs: RuntimeStory; plan: CutPlan; key: CutKey; res?: number; end: EndModel; badge: string };
-type PartPlan = { layout: CardLayout; place: CutPlace; focus: Rect | null; core: Rect | null; level: number };
+type PartPlan = { layout: CardLayout; place: CutPlace; focus: Rect | null; core: Rect | null; variant: number; tag: string };
 type Stats = { mean: number; std: number };
 type State = {
   rs: RuntimeStory; plan: CutPlan; f: CutFormat; E: number; cues: ReturnType<typeof cutCues>;
   g: CanvasRenderingContext2D; cv: HTMLCanvasElement; gl: HTMLCanvasElement; probe: CanvasRenderingContext2D;
   parts: PartPlan[]; hook: { layout: HookLayout; place: CutPlace; focus: Rect | null };
-  end: EndModel; badge: string; frames: number; stats: Stats;
+  end: EndModel; badge: string; frames: number; stats: Stats; audit: TypeAudit;
 };
 let S: State | null = null;
 const W: any = window;
@@ -62,9 +62,10 @@ export function presetFromCut(THREE: any, rs: RuntimeStory, plan: CutPlan, f: Cu
   return preset;
 }
 
-/** Load the faces the overlay draws with: a canvas does not wait for a face it has not used yet, and the first frame would be drawn in the fallback. */
-async function loadFonts() {
-  await Promise.all(WEIGHTS.map(w => (document as any).fonts.load(font(w, 32), 'Aa Hh 0123 See Companion Core')));
+/** Load the faces the overlay draws with: a canvas does not wait for a face it has not used yet, and the first frame would be drawn in the fallback. `sample` is every string the
+ *  cut prints (the name's capitals included), so a letter outside the basic Latin set loads its own piece of the face too. */
+async function loadFonts(sample = '') {
+  await Promise.all(WEIGHTS.map(w => (document as any).fonts.load(font(w, 32), `Aa Hh 0123 See Companion Core ${sample} ${sample.toUpperCase()}`)));
   await (document as any).fonts.ready;
   for (const w of WEIGHTS) if (!(document as any).fonts.check(font(w, 32))) throw new Error(`Manrope ${w} did not load`);
 }
@@ -75,10 +76,10 @@ export async function prepare(o: CutPrepare) {
   if (S) end();
   const rs = o.rs, plan = o.plan, f = cutFormat(o.key, o.res ?? 1080);
   if (plan.status !== 'ready') throw new Error(`${plan.id}: the plan is ${plan.status}, not ready`);
-  await loadFonts();
+  await loadFonts([o.badge, plan.name, plan.hook.text, ...o.end.lines, o.end.cta, o.end.url, ...plan.parts.flatMap(p => [p.card.title, p.card.note || '', ...p.card.chips, p.text])].join(' '));
   const E = establishSeconds(rs), cues = cutCues(plan.parts, cutCaptionChars(o.key));
   const cv = document.createElement('canvas'); cv.width = f.w; cv.height = f.h;
-  const g = cv.getContext('2d', { alpha: false })!;
+  const g = cv.getContext('2d', { alpha: false })!, audit = auditType(g, f.k);
   const pc = document.createElement('canvas'); pc.width = 32; pc.height = Math.max(8, Math.round(32 * f.h / f.w));
   const probe = pc.getContext('2d', { willReadFrequently: true })!;
   const dbg = W.__houseDebug(), THREE = W.__THREE;
@@ -92,40 +93,41 @@ export async function prepare(o: CutPrepare) {
     const b = rs.beats.find(x => x.id === part.beat)!, fr = trackFrameAt(rs.track, part.tour!.rest, f.compose);
     return { b, fr, focus: focusRect(fr.eye, fr.target, fr.fov, b.frame.box as any, f.w, f.h), core: rs.track.core ? focusRect(fr.eye, fr.target, fr.fov, rs.track.core as any, f.w, f.h) : null };
   };
-  /** the room beside a subject, on the side that has more, inside the safe area (a card on a frame that is not a sheet goes there) */
+  /** the room beside a subject, on the side that has more, inside the safe area (the hook goes there when the frame is not a sheet) */
   const freeSide = (focus: Rect | null) => { const gap = 18 * f.k; return focus ? Math.max(focus.x - f.safe.left - gap, f.w - f.safe.right - (focus.x + focus.w) - gap) : f.w - f.safe.left - f.safe.right; };
   for (const part of plan.parts) {
     const { b, focus, core } = subject(part), agent = b.agent ? rs.members.find(m => m.id === b.agent) : null;
     const model: CardModel = { name: plan.name, companion: agent && agent.companion ? agent.companion.name : null, title: part.card.title, chips: part.card.chips, note: part.card.note };
-    let best: PartPlan | null = null;
-    for (let level = 0; level < CARD_LEVELS; level++) {
-      // a sheet frame's card is the safe width; beside the subject it is as wide as the room the subject leaves, between 300 and 620 design units
-      const base = f.sheet ? f.w - f.safe.left - f.safe.right : Math.min(freeSide(focus), (f.key === '1x1' ? 560 : 620) * f.k * (level === 0 ? 1 : level === 1 ? 0.88 : 0.78));
-      const layout = measureCard(g, model, f, Math.max(base, f.sheet ? base : 300 * f.k), level), place = placeForCut(f, { focus, core, card: { w: layout.w, h: layout.h }, badgeW });
-      const cand: PartPlan = { layout, place, focus, core, level }, cost = (q: CutPlace) => q.overlapFocus + q.overlapCore + q.overlapBars;
-      if (!best || cost(place) < cost(best.place)) best = cand;
-      if (place.ok) break;
-    }
-    parts.push(best!);
+    // the card is offered as variants, never in smaller type: a sheet frame's card is the safe width (its padding as designed, then tighter); beside the subject it is the card's wanted
+    // width (about a third of the canvas, never narrower than 18 em of the 36 px floor), then 90 and 80 % of it, each with both paddings. The solver takes the first that clears the subject.
+    const widths = f.sheet ? [f.w - f.safe.left - f.safe.right] : canvasCardWidths(f);
+    const vars = canvasVariants(widths, (w, tight) => measureCard(g, model, f, w, tight));
+    const place = placeForCut(f, { focus, core, card: vars[0].size, variants: vars.map(v => v.size), badgeW });
+    parts.push({ layout: vars[place.variant].layout, place, focus, core, variant: place.variant, tag: vars[place.variant].size.tag || '' });
   }
   // the hook: the member and the title, big, where the first part's card will sit
-  const first = subject(plan.parts[0]), hw = f.sheet ? f.w - f.safe.left - f.safe.right : Math.max(340 * f.k, Math.min(freeSide(first.focus), (f.key === '1x1' ? 760 : 900) * f.k));
-  const hl = measureHook(g, { name: plan.name, text: plan.hook.text }, f, hw);
-  const hook = { layout: hl, place: placeForCut(f, { focus: first.focus, core: first.core, card: { w: hl.w, h: hl.h }, badgeW }), focus: first.focus };
+  const first = subject(plan.parts[0]), cw = canvasCardWidths(f), hw = f.sheet ? f.w - f.safe.left - f.safe.right : Math.max(cw[cw.length - 1], Math.min(freeSide(first.focus), (f.key === '1x1' ? 760 : 900) * f.k));
+  // the hook is offered at each size its title takes (the biggest first, none under 42): the placer takes the biggest that keeps off the subject
+  const hvars: Array<{ layout: HookLayout; size: { w: number; h: number; type: number; cost: number; tag: string } }> = [];
+  hookSizes(f).forEach((cap, i) => { const L = measureHook(g, { name: plan.name, text: plan.hook.text }, f, hw, cap); if (!hvars.some(v => Math.abs(v.layout.px - L.px) < 1e-6 && v.layout.h === L.h)) hvars.push({ layout: L, size: { w: L.w, h: L.h, type: L.type, cost: hvars.length * 0.05, tag: `${(L.px / f.k).toFixed(0)}` } }); });
+  const hplace = placeForCut(f, { focus: first.focus, core: first.core, card: hvars[0].size, variants: hvars.map(v => v.size), badgeW }), hl = hvars[hplace.variant].layout;
+  const hook = { layout: hl, place: hplace, focus: first.focus };
   // the end card's rectangle (drawn once at no opacity to measure it)
   const endRect = drawCutEnd(g, f, o.end, 0);
   const cap = cutCaptionBox(f);
+  // nothing may sit outside the safe area, and a card has to fit the room it was given: a canvas cannot scroll
   const unsafe: string[] = [];
-  parts.forEach((p, i) => { if (!inside(p.place.rect, f)) unsafe.push(`card ${plan.parts[i].beat}`); });
-  if (!inside(hook.place.rect, f)) unsafe.push('hook');
+  parts.forEach((p, i) => { if (!inside(p.place.rect, f) || p.layout.h > p.place.rect.h + 1) unsafe.push(`card ${plan.parts[i].beat}`); });
+  if (!inside(hook.place.rect, f) || hl.h > hook.place.rect.h + 1) unsafe.push('hook');
   if (!inside(endRect, f)) unsafe.push('end card');
   if (!inside(cap, f)) unsafe.push('captions');
-  S = { rs, plan, f, E, cues, g, cv, gl: dbg.renderer.domElement, probe, parts, hook, end: o.end, badge: o.badge, frames: plan.frames, stats: { mean: 0, std: 0 } };
-  const place = (p: CutPlace, extra: object) => ({ slot: p.slot, rect: p.rect, ok: p.ok, overlapFocus: +p.overlapFocus.toFixed(4), overlapCore: +p.overlapCore.toFixed(4), overlapBars: +p.overlapBars.toFixed(4), alt: p.alt, ...extra });
+  S = { rs, plan, f, E, cues, g, cv, gl: dbg.renderer.domElement, probe, parts, hook, end: o.end, badge: o.badge, frames: plan.frames, stats: { mean: 0, std: 0 }, audit };
+  const place = (p: CutPlace, extra: object) => ({ slot: p.slot, rect: p.rect, ok: p.ok, overlapFocus: +p.overlapFocus.toFixed(4), overlapCore: +p.overlapCore.toFixed(4), overlapBars: +p.overlapBars.toFixed(4), alt: p.alt, variant: p.variant, refused: p.refused, ...extra });
   return {
-    page: f.page, canvas: { w: f.w, h: f.h }, out: f.out, crop: f.crop, k: f.k, safe: f.safe, fps: plan.fps, frames: plan.frames, duration: plan.duration,
-    cards: parts.map((p, i) => place(p.place, { beat: plan.parts[i].beat, level: p.level, focus: p.focus, core: p.core })),
-    hook: place(hook.place, { lines: hl.lines.length, px: +hl.px.toFixed(1), focus: hook.focus }),
+    page: f.page, canvas: { w: f.w, h: f.h }, out: f.out, crop: f.crop, k: f.k, safe: f.safe, fps: plan.fps, frames: plan.frames, duration: plan.duration, floor: FLOOR * f.k,
+    tracking: nativeTracking(g) ? 'letterSpacing' : 'glyph by glyph',
+    cards: parts.map((p, i) => place(p.place, { beat: plan.parts[i].beat, tag: p.tag, type: +p.layout.type.toFixed(2), width: p.layout.w, height: p.layout.h, focus: p.focus, core: p.core })),
+    hook: place(hook.place, { lines: hl.lines.length, px: +hl.px.toFixed(1), type: +hl.type.toFixed(2), height: hl.h, focus: hook.focus }),
     end: endRect, captions: cap, unsafe,
     cues: cues.map(c => ({ start: c.start, end: c.end, text: c.text })),
   };
@@ -152,6 +154,8 @@ export function frame(i: number, quality = 0.95): string {
 }
 /** The luma mean and standard deviation (0 to 255) of the room in the last frame drawn, before the overlay. */
 export function stats(): Stats { return S ? S.stats : { mean: 0, std: 0 }; }
+/** The smallest type painted so far, in design units (the floor is 36), the string it was painted for and every size drawn: the render fails the floor on what was painted. */
+export function typeAudit(): TypeAudit { return S ? S.audit : { min: Infinity, text: '', sizes: {}, drawn: 0 }; }
 
 function drawScene(st: State, ft: number) {
   const { f, plan, g, rs } = st, sc = sceneAt(plan, ft, st.E);

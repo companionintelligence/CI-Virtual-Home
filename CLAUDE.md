@@ -8,26 +8,30 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 
 ## Rules
 
-**Source vs derived.** The sources are `content/families/<slug>.json` (the family stories), `content/story/` (the cast plan, personas, claims, catalog, roles, voices, lexicon, schema; `casting.json` is derived, below), `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
+**Source vs derived.** The sources are `content/families/<slug>.json` (the family stories), `content/story/` (the cast plan, personas, claims, catalog, roles, voices, lexicon, the lander plan `lander.json`, schema; `casting.json` is derived, below), `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
 `index.html`, `portal/*.css` and `portal/*.js`, `scripts/` and `reference/`. Everything else is generated — never hand-edit it; change the source and re-run:
 
 | Derived file | Regenerate with |
 |---|---|
 | `assets/**/*.js` (gitignored) | `pnpm run build` |
 | `content/houses/<id>.plan.json` | `pnpm run plans` |
-| `content/houses/index.json` | `pnpm run index` |
+| `content/houses/index.json` | `pnpm run index` (the front page holds no count: `portal:build` writes its counts as words from this list) |
 | `content/house-catalog.json`, `assets/props/measured.ts` | `pnpm run catalog` |
 | `assets/site-species-masks.ts` (what each planting species hides of the mulch, and its triangle cost) | `node --experimental-strip-types scripts/measure-species.mts --write` — after a change to a species' geometry (`assets/site-species.ts`, the flower heads and grass tuft in `assets/site.ts`), then `pnpm run build`; `scripts/test-site-species.mts` fails until it is done |
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
 | `portal/thumbs/<id>.webp`, `portal/hero.webp`, `portal/previews/<id>.jpg`, `portal/hero.jpg` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `portal/stage/<house>/core-0-{1200,640}.webp` (the Core's picture in the lander's band) | `pnpm run portal:thumbs -- --stage` — after a change to how the Core or the hero's Library looks |
 | `portal/icons/*` (the favicon, the manifest's PNGs, the apple-touch-icon) | `pnpm run portal:icons` — after a change to `assets/brand/ci-logo-mark.svg` |
 | `content/story/casting.json`, `reference/story/cast.md` | `pnpm run story:cast` (from `content/story/cast-plan.json`, the house files and `roles.json`; after the plan or a house changed; `--check` fails when stale; `story:cast-lint` holds the plan to the fleet rules) |
 | `content/families/<slug>.voice.json`, `content/families/<slug>/audio/*.m4a` | `pnpm run story:voice -- <slug>` (local Kokoro; after the story text changed: `--stale`) |
 | `content/families/<slug>.bake.json` | `pnpm run story:bake -- <slug>` (after the voice, after a story or a role-table change) |
 | `portal/og/*.jpg`, `portal/og/manifest.json` | `pnpm run portal:og` (after a family's text or its preview picture changed) |
+| `portal/apps/<id>/*.webp`, `portal/ci/*.webp`, `content/story/app-media.json` | `pnpm run story:media` (real logos and screenshots, from the sibling repos' git objects at the manifest's pinned commits; `-- --check` fails when stale) |
+| `content/story/services.json` (the derived columns: `apps`, `storyApps`, `storyStatus`, `incumbentNameList`, `fleetHomes`, `rank`, `top80`) | `pnpm run story:services` (from `catalog-apps.json`, `claims.json` and `content/families`; the facts in the file are authored; `story:services:check` fails when stale and is part of `pnpm run test`; [`reference/story/story-v3.md`](reference/story/story-v3.md)) |
 | `content/families/films.json`, `content/families/<slug>/film/` | `pnpm run story:film -- <slug>` |
+| the `CLAIMS_SNAPSHOT` block in `assets/story/fine-print.ts` (the player's mirror of `content/story/claims.json`'s disclosures; the fine print each page owes is `reference/story/fine-print.md`) | `node --experimental-strip-types scripts/story/lib/fine-print.mts --write` after a change to `claims.json`; `scripts/test-fine-print.mts` fails until it is done |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
@@ -46,7 +50,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - The Python generators are deterministic too (`random.Random(spec id)`); re-running one on an unchanged tree
   must leave `git status` clean.
 
-**The public site.** The gallery of thirty homes (`index.html`), a home's own page (`homes/<id>`), a fictional family's page
+**The public site.** The lander (`index.html`: the Companion Core's argument, then the families and their homes), a home's own page (`homes/<id>`), a fictional family's page
 (`family/<slug>`, one per current family) and the player (`room-creator.html?mode=view&house=<id>`, `assets/viewer.ts`; with
 `&family=<slug>` it plays that family's narrated tour) are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 
@@ -102,29 +106,37 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   in `room-creator.html`) and the player's end card and About panel send a visitor to exactly `https://ci.computer`, `https://ci.computer/core` (Buy Companion Core), `https://ci.computer/download`
   (Download Companion) and the docs (`LINKS` in `portal-pages.mts`; `assets/viewer.ts` has the same four); `portal:build` fails without them.
   No prices, specs or availability on these pages: reuse the wording ci.computer and the docs use. Say it once: Buy and Download are offered
-  by the header, the band after the homes and the footer (the gallery's hero only says what a Core is and points at the band), and the
+  by the sticky header, the one Core band and the footer (the hero only says what a Core is and points at the band), and the
   main site is linked from the header and the footer list only. On a phone the player's About panel is More > About (the "?" button
   needs the room a phone's top bar has not), its links are 44 px targets, and it does not list keyboard shortcuts; the end card's two
   links are a row of 32 px (44 px on touch) targets.
 <!-- front page -->
-- **The front page is the story's lander** (`index.html`, `portal/gallery.js`, `scripts/portal-front.mts`; `portal:build` writes the cards at step 5d from the
-  current families, `story.built`). A family's card goes to its page (`family/<slug>`, which goes on to the tour); a home with no current family keeps its
-  plain card, which goes to the player. The family cards are **static HTML in the built `index.html`** (`gallery.js` adopts them and does not draw them
-  again), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them. The hero says "Fictional family. Real software.",
-  `Take the tour` is its one action (the Brennans' tour, `HERO` in `portal-front.mts`), `See Companion Core` only points at the one Core band, and the
-  band, the header and the footer keep `Buy Companion Core` and `Download Companion`: say it once. No UI mockup, no third-party logo, no price, daylight
-  only, the beta line with every software claim, and a card's app line is `<app> replaces <service>` from the story, never a line `claims.json` stops.
-  A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The hero's "thirty" and the description's "Thirty homes" are
-  checked against the number of homes (step 5b).
+- **The front page is the story's lander** (`index.html`, `portal/gallery.js`, `scripts/portal-front.mts`, `scripts/story/lib/lander.mts` and `pairs.mts`, the plan `content/story/lander.json`; the contract and the checks are
+  `reference/story/lander.md`; `portal:build` writes it at step 5d from the current families, `story.built`). Six blocks and a sticky header, in this order: the hero ("Stop renting your intelligence.", the claim `rent-line` of
+  `claims.json`; what a Core is in one sentence; "Fictional family. Real software." and the full beta line; `Take the tour` is its one action, the Brennans' tour, `hero` in the plan; `See Companion Core` only points at the band),
+  "From rented to kept" (claims.json's words), "One pair, in full" (a beat of a family file, with `Watch this moment` into the tour), the one Core band (`#core`: the claims, the engine's stylised Core, Buy, Download, the docs, what a Core
+  is not), the chooser "What do you rent today?" and the families (six featured cards, then every other family and home in a native `<details>`). Say it once: the header, the band and the footer keep `Buy Companion Core` and
+  `Download Companion`. A family's card goes to its page (`family/<slug>`, which goes on to the tour); a home with no current family keeps its plain card, which goes to the player. The cards are **static HTML in the built
+  `index.html`** (`gallery.js` adopts them and draws a card only for a home with none), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them, and the chooser's controls are `disabled` until the
+  script runs. No UI mockup, no invented screen, no logo or screenshot on this page (the family pages keep their labelled real media), no price, daylight only. A pair is written `<app>, alternative to <service>`, never "replaces", and
+  never one `claims.json` stops or the plan holds (`hold`: pairs counsel has not cleared; releasing one is deleting its entry). A card names a family by the place of its address ("The Brennan family of Wrenfield"). The featured
+  families must pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day): the page is the destination of paid traffic, so a family that fails is never put in a slot. Counts are words, always
+  beside "fictional" and never a digit ("Thirty fictional families in thirty-six homes."), written by the build from the data; `portal:build` fails on a count typed in `index.html` (step 5b) and runs
+  `scripts/story/lib/lander-check.mts` on the built page (step 7). A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The six apartments are declared without a family in
+  `content/story/cast-plan.json` (`homesWithoutFamily`; `portal:build` names them, `story:cast-lint` holds the list to the homes, `--strict-families` errors on a home that is neither current nor declared), so the copy never says
+  every home has a family. The H1's claim `rent-line` is on hold in `claims.json` until the owner signs it off: the page builds with a warning, and a strict build (a push to main) fails.
 - The homes' own pages are linked by the footer's "Every home, on its own page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in
   `index.html` and `gallery.js` leaves alone, so the rendered DOM links them and not only the sitemap does. A home's page carries "Meet the family" when a
   current family lives there (`<!-- meet-family: -->`, written by the same step).
+- The lander's claims and fine print are `claims.json`'s words, never retyped in `index.html`: `portal:build` writes a claim at its `<!-- claim:<id> -->` marker (the page marks it `data-claim`, and the build checks it word for word)
+  and the fine print at `<!-- fine-hero: -->`, `<!-- fine-core: -->` and `<!-- fine-foot: -->` from `scripts/story/lib/fine-print.mts` (surfaces `lander-hero`, `lander-core`, `lander-footer`; `reference/story/fine-print.md`). Every
+  row of `DISCLOSURES` in `scripts/story/lib/site-copy.mts` is enforced, so `story:copy` fails a page that drops one.
 - **Campaign passthrough** (`portal/campaign.js`, plain script, no imports): the ad's tags (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`,
   `utm_term`, `fbclid`, `ttclid`, `gclid`, `msclkid`) are kept in `sessionStorage` (`ci-campaign`) and added, **at run time only**, to every link to
   `https://ci.computer`, `/core` and `/download` and to every relative link marked `data-campaign`. The built hrefs never carry a query (step 7 fails on
   one), no page may rewrite them in the HTML, and the docs, privacy and terms links never get tags. Every page of the site loads it
   (`<script src="./portal/campaign.js" defer data-cfasync="false"></script>`, `../portal/` one level down, before any script that writes the address); a
-  script that rewrites the address keeps the parameters that are not its own (gallery.js does; the player's `url()` does not yet). `scripts/test-campaign.mts`
+  script that rewrites the address keeps the parameters that are not its own (gallery.js does, and so does the player's `url()`: `OWN_PARAMS` in `assets/viewer.ts` and `assets/story/url.ts` is the one list of what is the player's own, and `family-pages.mts` asserts it). `scripts/test-campaign.mts`
   (`pnpm run test:campaign`, quick) and the `campaign` leg of `portal:test` check it.
 <!-- end front page -->
 - Every executable `<script>` in the built pages has `data-cfasync="false"` (Cloudflare's Rocket Loader is on for the zone and would
@@ -139,6 +151,9 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   fails the build if any text file under `dist/` contains a builder handle (derived from the `author` fields, never listed), the word
   "Sims", "Base Game" or "BG " (the allowlist, `GUARD_ALLOW`, is empty: keep it so). A new surface that wants a name uses
   `displayName` and credits no one; never read `author`, `source` or the spec's `name` in a page, a script that ships or the player.
+  The one author that is not a handle is the company's own name, `Companion Intelligence` (`scripts/own-authors.mts`, matched whole: a home it wrote itself, the apartments of
+  `reference/APARTMENTS.md`, is credited to it, and it is on every page); the credit guard and the story's leak scan both skip it, `GUARD_ALLOW` stays empty, and every other value is still a handle.
+  A home's display name must not be a phrase a family's words contain (`check-leaks.mts`: the loft is "Warehouse Loft" because a family's story has a "studio loft").
   `THIRD_PARTY.md` and `ATTRIBUTION.md` are internal licence records for dependencies and models: leave them.
 - **The homes portal names its homes**, by `displayName`, and nothing else about where they came from. The salvage branch's rule that no home
   or house id is ever public (sanitised specs, a stub of `home-names`) is NOT adopted. What holds of it: a STORY's words never name a home,
@@ -148,7 +163,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - **The story system** (`content/families/<slug>.json`, `content/story/`, `reference/story/`, `assets/story/`, `scripts/story/`). The families are
   fictional, two to six members each with an archetype, told as the argument for uncloud: the contract is `reference/story/personas.md`
   (read it first; the validator, the bake, the voice and the film follow it). Who lives where is `content/story/cast-plan.json`
-  (`reference/story/cast.md` is the readable table of it). One file per family is the one source of every word: the page,
+  (`reference/story/cast.md` is the readable table of it). A home that has no family yet is listed there under `homesWithoutFamily` with a reason (the six apartments); `story:cast-lint` fails a home that is in neither place, and one that is in both. One file per family is the one source of every word: the page,
   the popups, the captions, the voice-over and the film are all made from it. The order after an edit: `pnpm run story:validate -- <slug>`,
   `story:voice -- <slug> --stale`, `story:bake -- <slug>`, `portal:og`, then `portal:build` and `portal:test`. The `.voice.json`,
   `.bake.json`, audio and link-preview images are generated and committed; never hand-edit them. Every app a story names must be in
@@ -177,7 +192,8 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   there (the production deploy). `--stale-report` prints every reason.
 - Copy on the site follows the Uncloud voice (CI-Common `uncloud-voice`): no em or en dashes, sentence case, no price or performance number
   that is not on the fact sheet, "Fictional family. Real software." wherever a family is, Companion OS is in beta.
-  `scripts/story/check-copy.mts` lints the built family pages against `content/story/claims.json` (`portal:test`'s hooks leg).
+  `scripts/story/check-copy.mts` (`pnpm run story:copy -- dist`, in CI after `portal:build` and in `portal:test`'s `gallery` and `hooks` legs) lints every built page and data file a visitor reads
+  (the front page and its band and footer, the homes' pages, the family pages, the 404, the player's HTML, the tours' data, the cards, the ad plan and the player's strings) against `content/story/claims.json`; a disclosure the claims owe a page that nothing prints yet is listed as pending, never silently skipped (`--strict` fails on it).
 - **The voice-over is generated locally** (`pnpm run story:voice`, Kokoro-82M, Apache-2.0, CPU, no network at run time). No cloud
   text-to-speech service, no API key, ever; macOS `say` is a labelled last resort only. Nothing in the pipeline is shipped but its
   output: the AAC clips, which are content-hashed (`<clip>.<hash10>.m4a`), loaded per beat and only after the viewer chooses
@@ -209,6 +225,42 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   that parses (never hand-edit; `story:ads -- --check` says when it is stale); the videos are under `video/ads/` (gitignored: videos never ship in git or on Pages). The GPU path is `--gl default`
   (`PERSONA_CUT_GL`; the machine's own GPU through ANGLE; `software` is SwiftShader, hours a cut; never `--use-angle=vulkan`, it draws blank frames). `story:film`'s files and exports are not changed by it.
 <!-- ---- end ad kit ---- -->
+<!-- ---- app media ---- -->
+- **App media** (`pnpm run story:media`, `scripts/story/build-app-media.mts`, `scripts/story/lib/media.mts`, contract `reference/story/story-v2.md` "App media"): real logos and real
+  screenshots of the apps the families use, of Companion Hub and of the Companion account page, as content-hashed WebP under `portal/apps/<id>/` and `portal/ci/` and the manifest
+  `content/story/app-media.json` (sorted keys, no timestamps; all generated and committed, never hand-edited). The rule: a **logo identifies the app named beside it** (alt text
+  "<Name> logo"; 128 px, at most 12 KB; also allowed inside a chip of an ad cut, never alone); a **screenshot is real, unedited, whole and labelled** ("Real screenshot of <Name> from a
+  Companion Hub QA run. Not a recording of this family."; 960 px wide, at most 90 KB) and is never composited into a scene, the tour or a cut (a cut inset stays off unless the owner says so).
+  Sources are read with `git cat-file` from the sibling repos at the commits the manifest pins, never from a working tree; each screenshot that ships was looked at by eye and its git
+  blob id is in `VETTED` (a changed source stops the build until someone looks again), and every candidate left out is in `rejected` with its reason (a person's name, an email, a login
+  secret, a token, an internal host or address, a payment detail, an error page, a blank page, a different product, a claim the site does not make). Only ffmpeg with libwebp makes the
+  files (no image library, none may be added); a rerun on the same ffmpeg gives the same bytes. Page generators read the manifest through `scripts/story/lib/media.mts` (`logoImg`,
+  `shotFigure`: lazy, width and height set, alt text, the caption; the front page shows none). `portal:build` (the `app media` blocks of `scripts/build-portal.mts`)
+  ships only the files the manifest names, fails on a manifest or page that names a missing file, an image without alt text, size or loading, or a screenshot without its caption,
+  warns with the list of apps a family uses that have no entry, and scans the manifest's words with the credit guard; `portal/_headers` keeps `/portal/apps/*` and `/portal/ci/*`
+  for a year. `pnpm run story:media:test` (quick, in `test:node`) holds all of it. Each source is a THIRD_PARTY.md row. A new app a family uses: `story:media`; a screenshot that
+  should ship is added to `SHOT_SHOWS` and `VETTED` only after looking at it.
+<!-- ---- end app media ---- -->
+<!-- ---- layout (story v2) ---- -->
+- **The layout of the story pages** (`scripts/story/pages.mts`, `scripts/story/lib/plan-map.mts`, `scripts/portal-front.mts`, `portal/family.css`, `portal/media.css`, `portal/gallery.css`; `assets/story/popup.ts` for the card): everything
+  a visitor reads is in the built HTML. A family page's people live in `<div class="people">`, whose first child is the sticky `nav.who-nav` (portal/family.js marks the person being read with `aria-current`; a chip never changes size);
+  a person's section holds, in order, the bio (`member.profile`, else their `work`), the card "Rented before, on the Core now" (`swapOf`/`swapHtml`: a pair the story's copy rules stop, such as "replaces ChatGPT", is left out here and
+  on the cards), the moments (the chip that names an app wears its real 24 px logo; a beat's `detail` is a native `<details class="more">`) and up to three real screenshots of their apps (a link to the picture,
+  `data-shot`, with the manifest's exact caption; `portal/shots.js` opens it in the page's one `<dialog>`). After the people: "A day in the house" (`family.day`), "The home" (`family.home`, and from the spec: storeys, floor
+  area, rooms and the floor plan, one SVG for each storey in one shared view box with a 44 px pin for each person as an HTML link laid over it by percentage; a room's name is the spec's in sentence case, "Master" is "Primary",
+  "Portal" is "Archway", and a name that does not fit its room at 7 units is a tooltip only), the apps with their logos, "How it runs" and how the Core starts. The **plan is a diagram** (it says so): never a plan of walls, doors or
+  stairs, and the pin is where the casting puts the person. Real media is lazy and sized (`checkPageImages` in the build); the front page carries none. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
+  subject. Never put a screenshot in the tour, a scene or an ad cut; never an app's logo without its name beside it. Tests: `pnpm run test:node` (`test-story-pages.mts`) and `portal:test -- --only hooks`.
+<!-- ---- end layout (story v2) ---- -->
+<!-- ---- type scale (live pass 3) ---- -->
+- **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a
+  modal (card, start and end cards, About, failure card, the family page's screenshot dialog) **1.5rem = 25.5 px at 768 px and wider, `clamp(20px, 5.4vw, 25.5px)` on a phone**, a card's title 2.25rem, the start and end cards'
+  heading 2.6rem; Manrope 400 body, 500 controls, 600 chips, 700 titles and names (no 800), 0.2pt tracking. The tokens are `--st-min`, `--st-title` and `--st-hook` in `portal/viewer.css`; every size in the tour's CSS is one of them.
+  A card is `clamp(420px, 32vw, 560px)` wide, a phone's sheet up to 55 % of the height; the placement solver (`assets/story/place.ts`) may shrink padding, choose another slot or a narrower and taller card, and never shrinks type.
+  **A person's name is a kicker** on every card, dialog and family-page label: all capitals by CSS (the text and aria-labels stay as written), 700, 0.2em of tracking, in the accent; "THE BRENNAN FAMILY" the same. Film and ad
+  canvases keep 36 design px (a canvas is shown scaled down). Details and the table: `reference/story/player.md`, "Type and size". Tests: `scripts/test-story-place.mts`, `scripts/test-story-pages.mts`, `typography.mts`
+  (`pnpm run portal:test -- --only hooks`).
+<!-- ---- end type scale (live pass 3) ---- -->
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
   import map (and `?v=` on the `<script>`/`<link>` tags), and `portal/_headers` asks every file to revalidate. Never give an
   un-hashed file a long cache time or load a module around the build's rewriting: after a deploy a returning visitor would
@@ -233,18 +285,22 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`) and the 31 quick
-Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`), the story gates
+(`story:validate` on every family, `story:cast -- --check`, `story:cast-lint`, `story:services:check`, `story:bake -- --check --all`; `story:validate -- --complete` and
+`story:ads -- --check` run but do not block yet), the quick Node tests (`pnpm run test:node`: every `scripts/test-*.mts` marked `@check-house quick`, found by glob, so no
+count is written here), assembles the portal (`portal:build`'s link and staleness checks; strict about families on a push) and lints every word of it (`pnpm run story:copy -- dist`);
+`portal:test`'s browser legs run too but do not block yet (`.github/workflows/ci.yml` says which). Once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
-pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots + the 31 quick tests
+pnpm run check          # assets, specs, shots (144 / 0 errors), determinism, goldens (150 / 150; the six apartments are named as without a baseline until `goldens:update --house` is run on the Mac)
+
+pnpm run check:quick    # while iterating: assets + specs + shots + the quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count
-with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 150 goldens passing.
+with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and the goldens passing (150 frames today, 180 once the six apartments are blessed).
 After a spec change also re-run `plans`, `iso` and `floorplans` and commit their output with the spec.
 
 **Pass 4 works in streams** (S0 seams, then S1 kit, S2 architecture, S3 compose, S4 site, S5 shot, S6 ui, each on
@@ -263,7 +319,7 @@ your stream's `test/goldens/expected-diffs/<stream>.json` and record what it mov
 <stream>`, and `fixtures --record <stream>` for another stream's fixture). The integration re-blesses once and
 empties that ledger.
 
-**The interior layers (LIGHT, SOFT, SMALL, DRESS, BAKE, README → The interior layers).** The 30 houses carry their dress items baked in (`src: 'dress@1'`, a `dk` seed key): never
+**The interior layers (LIGHT, SOFT, SMALL, DRESS, BAKE, README → The interior layers).** The 36 homes carry their dress items baked in (`src: 'dress@1'`, a `dk` seed key): never
 hand-edit one and never add a `dress` field (a live opt-in) to a shipped house; after a layout re-bake run `node --experimental-strip-types scripts/compose-house.mts --house <id>
 --dress --write` (`test-dress-phase` S fails on a stale bake; `--undress` restores the bytes). A lamp placed by the dress phase is lit by LIGHT's room pool, so a recipe or a host
 change that moves lamps moves night frames: check `pnpm run test:light -- --bench` (19 rows) and `-- --lamps`. A change to how rooms look is judged with the review rig

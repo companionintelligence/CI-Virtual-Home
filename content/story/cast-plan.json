@@ -4,6 +4,7 @@
  "note": "Authored casting for the 30 persona homes (reference/story/personas.md). Names, places and companion names are invented and reserved here so the fleet's uniqueness rules hold by design; a writer may change one if it stays unique (cast-lint keeps the reservation). Everything derived from the house files (rooms, roles, Core room, anchors) is produced by scripts/story/build-casting.mts into content/story/casting.json: never edit that file by hand.",
  "households": {"solo-or-couple": "Solo, couple, no children at home", "young-family": "Young family (children under 13)", "older-kids": "Teens or adult children at home", "grandparents": "Grandparents and grandchildren"},
  "retiredSlugs": ["lindqvist-abara", "vance-takahashi", "nowak-pillai", "dufresne", "oyelaran-brandt", "castellanos", "whitlock-mensah", "eriksen-bautista", "kowalczyk-ferreira", "ashworth", "nakamura-oduya", "ibarra-holm", "karimi-santos", "delgado-park", "chowdhury-osei", "aguirre-lund", "okonkwo-reid", "tran-mcallister", "papadakis-roy", "vasquez-nilsen", "bellamy-nwosu", "ferrante-oyelowo", "adeyemi-castro", "keane", "mbeki-fontaine", "lacroix-adebayo", "ramos-whitfield", "yilmaz-hartmann", "mahlangu-engstrom", "ochieng-sorensen"],
+ "homesWithoutFamily": {"city-one-bed": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "corner-penthouse": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "garden-flat": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "studio-loft": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "two-bed-flat": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "walkup-duplex": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet."},
  "families": [
   {
    "slug": "brennan",
@@ -18,9 +19,9 @@
    "narrator": "v-clear-f",
    "reason": "Native fit for all four: two kids' rooms with a desk each, a Library for the Core, a Master Suite with a laptop desk; the Nursery is a spare room and is never a stage.",
    "household_text": "Two parents and two teens: the flagship family in the house that suits them best.",
-   "care": "Jean's questions to a local model stay on the Core, told without fear.",
+   "care": "Jean's schoolwork and reading stay on the Core, in tools that each do one job, told without fear.",
    "reviewNeeded": ["code-server"],
-   "signatureApps": ["ci-hermes", "ci-planning", "nextcloud", "code-server", "open-webui", "steam-headless", "kiwix"],
+   "signatureApps": ["ci-hermes", "ci-planning", "nextcloud", "code-server", "open-webui", "steam-headless", "libretranslate"],
    "beatApps": {"iot": "home-assistant", "food": "yuvomi"},
    "members": [
     {"id": "sally", "name": "Sally", "age": 43, "role": "parent", "archetype": "organiser", "work": "consultant, runs her own small practice", "room": "Library", "sleepsIn": "Master Suite", "companion": "Juniper"},
@@ -154,7 +155,7 @@
    "reason": "Primary Bedroom has the record player (maker), the Kids' Room has the easel and a kids desk (learner), the Guest Bedroom is the teen's, and the Conservatory Dining table is the office.",
    "household_text": "Two parents, a teenager and a ten-year-old in the villa with a record player.",
    "care": "A client's contract and a child's homework both stay on the Core.",
-   "signatureApps": ["ci-hermes", "onlyoffice", "libretranslate", "navidrome", "audiomass", "steam-headless", "kiwix"],
+   "signatureApps": ["ci-hermes", "onlyoffice", "libretranslate", "navidrome", "audiomass", "steam-headless", "razzia"],
    "beatApps": {"iot": "ntfy", "food": "homehub", "privacy": "vaultwarden"},
    "members": [
     {"id": "meenakshi", "name": "Meenakshi", "age": 45, "role": "parent", "archetype": "organiser", "work": "translator, runs a small agency", "room": "Conservatory Dining", "sleepsIn": "Primary Bedroom", "companion": "Clover"},
@@ -217,7 +218,7 @@
    "reason": "Two kids' bedrooms with different furniture: the Kids Room has the desk (learner), the Kids Bedroom has the easel (maker); the Dining Room table is the office and the Den the builder's.",
    "household_text": "Two parents and two children under eleven in the house with two kids rooms.",
    "care": "The children's drawings and homework sit on the Core.",
-   "signatureApps": ["ci-hermes", "yuvomi", "uptime-kuma", "pi-hole", "kiwix", "blockbench", "librephotos"],
+   "signatureApps": ["ci-hermes", "yuvomi", "uptime-kuma", "pi-hole", "linkwarden", "blockbench", "librephotos"],
    "members": [
     {"id": "marisol", "name": "Marisol", "age": 38, "role": "parent", "archetype": "organiser", "work": "clinic office manager", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Willow"},
     {"id": "andres", "name": "Andres", "age": 40, "role": "parent", "archetype": "builder", "work": "devops engineer", "room": "Den", "sleepsIn": "Primary Bedroom", "companion": "Thimble"},
@@ -258,7 +259,7 @@
    "reason": "The 6 m2 Study with a desk and a gaming chair is the builder's cubby; the Dining room is the organiser's; the Kids Room has the shelf; the house has no TV.",
    "household_text": "Two parents and an eight-year-old in the house on the knoll.",
    "care": "An eight-year-old's reading stays on the Core.",
-   "signatureApps": ["ci-hermes", "donetick", "bookstack", "forgejo", "kiwix", "frigate", "duplicati"],
+   "signatureApps": ["ci-hermes", "donetick", "bookstack", "forgejo", "kokoro", "frigate", "duplicati"],
    "beatApps": {"food": "grocy"},
    "members": [
     {"id": "minjung", "name": "Minjung", "age": 40, "role": "parent", "archetype": "organiser", "work": "school administrator", "room": "Dining", "sleepsIn": "Primary Suite", "companion": "Poppy"},
@@ -418,7 +419,7 @@
    "reason": "One floor, two bedrooms and a Fireside Nook: two grandparents and a ten-year-old grandchild in the 10 m2 Guest Bedroom.",
    "household_text": "Two grandparents and their ten-year-old grandchild on one floor.",
    "care": "A retired accountant's paperwork stays on the Core.",
-   "signatureApps": ["ci-memory", "paperless", "monetr", "vaultwarden", "kitchenowl", "hortusfox", "kiwix"],
+   "signatureApps": ["ci-memory", "paperless", "monetr", "vaultwarden", "kitchenowl", "hortusfox", "audiobookshelf"],
    "beatApps": {"iot": "ntfy"},
    "members": [
     {"id": "willem", "name": "Willem", "age": 71, "role": "grandparent", "archetype": "organiser", "work": "retired accountant", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Marmalade"},
@@ -438,7 +439,7 @@
    "reason": "Five bedrooms: two grandparents, their daughter at the Bedroom Two desk, a nine-year-old and a baby in the Nursery; the Family Room has the record player.",
    "household_text": "Two grandparents, their daughter, a nine-year-old grandchild and a baby.",
    "care": "Three generations of family photographs stay on one Core.",
-   "signatureApps": ["ci-hermes", "homehub", "navidrome", "gitea", "immich", "kiwix", "frigate"],
+   "signatureApps": ["ci-hermes", "homehub", "navidrome", "gitea", "immich", "kokoro", "frigate"],
    "members": [
     {"id": "yoshiko", "name": "Yoshiko", "age": 67, "role": "grandparent", "archetype": "host", "work": "cooks for the whole house", "room": "Kitchen", "sleepsIn": "Primary Suite", "companion": "Cinnamon"},
     {"id": "haruo", "name": "Haruo", "age": 70, "role": "grandparent", "archetype": "maker", "work": "retired surveyor, keeps a record collection", "room": "Family Room", "sleepsIn": "Primary Suite", "companion": "Sesame"},

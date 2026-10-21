@@ -63,8 +63,13 @@ export type RuntimeBeat = Omit<Beat, 'anchor' | 'camera' | 'capability'> & {
   frame: Pick<BeatFrame, 'box' | 'focus' | 'role'>;
 };
 export type RuntimeChapter = Chapter & { beat0: number; beats: number; t0: number; t1: number };
+/** Story v2: the real logo of an app the tour names (content/story/app-media.json; scripts/story/ship/player.mts fills it). A file is relative to the site root. */
+export type RuntimeLogo = { file: string; w: number; h: number; alt: string };
+export type RuntimeMedia = Record<string, { name: string; logo: RuntimeLogo | null }>;
 export type RuntimeStory = {
   v: 1; slug: string; fictional: true;
+  /** the apps of the beats (`app` and `with`) and their real logos; absent in a story shipped without the manifest. The card shows a logo beside the chip that names its app. */
+  media?: RuntimeMedia;
   /** 'voice': the timeline is the recorded voice's. 'estimated': a draft (a release build refuses it) */
   durations: 'voice' | 'estimated';
   family: FamilyInfo; members: Member[]; chapters: RuntimeChapter[]; beats: RuntimeBeat[]; closing: Closing;

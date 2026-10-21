@@ -2,6 +2,7 @@
 // pieces they share with the hand-written index.html: where the site sends a visitor, the structured data, the number written out.
 // Pure functions of index.json and the site's address, so a rebuild is byte-identical.
 import { displayName } from '../assets/home-names.js';
+import { coreLine, finePrint } from './story/lib/fine-print.mts';
 
 // Where this site sends a visitor. Exactly these addresses, on every page and in the player (assets/viewer.ts has the same
 // four): /core redirects to the product page and is still the address to link; the docs have no page for the virtual homes
@@ -37,8 +38,8 @@ export const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with 
 
 const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-// 30 → "thirty": the copy says "thirty homes" in words; this is what the data's count reads as, so a page that still says
-// "thirty" after the collection changes is found by the build (build-portal.mts checks index.html's hand-written copy)
+// 36 → "thirty-six": the copy says a count in words; this is what the data's count reads as. The front page's words are written from the data when the portal
+// is built (scripts/portal-front.mts, scripts/story/lib/lander.mts countLine), and the build refuses a count typed in index.html
 export function numberWord(n: number): string {
   if (!Number.isInteger(n) || n < 0 || n > 99) return String(n);
   if (n < 20) return ONES[n];
@@ -48,7 +49,7 @@ export const capital = (s: string): string => s.charAt(0).toUpperCase() + s.slic
 
 // a link-preview description fits a search result: one sentence on the style, one on what the page does, under 160 characters.
 export function homeDescription(h: House): string {
-  const tail = 'Built live in 3D in your browser: fly its camera paths and change the hour.';
+  const tail = 'Walk through it in 3D in your browser.';
   let style = shortStyle(h.style);
   const room = 155 - tail.length - 2;
   if (style.length > room) style = `${style.slice(0, room - 1).replace(/\s+\S*$/, '')}…`;
@@ -68,11 +69,12 @@ export const homeUrl = (site: string, id: string): string => new URL(`homes/${id
 export const ldScript = (graph: object[]): string => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')}</script>`;
 export const orgLd = (site: string): object => ({ '@type': 'Organization', '@id': `${site}#organization`, name: SITE_NAME, url: LINKS.site, logo: new URL('portal/icons/icon-512.png', site).href, sameAs: SAME_AS });
 export const siteLd = (site: string): object => ({ '@type': 'WebSite', '@id': `${site}#website`, name: 'Virtual homes', url: site, inLanguage: 'en', publisher: { '@id': `${site}#organization` } });
-// the gallery: the site, its publisher and the list of homes
-export function galleryLd(site: string, houses: House[], title: string, desc: string): string {
+// the front page: the site, its publisher and the pages it features (the featured families' pages, absolute and extensionless; every home's page is linked
+// from the footer). No SearchAction, Product, Review, AggregateRating or FAQPage.
+export function galleryLd(site: string, items: { url: string; name: string }[], title: string, desc: string): string {
   return ldScript([orgLd(site), siteLd(site), {
     '@type': 'CollectionPage', '@id': `${site}#collection`, url: site, name: title, description: desc, isPartOf: { '@id': `${site}#website` },
-    mainEntity: { '@type': 'ItemList', numberOfItems: houses.length, itemListElement: houses.map((h, i) => ({ '@type': 'ListItem', position: i + 1, url: homeUrl(site, h.id), name: displayName(h) })) },
+    mainEntity: { '@type': 'ItemList', numberOfItems: items.length, itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, url: it.url, name: it.name })) },
   }]);
 }
 // a home's page: the site, its publisher, the page with its picture, and where it sits
@@ -92,13 +94,14 @@ export const playerLd = (site: string): string => ldScript([orgLd(site), siteLd(
 // ---- the gallery's list of homes, written into index.html so a visitor without JavaScript, and a crawler that does not run it,
 // see the homes and can follow each to its page. portal/gallery.js replaces them with the same cards, whose links go straight to
 // the player (same markup as its card(): a swap that does not move anything).
-export function galleryCards(houses: House[]): string {
-  return houses.map((h, i) => {
+export function galleryCards(houses: House[], types: Record<string, string> = {}): string {
+  return houses.map((h) => {
     const name = displayName(h), storeys = h.storeys || 1;
-    return `<li class="card" data-id="${esc(h.id)}"><a href="./homes/${esc(encodeURIComponent(h.id))}" aria-label="${esc(`${name}. ${shortStyle(h.style)}. Open its page`)}">`
-      + `<div class="thumb"><img src="./portal/thumbs/${esc(encodeURIComponent(h.id))}.webp" alt="" width="640" height="360" decoding="async"${i > 5 ? ' loading="lazy"' : ''}>`
-      + `<span class="thumb-play"><svg class="i i-fill"><use href="#i-play"/></svg>Play in 3D</span></div>`
-      + `<div class="card-body"><h3>${esc(name)}</h3><p class="style" title="${esc(h.style || '')}">${esc(shortStyle(h.style))}</p>`
+    const find = [name, h.style || '', h.id].join(' ').toLowerCase().replace(/\s+/g, ' ').trim();
+    return `<li class="card card-plain" data-id="${esc(h.id)}" data-type="${esc(types[h.id] || 'home')}" data-find="${esc(find)}"><a href="./homes/${esc(encodeURIComponent(h.id))}" aria-label="${esc(`${name}. No family yet. Open its page`)}">`
+      + `<div class="thumb"><img src="./portal/thumbs/${esc(encodeURIComponent(h.id))}.webp" alt="" width="640" height="360" decoding="async" loading="lazy">`
+      + `<span class="thumb-play"><svg class="i i-fill"><use href="#i-play"/></svg>Look around in 3D</span></div>`
+      + `<div class="card-body"><h3>${esc(name)}</h3><p class="no-family">No family yet.</p><p class="style" title="${esc(h.style || '')}">${esc(shortStyle(h.style))}</p>`
       + `<p class="facts"><span class="fact">${storeys} ${storeys === 1 ? 'storey' : 'storeys'}</span>${h.areaSqm ? `<span class="fact">${nf.format(h.areaSqm)} m²</span>` : ''}</p></div></a></li>`;
   }).join('\n        ');
 }
@@ -141,8 +144,8 @@ const header = (): string => `<header class="site-head">
 const ctaBand = (): string => `<section class="cta-band" id="core" aria-labelledby="cta-title">
       <div class="cta-copy">
         <h2 id="cta-title">Meet the Companion Core.</h2>
-        <p>The small computer on your desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
-        <p class="cta-note">Companion OS is in beta.</p>
+        <p>${esc(coreLine('your desk'))}</p>
+        ${finePrint('home-band', {}, undefined, { cls: 'cta-note' }).html}
       </div>
       <div class="cta-actions">
         <a class="btn btn-buy" href="${LINKS.core}">Buy Companion Core</a>
@@ -165,6 +168,9 @@ const footer = (): string => `<footer class="site-foot">
           <li><a href="${LINKS.terms}">Terms</a></li>
         </ul>
       </nav>
+      <div class="foot-notes" style="grid-column: 1 / -1">
+        ${finePrint('home-footer').html}
+      </div>
     </div>
     <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>
   </footer>`;
@@ -227,7 +233,7 @@ export function homePage(h: House, site: string): string {
           <a class="btn btn-primary" href="${esc(player)}" data-campaign><svg class="i i-fill" aria-hidden="true"><use href="#i-play"/></svg><span>Open ${esc(name)} in 3D</span></a>
           <a class="btn btn-ghost" href="../#homes" data-campaign><span>All homes</span></a>
         </div>
-        <p class="home-note">Built live in your browser from one spec file.</p>
+        <p class="home-note">The tour draws this home in 3D in your browser.</p>
       </div>
       <a class="hero-media" href="${esc(player)}" data-campaign aria-label="Open ${esc(name)} in 3D">
         <img src="../portal/previews/${esc(id)}.jpg" alt="${esc(alt)}" width="1200" height="630" fetchpriority="high">
@@ -296,6 +302,7 @@ export function notFoundPage(site: string, word: string): string {
       background: var(--primary); color: var(--on-primary); }
     .btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
     .more { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin-top: 8px; font-size: 14px; }
+    .fine { margin-top: 12px; font-size: 13px; max-width: 36em; }
     a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 6px; }
   </style>
 </head>
@@ -309,6 +316,7 @@ export function notFoundPage(site: string, word: string): string {
       <a class="btn ghost" href="${LINKS.download}">Download Companion</a>
     </div>
     <p class="more"><a href="${LINKS.site}">${SITE_NAME}</a> <a href="${LINKS.docs}">Docs</a></p>
+    ${finePrint('not-found', {}, undefined, { cls: 'fine' }).html}
   </main>
 </body>
 </html>

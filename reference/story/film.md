@@ -30,16 +30,39 @@ timeout or a browser crash.
 | last 15 s or so | **End card** | the same exterior move played backwards (a pull-back) under the closing words; after the last word, a panel: **UnCloud your life.**, `ci.computer/core`, the fictional line, and the disclosures below. It holds at least 5 s |
 
 **On screen.** The *popup card* shows who is in the scene and which companion helps (a monogram disc, never a face), the title, the app chips and the one-line note, and for the
-first-run beats a stylised phone drawing whose rows tick off as the narration reaches them. The narration itself is the *caption strip* (the popup body is the
+first-run beats a stylised phone screen (a panel under the note: a header and up to four rows, each ticked off as the narration reaches it). The narration itself is the *caption strip* (the popup body is the
 narration, bible R2: one source of text), burned in as open captions with a karaoke highlight; an agent's line shows its speaker and the word *Scripted*. A leader
 line and dot point at the subject. A small corner mark, **Fictional family. Real software.**, stays on every frame except the two that carry the line large.
 
-**The card never covers the subject.** Placement is story-bake's solver (`assets/story/place.ts`, the same function the live popup calls), solved once per beat against the beat's rest
-pose. If the full card would cover more than 2% of the subject, the same card is tried smaller (type and padding at 0.86, then 0.74 with the phone drawing dropped and
-its words kept as the note). A 9:16 card is a sheet on top of the captions, or under the top margin if that clears the subject. `--stills` writes each beat's
-placement (slot, level, overlap) to `<slug>/<aspect>.cards.json`.
+**Type (live pass 3).** The owner asked for 36 px text in the modals and then, seeing it, for 30 percent less (the canon's 1.5rem of the 17 px root: 25.5 px). The live cards took the
+correction. **The canvases did not**: a film frame is a picture shown scaled down (a 1080 px canvas is about 390 px wide on a phone, a 0.36 scale), so its 36 design px (at the 1080 px short edge, times the frame's `k`) is already
+smaller on screen than the live modal's 25.5 px. `CANVAS_TYPE_MIN` (assets/story/place.ts) is the one number; if the owner wants the canvases down by the same 30 percent it is that constant (27) and the fits below, nothing else.
 
-**Safe areas.** 16:9 keeps 54 px top and bottom and 96 px at the sides. 9:16 keeps 200 px at the top and 340 px at the bottom clear (a phone's own interface covers them) and 72 px at the sides.
+| What | Design px (1080 short edge) | Weight | Before |
+|---|---|---|---|
+| a card's kicker (the name), "with <companion>", the chips, the note, the phone screen's header and rows | 36 | 700 (the name, caps, tracked 0.2em, sage), 500, 600, 500, 700 and 500 | 27 to 29, 23, 24, 19 |
+| a card's title | 56 | 800 | 40 |
+| the monogram disc | 60 across, its letter 36 | 700 | 46 across, 24 |
+| the corner mark | 36 | 700 | 26 |
+| the caption strip, and an agent's speaker row and its "Scripted" | 40 (portrait) and 44, and 36 | 700, 700, 600 | 40 and 44, 25 and 20 |
+| the title card: the family's name (a kicker, fitted down from 92, at most two lines), the address, the tagline, the fictional pill | 92 to 38 (78 portrait), 42, 38, 36 | 700 caps tracked 0.2em, 700, 500, 700 | 92, 42, 34, 32 |
+| the end card: the sign-off, the address, the fictional pill, every disclosure | 100 (80), 52 (44), 36, 36 | 800, 700, 700, 500 | 100, 46, 32, 26 |
+
+A card is **a third of the canvas wide and never narrower than 18 em of the floor** (648 design px at 16:9; the live card is 32 percent of a window, 18 em at 1440 px), then 92, 85, 78 and 72 percent of that, none under 12.5 em, and a width that cannot
+hold its widest chip is dropped. **The type never shrinks to fit**: the old "level 1 and 2" (0.86 and 0.74 of the type) are gone. A card is offered as *variants* (its width with padding as designed, the same with padding at 0.68, narrower and so
+taller, and, for a first-run beat, the same without the phone screen, its words kept as the note) and the solver (`placeCanvasCard`, layout.ts, over place.ts) refuses one whose type is under the floor and takes the first that clears the subject. A card
+cannot scroll on a canvas: one taller than its room is not ok.
+
+**The name is a kicker** (as on the live cards): capitals by drawing (the story's string is never changed, so the captions, the WebVTT and every report keep "Sally"), 700, tracked 0.2em, in the sage; "THE BRENNAN FAMILY" on the title card the same, fitted
+to two lines at most. Canvas2D tracks with `ctx.letterSpacing` (the rendering Chromium has it); where it does not, the same letters are drawn one by one at a fixed advance (`kickWidth` and `drawKick` measure and draw by one rule either way), and
+`scripts/film/canvas-fit.mts` measures both against each other.
+
+**The card never covers the subject.** Placement is story-bake's solver (`assets/story/place.ts`, the same function the live popup calls), solved once per beat against the beat's rest
+pose, with the floor of this canvas. If the full card would cover more than 2% of the subject, the variants above are tried in order, then another slot (the edge panels the live card has are on too). A 9:16 card is a sheet on top of the captions,
+or under the corner mark if that clears the subject. `--stills` writes each beat's placement (slot, variant, overlap) to `<slug>/<aspect>.cards.json`.
+
+**Safe areas.** 16:9 keeps 54 px top and bottom and 96 px at the sides. 9:16 keeps 200 px at the top and 340 px at the bottom clear (a phone's own interface covers them) and 72 px at the sides. The title card and the end card now keep the
+bottom margin too (the portrait panel used to take a third of the band); a layout outside the safe area stops the render (`info.unsafe`).
 
 **Accessibility.** The words are always on screen (burned captions), and also written as WebVTT from the same cues. Contrast: text `#e8f2f4` on 88% ink glass is over 10:1 at its worst; the muted note
 `#a3babf` over 6:1; the not-yet-spoken caption word `#9db4ba` over 5:1; the spoken word on the sage highlight is ink on `#c5e8dc`, 13:1. Nothing flashes: the dips are 0.35 s fades.
@@ -51,14 +74,15 @@ agent, *Hermes is from Nous Research. OpenClaw is from the OpenClaw Foundation. 
 ## Files
 
 ```
-assets/story/film/layout.ts    the clock, the audio placements, the caption cues and WebVTT, the two frames, the card placement. Pure: Node tests it
-assets/story/film/cards.ts     Canvas2D: the popup card, the phone drawing, the title card, the end card
+assets/story/film/layout.ts    the clock, the audio placements, the caption cues and WebVTT, the two frames, the canvas card placement (`placeCanvasCard`, the one the ad cuts share). Pure: Node tests it
+assets/story/film/cards.ts     Canvas2D: the type table (`TYPE`, `FLOOR`), the name kicker, the type audit, the popup card, the phone screen, the title card, the end card
 assets/story/film/overlay.ts   Canvas2D: the corner mark, the karaoke caption, the leader, the dip
 assets/story/film/index.ts     the page module: registers the film as a shot preset (frameAt over film seconds), draws frame i, returns a JPEG
 scripts/render-family-film.mts the CLI
 scripts/film/{lib,mux,qa}.mts  families and films.json / the sound and the encode / the gates
+scripts/film/canvas-fit.mts    the type floor and the fit of every family's film and ad cuts (browser, no house, no GPU): `node --experimental-strip-types scripts/film/canvas-fit.mts`
 scripts/story/ship/films.mts   the site build's step: registers posters and captions, links the hosted films
-scripts/test-film.mts          18 tests, no GPU (the sound test needs ffmpeg and skips without it)
+scripts/test-film.mts          19 tests, no GPU (the sound test needs ffmpeg and skips without it)
 scripts/film-bookends.mts      optional CI-Common bookends (off; see below)
 ```
 

@@ -29,6 +29,10 @@ node --experimental-strip-types scripts/story/build-catalog-snapshot.mts --fetch
   reports go to Companion Intelligence from the first-party apps unless switched off (see the first-party row in the
   maker and host table). Remote access is not claimed: set every scene on the home network. A coding or chat agent is
   private only on the Core's local model, so never mention a cloud key.
+- **Age rule 16.** An app the catalog tags `ai: "chat"` (a chat model or an agent: Open WebUI, Ollama, AnythingLLM, Companion Memory, Hermes, OpenClaw,
+  OpenCode, Aider and the like) is used in a beat only by a `member` aged 16 or older, an agent's owner is 16 or older and the person who approves is an
+  adult. A child may be named in the body of a parent-led beat as the one being helped. Tools such as LibreTranslate, Whisper-WebUI, Kokoro and
+  Stirling-PDF OCR are allowed for younger members. The validator rules are `age-chat` and `age-companion` (validator.md, Story v3).
 - **No screens.** The popup, chips and camera tell the story. No app screenshot, no UI mock, no invented interface.
 - **QA column.** `shot` means a QA screenshot exists on `origin/main` (`e2e/screenshots`). `none` means the validator
   raises `app-qa-screenshot` (review), so the owner must list the beat in `content/story/reviewed.json`. Prefer `shot`.
@@ -198,27 +202,28 @@ Plays on the Core, from the couch or the bedroom. The privacy point is where the
 
 ## Learner (Jean)
 
-Homework, reading, languages and exams. A child's questions are the privacy stake, told without fear.
+Homework, reading, languages and exams. A child's questions are the privacy stake, told without fear. The pool is Open WebUI, Calibre-Web, LibreTranslate,
+Obsidian, JupyterLab, Spellbook, Koodo Reader, BookLore, Kokoro, Razzia, Readeck and Linkwarden (Kiwix left it: see the end of this file).
 
 | Store id | Display name | Replaces | Caveats the text must carry | QA |
 |---|---|---|---|---|
 | `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
-| `kiwix` | Kiwix | Google Search, Bing | Content files (ZIM) are downloaded once. | shot |
 | `calibre-web` | Calibre-Web | Kindle, Apple Books | Your own books only. | none |
 | `libretranslate` | LibreTranslate | Google Translate, DeepL | Language models are downloaded once. | shot |
 | `obsidian` | Obsidian | Notion, Evernote | Not open source: never say so. Notes are Markdown files. | shot |
 | `jupyterlab` | JupyterLab | none | See the builder table. | shot |
 | `ci-spellbook` | Spellbook | none | A catalog of local-AI and self-hosting tools. Crash reports on by default. | shot |
+| `koodo-reader` | Koodo Reader | Amazon Kindle, Apple Books | An ebook reader in the browser with notes, highlights and text-to-speech; the library is on the Core. Your own books only. Instead of Kindle or Apple Books per the catalog: do not say it imports a Kindle library. | shot |
+| `booklore` | BookLore | Kindle, Apple Books | Manage and read books, comics and PDFs with automatic covers and metadata. Fetches metadata and covers from outside. Your own files only. | shot |
+| `kokoro` | Kokoro | none | Text to speech on the Core, through an OpenAI-compatible speech API. A tool, not a chat model: allowed for younger members. Say nothing about the voice's quality. | shot |
+| `razzia` | Razzia | none | Run a quiz night for a small group on the Core. Set a manager password at install: the upstream default blocks access. No question bank comes with it: the teacher types the questions. | shot |
+| `readeck` | Readeck | Pocket, Instapaper | Save articles to read later. Your own saved pages only. | shot |
+| `linkwarden` | Linkwarden | Raindrop.io, Pocket | Saves a page with a screenshot and a PDF so it survives link rot. A screenshot kept by the app is a feature, not a description of a screen. | shot |
 
 **Open WebUI** (learner)
 - Say: "Jean asks a model on the Core to explain the proof, and the question stays on the Core by default."
 - Say: "Her homework chat sits on the Core."
 - Never: "Open WebUI is as smart as ChatGPT."
-
-**Kiwix**
-- Say: "Jean looks things up in Kiwix, which serves Wikipedia from the Core, so no search engine sees the question."
-- Say: "The Wikipedia file was downloaded once. After that Kiwix serves it from the Core."
-- Never: "Kiwix works offline anywhere in the world."
 
 **Calibre-Web**
 - Say: "The family's own ebooks sit in Calibre-Web on the Core."
@@ -244,6 +249,33 @@ Homework, reading, languages and exams. A child's questions are the privacy stak
 - Say: "Jean browses Spellbook, a searchable catalog of local-AI and self-hosting tools, for a project idea."
 - Say: "Spellbook runs on the Core like every other app."
 - Never: "Spellbook lists 797 tools." (No app or tool counts.)
+
+**Koodo Reader**
+- Say: "Jean reads her set text in Koodo Reader, and her notes sit on the Core."
+- Never: "Koodo Reader opens your Kindle books."
+
+**BookLore**
+- Say: "BookLore holds the family's own books and comics on the Core."
+- Never: "BookLore gets you any book you want."
+
+**Kokoro**
+- Say: "Kokoro reads the chapter aloud on the Core."
+- Never: "Kokoro sounds like a person."
+
+**Razzia**
+- Say: "Razzia runs the Friday quiz from the Core."
+- Never: "Razzia grades the class."
+
+**Readeck**
+- Say: "Readeck keeps the articles Jean saved for her essay on the Core."
+- Never: "Readeck finds the article for you."
+
+**Linkwarden**
+- Say: "Linkwarden keeps a copy of each page, so the source is still there next year."
+- Never: "Linkwarden keeps every page forever."
+
+Kiwix is not a learner app (it ships with an empty library; see the list of apps that must not be named). Open WebUI is a chat app: the member in a
+learner beat is 16 or older, so a younger learner's beat uses a tool (LibreTranslate, Kokoro, Koodo Reader), or is parent-led.
 
 ## Maker and host
 
@@ -289,6 +321,365 @@ credentials, file paths, request bodies and memories stripped. Never write that 
 
 Immich, Jellyfin, Obsidian, Companion Planning and Yuvomi use the sentences above.
 
+The eight archetypes of story v3 follow (`tech-family`, `business-owner`, `creative`, `contractor`, `marketer`, `lawyer`, `journalist`, `educator`). Their pools are
+the `personas.json` rows of [persona-bible.md](persona-bible.md) section 5.3, minus Kiwix. An app already tabled above is referred back to its table.
+
+## Tech family (Andres)
+
+The household lead of a family that already runs its own network, lamp rules and a few apps. The rest of the family is the acceptance test: pair every tinkerer scene with a reaction from someone who does not tinker. Call the person the household lead, not admin or owner. Never open on a breach and never call an install easy. AI is the third beat, with its limit said once ("it can be wrong, so the household lead checks").
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `home-assistant` | Home Assistant | Google Home, Amazon Alexa, Apple HomeKit | See the maker and host table. | shot |
+| `pi-hole` | Pi-hole | AdGuard, NextDNS | Network-wide blocking at DNS: not parental control, not a security guarantee, never "stops tracking". The router must send DNS to it. Lookups it does not block still go to the upstream resolver the family chose. | shot |
+| `forgejo` | Forgejo | GitHub, GitLab (SaaS) | See the builder table. | shot |
+| `ntfy` | ntfy | none | iOS push goes through an upstream relay setting; Android and the browser can stay on the Core. Scripts point at the Core's address on the home network. | shot |
+| `uptime-kuma` | Uptime Kuma | Datadog, New Relic | A simple monitor that checks a page or a port answers: not Datadog. No SLA or dashboard-on-the-wall scene. | shot |
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `ollama` | Ollama | OpenAI, ChatGPT | See the builder table. | none |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `n8n` | n8n | Zapier, Make | See the organiser table. | shot |
+| `syncthing` | Syncthing | Dropbox, Resilio Sync | Listed and installable, no recorded QA run: the beat needs an owner entry. Keep to devices on the home network (sync across the internet is a remote-access claim). Sync is not a backup: it copies a deletion too. | none |
+
+**Pi-hole**
+- Say: "Pi-hole answers the house's DNS from the Core."
+- Say: "Andres reads the query list on Sunday, and one allow-list entry brings the homework site back."
+- Never: "Pi-hole is parental control."
+
+**ntfy**
+- Say: "ntfy tells Andres when the nightly script has finished."
+- Say: "The Core sends the message; the phone on the home network shows it."
+- Never: "ntfy alerts you from anywhere."
+
+**Uptime Kuma**
+- Say: "Uptime Kuma checks the apps on the Core and shows Andres which one stopped."
+- Never: "Uptime Kuma is a full monitoring platform."
+
+**Syncthing**
+- Say: "Syncthing keeps the workshop folder the same on the laptop and the Core."
+- Never: "Syncthing is the family's backup."
+
+Honest edges for this archetype:
+
+- Remote access is not claimed: no VPN, Tailscale, tunnel or "remote" in the copy.
+- There is no Zigbee stick by default; Pi-hole is not parental control; no backup story is told.
+- Open WebUI and Ollama are chat apps: the household lead is 16 or older (age rule).
+
+## Business owner (Ruth)
+
+Runs a shop, studio, agency or practice of one to fifteen people: quotes, invoices, contracts and the customer list. Not the organiser (household records and a practice of one): a business owner has premises, staff and books. A bounded chore by the model on the Core on the owner's files, which the owner reads and approves before anything reaches a client; nothing emails, pays or books alone.
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `invoice-ninja` | Invoice Ninja | FreshBooks, QuickBooks | Invoices, quotes, expenses and time tracking: not a ledger, payroll or tax filing. Cards need a payment provider: say invoicing, not payment processing. Never "tax ready". | shot |
+| `paperless` | Paperless-ngx | Evernote, Google Drive | See the organiser table. | shot |
+| `docuseal` | Docuseal | DocuSign | Fill and sign PDF forms. Never say a signature is legally binding or valid. Signers outside the home network need to reach the Core: show signing at the desk. | shot |
+| `akaunting` | Akaunting | QuickBooks, Xero, FreshBooks | Bookkeeping only: no tax, accounting or legal advice, no payroll, no bank feeds. | shot |
+| `twenty` | Twenty | Salesforce | A customer list and pipeline: not HubSpot-style automation. | shot |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `anything-llm` | AnythingLLM | ChatGPT, Claude | Chat with your own documents using a local model. It can also connect to cloud models: show only the local path and never mention a key. A chat app: the member in the beat is 16 or older (age rule). | shot |
+| `solidtime` | Solidtime | Harvest, Toggl Track | Listed and installable, no recorded QA run: the beat needs an owner entry. Time tracking only. | none |
+| `grist` | Grist | Airtable | A spreadsheet with tables that link, for the stock list or the rota. Not a bank feed or a payroll system. | shot |
+| `bookstack` | BookStack | Confluence, Notion | See the organiser table. | shot |
+| `baikal` | Baikal | Google Calendar, iCloud Calendar | Overlaps Radicale: one calendar server per household, not both. No sharing carries over from Google Calendar. | shot |
+| `libreoffice` | LibreOffice | Microsoft Office, Google Workspace | See the organiser table. | shot |
+| `stirling-pdf` | Stirling-PDF | Adobe Acrobat, Smallpdf | See the organiser table. | shot |
+| `whisper-webui` | Whisper-WebUI | none | Listed and installable, no recorded QA run: the beat needs an owner entry. Model weights are downloaded first; it runs on the CPU unless the host passes a GPU in. Say nothing about speed or accuracy. Subtitles and transcripts only. | none |
+| `ci-memory` | Companion Memory | none | Beta: the first mention reads "Companion Memory (beta)". Imports are opt-in and revocable, nothing connected by default. First-party crash-report caveat below. A chat and agent app: the member in the beat is 16 or older. | shot |
+
+**Invoice Ninja**
+- Say: "Ruth's quotes and invoices go through Invoice Ninja on the Core."
+- Say: "The client, the line items and last spring's job sit together in Invoice Ninja."
+- Never: "Invoice Ninja takes card payments."
+
+**Docuseal**
+- Say: "The engagement letter is signed at the desk in Docuseal, and the PDF sits on the Core."
+- Never: "Docuseal signatures are legally binding."
+
+**Akaunting**
+- Say: "Akaunting keeps the shop's books on the Core."
+- Never: "Akaunting files your taxes."
+
+**Twenty**
+- Say: "The customer list sits in Twenty on the Core, not in a rented CRM."
+- Never: "Twenty emails your customers for you."
+
+**AnythingLLM**
+- Say: "Ruth asks a model on the Core about her own folder of contracts, and reads the answer before anything goes to a client."
+- Never: "AnythingLLM answers your customers."
+
+**Solidtime**
+- Say: "Solidtime keeps the hours for each client on the Core."
+- Never: "Solidtime bills the client for you."
+
+**Grist**
+- Say: "The stock list is a Grist table on the Core."
+- Never: "Grist replaces your accountant."
+
+**Baikal**
+- Say: "The shop's calendar is served from Baikal on the Core."
+- Never: "Baikal shares your calendar with every customer."
+
+**Whisper-WebUI**
+- Say: "Whisper-WebUI turns the recording into text on the Core."
+- Say: "Noor checks every quote against the audio."
+- Never: "Whisper-WebUI transcribes every word correctly."
+
+**Companion Memory**
+- Say: "Companion Memory (beta) keeps the client file on the Core, so the agent has the context."
+- Never: "Companion Memory remembers everything."
+
+Honest edges for this archetype:
+
+- No payroll, point of sale, card processing or bank feeds; no tax or accounting advice; never "legally binding".
+- Staff, clients and signers outside the home network are out, and so are web shops: one household lead, one machine.
+- AnythingLLM and Companion Memory are chat or agent apps: the member in the beat is 16 or older.
+
+## Creative (Dalia)
+
+A working designer, photographer, filmmaker, illustrator or musician: client work, an archive that outlives the job, and a brief that is confidential. They talk about the brief, the proof and the round of changes, and say "under NDA" or "embargoed", not "privacy". One named chore, then the creative decides; never a generative image or music hero, and never AI pushed at someone who rejects it.
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `immich` | Immich | Google Photos, iCloud Photos | See the gamer table. | shot |
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `penpot` | Penpot | Figma, Sketch | Design and prototyping in the browser. No Figma importer: say "export and rebuild", never "imports Figma". | shot |
+| `inkscape` | Inkscape | Adobe Illustrator | Vector drawing only, in a browser session. Opens SVG and PDF. | shot |
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `invoice-ninja` | Invoice Ninja | FreshBooks, QuickBooks | See the business owner table. | shot |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `whisper-webui` | Whisper-WebUI | none | See the business owner table. | none |
+| `docuseal` | Docuseal | DocuSign | See the business owner table. | shot |
+| `freecut` | FreeCut | none | A browser video editor that uses WebGPU in Chromium on the device you edit on. Not Premiere or Resolve: say nothing about formats or speed. | shot |
+| `audiomass` | AudioMass | Adobe Audition, TwistedWave | A browser audio editor. It saves where the person chooses. Not Audition or Logic. | shot |
+| `photoview` | Photoview | Google Photos | Listed and installable, no recorded QA run: the beat needs an owner entry. The map view uses a Mapbox token you can add: leave it off for a gallery that stays on the Core. | none |
+| `pingvin-share` | Pingvin Share | WeTransfer | Share links for people outside the home network need to reach the Core, which is not claimed: show the handover at the table. | shot |
+| `syncthing` | Syncthing | Dropbox, Resilio Sync | See the tech family table. | none |
+| `navidrome` | Navidrome | Spotify, Apple Music | Plays your own music files. Not a streaming service. | shot |
+
+**Penpot**
+- Say: "Dalia lays out the poster in Penpot on the Core."
+- Never: "Penpot opens your Figma files."
+
+**Inkscape**
+- Say: "The logo is drawn in Inkscape and the file sits on the Core."
+- Never: "Inkscape replaces the whole Adobe suite."
+
+**FreeCut**
+- Say: "Dalia cuts the short film in FreeCut, and the project files sit on the Core."
+- Never: "FreeCut opens your Premiere projects."
+
+**AudioMass**
+- Say: "Dalia trims the voice-over in AudioMass and saves it to the Core."
+- Never: "AudioMass opens your Ableton sessions."
+
+**Photoview**
+- Say: "Photoview shows the shoot folders on the Core as a gallery."
+- Never: "Photoview is a RAW developer."
+
+**Pingvin Share**
+- Say: "Pingvin Share makes the link for the proof on the Core."
+- Never: "Pingvin Share sends files to clients anywhere."
+
+**Navidrome**
+- Say: "Navidrome plays the studio's own music from the Core."
+- Never: "Navidrome streams any song you ask for."
+
+Honest edges for this archetype:
+
+- Cannot move Lightroom, Photoshop, Premiere, Resolve, Ableton or Logic; no Figma or Lightroom import; no link for clients outside the house.
+- The Core is not a backup. No story may imply a company trains on customer content.
+- Open WebUI is a chat app: the member in the beat is 16 or older.
+
+## Contractor (Kunle)
+
+A self-employed tradesperson or small building contractor: the quote, the site photos, the tools and the warranty cards, run from the garage bench. A trade is two jobs, on site with the hands and then the firm at the end of the day. The anchor is `room` set to the garage (roles.json has no workbench), then `desk`, `driveway` and `laundry`. Dry and short: "Quote done. Photos in. Home by six."
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `invoice-ninja` | Invoice Ninja | FreshBooks, QuickBooks | See the business owner table. | shot |
+| `immich` | Immich | Google Photos, iCloud Photos | See the gamer table. | shot |
+| `homebox` | HomeBox | Sortly | Listed and installable, no recorded QA run: the beat needs an owner entry. A one-household inventory: items, locations, photos. Barcode and Open Food Facts lookups call outside services. No warranty tracking claim. | none |
+| `lubelogger` | LubeLogger | Fuelly, Drivvo | Service and fuel records for a vehicle: no fleet telematics. | shot |
+| `paperless` | Paperless-ngx | Evernote, Google Drive | See the organiser table. | shot |
+| `docuseal` | Docuseal | DocuSign | See the business owner table. | shot |
+| `solidtime` | Solidtime | Harvest, Toggl Track | See the business owner table. | none |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `radicale` | Radicale | Google Calendar, iCloud Calendar | Listed and installable, no recorded QA run: the beat needs an owner entry. Calendars and contacts. No sharing carries over from Google Calendar. | none |
+| `stirling-pdf` | Stirling-PDF | Adobe Acrobat, Smallpdf | See the organiser table. | shot |
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `planka` | Planka | Trello | Boards and cards for jobs. Name one board tool per household. | shot |
+| `akaunting` | Akaunting | QuickBooks, Xero, FreshBooks | See the business owner table. | shot |
+
+**HomeBox**
+- Say: "HomeBox lists the tools on the wall, with a photo and a place for each."
+- Never: "HomeBox tracks every warranty."
+
+**LubeLogger**
+- Say: "LubeLogger keeps the van's service history on the Core."
+- Never: "LubeLogger tracks your whole fleet live."
+
+**Radicale**
+- Say: "The job calendar is served from Radicale on the Core."
+- Never: "Radicale shares your calendar with your crew on site."
+
+**Planka**
+- Say: "The week's jobs are cards on a Planka board on the Core."
+- Never: "Planka dispatches the crew."
+
+Honest edges for this archetype:
+
+- Remote access is not claimed: a crew on site or a quote sent from the van cannot be shown.
+- Never "tax ready" (Making Tax Digital needs recognised software). No payments, no dispatch, no one-click move from CompanyCam or Jobber.
+- Open WebUI is a chat app: the member in the beat is 16 or older.
+
+## Marketer (Elena)
+
+A freelance or in-house digital marketer. The story is not cheaper tools: the client's list, files and briefs sit in the house, and the model that drafts from them runs on the Core. She edits and approves; no better-copy claim, no time or money saved, no cloud key.
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `ci-memory` | Companion Memory | none | See the business owner table. | shot |
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `ghost` | Ghost | Squarespace, Wix, Medium, Mailchimp, ConvertKit | Publishing and newsletters. A public site needs the Core reachable from outside, which is not claimed: use it for drafting and the list. Sending needs an outside mailer. | shot |
+| `penpot` | Penpot | Figma, Sketch | See the creative table. | shot |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `twenty` | Twenty | Salesforce | See the business owner table. | shot |
+| `whisper-webui` | Whisper-WebUI | none | See the business owner table. | none |
+| `listmonk` | Listmonk | Mailchimp, ConvertKit | Sending at volume needs an SMTP provider or mail server: do not promise delivery. | shot |
+| `plausible` | Plausible Analytics | Google Analytics | To count visits it must be exposed to the web: not claimed. The manifest says GDPR, CCPA and PECR compliant: do not repeat any compliance claim. | shot |
+| `n8n` | n8n | Zapier, Make | See the organiser table. | shot |
+| `inkscape` | Inkscape | Adobe Illustrator | See the creative table. | shot |
+| `freecut` | FreeCut | none | See the creative table. | shot |
+| `mixpost` | Mixpost | Buffer, Hootsuite | Publishes to outside social platforms and needs a public callback URL: a limit card, not a hero. Overlaps Postiz: name one. | shot |
+| `solidtime` | Solidtime | Harvest, Toggl Track | See the business owner table. | none |
+| `grist` | Grist | Airtable | See the business owner table. | shot |
+
+**Ghost**
+- Say: "The client's list sits in Ghost on the Core, not in a mailing service she rents."
+- Never: "Ghost sends your newsletter to the world."
+
+**Listmonk**
+- Say: "Listmonk holds the subscriber list and the campaign drafts on the Core."
+- Never: "Listmonk lands every email in the inbox."
+
+**Plausible Analytics**
+- Say: "Plausible keeps the traffic numbers on the Core."
+- Never: "Plausible makes you GDPR compliant."
+
+**Mixpost**
+- Say: "Mixpost holds the week's posts as drafts on the Core."
+- Never: "Mixpost posts for you at the best time."
+
+Honest edges for this archetype:
+
+- Cannot move the platforms, sending reputation, SEO suites, Canva's library, live co-editing with a client or HubSpot automation.
+- Ghost holds the list; sending needs an outside mailer. Mixpost needs a public callback URL.
+- Open WebUI and Companion Memory are chat or agent apps: the member in the beat is 16 or older.
+
+## Lawyer (Ingrid)
+
+A solo or small-firm attorney: the client file, the engagement letter and a first-pass summary she checks line by line. Precise, dry, guarded, allergic to promises. The model drafts, the person signs; one checkable chore with the lawyer reading the source. The headline is where the file lives, never accuracy, parity, speed or "privileged".
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `paperless` | Paperless-ngx | Evernote, Google Drive | See the organiser table. | shot |
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `docuseal` | Docuseal | DocuSign | See the business owner table. | shot |
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `libreoffice` | LibreOffice | Microsoft Office, Google Workspace | See the organiser table. | shot |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `stirling-pdf` | Stirling-PDF | Adobe Acrobat, Smallpdf | See the organiser table. | shot |
+| `cryptgeon` | Cryptgeon | Privnote, WeTransfer | Sends a note that can be opened once. A recipient outside the home network needs to reach the Core: show the handover in the room. | shot |
+| `ollama` | Ollama | OpenAI, ChatGPT | See the builder table. | none |
+| `whisper-webui` | Whisper-WebUI | none | See the business owner table. | none |
+| `radicale` | Radicale | Google Calendar, iCloud Calendar | See the contractor table. | none |
+| `solidtime` | Solidtime | Harvest, Toggl Track | See the business owner table. | none |
+| `invoice-ninja` | Invoice Ninja | FreshBooks, QuickBooks | See the business owner table. | shot |
+| `bookstack` | BookStack | Confluence, Notion | See the organiser table. | shot |
+| `twenty` | Twenty | Salesforce | See the business owner table. | shot |
+| `ci-memory` | Companion Memory | none | See the business owner table. | shot |
+
+**Cryptgeon**
+- Say: "Ingrid hands the one-time note across the desk through Cryptgeon."
+- Never: "Cryptgeon makes the note privileged."
+
+Honest edges for this archetype:
+
+- No Clio, Westlaw or Lexis replacement: no matter workspace, conflict checks, trust accounting or e-filing. No compliance claim. Docuseal: never "legally binding".
+- Email is the hardest thing to move; video with outside clients needs outside reach.
+- Open WebUI, Ollama and Companion Memory are chat apps: the member in the beat is 16 or older.
+
+## Journalist (Noor)
+
+A reporter, writer or researcher: the tape, the notes and the records sit on the Core, and every quote is checked against the audio. Evidence first; a pun is unwelcome. One bounded chore on her own material, verified by hand; never AI writing or deciding anything with a byline.
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `whisper-webui` | Whisper-WebUI | none | See the business owner table. | none |
+| `paperless` | Paperless-ngx | Evernote, Google Drive | See the organiser table. | shot |
+| `obsidian` | Obsidian | Notion, Evernote | See the learner table. | shot |
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `ci-memory` | Companion Memory | none | See the business owner table. | shot |
+| `stirling-pdf` | Stirling-PDF | Adobe Acrobat, Smallpdf | See the organiser table. | shot |
+| `libretranslate` | LibreTranslate | Google Translate, DeepL | See the learner table. | shot |
+| `linkwarden` | Linkwarden | Raindrop.io, Pocket | See the learner table. | shot |
+| `libreoffice` | LibreOffice | Microsoft Office, Google Workspace | See the organiser table. | shot |
+| `cryptgeon` | Cryptgeon | Privnote, WeTransfer | See the lawyer table. | shot |
+| `joplin` | Joplin Server | Evernote | See the organiser table. | shot |
+| `anything-llm` | AnythingLLM | ChatGPT, Claude | See the business owner table. | shot |
+| `miniflux` | Miniflux | Feedly, Inoreader | Listed and installable, no recorded QA run: the beat needs an owner entry. Overlaps FreshRSS: name one feed reader. | none |
+| `element` | Element | Slack, Discord | A Matrix chat app that connects to a homeserver you run. Sources choose their own channel: Signal, WhatsApp and iMessage do not move. | shot |
+
+**Miniflux**
+- Say: "Miniflux gathers the feeds Noor follows on the Core."
+- Never: "Miniflux finds the story for you."
+
+**Element**
+- Say: "Element connects the household to the chat server on the Core."
+- Never: "Element replaces Signal for sources."
+
+Honest edges for this archetype:
+
+- Signal, WhatsApp and iMessage do not move: sources choose the channel. Remote access is not claimed.
+- The Hub is not a source-protection tool and the Core is not a vault: never imply immunity from a search or a seizure.
+- Open WebUI, AnythingLLM and Companion Memory are chat or agent apps: the member in the beat is 16 or older.
+
+## Educator (Eszter)
+
+A teacher, tutor, lecturer or homeschooling parent: lesson folders, handouts and report comments the teacher rewrites by hand. "I use it for the paperwork, not for the child." A model on the Core does one named chore from the teacher's own materials, then she rewrites it; never grading or deciding about a child; never an hours figure.
+
+| Store id | Display name | Replaces | Caveats the text must carry | QA |
+|---|---|---|---|---|
+| `open-webui` | Open WebUI | ChatGPT, Claude | See the builder table. | shot |
+| `paperless` | Paperless-ngx | Evernote, Google Drive | See the organiser table. | shot |
+| `nextcloud` | Nextcloud | Google Drive, Dropbox, OneDrive, iCloud | See the organiser table. | shot |
+| `libreoffice` | LibreOffice | Microsoft Office, Google Workspace | See the organiser table. | shot |
+| `libretranslate` | LibreTranslate | Google Translate, DeepL | See the learner table. | shot |
+| `joplin` | Joplin Server | Evernote | See the organiser table. | shot |
+| `stirling-pdf` | Stirling-PDF | Adobe Acrobat, Smallpdf | See the organiser table. | shot |
+| `vaultwarden` | VaultWarden | LastPass, 1Password | See the organiser table. | shot |
+| `razzia` | Razzia | none | See the learner table. | shot |
+| `excalidraw` | Excalidraw | Miro, Mural | A whiteboard in the browser; amd64 only. The lesson sketch is a file on the Core. | shot |
+| `ci-planning` | Companion Planning | none | See the organiser table. | shot |
+| `radicale` | Radicale | Google Calendar, iCloud Calendar | See the contractor table. | none |
+| `calibre-web` | Calibre-Web | Kindle, Apple Books | See the learner table. | none |
+
+**Excalidraw**
+- Say: "Eszter sketches the lesson on an Excalidraw board on the Core."
+- Never: "Excalidraw runs a live class."
+
+Honest edges for this archetype:
+
+- No learning platform, gradebook or student information system is in the store; it does not work with Google Classroom (say so). Never a class list, a grade or a safeguarding note at a home Core.
+- No FERPA or UK GDPR claim; remote access is not claimed. Kiwix is not used (it ships an empty library).
+- Open WebUI is a chat app: the member in the beat is 16 or older.
+
 ## Apps that look like persona apps but must not be named
 
 | Store id / name | Why not |
@@ -303,7 +694,8 @@ Immich, Jellyfin, Obsidian, Companion Planning and Yuvomi use the sentences abov
 | `gitea-mirror` Gitea Mirror | A different listing: it copies GitHub repositories into Gitea. Name only Gitea. |
 | `onlyoffice-documentserver`, `onlyoffice-workspace` | The editing engine and a portal that needs it. The persona suite is ONLYOFFICE Desktop Editors. |
 | `plex`, `emby` | Closed-source, account-based. Use Jellyfin. |
-| `lingva-translate` Lingva Translate | It scrapes Google Translate, so it is not local. Use LibreTranslate. (SearXNG, which queries other search engines, is in the catalog with a cloud-link caveat; it is not a Kiwix substitute.) |
+| `kiwix` Kiwix | It installs with an EMPTY library and the Hub has no way to add one (its own QA capture shows "No result"), so no story may show a look-up, a Wikipedia file or an answer from it; "replaces Google Search" is also stretched (it serves a snapshot, not a search engine). Catalog `storySafe` is `avoid`. Revisit when the Marketplace ships a starter library. |
+| `lingva-translate` Lingva Translate | It scrapes Google Translate, so it is not local. Use LibreTranslate. (SearXNG, which queries other search engines, is in the catalog with a cloud-link caveat; it is not a substitute for a look-up app.) |
 | `openclaw` (third-party), `hermes-agent` | The first-party pair is `ci-openclaw` and `ci-hermes`. |
 | The *arr apps, torrent and Usenet clients | Copyright exposure. Keep out of family stories. |
 

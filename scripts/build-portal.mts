@@ -2,7 +2,8 @@
 // Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
 //
 //   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/] [--families <dir>] [--strict-families] [--stale-report]
-//   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
+//   pnpm run portal:preview [--port 8081] [--tailscale | --host <ipv4>]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
+//                                         (--tailscale: also on this machine's Tailscale address, so other devices on the tailnet can open it; never 0.0.0.0)
 //
 //   <out>/index.html                 the front page: the families and their homes (portal/gallery.css + gallery.js + campaign.js,
 //                                    portal/thumbs/, the hero's picture), its link-preview image (portal/hero.jpg) and URL made absolute
@@ -65,15 +66,18 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { ROOT, parseArgs, serve, tailscaleAddress } from './portal-lib.mts';
 import { redactIndex, redactSpecText, guardOutput, GUARD_ALLOW } from './portal-redact.mts';
 import {
   type House, LINKS, SITE_NAME, PLAYER_TITLE, HERO_ALT, TITLE_MAX, TWITTER_SITE, esc, numberWord, capital, galleryCards, galleryHomeIndex, galleryLd, homeDescription, homeLd, homePage, homeTitle, homeUrl, notFoundPage, playerLd,
 } from './portal-pages.mts';
 import { buildStorySite } from './story/site.mts';
 // ---- front page ----
-import { HERO, readFamilies, frontCards, personaButtons, meetFamily } from './portal-front.mts';
+import { HERO, readFamilies, frontCards, meetFamily, homesWithoutFamily, readStories, landerFamilies, proofBlock, coreFigure, swapBlock, appsNamed, heroCount } from './portal-front.mts';
 import { MEET_MARKER } from './portal-pages.mts';
+import { finePrint, finePrintHtml, missingFinePrint } from './story/lib/fine-print.mts';
+import { computeLander, readInputs as landerInputs, familiesWord } from './story/lib/lander.mts';
+import { landerChecks, landerHeadChecks } from './story/lib/lander-check.mts';
 import { displayName } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
@@ -125,6 +129,49 @@ copy(path.join('portal', 'icons', 'apple-touch-icon.png'), 'apple-touch-icon.png
 //    scripts/story/site.mts ships them under a hash of their content, which _headers lets a cache keep for a year)
 for (const f of walk('portal', f => /\.(css|js|webp|jpg|png|ico|webmanifest)$/.test(f) && !f.startsWith(path.join('portal', 'og') + path.sep))) copy(f);
 
+// ---- campaign link rules ---- portal/campaign.json (portal/campaign.js reads it at run time; README -> Campaign link rules): a short authored list of
+// {match, to, from, until} mappings for the sanctioned ci.computer links, EMPTY by default. It is copied as it is (it is not a script or a style, so
+// the walk above did not take it) and held to campaign.js's own validator, so a rule that has expired, runs too long or names anything but the three
+// sanctioned addresses fails the build and a stale rule cannot live forever. The built pages never carry the mapped address (step 7).
+{
+  const cj = path.join(ROOT, 'portal', 'campaign.json');
+  if (!fs.existsSync(cj)) problems.push('missing portal/campaign.json');
+  else {
+    copy(path.join('portal', 'campaign.json'));
+    try {
+      const sandbox: Record<string, any> = {};
+      (await import('node:vm')).runInNewContext(fs.readFileSync(path.join(ROOT, 'portal', 'campaign.js'), 'utf8'), sandbox, { filename: 'portal/campaign.js' });
+      problems.push(...sandbox.CICampaign.validate(JSON.parse(fs.readFileSync(cj, 'utf8')), new Date().toISOString().slice(0, 10)));
+    } catch (err) { problems.push(`portal/campaign.json: ${(err as Error).message}`); }
+  }
+}
+
+// ---- app media ---- (scripts/story/lib/media.mts, scripts/story/build-app-media.mts, reference/story/story-v2.md "App media")
+// The real logos and screenshots under portal/apps/ and portal/ci/, every one named <name>.<hash10>.webp. Step 3's walk copied every .webp under portal/,
+// these two folders included, so what it copied is taken back out and only the files content/story/app-media.json names are shipped (portal/_headers keeps
+// these two folders for a year: nothing un-hashed may be in them). The manifest is held to its rules here (the files exist, are named by their hash,
+// fit their budgets, carry alt text and the exact captions), and an app a family uses that has no entry is a warning that lists the apps.
+const appMedia = await (async () => {
+  const media = await import('./story/lib/media.mts');
+  const left = (d: string): string[] => fs.existsSync(d) ? fs.readdirSync(d).flatMap(n => { const f = path.join(d, n); return fs.statSync(f).isDirectory() ? left(f) : [f]; }) : [];
+  for (const d of ['apps', 'ci']) {
+    for (const f of left(path.join(OUT, 'portal', d))) { files--; bytes -= fs.statSync(f).size; }
+    fs.rmSync(path.join(OUT, 'portal', d), { recursive: true, force: true });
+  }
+  const manifest = media.readMedia(ROOT);
+  if (!manifest) { console.log(`app media: no ${media.MANIFEST} (pnpm run story:media): the pages show no logos or screenshots`); return { media, manifest, named: new Map<string, string>() }; }
+  problems.push(...media.checkManifest(manifest, ROOT).map(p => `app media: ${p}`));
+  // the files the manifest names, and what each one is (the page check below needs the caption of a screenshot)
+  const named = new Map<string, string>();
+  for (const a of Object.values(manifest.apps)) { if (a.logo) named.set(a.logo.file, ''); if (a.shot) named.set(a.shot.file, a.shot.caption); }
+  for (const s of [...manifest.ci.hub, ...manifest.ci.portal]) named.set(s.file, s.caption);
+  for (const rel of named.keys()) copy(rel);
+  const stale = media.staleApps(manifest, ROOT);
+  console.log(`app media: ${named.size} files shipped (${manifest.rejected.length} candidates rejected, see ${media.MANIFEST})${stale.length ? `\n  warning: ${stale.length} app${stale.length === 1 ? '' : 's'} a family uses ${stale.length === 1 ? 'has' : 'have'} no entry in ${media.MANIFEST} (pnpm run story:media): ${stale.join(', ')}` : ''}`);
+  return { media, manifest, named };
+})();
+// ---- end app media ----
+
 // 4. the engine: compiled modules, three.js (whole vendored tree: modules plus LICENSE), fonts, brand
 for (const f of sources) copy(f.replace(/\.ts$/, '.js'));
 for (const f of walk(path.join('assets', 'vendor'), f => /\.js$|LICENSE/.test(f))) copy(f);
@@ -156,27 +203,16 @@ for (const h of index.houses || []) {
 }
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
 
-// 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes and floor
-// area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones; and the
-// hand-written copy's count in words ("Walk into thirty homes", "Thirty homes, each built live …") must be the number of homes
-// (the generated pages take the word from the data, this one is written by hand)
+// 5b. the front page's numbers are words the build writes from the data (the families word in the hero and the description, the count line above the
+// families), never typed in index.html: a spelled number or a figure in the source would go stale when a home is added, so the build refuses one.
 const houses: House[] = index.houses || [];
 const COUNT_WORD = numberWord(houses.length);
 {
-  const want: Record<string, string> = {
-    homes: String(houses.length),
-    area: new Intl.NumberFormat('en').format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10),
-  };
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  for (const [k, v] of Object.entries(want)) {
-    const got = html.match(new RegExp(`data-stat="${k}">([^<]*)<`));
-    if (!got) problems.push(`index.html: no data-stat="${k}" figure`);
-    else if (got[1] !== v) problems.push(`index.html: the static ${k} figure is ${got[1]}, index.json says ${v}`);
-  }
-  const h1 = (html.match(/<h1[^>]*>([^<]*)<\/h1>/) || [])[1] || '';
-  const description = (html.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
-  if (!new RegExp(`\\b${COUNT_WORD}\\b`, 'i').test(h1)) problems.push(`index.html: the heading "${h1}" does not say "${COUNT_WORD}", the number of homes in index.json`);
-  if (!description.startsWith(`${capital(COUNT_WORD)} homes`)) problems.push(`index.html: the description does not start "${capital(COUNT_WORD)} homes", the number of homes in index.json`);
+  const body = html.slice(html.indexOf('<body')).replace(/<!--[\s\S]*?-->/g, ' ');
+  if (/\bdata-stat=/.test(html)) problems.push('index.html: a data-stat figure (the lander writes its counts as words, from the data)');
+  const word = body.match(/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|(?:twen|thir|for|fif|six|seven|eigh|nine)ty(?:-(?:one|two|three|four|five|six|seven|eight|nine))?|(?:thir|four|fif|six|seven|eigh|nine)teen) (?:fictional |homes?\b|famil)/i);
+  if (word) problems.push(`index.html: the count "${word[0].trim()}" is typed in the source (portal-front.mts writes it from the data)`);
 }
 
 // 5c. a home's own page: homes/<id>.html, one per home (portal-pages.mts, see the header), and the tag that tells the player they exist
@@ -192,7 +228,16 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   const rc = path.join(OUT, 'room-creator.html');
   const text = fs.readFileSync(rc, 'utf8');
   if (!text.includes('</head>')) problems.push('room-creator.html has no </head> for the share tag');
-  else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
+  else fs.writeFileSync(rc, text.replace('</head>', () => [
+    '  <meta name="vh-share" content="homes/">',
+    // The player carries the ad's tags too (portal/campaign.js; the source page is the editor's and is not touched). A deferred classic script in the head runs
+    // after the page is parsed and before the module at the end of the body, so the tags are read before the player writes its address; the player draws
+    // its end card and About panel later, and campaign.js tags those links as they arrive and when they are clicked. The fingerprinting step below names the file by its hash.
+    // Without JavaScript nothing of the editor or the player can be used: the page shows the message in its <noscript> and nothing under it.
+    '  <script src="./portal/campaign.js" defer data-cfasync="false"></script>',
+    '  <noscript><style>body > :not(noscript) { display: none !important; }</style></noscript>',
+    '</head>',
+  ].join('\n')));
 }
 
 // 5c2. the families: a page each (family/<slug>), the tour's data and files, the manifest the player reads (scripts/story/site.mts).
@@ -213,6 +258,13 @@ const familyPages = story.built.map(b => b.file);
 const front = readFamilies({ ROOT, dir: path.resolve(ROOT, args.families && args.families !== 'true' ? args.families : path.join('content', 'families')), built: story.built, cards: story.cards });
 const heroFamily = front.find(f => f.slug === HERO.slug && f.house === HERO.house);
 if (!heroFamily) console.log(`front: the hero's tour is the ${HERO.slug} family, which is not current (pnpm run story:validate -- ${HERO.slug}): the hero plays its home`);
+// the lander's choices (content/story/lander.json, scripts/story/lib/lander.mts): the pairs the page may show, the chooser's chips, the featured families, the proof
+const landerFiles = landerInputs(ROOT);
+const lander = computeLander({ root: ROOT, stories: readStories({ dir: path.resolve(ROOT, args.families && args.families !== 'true' ? args.families : path.join('content', 'families')), built: story.built }), families: landerFamilies(front), houses, files: landerFiles });
+for (const line of lander.log) console.log(line);
+for (const e of lander.check.errors) problems.push(e);
+for (const w of lander.check.warnings) { console.log(`front: ${w}`); if (story.strict) problems.push(`${w} (--strict-families wants the plan to hold)`); }
+for (const n of lander.featured.notes) { console.log(`front: ${n}`); if (story.strict) problems.push(`featured families: ${n}`); }
 for (const h of houses) {
   const file = path.join(OUT, 'homes', `${h.id}.html`);
   if (!fs.existsSync(file)) continue;
@@ -221,7 +273,17 @@ for (const h of houses) {
   const f = front.find(x => x.house === h.id);
   fs.writeFileSync(file, text.replace(MEET_MARKER, () => (f ? meetFamily(f) : '')));
 }
-console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on the front page, ${houses.filter(h => !front.some(f => f.house === h.id)).length} home${houses.filter(h => !front.some(f => f.house === h.id)).length === 1 ? '' : 's'} with none`);
+{
+  // The homes with no current family keep a plain card (it opens the player) and a page of their own. Some are declared so by the cast plan (the
+  // apartments: no family has moved in); that is the plan's say and never a failure. A home that is neither current nor declared is a family that
+  // went stale (listed under "story:" above) or a home the plan does not know (cast-lint's error); --strict-families makes either an error.
+  const none = houses.filter(h => !front.some(f => f.house === h.id));
+  const declared = homesWithoutFamily(ROOT), planned = none.filter(h => h.id in declared), other = none.filter(h => !(h.id in declared));
+  console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on the front page, ${none.length} home${none.length === 1 ? '' : 's'} with none`);
+  if (planned.length) console.log(`front: ${planned.length} of them ${planned.length === 1 ? 'has' : 'have'} no family yet by the cast plan (content/story/cast-plan.json homesWithoutFamily), a plain card and a page of ${planned.length === 1 ? 'its' : 'their'} own, no tour: ${planned.map(h => h.id).join(', ')}`);
+  if (other.length) console.log(`front: ${other.length} ${other.length === 1 ? 'has' : 'have'} no current family and ${other.length === 1 ? 'is' : 'are'} not declared without one (a stale family: see story: above; or pnpm run story:cast-lint): ${other.map(h => h.id).join(', ')}`);
+  if (story.strict) for (const h of other) problems.push(`front: ${h.id} has no current family and is not in the cast plan's homesWithoutFamily (--strict-families wants the whole cast there)`);
+}
 // ---- end front page ----
 
 // 5d. link previews for the site's own pages. The gallery's og:image is relative in the source (a checkout has no
@@ -238,20 +300,61 @@ console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on 
   if (!gallery.includes(rel)) problems.push('index.html: no relative og:image for the hero to make absolute');
   gallery = gallery.replace(rel, `<meta property="og:image" content="${esc(hero)}">\n  <meta property="og:url" content="${esc(SITE)}">`);
 
-  // the list of homes, in place of the placeholders (which stay in the source: the page is served as it is in a checkout)
-  const list = /(<ul class="grid" id="grid")( aria-busy="true")?>[\s\S]*?<\/ul>/;
-  if (!list.test(gallery)) problems.push('index.html: no <ul class="grid" id="grid"> to write the homes into');
-  // ---- front page ---- the families' cards first (static HTML: a crawler, a visitor without JavaScript and an in-app browser with a slow
-  // script see them; gallery.js adopts them), then a plain card for each home with no current family
-  else gallery = gallery.replace(list, (_m, open: string) => `${open}>\n        ${frontCards(houses, front, galleryCards)}\n      </ul>`);
-  // ---- front page ---- the buttons for the jobs the families do (gallery.js counts them and filters by them: ?persona=<archetype>)
-  const personas = /(<div class="personas"[^>]*?) hidden><\/div>/;
-  if (!personas.test(gallery)) problems.push('index.html: no <div class="personas" … hidden></div> to write the persona buttons into');
-  else gallery = gallery.replace(personas, (_m, open: string) => (front.length ? `${open}>\n        ${personaButtons(front)}\n      </div>` : `${open} hidden></div>`));
+  // the head: the message and the Core in the title, the count in words in the description. claims.json's words and the data's; the source holds neither
+  {
+    const msg = Object.values(lander.messages)[0];
+    if (msg) {
+      const title = `${msg.text.replace(/\.$/, '')} · Companion Core`;
+      const desc = `A Companion Core is a small personal server that runs local AI and your household's apps. ${familiesWord(front.length)} show how. Fictional family. Real software.`;
+      const swap = (re: RegExp, to: string, what: string): void => { if (!re.test(gallery)) problems.push(`index.html: no ${what} to write`); else gallery = gallery.replace(re, () => to); };
+      swap(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`, '<title>');
+      swap(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(desc)}">`, 'description');
+      swap(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${esc(title)}">`, 'og:title');
+      swap(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${esc(desc)}">`, 'og:description');
+    }
+  }
+  // ---- front page ---- the cards: the featured families' (the plan's six that pass the gate) in the first list, everything else in the second, which sits in a
+  // native <details> (static HTML: a crawler, a visitor without JavaScript and an in-app browser with a slow script see every family and every home; gallery.js adopts them)
+  const cards = frontCards(houses, front, lander, galleryCards);
+  const list = /(<ul class="grid" id="grid" aria-label="[^"]*")( aria-busy="true")?>[\s\S]*?<\/ul>/;
+  if (!list.test(gallery)) problems.push('index.html: no <ul class="grid" id="grid" aria-label="…"> to write the featured families into');
+  else gallery = gallery.replace(list, (_m, open: string) => `${open}>\n        ${cards.featured}\n      </ul>`);
+  const rest = /(<ul class="grid grid-rest" id="grid-rest"[^>]*)><\/ul>/;
+  if (!rest.test(gallery)) problems.push('index.html: no <ul class="grid grid-rest" id="grid-rest"></ul> to write the other families and homes into');
+  else gallery = gallery.replace(rest, (_m, open: string) => `${open}>\n        ${cards.rest}\n      </ul>`);
   // ---- front page ---- the hero tours the Brennan family (index.html's source says so); without a current one it plays the home
-  if (!gallery.includes(`house=${HERO.house}&amp;family=${HERO.slug}"`)) problems.push(`index.html: the hero's tour link is not house=${HERO.house}&family=${HERO.slug} (portal-front.mts HERO)`);
+  if (!gallery.includes(`house=${HERO.house}&amp;family=${HERO.slug}"`)) problems.push(`index.html: the hero's tour link is not house=${HERO.house}&family=${HERO.slug} (content/story/lander.json hero)`);
   else if (!heroFamily) gallery = gallery.split(`&amp;family=${HERO.slug}"`).join('"');
   // ---- end front page ----
+  // ---- the lander ---- (reference/story/lander.md): the blocks and the words, written at their markers in index.html. A claim and the fine print are claims.json's words, never
+  // retyped; the lists are the plan's and the families'. The Core's own picture (portal/stage/<house>/) is the band's when its frames are committed.
+  {
+    const at = (marker: RegExp, html: string, what: string): void => {
+      if (!marker.test(gallery)) problems.push(`index.html: no <!-- ${what}: --> marker to write ${what} at`);
+      else gallery = gallery.replace(marker, () => html);
+    };
+    const claimText = new Map(landerFiles.claims.allowedClaims.map((c) => [c.id, c.text]));
+    gallery = gallery.replace(/<!-- claim:([a-z0-9-]+) -->/g, (_m, id: string) => {
+      const t = claimText.get(id);
+      if (t === undefined) { problems.push(`index.html: <!-- claim:${id} --> names no claim in claims.json`); return ''; }
+      return esc(t);
+    });
+    at(/<!-- lander-hero-count:[\s\S]*?-->/, esc(heroCount(front.length)), 'lander-hero-count');
+    at(/<!-- lander-proof:[\s\S]*?-->/, proofBlock(lander, front), 'lander-proof');
+    const disclosure = (id: string): string => landerFiles.claims.disclosures.find((d) => d.id === id)?.text ?? '';
+    const heroHome = heroFamily?.house ?? HERO.house;
+    const fig = coreFigure(ROOT, heroHome, 'The Companion Core on a writing desk in the Library, drawn in 3D.', disclosure('stylised-art'));
+    at(/<!-- lander-core-fig:[\s\S]*?-->/, fig, 'lander-core-fig');
+    if (fig) gallery = gallery.replace('<section class="cta-band" id="core"', () => '<section class="cta-band has-fig" id="core"');
+    at(/<!-- lander-swap:[\s\S]*?-->/, swapBlock(lander, front), 'lander-swap');
+    at(/<!-- lander-count:[\s\S]*?-->/, esc(lander.count), 'lander-count');
+    at(/<!-- lander-apps:[\s\S]*?-->/, appsNamed(front), 'lander-apps');
+    // the fine print: the hero's two chips, the band's lines (the stylised-art line is the figure's caption when there is a figure), the footer's
+    at(/<!-- fine-hero:[\s\S]*?-->/, `<div class="hero-chips">${finePrint('lander-hero').html.replace('<p data-fine="fictional-family">', '<p class="fiction-label" data-fine="fictional-family">').replace('<p data-fine="beta-short">', '<p class="beta-chip" data-fine="beta-short">')}</div>`, 'fine-hero');
+    at(/<!-- fine-core:[\s\S]*?-->/, finePrintHtml(finePrint('lander-core').items.filter((i) => i.id !== 'stylised-art' || !fig), { cls: 'cta-note' }), 'fine-core');
+    at(/<!-- fine-foot:[\s\S]*?-->/, `<div class="foot-notes">${finePrint('lander-footer').html}</div>`, 'fine-foot');
+  }
+  // ---- end the lander ----
   // every home's own page, linked from the footer (the cards go to the player; gallery.js leaves this list as it is)
   const marker = /<!-- foot-homes:[\s\S]*?-->/;
   if (!marker.test(gallery)) problems.push('index.html: no <!-- foot-homes: --> marker to write the list of the homes\' pages at');
@@ -265,7 +368,7 @@ console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on 
   let page = fs.readFileSync(rc, 'utf8');
   const galleryDesc = (gallery.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
   const alt = (gallery.match(/<meta property="og:image:alt" content="([^"]*)">/) || [])[1] || '';
-  const playerDesc = `Fly through one of ${COUNT_WORD} virtual homes in 3D, built live in your browser from one spec file. Change the hour and meet the Companion Core.`;
+  const playerDesc = `Fly through one of ${COUNT_WORD} virtual homes in 3D in your browser and meet the Companion Core.`;
   // The player and the editor are one file, a viewer and a tool rather than pages to find: out of the index in the page's own
   // HTML, where a crawler that never runs the page's script reads it (the pages to find are the gallery and each home's page,
   // which link the player). "follow": the links on the page, the way back to the gallery and the Core's, still count.
@@ -336,7 +439,7 @@ console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on 
   };
   const galleryTitle = (fs.readFileSync(path.join(OUT, 'index.html'), 'utf8').match(/<title>([^<]*)<\/title>/) || [])[1] || '';
   const galleryDesc = (fs.readFileSync(path.join(OUT, 'index.html'), 'utf8').match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
-  seo('index.html', SITE, galleryLd(SITE, houses, galleryTitle, galleryDesc.replace(/&quot;/g, '"').replace(/&amp;/g, '&')));
+  seo('index.html', SITE, galleryLd(SITE, lander.featured.slugs.flatMap((slug) => { const f = front.find((x) => x.slug === slug); return f ? [{ url: new URL(`family/${slug}`, SITE).href, name: f.title }] : []; }), galleryTitle, galleryDesc.replace(/&quot;/g, '"').replace(/&amp;/g, '&')));
   seo('room-creator.html', null, playerLd(SITE));
   for (const h of houses) {
     const file = path.join('homes', `${h.id}.html`);
@@ -537,13 +640,22 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...familyPages
   if (alt(g) !== HERO_ALT) problems.push('index.html: its og:image:alt is not HERO_ALT (portal-pages.mts), which the 404 page uses');
   // ---- front page ---- the static list is each current family's card, in the story's order, then a card for each home with no current
   // family (so every home is still there once: index.json's homes), and the campaign script, the family links and the tour are in it
-  const listed = [...g.matchAll(/<li class="card(?: card-family)?" data-id="([^"]+)"/g)].map(m => m[1]);
-  const wanted = [...front.map(f => f.house), ...houses.filter(h => !front.some(f => f.house === h.id)).map(h => h.id)];
+  const listed = [...g.matchAll(/<li class="card[^"]*" data-id="([^"]+)"/g)].map(m => m[1]).filter(id => id !== '');
+  const byFam = (slug: string): string => front.find(f => f.slug === slug)?.house ?? '';
+  const wanted = [...lander.featured.slugs.map(byFam), ...front.filter(f => !lander.featured.slugs.includes(f.slug)).map(f => f.house), ...houses.filter(h => !front.some(f => f.house === h.id)).map(h => h.id)];
   if (listed.join() !== wanted.join()) problems.push(`index.html: the static cards (${listed.length}) are not the current families then the homes with none (${wanted.length})`);
   if (new Set(houses.map(h => h.id)).size !== new Set(listed).size) problems.push(`index.html: the static cards cover ${new Set(listed).size} of index.json's ${houses.length} homes`);
   for (const f of front) if (!g.includes(`<a href="./family/${f.slug}" data-campaign `)) problems.push(`index.html: the ${f.slug} family's card does not link ./family/${f.slug}`);
-  if (front.length && !/<div class="personas"[^>]*>\s*<button/.test(g)) problems.push('index.html: families, but no persona buttons');
+  if (front.length && !/<div class="jobs" id="personas"[^>]*>[\s\S]*?<button/.test(g)) problems.push('index.html: families, but no job chips');
+  problems.push(...landerChecks(g, { data: lander, claims: landerFiles.claims, services: landerFiles.services, apps: landerFiles.apps, links: { site: LINKS.site, core: LINKS.core, download: LINKS.download, docs: LINKS.docs },
+    missingFine: (html, surface) => missingFinePrint(html, surface).map(String) }));
+  { const m = Object.values(lander.messages)[0]; if (m) problems.push(...landerHeadChecks(g, m.text)); }
   if (!/<script src="\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(g)) problems.push('index.html: no portal/campaign.js (with its content hash, defer and data-cfasync="false")');
+  // the player loads it too, before the module that writes its address (the page's one module is at the end of its body)
+  { const rcText = read('room-creator.html'), at = rcText.search(/<script src="\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/), mod = rcText.search(/<script type="module"/);
+    if (at < 0) problems.push('room-creator.html: no portal/campaign.js (with its content hash, defer and data-cfasync="false")');
+    else if (mod >= 0 && at > mod) problems.push('room-creator.html: portal/campaign.js comes after the first module');
+    if (!/<noscript><style>body > :not\(noscript\)/.test(rcText)) problems.push('room-creator.html: no <noscript> style that leaves only the message when JavaScript is off'); }
   for (const f of ['404.html', ...homePages.filter(p => p.endsWith('.html'))]) if (!/<script src="[^"]*\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(read(f))) problems.push(`${f}: no portal/campaign.js (with its content hash, defer and data-cfasync="false")`);
   // a campaign's tags are added in the browser, never in the built page: every link to ci.computer is exactly as step 7 above requires
   for (const f of [...pages, 'room-creator.html']) if (/href="https:\/\/ci\.computer\/?[?#]/.test(read(f))) problems.push(`${f}: a link to ci.computer carries a query or fragment (portal/campaign.js adds a campaign's tags at run time)`);
@@ -576,6 +688,23 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...familyPages
   for (const f of ['index.html', 'room-creator.html']) { const t = tag(read(f), /<title>([^<]*)<\/title>/); if (titles.has(t)) problems.push(`${f}: its title "${t}" is also ${titles.get(t)}'s`); titles.set(t, f); }
 }
 
+// ---- app media ---- what the built pages do with the media: every <img> of a file under portal/apps/ or portal/ci/ names a file the manifest
+// shipped and that is in the output, has alt text, its width and height and a loading attribute (lazy on the front page, which loads none above the
+// fold), and a screenshot's page carries its caption; and the manifest's own words (alt text, captions, reasons) pass the credit guard.
+{
+  const { media, manifest, named } = appMedia;
+  if (manifest) {
+    const red = await import('./portal-redact.mts');
+    problems.push(...red.scanText(media.MANIFEST, fs.readFileSync(path.join(ROOT, media.MANIFEST), 'utf8'), red.guardTerms(red.builderHandles(ROOT))).map(p => `credit guard: ${p}`));
+    const pages = ['index.html', ...homePages, ...familyPages, '404.html'].filter(p => fs.existsSync(path.join(OUT, p))).map(p => ({ file: p.split(path.sep).join('/'), html: fs.readFileSync(path.join(OUT, p), 'utf8') }));
+    const checked = media.checkPageImages(pages, named, f => fs.existsSync(path.join(OUT, f)));
+    problems.push(...checked.problems);
+    const shown = checked.shown;
+    console.log(`app media: ${shown} image${shown === 1 ? '' : 's'} on the built pages, each checked for alt, size, loading and caption`);
+  }
+}
+// ---- end app media ----
+
 // 8. nothing in the output credits a builder or names the build a home was written from (scripts/portal-redact.mts has the rule and
 // the guard): every text file of the output, the shipped specs and the family and story JSON included, is read for the builders'
 // handles (derived from the specs' `author` fields, never listed), the word "Sims", "Base Game" and "BG ". The allowlist is empty.
@@ -590,6 +719,13 @@ console.log(`portal: ${files} files, ${(bytes / 1024 / 1024).toFixed(1)} MB → 
 
 // --serve: preview the tree under a sub-path, which proves every URL in it is relative
 if (args.serve === 'true') {
-  const srv = await serve(OUT, '/ci-virtual-home/', Number(args.port || 8081));
+  // ---- tailscale ---- `--tailscale` also listens on this machine's Tailscale address (and only that one besides the loopback), so a phone or laptop on the
+  // same tailnet opens the preview; `--host <ipv4>` listens on that one address instead. Without either, the loopback address only, as before.
+  const ts = args.tailscale === 'true' ? await tailscaleAddress() : null;
+  if (args.tailscale === 'true' && !ts) { console.error('preview: --tailscale needs the tailscale command, running, with an IPv4 address (tailscale ip -4)'); process.exit(1); }
+  const extra = ts ? [ts.ip] : (args.host && args.host !== 'true' ? [args.host] : []);
+  const srv = await serve(OUT, '/ci-virtual-home/', Number(args.port || 8081), extra);
   console.log(`preview: ${srv.url()}  (Ctrl-C to stop)`);
+  for (const o of srv.also) console.log(`preview on the tailnet: ${o}${srv.base}${ts?.dns ? `   or   http://${ts.dns}:${srv.port}${srv.base}` : ''}`);
+  // ---- end tailscale ----
 }

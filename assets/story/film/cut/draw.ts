@@ -6,8 +6,17 @@
 // primary for the one accent. It is the daylight set because an ad is held to daylight (CI-Common ADS.md 9.1: light grounds, no neon, no glow, no RGB), and
 // the family films' dark glass is theirs. Type is Manrope 500, 600 and 700 (the canon's weights; assets/fonts). No faces, no photographs, no app screens,
 // no phone drawing: a member is a monogram disc, the popup is words and chips.
+//
+// THE TYPE FLOOR (live pass 3). A cut is a picture shown scaled down (a 1080 px canvas is about 390 px wide on a phone), so every line of reading text in it is at least
+// 36 design px at the 1080 px short edge (`CANVAS_TYPE_MIN`, assets/story/place.ts) times the frame's k: the corner mark, the card's kicker, chips and note, the caption (42 and 44),
+// the pill and the disclosures. The card's title is 56. The cut does not take the live modals' 30 % reduction (25.5 px), because the canvas is reduced itself (reference/story/ads.md).
+// A card never shrinks its type to fit: it is offered as variants (padding, width) and layout.ts's solver refuses one under the floor. `auditType` (cards.ts) records the smallest size
+// the overlay really drew, so a render fails the floor on what was painted and not only on what was planned.
+//
+// THE NAME IS A KICKER: the member's name on the hook and the card is drawn in capitals, bold, tracked 0.2em, in the primary (phthalo on this light set), as the live cards draw it; the
+// string in the plan stays as written.
 // Owner: ad-kit.
-import { font, wrap, rrect, type Ctx } from '../cards.js';
+import { font, wrap, rrect, drawKick, TYPE, CHIP_PAD, CHIP_H, DISC_D, FLOOR, type Ctx } from '../cards.js';
 import { cutBadgeBox, cutCaptionBox, type CutFormat } from './plan.js';
 import type { Cue, CueWord } from '../layout.js';
 
@@ -28,7 +37,7 @@ function panel(g: Ctx, x: number, y: number, w: number, h: number, r: number, k:
 }
 function pill(g: Ctx, x: number, y: number, text: string, px: number, k: number, filled: boolean): number {
   g.font = font(600, px);
-  const padX = 16 * k, h = px * 1.7, w = g.measureText(text).width + 2 * padX;
+  const padX = CHIP_PAD * k, h = px * CHIP_H, w = g.measureText(text).width + 2 * padX;
   rrect(g, x, y, w, h, h / 2);
   if (filled) { g.fillStyle = PAL.primary; g.fill(); } else { g.lineWidth = Math.max(1.5, 2.5 * k); g.strokeStyle = PAL.primary; g.stroke(); }
   g.fillStyle = filled ? PAL.onPrimary : PAL.primary; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillText(text, x + padX, y + h / 2 + px * 0.03);
@@ -36,7 +45,7 @@ function pill(g: Ctx, x: number, y: number, text: string, px: number, k: number,
 }
 function disc(g: Ctx, cx: number, cy: number, r: number, name: string) {
   g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fillStyle = PAL.primary; g.fill();
-  g.fillStyle = PAL.onPrimary; g.font = font(700, r * 1.05); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText((name[0] || '?').toUpperCase(), cx, cy + r * 0.05);
+  g.fillStyle = PAL.onPrimary; g.font = font(700, r * 1.2); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText((name[0] || '?').toUpperCase(), cx, cy + r * 0.05);
   g.textAlign = 'left';
 }
 
@@ -59,11 +68,13 @@ export function badgeTextWidth(g: Ctx, f: CutFormat, text: string): number { g.s
 
 // ---- the hook -------------------------------------------------------------------------------------------------------------------------------
 export type HookModel = { name: string; text: string };
-export type HookLayout = { w: number; h: number; k: number; pad: number; px: number; lines: string[]; kick: number; model: HookModel };
-/** The hook: the member, then the beat's title as big as it goes in at most three lines (the sizes are in design units, scaled by k). */
-export function measureHook(g: Ctx, m: HookModel, f: CutFormat, width: number): HookLayout {
-  const k = f.k, pad = 34 * k, kick = 46 * k, inner = width - 2 * pad;
-  const sizes = (f.sheet ? [92, 84, 76, 68, 60, 52, 46] : f.key === '1x1' ? [84, 76, 68, 60, 52, 46, 42] : [72, 64, 56, 48, 42]).map(s => s * k);
+export type HookLayout = { w: number; h: number; k: number; pad: number; px: number; lines: string[]; kick: number; kickPx: number; /** the smallest type in the panel, px of this canvas */ type: number; model: HookModel };
+/** The hook: the member (a kicker: capitals, bold, tracked), then the beat's title as big as it goes in at most three lines (the sizes are in design units, scaled by k; the smallest is 42). */
+export const hookSizes = (f: CutFormat): number[] => (f.sheet ? [92, 84, 76, 68, 60, 52, 46] : f.key === '1x1' ? [84, 76, 68, 60, 52, 46, 42] : [72, 64, 56, 48, 42]).map(s => s * f.k);
+/** `cap` (px) keeps the title at or under that size: the placer asks for the next smaller panel when the biggest would cover the subject. */
+export function measureHook(g: Ctx, m: HookModel, f: CutFormat, width: number, cap = Infinity): HookLayout {
+  const k = f.k, pad = 34 * k, kick = DISC_D * k, inner = width - 2 * pad, kickPx = TYPE.read * k;
+  const sizes = hookSizes(f).filter(s => s <= cap + 1e-6);
   let px = sizes[sizes.length - 1], lines: string[] = [];
   for (const s of sizes) {
     g.font = font(700, s); const ls = wrap(g, m.text, inner);
@@ -71,7 +82,7 @@ export function measureHook(g: Ctx, m: HookModel, f: CutFormat, width: number): 
   }
   if (!lines.length) { g.font = font(700, px); lines = wrap(g, m.text, inner); }   // (never cut a word off: more lines before fewer words)
   const h = pad + kick + 22 * k + lines.length * px * 1.12 + pad - 6 * k;
-  return { w: width, h: Math.ceil(h), k, pad, px, lines, kick, model: m };
+  return { w: width, h: Math.ceil(h), k, pad, px, lines, kick, kickPx, type: Math.min(px, kickPx), model: m };
 }
 export function drawHook(g: Ctx, L: HookLayout, x: number, y: number, alpha: number) {
   if (alpha <= 0.002) return;
@@ -79,7 +90,7 @@ export function drawHook(g: Ctx, L: HookLayout, x: number, y: number, alpha: num
   panel(g, x, y, L.w, L.h, 28 * k, k);
   const r = L.kick / 2, cx = x + L.pad + r, cy = y + L.pad + r;
   disc(g, cx, cy, r, L.model.name);
-  g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = font(700, 30 * k); g.fillStyle = PAL.mutedFg; g.fillText(L.model.name, x + L.pad + L.kick + 16 * k, cy + 1 * k);
+  g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = PAL.primary; drawKick(g, L.model.name, x + L.pad + L.kick + 16 * k, cy + 1 * k, L.kickPx);
   g.textBaseline = 'alphabetic'; g.font = font(700, L.px); g.fillStyle = PAL.fg;
   L.lines.forEach((t, i) => g.fillText(t, x + L.pad, y + L.pad + L.kick + 22 * k + L.px * (0.9 + 1.12 * i)));
   g.restore();
@@ -88,33 +99,39 @@ export function drawHook(g: Ctx, L: HookLayout, x: number, y: number, alpha: num
 // ---- the popup card -------------------------------------------------------------------------------------------------------------------------
 export type CardModel = { name: string; companion: string | null; title: string; chips: string[]; note: string | null };
 export type CardLayout = {
-  w: number; h: number; k: number; s: number; model: CardModel; pad: number; kick: number;
-  titleLines: string[]; titlePx: number; noteLines: string[]; notePx: number; chipPx: number;
+  w: number; h: number; k: number; tight: boolean; model: CardModel; pad: number; kick: number;
+  /** a chip or a word is wider than the text column: this width is not a way to set the card */
+  bad: boolean;
+  /** the smallest type in the card, px of this canvas (the solver refuses a card under 36 design px) */
+  type: number;
+  titleLines: string[]; titlePx: number; noteLines: string[]; notePx: number; chipPx: number; kickPx: number;
   chips: Array<{ text: string; x: number; y: number; filled: boolean }>; yTitle: number; yChips: number; yNote: number;
 };
-export const CARD_LEVELS = 3;
-/** Measure a card for `width` pixels. `level` 0 is the card as designed; 1 and 2 are the same card smaller (0.86 and 0.74), for a frame where the full card would cover the subject. */
-export function measureCard(g: Ctx, m: CardModel, f: CutFormat, width: number, level = 0): CardLayout {
-  const s = [1, 0.86, 0.74][level] ?? 0.74, k = f.k, pad = 32 * k * s, titlePx = 46 * k * s, chipPx = 26 * k * s, notePx = 27 * k * s, kick = 48 * k * s;
+/** The card's ways to be set: `tight` is the same card with its padding and gaps at 0.68 (the type is never touched; it is 36 design px for the kicker, the chips and the note and 56 for the title). */
+export const CARD_PAD_TIGHT = 0.68;
+/** Measure a card for `width` pixels. */
+export function measureCard(g: Ctx, m: CardModel, f: CutFormat, width: number, tight = false): CardLayout {
+  const k = f.k, s = tight ? CARD_PAD_TIGHT : 1, pad = 32 * k * s, gap = (tight ? 9 : 14) * k, px = TYPE.read * k, titlePx = TYPE.title * k, kick = DISC_D * k;
   const textW = width - 2 * pad;
   g.font = font(700, titlePx);
   const titleLines = wrap(g, m.title, textW);
-  let y = pad + kick + 16 * k;
-  const yTitle = y; y += titleLines.length * titlePx * 1.16 + 14 * k;
-  const chips: CardLayout['chips'] = [], yChips = y;
+  let y = pad + kick + 16 * k * s;
+  const yTitle = y; y += titleLines.length * titlePx * 1.14 + gap;
+  const chips: CardLayout['chips'] = [], yChips = y, ch = px * CHIP_H;
   if (m.chips.length) {
-    g.font = font(600, chipPx);
-    let x = 0, row = 0; const hh = chipPx * 1.7;
+    g.font = font(600, px);
+    let x = 0, row = 0;
     m.chips.forEach((c, i) => {
-      const w = g.measureText(c).width + 32 * k * s;
+      const w = g.measureText(c).width + 2 * CHIP_PAD * k;
       if (x > 0 && x + w > textW) { x = 0; row++; }
-      chips.push({ text: c, x, y: row * (hh + 10 * k), filled: i === 0 }); x += w + 10 * k;
+      chips.push({ text: c, x, y: row * (ch + 10 * k * s), filled: i === 0 }); x += w + 10 * k * s;
     });
-    y += (row + 1) * (chipPx * 1.7 + 10 * k) + 6 * k;
+    y += (row + 1) * (ch + 10 * k * s) + 4 * k;
   }
   const yNote = y; let noteLines: string[] = [];
-  if (m.note) { g.font = font(500, notePx); noteLines = wrap(g, m.note, textW); y += noteLines.length * notePx * 1.32 + 6 * k; }
-  return { w: width, h: Math.ceil(y + pad - 6 * k), k, s, model: m, pad, kick, titleLines, titlePx, noteLines, notePx, chipPx, chips, yTitle, yChips, yNote };
+  if (m.note) { g.font = font(500, px); noteLines = wrap(g, m.note, textW); y += noteLines.length * px * 1.3 + 4 * k; }
+  g.font = font(700, titlePx); const wide = Math.max(...m.title.split(/\s+/).map(t => g.measureText(t).width), 0) > textW + 0.5 || chips.some(c => { g.font = font(600, px); return g.measureText(c.text).width + 2 * CHIP_PAD * k > textW + 0.5; });
+  return { w: width, h: Math.ceil(y + pad - 4 * k), k, tight, bad: wide, model: m, pad, kick, type: px, titleLines, titlePx, noteLines, notePx: px, chipPx: px, kickPx: px, chips, yTitle, yChips, yNote };
 }
 export function drawCard(g: Ctx, L: CardLayout, x: number, y: number, alpha: number) {
   if (alpha <= 0.002) return;
@@ -122,15 +139,16 @@ export function drawCard(g: Ctx, L: CardLayout, x: number, y: number, alpha: num
   panel(g, x, y, L.w, L.h, 26 * k, k);
   const r = L.kick / 2, cx = x + L.pad + r, cy = y + L.pad + r;
   disc(g, cx, cy, r, m.name);
-  g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = font(700, 29 * k * L.s); g.fillStyle = PAL.fg;
-  const nameW = g.measureText(m.name).width; g.fillText(m.name, x + L.pad + L.kick + 14 * k, cy + 1 * k);
-  if (m.companion) { g.font = font(500, 27 * k * L.s); g.fillStyle = PAL.mutedFg; g.fillText(`with ${m.companion}`, x + L.pad + L.kick + 14 * k + nameW + 12 * k, cy + 1 * k); }
+  // the kicker: the name as capitals, bold, tracked, in the primary; "with <companion>" after it
+  g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = PAL.primary;
+  const tx = x + L.pad + L.kick + 16 * k, nameW = drawKick(g, m.name, tx, cy + 1 * k, L.kickPx);
+  if (m.companion) { g.font = font(500, L.kickPx); g.fillStyle = PAL.mutedFg; g.textAlign = 'left'; g.fillText(`with ${m.companion}`, tx + nameW + 16 * k, cy + 1 * k); }
   g.textBaseline = 'alphabetic'; g.font = font(700, L.titlePx); g.fillStyle = PAL.fg;
-  L.titleLines.forEach((t, i) => g.fillText(t, x + L.pad, y + L.yTitle + L.titlePx * (0.92 + 1.16 * i)));
+  L.titleLines.forEach((t, i) => g.fillText(t, x + L.pad, y + L.yTitle + L.titlePx * (0.9 + 1.14 * i)));
   g.textBaseline = 'middle';
   for (const c of L.chips) pill(g, x + L.pad + c.x, y + L.yChips + c.y, c.text, L.chipPx, k, c.filled);
   g.textBaseline = 'alphabetic'; g.font = font(500, L.notePx); g.fillStyle = PAL.mutedFg;
-  L.noteLines.forEach((t, i) => g.fillText(t, x + L.pad, y + L.yNote + L.notePx * (1 + 1.32 * i)));
+  L.noteLines.forEach((t, i) => g.fillText(t, x + L.pad, y + L.yNote + L.notePx * (0.98 + 1.3 * i)));
   g.restore();
 }
 
@@ -212,30 +230,45 @@ export function drawDip(g: Ctx, f: CutFormat, amount: number) {
 // ---- the end card ---------------------------------------------------------------------------------------------------------------------------
 export type EndModel = { cta: string; url: string; fictional: string; lines: string[] };
 /**
- * The end card: the call to action as the headline, where to go, the fictional line on its own pill, and the plain disclosures (beta, scripted scenes, stylised art,
- * and the rest the cut's beats require). Sizes fit the frame: the headline and the address take the largest size that stays on one line.
- * Returns the panel's rectangle (the checks read it).
+ * The end card: the call to action as the headline, where to go, the fictional line on its own pill, and the plain disclosures (beta, scripted scenes, stylised art, and the rest
+ * the cut's beats require) at 36 design px. The headline and the address take the largest size that stays on one line. The panel sits between the corner mark and the bottom margin
+ * (the corner mark is on every frame and must not be covered): if the disclosures at that size need more room than the frame has (a square), the panel goes tighter, never smaller in its
+ * fine print: first its padding and spacing, then the disclosures run on as one paragraph, then the pill in the panel goes (the corner mark says it on the same frame).
+ * Returns the panel's rectangle (the checks read it); `fit` says which of the three it took.
  */
-export function drawCutEnd(g: Ctx, f: CutFormat, m: EndModel, alpha: number): { x: number; y: number; w: number; h: number } {
-  const k = f.k, pad = 40 * k, w = f.sheet || f.key === '1x1' ? f.w - f.safe.left - f.safe.right : Math.min(f.w - f.safe.left - f.safe.right, 1360 * k), inner = w - 2 * pad;
-  const fit = (text: string, weight: number, max: number) => { let px = max * k; g.font = font(weight, px); while (g.measureText(text).width > inner && px > 24 * k) { px -= 2 * k; g.font = font(weight, px); } return px; };
-  const ctaPx = fit(m.cta, 700, f.sheet ? 96 : 92), urlPx = fit(m.url, 700, f.sheet ? 52 : 50), fx = (f.sheet ? 31 : 30) * k, small = (f.sheet ? 26 : 25) * k;
-  g.save(); g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.font = font(500, small);
-  const wrapped = m.lines.map(l => wrap(g, l, inner)), nLines = wrapped.reduce((a, l) => a + l.length, 0), lh = small * 1.34;
-  g.font = font(700, fx); const pw = g.measureText(m.fictional).width + 2 * 26 * k, ph = fx * 1.75;
-  const h = pad + ctaPx * 1.0 + 12 * k + urlPx * 1.25 + 24 * k + ph + 24 * k + nLines * lh + (wrapped.length - 1) * 6 * k + pad - 6 * k;
-  const x = Math.round((f.w - w) / 2), y = Math.round(f.h - f.safe.bottom - h);
+export type EndFit = 'roomy' | 'tight' | 'run-on' | 'no-pill';
+export function drawCutEnd(g: Ctx, f: CutFormat, m: EndModel, alpha: number): { x: number; y: number; w: number; h: number; fit: EndFit; lines: number } {
+  const k = f.k, w = f.sheet || f.key === '1x1' ? f.w - f.safe.left - f.safe.right : Math.min(f.w - f.safe.left - f.safe.right, 1360 * k);
+  const top = f.safe.top + cutBadgeBox(f, 0).h + 12 * k, room = f.h - f.safe.bottom - top, floor = FLOOR * k;
+  const lay = (mode: EndFit) => {
+    const tight = mode !== 'roomy', pad = (tight ? 28 : 40) * k, inner = w - 2 * pad;
+    const fit = (text: string, weight: number, max: number) => { let px = max * k; g.font = font(weight, px); while (g.measureText(text).width > inner && px > floor * 1.1) { px -= 2 * k; g.font = font(weight, px); } return px; };
+    const ctaPx = fit(m.cta, 700, (f.sheet ? 96 : 92) * (tight ? 0.84 : 1)), urlPx = fit(m.url, 700, (f.sheet ? 52 : 50) * (tight ? 0.9 : 1)), fx = TYPE.read * k, small = TYPE.read * k;
+    g.font = font(500, small);
+    const paras = mode === 'run-on' || mode === 'no-pill' ? [m.lines.join(' ')] : m.lines, wrapped = paras.map(l => wrap(g, l, inner)), nLines = wrapped.reduce((a, l) => a + l.length, 0);
+    const lh = small * (tight ? 1.22 : 1.34), sp = (tight ? 3 : 6) * k, gaps = (tight ? [8, 14, 14] : [12, 24, 24]).map(v => v * k);
+    g.font = font(700, fx); const pw = g.measureText(m.fictional).width + 2 * 26 * k, ph = fx * 1.75, pillH = mode === 'no-pill' ? 0 : ph + gaps[2];
+    const h = pad + ctaPx * 1.0 + gaps[0] + urlPx * 1.25 + gaps[1] + pillH + nLines * lh + (wrapped.length - 1) * sp + pad - 6 * k;
+    return { pad, inner, ctaPx, urlPx, fx, small, wrapped, nLines, lh, sp, gaps, pw, ph, h, mode };
+  };
+  let L = lay('roomy');
+  for (const mode of ['tight', 'run-on', 'no-pill'] as EndFit[]) if (L.h > room) L = lay(mode);
+  g.save(); g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+  const h = L.h, x = Math.round((f.w - w) / 2), y = Math.round(f.h - f.safe.bottom - h);
   g.globalAlpha *= alpha; panel(g, x, y, w, h, 30 * k, k);
-  let cy = y + pad + ctaPx * 0.82;
-  g.font = font(700, ctaPx); g.fillStyle = PAL.primary; g.fillText(m.cta, x + pad, cy);
-  cy += ctaPx * 0.18 + 12 * k + urlPx * 0.95;
-  g.font = font(700, urlPx); g.fillStyle = PAL.fg; g.fillText(m.url, x + pad, cy);
-  cy += urlPx * 0.3 + 24 * k;
-  rrect(g, x + pad, cy, pw, ph, ph / 2); g.fillStyle = PAL.primary; g.fill();
-  g.font = font(700, fx); g.fillStyle = PAL.onPrimary; g.textBaseline = 'middle'; g.fillText(m.fictional, x + pad + 26 * k, cy + ph / 2 + fx * 0.04);
-  g.textBaseline = 'alphabetic'; cy += ph + 24 * k + small * 0.95;
-  g.font = font(500, small); g.fillStyle = PAL.mutedFg;
-  for (const para of wrapped) { for (const ln of para) { g.fillText(ln, x + pad, cy); cy += lh; } cy += 6 * k; }
+  let cy = y + L.pad + L.ctaPx * 0.82;
+  g.font = font(700, L.ctaPx); g.fillStyle = PAL.primary; g.fillText(m.cta, x + L.pad, cy);
+  cy += L.ctaPx * 0.18 + L.gaps[0] + L.urlPx * 0.95;
+  g.font = font(700, L.urlPx); g.fillStyle = PAL.fg; g.fillText(m.url, x + L.pad, cy);
+  cy += L.urlPx * 0.3 + L.gaps[1];
+  if (L.mode !== 'no-pill') {
+    rrect(g, x + L.pad, cy, L.pw, L.ph, L.ph / 2); g.fillStyle = PAL.primary; g.fill();
+    g.font = font(700, L.fx); g.fillStyle = PAL.onPrimary; g.textBaseline = 'middle'; g.fillText(m.fictional, x + L.pad + 26 * k, cy + L.ph / 2 + L.fx * 0.04);
+    g.textBaseline = 'alphabetic'; cy += L.ph + L.gaps[2];
+  }
+  cy += L.small * 0.95;
+  g.font = font(500, L.small); g.fillStyle = PAL.mutedFg;
+  for (const para of L.wrapped) { for (const ln of para) { g.fillText(ln, x + L.pad, cy); cy += L.lh; } cy += L.sp; }
   g.restore();
-  return { x, y, w, h };
+  return { x, y, w, h, fit: L.mode, lines: L.nLines };
 }

@@ -5,6 +5,9 @@
 //   * where each recorded clip sits (the bake lock's offsets), and that a clip which would run past its part is refused
 //   * the captions: the clip's text broken into cues of two short lines, timed by the words, never overlapping; the WebVTT made from them
 //   * the popup card's place in a frame: inside the safe area, off the captions, off the subject
+//   * the canvas type floor (live pass 3): every line of reading text the film prints is at least 36 design px at the 1080 px short edge (the corner mark, the card's kicker, chips and note,
+//     the phone screen's words, the speaker row, the fine print); a card is offered as variants and never in smaller type; the name is a kicker by drawing only. The browser half of it, over every
+//     family's film, is scripts/film/canvas-fit.mts
 //   * the mux: the timeline in samples, the loudness chain, the encode command line (caps, bitexact, no metadata), and (with ffmpeg) a real normalisation to -14 LUFS
 //   * films.json: the shape, the content-hashed names, the 24 MiB guard
 //   * the words the film prints are the Uncloud voice's (no dash, no exclamation mark) and the disclosures are all there
@@ -18,8 +21,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import type { RuntimeStory } from '../assets/story/runtime.js';
-import { FILM, filmClock, sceneAt, audioPlacements, captionCues, chunkTokens, tokensWithTiming, toVtt, powerForFilm, filmTimeOfTour, formatFor, captionBox, placeForFilm, overCap, CAPTION, cardAlpha } from '../assets/story/film/layout.js';
-import { inter } from '../assets/story/place.js';
+import { FILM, filmClock, sceneAt, audioPlacements, captionCues, chunkTokens, tokensWithTiming, toVtt, powerForFilm, filmTimeOfTour, formatFor, captionBox, badgeBox, placeForFilm, overCap, CAPTION, cardAlpha, canvasCardWidths, canvasCardWidth, canvasVariants } from '../assets/story/film/layout.js';
+import { TYPE, FLOOR, DISC_D, caps } from '../assets/story/film/cards.js';
+import { inter, CANVAS_TYPE_MIN } from '../assets/story/place.js';
 import { mixTimeline, floatWav, normaliseChain, encodeArgs, buildAudio, measure, TARGET, CLIP_RATE } from './film/mux.mts';
 import { filmsProblems, sizeGuard, WEB_MAX_BYTES, webFileName, posterFileName, vttFileName, filmText, loadClaims, namesAgentRuntime, FILM_FILE_RE, type FilmsFile } from './film/lib.mts';
 import shipFilms from './story/ship/films.mts';
@@ -174,12 +178,15 @@ test('the formats: 1920 x 1080 and 1080 x 1920, a portrait film clear of a phone
   for (const f of [l, p, formatFor('16x9', 720)]) {
     const cb = captionBox(f);
     assert.ok(cb.x >= f.safe.left - 1 && cb.x + cb.w <= f.w - f.safe.right + 1 && cb.y + cb.h <= f.h - f.safe.bottom + 1, `${f.key} ${f.res}: the caption strip is inside the safe area`);
+    assert.ok(cb.font >= CANVAS_TYPE_MIN * f.k && cb.tag >= CANVAS_TYPE_MIN * f.k, `${f.key} ${f.res}: the caption and the speaker row are at the floor`);
+    assert.ok(cb.h >= cb.line * CAPTION.maxLines + 2 * cb.pad + cb.tag, `${f.key} ${f.res}: the strip reserves the speaker row of an agent's line`);
+    assert.ok(badgeBox(f, 0).font >= CANVAS_TYPE_MIN * f.k - 1e-9, `${f.key} ${f.res}: the corner mark is at the floor (it was 26)`);
   }
 });
 
 test('the card is placed inside the safe area, off the captions, off the subject', () => {
   for (const key of ['16x9', '9x16'] as const) {
-    const f = formatFor(key), cb = captionBox(f), card = { w: f.portrait ? f.w - f.safe.left - f.safe.right : 620, h: 230 };
+    const f = formatFor(key), cb = captionBox(f), card = { w: f.portrait ? f.w - f.safe.left - f.safe.right : canvasCardWidth(f), h: 330 };
     // a subject at the middle; the card has room all round
     const focus = { x: f.w * 0.4, y: f.h * 0.25, w: f.w * 0.2, h: f.h * 0.12 };
     const pl = placeForFilm(f, { focus, core: null, card });
@@ -193,6 +200,26 @@ test('the card is placed inside the safe area, off the captions, off the subject
   const low = { x: p.w * 0.2, y: cb.y - 420, w: p.w * 0.6, h: 300 };
   const pl = placeForFilm(p, { focus: low, core: null, card });
   assert.equal(pl.alt, 'top'); assert.ok(pl.ok);
+});
+
+test('the canvas floor: a card is offered as variants and never in smaller type; a variant under 36 design px is refused; a card too tall for its room is not ok', () => {
+  assert.equal(FLOOR, 36); assert.equal(CANVAS_TYPE_MIN, 36);
+  assert.ok(TYPE.read >= FLOOR && TYPE.title >= 52 && TYPE.title <= 60 && TYPE.titleHead.every(s => s >= FLOOR) && TYPE.address >= FLOOR && TYPE.tagline >= FLOOR && DISC_D * 1.2 >= FLOOR);
+  for (const key of ['16x9', '9x16'] as const) for (const res of [540, 1080]) {
+    const f = formatFor(key, res), k = f.k, w = f.portrait ? f.w - f.safe.left - f.safe.right : canvasCardWidth(f), focus = { x: f.w * 0.1, y: f.h * 0.3, w: f.w * 0.12, h: f.h * 0.1 };
+    const under = placeForFilm(f, { focus, core: null, card: { w, h: 300 * k }, variants: [{ w, h: 300 * k, type: 28 * k }, { w, h: 340 * k, type: 36 * k, cost: 1 }] });
+    assert.equal(under.variant, 1, `${key} ${res}: a card whose type is 28 is refused`); assert.equal(under.refused, 1);
+    assert.equal(placeForFilm(f, { focus, core: null, card: { w, h: 300 * k }, variants: [{ w, h: 300 * k, type: 28 * k }] }).ok, false, `${key} ${res}: all under the floor`);
+    assert.equal(placeForFilm(f, { focus, core: null, card: { w, h: f.h }, variants: [{ w, h: f.h, type: 36 * k }] }).ok, false, `${key} ${res}: a card as tall as the frame has no room`);
+    // the card's widths are the live card's proportions: a third of the canvas, 18 em of the floor at least
+    assert.ok(canvasCardWidths(f)[0] >= 18 * FLOOR * k - 1 && canvasCardWidths(f)[0] >= 0.32 * f.w - 1);
+  }
+  // the phone screen goes last: variants with it first, the same card without it after, at a higher cost
+  const v = canvasVariants([648, 560], (w, tight, bare) => ({ w, h: 500 - (bare ? 120 : 0) - (tight ? 20 : 0), type: 36 }), { bare: true });
+  assert.equal(v.length, 8); assert.ok(v.slice(0, 4).every(x => !x.size.tag!.includes('bare')) && v.slice(4).every(x => x.size.tag!.includes('bare')) && v[4].size.cost! > v[3].size.cost!);
+  // the name is a kicker by drawing only
+  assert.equal(caps('Mika'), 'MIKA'); assert.equal(caps('The Brennan family'), 'THE BRENNAN FAMILY');
+  const src = fs.readFileSync(new URL('../assets/story/film/layout.ts', import.meta.url), 'utf8').replace(/\/\/[^\n]*/g, ''); assert.ok(!/toUpperCase/.test(src), 'the clock and the cues never uppercase a name');
 });
 
 test('the card fades in and out inside its window', () => {

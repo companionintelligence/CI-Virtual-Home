@@ -14,14 +14,19 @@
 
 export type NamedHome = { id: string; name?: string };
 
-// id → display name, where stripping alone would not do
+// id → display name, where stripping alone would not do. The six apartments (city-one-bed, corner-penthouse, garden-flat, studio-loft,
+// two-bed-flat, walkup-duplex: Companion Intelligence's own, reference/APARTMENTS.md) are pinned although their filed titles are already
+// clean, so a later edit of a spec's title never moves the name a visitor, a link and a search result already know.
 const NAMES: Record<string, string> = {
   'asymmetry': 'Modern Asymmetry House',
   'bgfamily': 'Stone Gable House',          // white siding and grey stone under steep black gables
   'bghouse-olcia': 'Twin Gable House',      // nothing is left of the filed title once the shorthand goes
+  'city-one-bed': 'City One-Bedroom',
+  'corner-penthouse': 'Corner Penthouse',
   'cutestarter': 'Cute Starter Cottage',
   'familyhome': 'Yellow Family Home',       // butter-yellow homestead; a twin of familyhouse-nora's name
   'familyhouse-nora': 'Split-Level Family House',
+  'garden-flat': 'Garden Flat',
   'mediterranean': 'Mediterranean Villa',
   'modernhome-nora': 'Black Tower Modern',  // white box over a carport beside a tall black stair tower
   'modernhouse-nora': 'Modern Pavilion',    // low pavilion under opposing shed roofs
@@ -30,6 +35,9 @@ const NAMES: Record<string, string> = {
   'onestory': 'Blue Dormer Cottage',        // "One-Story House" is a storey and a half
   'palnknoll': 'Palm Knoll',                // "Paln Knoll of Ermosa" reads as a typo to a visitor; palms on a knoll
   'starter18k': 'Grey Starter Cottage',     // a build budget and a bed/bath count
+  'studio-loft': 'Warehouse Loft',          // (reference/APARTMENTS.md: a name no family's words contain)
+  'two-bed-flat': 'Two-Bedroom Flat',
+  'walkup-duplex': 'Walk-up Duplex',
 };
 
 // The shorthand a filed title carries, as whole words: the pack tag, a build budget ("18k"), a bed/bath count ("2/1"),

@@ -7,7 +7,7 @@ a writer may change one if it stays unique. Rooms are the spec's own names (a na
 
 ## The fleet at a glance
 
-- Families with each archetype: organiser 24, builder 22, gamer 7, learner 18, maker 8, host 10.
+- Families with each archetype: organiser 24, builder 22, gamer 7, learner 18, maker 8, host 10, tech-family 0, business-owner 0, creative 0, contractor 0, marketer 0, lawyer 0, journalist 0, educator 0, money-keeper 0, housemate 0, carer 0, community-lead 0, researcher 0, seller 0, translator 0, archivist 0, traveller 0, athlete 0, collector 0, shift-worker 0.
 - Households: solo-or-couple 9, young-family 8, older-kids 9, grandparents 4.
 - Business families: 16 of 30.
 - Narrators: v-bright-f 2, v-clear-f 6, v-deep-m 3, v-light-m 2, v-steady-m 5, v-storyteller-m 4, v-warm-f 6, v-young-f 2.
@@ -16,18 +16,18 @@ a writer may change one if it stays unique. Rooms are the spec's own names (a na
 
 | House id | Display name | Family (slug) | Members | Household | Business | Core room | Signature apps | Beat apps | Flagship |
 |---|---|---|---|---|---|---|---|---|---|
-| `seraphine` | Seraphine | The Brennan family (`brennan`), Wrenfield | Sally 43 organiser; John 45 builder; Steve 16 gamer; Jean 14 learner | older-kids | yes | Library | `ci-hermes` `ci-planning` `nextcloud` `code-server` `open-webui` `steam-headless` `kiwix` | iot: `home-assistant`; food: `yuvomi` | yes |
+| `seraphine` | Seraphine | The Brennan family (`brennan`), Wrenfield | Sally 43 organiser; John 45 builder; Steve 16 gamer; Jean 14 learner | older-kids | yes | Library | `ci-hermes` `ci-planning` `nextcloud` `code-server` `open-webui` `steam-headless` `libretranslate` | iot: `home-assistant`; food: `yuvomi` | yes |
 | `bgfamily` | Stone Gable House | The Brennan family (`brennan-hollin`), Hollin Cross | Sally 43 organiser; John 45 builder; Steve 16 gamer; Jean 14 learner | older-kids | yes | Study | `ci-openclaw` `yuvomi` `libreoffice` `forgejo` `code-server` `steam-headless` `obsidian` | iot: `frigate` | yes |
 | `familyhouse-nora` | Split-Level Family House | The Brennan family (`brennan-merrow`), Merrow Ford | Sally 43 organiser; John 45 builder; Steve 16 gamer; Jean 14 learner | older-kids | yes | Kitchen & Dining | `ci-memory` `joplin` `vaultwarden` `gitea` `code-server` `steam-headless` `ci-spellbook` | iot: `pi-hole`; food: `yuvomi` | yes |
 | `asymmetry` | Modern Asymmetry House | The Adeniran family (`adeniran`), Kestrel Bay | Folake 47 organiser; Kunle 49 builder; Tobi 17 gamer; Ife 15 learner | older-kids | yes | Living | `ci-hermes` `akaunting` `paperless` `gitea` `steam-headless` `anything-llm` `wingfit` | iot: `frigate`; food: `homehub` |  |
 | `mediterranean` | Mediterranean Villa | The Kovacs family (`kovacs`), Ashby Dene | Eszter 49 organiser; Gabor 51 builder; Bence 16 gamer; Reka 13 learner | older-kids | no | Salon | `ci-hermes` `libreoffice` `yuvomi` `jupyterlab` `steam-headless` `obsidian` `pi-hole` |  |  |
 | `epiphany` | Epiphany | The Haddad family (`haddad`), Thistlemere | Dalia 46 organiser; Samir 48 builder; Yasmin 20 learner | older-kids | yes | Den | `ci-openclaw` `twenty` `nextcloud` `forgejo` `open-webui` `wallos` `drawio` | iot: `uptime-kuma`; food: `homehub` |  |
-| `mesamariposa` | Villa Mesa Mariposa | The Iyer family (`iyer`), Tarrow Heights | Meenakshi 45 organiser; Ravi 47 maker; Arjun 15 gamer; Kavya 10 learner | older-kids | yes | Living Room | `ci-hermes` `onlyoffice` `libretranslate` `navidrome` `audiomass` `steam-headless` `kiwix` | iot: `ntfy`; food: `homehub`; privacy: `vaultwarden` |  |
+| `mesamariposa` | Villa Mesa Mariposa | The Iyer family (`iyer`), Tarrow Heights | Meenakshi 45 organiser; Ravi 47 maker; Arjun 15 gamer; Kavya 10 learner | older-kids | yes | Living Room | `ci-hermes` `onlyoffice` `libretranslate` `navidrome` `audiomass` `steam-headless` `razzia` | iot: `ntfy`; food: `homehub`; privacy: `vaultwarden` |  |
 | `mirage` | The Mirage | The Tesfaye family (`tesfaye`), Quillhaven | Hana 49 organiser; Dawit 51 builder; Selam 15 learner; Bruk 19 maker | older-kids | no | Kitchen | `ci-memory` `vikunja` `cryptpad` `gitea` `jupyterlab` `photoprism` `home-assistant` | food: `kitchenowl` |  |
 | `modernhouse1` | Modern Studio House | The Moreau family (`moreau`), Pennard Mill | Claire 46 organiser; Etienne 48 builder; Hugo 17 gamer; Lea 12 learner | older-kids | no | Library Lounge | `ci-hermes` `firefly-iii` `paperless` `forgejo` `steam-headless` `koodo-reader` `blockbench` | iot: `pi-hole`; food: `kitchenowl` |  |
-| `cocoon` | Cocoon | The Quintero family (`quintero`), Corran Hill | Marisol 38 organiser; Andres 40 builder; Camila 10 learner; Mateo 7 maker | young-family | no | Living Room | `ci-hermes` `yuvomi` `uptime-kuma` `pi-hole` `kiwix` `blockbench` `librephotos` |  |  |
+| `cocoon` | Cocoon | The Quintero family (`quintero`), Corran Hill | Marisol 38 organiser; Andres 40 builder; Camila 10 learner; Mateo 7 maker | young-family | no | Living Room | `ci-hermes` `yuvomi` `uptime-kuma` `pi-hole` `linkwarden` `blockbench` `librephotos` |  |  |
 | `modernhome-nora` | Black Tower Modern | The Nguyen family (`nguyen`), Dunmere | Linh 39 organiser; Duc 41 builder; Mai 11 learner; Bao 8 maker | young-family | no | Living Room | `ci-openclaw` `homehub` `vaultwarden` `gitea` `excalidraw` `libretranslate` `pairdrop` | iot: `ntfy` |  |
-| `palnknoll` | Palm Knoll | The Hwang family (`hwang`), Sorrelby | Minjung 40 organiser; Jiho 42 builder; Yuna 8 learner | young-family | no | Living Room | `ci-hermes` `donetick` `bookstack` `forgejo` `kiwix` `frigate` `duplicati` | food: `grocy` |  |
+| `palnknoll` | Palm Knoll | The Hwang family (`hwang`), Sorrelby | Minjung 40 organiser; Jiho 42 builder; Yuna 8 learner | young-family | no | Living Room | `ci-hermes` `donetick` `bookstack` `forgejo` `kokoro` `frigate` `duplicati` | food: `grocy` |  |
 | `gardennook` | Garden Nook | The Kamau family (`kamau`), Orrin Vale | Wanjiru 34 builder; Juma 36 host; Zuri 0 baby | young-family | no | Living Room | `ci-hermes` `hortusfox` `home-assistant` `n8n` `immich` `audiobookshelf` `kitchenowl` | privacy: `duplicati` |  |
 | `lakecabin` | Lake Cabin | The Chaudhry family (`chaudhry`), Halden Water | Noor 36 builder; Imran 38 host; Zara 1 baby | young-family | no | Study | `ci-openclaw` `gitea` `open-webui` `navidrome` `kitchenowl` `frigate` `foldergram` |  |  |
 | `newcrest` | Newcrest House | The Petrov family (`petrov`), Highmoor Cross | Elena 34 organiser; Nikolai 36 host; Mila 1 baby | young-family | no | Kitchen | `ci-memory` `ci-planning` `wallos` `kitchenowl` `home-assistant` `hortusfox` `immich` |  |  |
@@ -35,8 +35,8 @@ a writer may change one if it stays unique. Rooms are the spec's own names (a na
 | `familyhome` | Yellow Family Home | The Whitaker family (`whitaker`), Cobblesby | Hannah 35 organiser; Callum 37 host; Nell 7 learner; Alfie 1 baby | young-family | yes | Living Room | `ci-hermes` `akaunting` `paperless` `kitchenowl` `home-assistant` `koodo-reader` `immich` |  |  |
 | `bghouse-olcia` | Twin Gable House | The Hovsepian family (`hovsepian`), Alderwick | Araxi 67 organiser; Hagop 70 builder; Nare 11 learner | grandparents | yes | Study | `ci-hermes` `kimai` `joplin` `forgejo` `jellyfin` `booklore` `frigate` | food: `yuvomi` |  |
 | `cutestarter` | Cute Starter Cottage | The Nwachukwu family (`nwachukwu`), Pellam Green | Ngozi 67 organiser; Emeka 70 host; Chidi 8 learner | grandparents | no | Living Room | `ci-hermes` `papra` `firefly-iii` `kitchenowl` `hortusfox` `jellyfin` `audiobookshelf` | iot: `frigate`; privacy: `duplicati` |  |
-| `onestory` | Blue Dormer Cottage | The Dekker family (`dekker`), Verrin Park | Willem 71 organiser; Greet 69 host; Joris 10 learner | grandparents | no | Living Room | `ci-memory` `paperless` `monetr` `vaultwarden` `kitchenowl` `hortusfox` `kiwix` | iot: `ntfy` |  |
-| `riverbend` | Riverbend Drive | The Watanabe family (`watanabe`), Ellsworth Green | Yoshiko 67 host; Haruo 70 maker; Emi 38 builder; Kenji 9 learner; Sora 0 baby | grandparents | no | Family Room | `ci-hermes` `homehub` `navidrome` `gitea` `immich` `kiwix` `frigate` |  |  |
+| `onestory` | Blue Dormer Cottage | The Dekker family (`dekker`), Verrin Park | Willem 71 organiser; Greet 69 host; Joris 10 learner | grandparents | no | Living Room | `ci-memory` `paperless` `monetr` `vaultwarden` `kitchenowl` `hortusfox` `audiobookshelf` | iot: `ntfy` |  |
+| `riverbend` | Riverbend Drive | The Watanabe family (`watanabe`), Ellsworth Green | Yoshiko 67 host; Haruo 70 maker; Emi 38 builder; Kenji 9 learner; Sora 0 baby | grandparents | no | Family Room | `ci-hermes` `homehub` `navidrome` `gitea` `immich` `kokoro` `frigate` |  |  |
 | `aurora` | Aurora | The Halvorsen family (`halvorsen`), Linden Reach | Ingrid 38 organiser; Mats 41 builder | solo-or-couple | yes | Study | `ci-openclaw` `twenty` `kimai` `stirling-pdf` `forgejo` `home-assistant` `spliit` | food: `yuvomi` |  |
 | `modernhouse-nora` | Modern Pavilion | The Rahimi family (`rahimi`), Sandover | Parisa 41 organiser; Kian 43 maker | solo-or-couple | yes | Desk Hall | `ci-hermes` `ci-planning` `opnform` `navidrome` `audiomass` `baikal` `vaultwarden` | iot: `ntfy`; food: `homehub` |  |
 | `payorote` | Payorote | The Salazar family (`salazar`), Brindle Cross | Valeria 36 maker; Rafael 38 builder | solo-or-couple | yes | Sleeping Nook & Study | `ci-openclaw` `forgejo` `inkscape` `wordpress` `mazanoke` `home-assistant` `wanderer` | food: `grocy` |  |
@@ -191,3 +191,14 @@ The spec keeps the builders' own room names. These are Sims-era or gendered and 
 - `flowerycottage` (tuala, solo-or-couple, business): Seven day rooms and no bedroom: a studio cottage for two. The Sunroom has the easel and the Study the desk; sleeping is never told. The spec has no bedroom: the stories are daytime only and never show anyone asleep.
 - `valleyview` (gill, solo-or-couple): One bedroom and many lounging rooms: a retired couple who host, with a Reading Lounge and a Kitchen with two islands.
 - `vanilla` (mbatha, solo-or-couple, business): A 24 m2 Greenhouse and a Library with the Core desk: a grower who runs a plant business and a developer.
+
+## Homes without a family
+
+6 homes of the gallery have no family yet. The site shows each with a plain card that opens the player, and a page of its own, and no tour; adding a family means a plan entry above and removing the home from `homesWithoutFamily` in the plan.
+
+- `city-one-bed` (City One-Bedroom): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `corner-penthouse` (Corner Penthouse): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `garden-flat` (Garden Flat): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `studio-loft` (Warehouse Loft): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `two-bed-flat` (Two-Bedroom Flat): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `walkup-duplex` (Walk-up Duplex): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.

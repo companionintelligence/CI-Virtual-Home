@@ -14,8 +14,21 @@ export const MEMBER_ROLES = ['parent', 'partner', 'adult-child', 'teen', 'child'
 export const CHAPTER_KINDS = ['ftue', 'room', 'outside', 'outro'] as const;
 export const COLOURS = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'] as const;
 export const RUNTIMES = ['Hermes', 'OpenClaw'] as const;
-/** The job a member does on the family's one Companion Core (reference/story/personas.md; content/story/personas.json). */
-export const ARCHETYPES = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host'] as const;
+/**
+ * The job a member does on the family's one Companion Core (reference/story/personas.md; content/story/personas.json). The first six are the original cast,
+ * the next eight are story v3, the last twelve are the persona expansion (reference/story/personas/index.md). Which front-page category each belongs to
+ * is content/story/categories.json.
+ */
+export const ARCHETYPES = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host', 'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator', 'money-keeper', 'housemate', 'carer', 'community-lead', 'researcher', 'seller', 'translator', 'archivist', 'traveller', 'athlete', 'collector', 'shift-worker'] as const;
+/** Story v2 (reference/story/story-v2.md): the parts of the day a `family.day` entry can be at, daylight only, in this order. */
+export const DAY_PARTS = ['morning', 'midday', 'afternoon', 'after-school', 'weekend'] as const;
+/**
+ * Story v3 (reference/story/story-v3.md), mirrored by the schema (beat.service.pattern, popup.chips items maxLength) and kept equal by a test:
+ * the shape of a registry service id (content/story/services.json), the longest chip, and the words a pair beat's second chip starts with.
+ */
+export const SERVICE_ID_PATTERN = '^[a-z0-9][a-z0-9-]{1,38}$' as const;
+export const CHIP_MAX_LENGTH = 48 as const;
+export const ALTERNATIVE_CHIP_PREFIX = 'alternative to ' as const;
 
 export type Id = string;
 export type AppId = string;
@@ -30,6 +43,7 @@ export type ChapterKind = (typeof CHAPTER_KINDS)[number];
 export type Colour = (typeof COLOURS)[number];
 export type Runtime = (typeof RUNTIMES)[number];
 export type Archetype = (typeof ARCHETYPES)[number];
+export type DayPart = (typeof DAY_PARTS)[number];
 
 // ---- the authored file: content/families/<slug>.json -------------------------------------------------------------------
 export interface AnchorLeaf { role: RoleId; room?: RoomRole; nth?: number }
@@ -39,8 +53,12 @@ export interface CameraHint { framing?: 'wide' | 'medium' | 'close'; from?: 'fro
 export interface Companion {
   name: string; runtime: Runtime; job: string; personality: [string, string, string]; voice: VoiceKey; memory: boolean; limits: string;
 }
+/** Story v2. Optional on a member: who they are and how they use the Core (at most 45 words, third person, no age). */
+export interface MemberProfile { bio: string }
 export interface Member {
   id: Id; name: string; age: number; role: MemberRole; work?: string; colour: Colour; companion?: Companion;
+  /** Story v2 (optional). */
+  profile?: MemberProfile;
   /** Optional. The persona model (reference/story/personas.md): what this member does on the Core. A member with one is held to the persona rules. */
   archetype?: Archetype;
 }
@@ -48,19 +66,36 @@ export interface Chapter { id: Id; kind: ChapterKind; room?: RoomRole; title: st
 export interface PhoneScreen { header: string; rows: string[] }
 export interface Popup { kind?: 'card' | 'phone'; title: string; body: string; chips?: string[]; note?: string; phone?: PhoneScreen }
 export interface Say { speaker: Id; text: string }
+/**
+ * Story v2 (optional, reference/story/story-v2.md): what a visitor who stays opens up. All four are present when `detail` is.
+ * before and after at most 28 words each, steps 2 to 4 items of at most 12 words, fact at most 28 words. The popup (the narration) is untouched.
+ */
+export interface BeatDetail { before: string; after: string; steps: string[]; fact: string }
 export interface Beat {
   id: Id; chapter: Id; member?: Id; agent?: Id; approval?: Id;
   category: Category; segment: Segment;
   app?: { id: AppId; replaces: string[] }; with?: AppId[]; capability?: string;
+  /** Story v3 (optional): the id of the replaced service this beat's app is the alternative to. A story with one is a v3 story (isV3Story). */
+  service?: string;
   anchor: AnchorRef; camera?: CameraHint;
   popup: Popup; say?: Say;
+  /** Story v2 (optional). */
+  detail?: BeatDetail;
   emphasis?: { ring?: boolean; wake?: boolean };
   film?: boolean; minSeconds?: number;
 }
 export interface Closing { body: string; cta: { label: string; url: 'https://ci.computer/core' } }
+/** Story v2: a room of the house and one line about it. `room` is an exact room name of the house; the line is at most 16 words. */
+export interface HomeSpot { room: string; line: string }
+/** Story v2 (optional): the house told true to its spec. `lede` at most 50 words, 2 to 5 spots. */
+export interface FamilyHome { lede: string; spots: HomeSpot[] }
+/** Story v2 (optional): one entry of a day in the house, 5 to 10 in time order; `beat` is an existing beat id, `line` at most 14 words. */
+export interface DayEntry { at: DayPart; beat: Id; line: string }
 export interface FamilyInfo {
   surname: string; tagline: string; household: Household; business: boolean; story: string;
   address: { line: string; place: string }; narrator: VoiceKey;
+  /** Story v2 (optional). */
+  home?: FamilyHome; day?: DayEntry[];
 }
 export interface Story {
   schema: 'family/v1'; slug: string; house: Id; fictional: true;

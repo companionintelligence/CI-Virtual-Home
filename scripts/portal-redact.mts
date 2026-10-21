@@ -18,7 +18,9 @@
 // licence) and reports any of:
 //
 //   - a builder handle: the `author` of every spec in content/houses/ (and of index.json), read from the files, never listed
-//     here, matched case-insensitively; plus the handle's letters alone when that is six or more ("Schnuck01" is also "schnuck")
+//     here, matched case-insensitively; plus the handle's letters alone when that is six or more ("Schnuck01" is also "schnuck").
+//     The one exception is the company's own name (scripts/own-authors.mts): a home Companion Intelligence wrote itself is credited
+//     to it, and it is on every page, so it is not a builder. That is not an allowlist entry (GUARD_ALLOW stays empty)
 //   - the word "Sims" (capitalised, as a word: not the lower-case identifiers a program uses), "SimsTree", "The Sims", "Sims 4"
 //   - "Base Game" / "Basegame" (the pack tag a filed title carries)
 //   - "BG " (that tag's abbreviation), as a word
@@ -29,6 +31,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { displayName } from '../assets/home-names.js';
+import { isOwnAuthor } from './own-authors.mts';
 
 // ---------------------------------------------------------------------------------------------------- redaction
 
@@ -72,11 +75,14 @@ export function redactIndex(index: any): any {
 
 // ---------------------------------------------------------------------------------------------------- the guard
 
-/** The builder handles: the `author` of every spec file in content/houses/ and of the list, read from the files. */
+/**
+ * The builder handles: the `author` of every spec file in content/houses/ and of the list, read from the files. The company's own name
+ * (scripts/own-authors.mts: the apartments, which Companion Intelligence wrote itself) is not a handle: it is on every page of the site.
+ */
 export function builderHandles(root: string): string[] {
   const dir = path.join(root, 'content', 'houses');
   const found = new Set<string>();
-  const add = (v: unknown): void => { if (typeof v === 'string' && v.trim()) found.add(v.trim()); };
+  const add = (v: unknown): void => { if (typeof v === 'string' && v.trim() && !isOwnAuthor(v)) found.add(v.trim()); };
   for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
     if (!f.endsWith('.json') || f.endsWith('.plan.json')) continue;
     const j = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));

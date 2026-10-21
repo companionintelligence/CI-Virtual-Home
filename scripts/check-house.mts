@@ -16,7 +16,7 @@
 //
 //   0. assets     build-house-assets.mts    — compiles assets/*.ts (the three.js engine) to the .js
 //                                             room-creator.html's browser-native ES modules actually load
-//   1. specs      validate-house-spec.mts   — 30 HouseSpecs against the schema, the catalog and the registry
+//   1. specs      validate-house-spec.mts   — every HouseSpec (36) against the schema, the catalog and the registry
 //   2. shots      render-house-shots.mts    — camera paths through walls, floors, furniture, and the Core kept
 //                                             in frame through its orbits; and the scene gate: dressing,
 //                                             clashes, planting. Again on planner v2 (shots:v2: QA v2 on its three films)
