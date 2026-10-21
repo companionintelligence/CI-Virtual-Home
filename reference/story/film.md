@@ -13,12 +13,15 @@ pnpm run story:film -- <slug> --master               # also keep the CRF 18 mast
 pnpm run story:film -- <slug> --res 540              # the same picture at a quarter of the cost, to look at
 pnpm run story:film -- <slug> --stills <dir>         # single frames (title, each film beat, end card) + the card placements, no film
 pnpm run story:film -- <slug> --dry-run              # the sound, the captions and the timeline only (no GPU)
+pnpm run story:film -- <slug> --silent               # a captioned film with no sound (no voice lock needed; see Silent mode)
+pnpm run story:film -- <slug> --probe                # 3 s of the first film beats at 540 p: seconds a frame, the renderer, a projected time (see The probe)
+pnpm run story:film -- <slug> --gl software          # the repo's SwiftShader flags (the CPU: hours a film); the default is the machine's GPU (see The GPU)
 pnpm run story:film -- --all --jobs 1 --force        # --jobs is families at once in ONE browser; keep it at 1 on a shared machine
 ```
 
 A family can be filmed once it has `content/families/<slug>.json`, `.voice.json` (`pnpm run story:voice`) and `.bake.json` (`pnpm run story:bake`), the bake made
-from that voice lock. The film refuses estimated durations. One GPU process of its own, `--jobs 1`; it retries a family once on a fresh page after a
-timeout or a browser crash.
+from that voice lock. A film with sound refuses estimated durations. A family with **no voice lock** is filmed **silent** on its own, with a notice (next section); `--silent` asks for it.
+One GPU process of its own, `--jobs 1`; it retries a family once on a fresh page after a timeout or a browser crash.
 
 ## What a film is
 
@@ -71,18 +74,67 @@ bottom margin too (the portrait panel used to take a third of the band); a layou
 (*Companion OS, Companion Memory and Companion Agents are in beta.*); scripted scenes; the Core drawn as a stylised illustration; the synthetic, locally generated voice; and, only when a film beat names an
 agent, *Hermes is from Nous Research. OpenClaw is from the OpenClaw Foundation. Companion Hub packages both.* No price, no ship date, no performance number, no customer quote.
 
+## Silent mode
+
+`--silent` makes the same film without a voice: **captioned, no audio stream**. It is the way to film a family before Kokoro is installed (the voice is a 3 GB model download that is the owner's to approve),
+and it is what `story:film` does on its own, with a printed notice, for a family that has no `<slug>.voice.json`. A family with a voice lock is filmed with sound unless `--silent` says otherwise.
+
+* **Inputs.** `content/families/<slug>.json` and `.bake.json` only. A bake lock with `durations: "estimated"` is accepted **only** here: a film with sound still refuses it
+  (`filmClock` throws "the film needs the recorded voice" unless it is given `{ silent: true }`).
+* **The clock and the captions.** `silentStory(rs)` (`assets/story/film/layout.ts`) gives every line the film captions (each beat's narration, an agent's line, the closing) a length of the estimate the bake used
+  (`estimateMs`, 150 words a minute, the same function `runtime.ts` joins the lock with) and no word timings, so `captionCues` shares each clip's length among its words by their size and the karaoke highlight runs
+  across the estimated clip. A beat's own offsets (`speechAt`, `sayAt`) are the bake's. A clip the lock really recorded is kept: a voiced bake can be filmed silent and the picture is then timed by the real voice.
+  The page (`index.ts`) and the script both call `silentStory`, a pure function, so they agree on the clock.
+* **Captions are burned in** exactly as in a voiced film, and the WebVTT is written from the same cues (`captions.<hash10>.vtt`), so the open item below ("`<track>` should not be `default`") applies unchanged.
+* **No sound, no sound gates.** The encode has one input and `-an` (no audio stream at all). The gates that stay are the picture's: `ffprobe` (exactly one H.264 `yuv420p` stream, the right size, 30 fps, exactly the
+  frames the clock says, the length within 0.15 s of the clock and at most 110 s), `freezedetect`, and the 24 MiB size guard. The AAC, silence (dead air) and loudness gates are skipped.
+* **Caption legibility** (the "painted-pixel type audit" the ad kit uses is already the film's): every frame's overlay is audited as it is drawn and the render fails if the smallest type painted is under the 36 design px
+  floor (`typeAudit`, the captions included). On top of it `captionProblems` (`scripts/film/lib.mts`) checks the cues before any pixel is drawn: none ends after the film, none overlaps the one before, none holds a three-word line
+  for under 1.5 s, and the reading speed (characters a second) is a warning above 21 and an error above 30. At the estimate's 150 words a minute a caption needs about 13 characters a second, so this is the check that
+  the estimate is a slow enough clock to read by. `--dry-run` prints the maximum.
+* **The end card** carries every disclosure it carries today except the synthetic-voice line: claims.json places that on the end card of a film with narration, and saying a voice was generated under a silent film would be false.
+  (The words are claims.json's, read through `filmText(rs, claims, { silent: true })`.)
+* **films.json** records `"sound": false` for the entry and **no `loudness`** on its aspects (`filmsProblems` enforces both; an entry with no `sound` is a film with sound, as before). The web file is
+  `<slug>.<aspect>.silent.<hash10>.mp4`, so a silent film and a voiced film of one family never share a file name and one can never overwrite the other (the gates' report is `<slug>.<aspect>.silent.report.json`, a rejected
+  one lands in `rejected/` under the same name). `inputsSha` includes a "silent" marker, so a family that gets its voice later is stale, and `story:film` renders it with sound. films.json holds one entry a family: the voiced film replaces the silent one.
+* **The ship step** (`scripts/story/ship/films.mts`) is unchanged in what it does: it links `FILM_BASE_URL/<file>` for each aspect, the poster and the captions, checks `filmsProblems`, and compares `inputsSha` with the right mode
+  (`loadFamily(slug, { silent: entry.sound === false })`). A silent film is still a film.
+
+## The GPU
+
+`story:film` used to launch Chromium with the repo's Linux flags, which are SwiftShader (software GL on the CPU: hours a film). It now takes the ad-cut renderer's choice (`glArgs`, `glMode` and `chromiumFor` of
+`scripts/film/ads-lib.mts`, the same helpers `scripts/render-persona-cuts.mts` uses): **`--gl default`** (the default, or `FILM_GL=default`) lets ANGLE pick the machine's own GPU (the Intel iGPU here), **`--gl software`**
+is the repo's own SwiftShader flags. Never `--use-angle=vulkan` (blank frames on the NVIDIA here). The page's WebGL renderer string is printed; under `--gl default` a string that says `swiftshader`, `llvmpipe` or `software`
+is a warning (the GPU path fell back to the CPU: this will be slow). **A blank first frame stops the render**: the page reports the luma spread of the room before the overlay is drawn (`stats()`, as the cut renderer
+does), a first or last frame under `BLANK_STD` fails the film at once, and more than 5 percent blank frames fail it at the end, because the overlay alone would make a flat picture look like a film. When Playwright's own Chromium is
+not installed the newest one in `$PLAYWRIGHT_BROWSERS_PATH` (or `~/.cache/ms-playwright`) is used. A different GPU draws different pixels, so a film is a picture made on one machine profile, not a golden (Determinism, below).
+`scripts/story-bake.mts` has its own flag (its `--stills` path); this one is the film's.
+
+## The camera gate
+
+A film is rendered only from a family whose tour passes `pnpm run story:spline` ([spline.md](spline.md)): `story:film` grades the family's bake lock first (about 70 ms, no browser) and stops with the first failing rules and their beat ids.
+`--no-spline-gate` renders anyway; `--stills`, `--dry-run` and `--probe` are exempt, so a failing camera can still be looked at.
+
+## The probe
+
+`pnpm run story:film -- <slug> --probe [seconds]` measures instead of guessing. It renders N seconds (default 3) from the first film beat and 1.5 s of the title card at `--res` (default **540**), encodes the beats to a silent mp4,
+then repeats a short run (18 frames of each) at 1080 p, and prints the seconds a frame in the rooms and on the title card (the exterior is a different cost), the renderer string, and a projected time for the full 1080 p
+two-aspect film: the film's rooms and title/end-card frames, each at its measured cost, plus one house build and a composer warm-up per aspect. Output goes to `$CI_FILM_PROBE_OUT` (default `video/families/probe/`):
+`<slug>.probe.<aspect>.r540[.silent].mp4`, the first and last frame as JPEG, and `<slug>.probe.json`. It writes nothing to `content/families`. The numbers are the machine's at that moment (other sessions share the GPU): read them with the load average
+in the JSON, take the median of a few runs, and treat the projection as an estimate with that spread.
+
 ## Files
 
 ```
-assets/story/film/layout.ts    the clock, the audio placements, the caption cues and WebVTT, the two frames, the canvas card placement (`placeCanvasCard`, the one the ad cuts share). Pure: Node tests it
+assets/story/film/layout.ts    the clock, `silentStory`, the audio placements, the caption cues and WebVTT, the two frames, the canvas card placement (`placeCanvasCard`, the one the ad cuts share). Pure: Node tests it
 assets/story/film/cards.ts     Canvas2D: the type table (`TYPE`, `FLOOR`), the name kicker, the type audit, the popup card, the phone screen, the title card, the end card
 assets/story/film/overlay.ts   Canvas2D: the corner mark, the karaoke caption, the leader, the dip
 assets/story/film/index.ts     the page module: registers the film as a shot preset (frameAt over film seconds), draws frame i, returns a JPEG
-scripts/render-family-film.mts the CLI
-scripts/film/{lib,mux,qa}.mts  families and films.json / the sound and the encode / the gates
+scripts/render-family-film.mts the CLI: `--silent`, `--gl`, `--probe`
+scripts/film/{lib,mux,qa}.mts  families and films.json (and the silent caption checks) / the sound and the encode (silent: no audio) / the gates (silent: the picture's only)
 scripts/film/canvas-fit.mts    the type floor and the fit of every family's film and ad cuts (browser, no house, no GPU): `node --experimental-strip-types scripts/film/canvas-fit.mts`
 scripts/story/ship/films.mts   the site build's step: registers posters and captions, links the hosted films
-scripts/test-film.mts          19 tests, no GPU (the sound test needs ffmpeg and skips without it)
+scripts/test-film.mts          28 tests, no GPU (the sound and silent-encode tests need ffmpeg and skip without it)
 scripts/film-bookends.mts      optional CI-Common bookends (off; see below)
 ```
 
@@ -91,11 +143,12 @@ Outputs:
 | Where | What | In git |
 |---|---|---|
 | `video/families/web/<slug>.<aspect>.<hash10>.mp4` | the web film: H.264 High, CRF 28, `maxrate 1500k`, `bufsize 3000k`, `+faststart`, AAC 64k mono, content-hashed name | no (gitignored like `video/houses`) |
+| `video/families/web/<slug>.<aspect>.silent.<hash10>.mp4` | the same with no audio stream (silent mode) | no |
 | `video/families/master/<slug>.<aspect>.mp4` | with `--master`: CRF 18, AAC 128k stereo | no |
-| `video/families/<slug>.<aspect>.report.json` | the gates' numbers, the card placements, the clip offsets, the wall time | no |
+| `video/families/<slug>.<aspect>[.silent].report.json` | the gates' numbers, the card placements, the clip offsets, the wall time | no |
 | `content/families/<slug>/film/poster.<hash10>.jpg`, `poster-9x16.<hash10>.jpg` | the posters (the title card at 3.2 s; 1280 and 720 px wide) | yes |
 | `content/families/<slug>/film/captions.<hash10>.vtt` | WebVTT, one file for both shapes | yes |
-| `content/families/films.json` | per family: duration, `inputsSha`, the vtt, and per aspect the file name, sha256, bytes, size, duration, poster, loudness | yes |
+| `content/families/films.json` | per family: `sound`, duration, `inputsSha`, the vtt, and per aspect the file name, sha256, bytes, size, duration, poster, loudness (none for a silent film) | yes |
 
 `films.json` keeps no timestamps and no absolute paths. `inputsSha` hashes the story, voice lock and bake lock files, the film code and `claims.json`, and the frame size: a changed
 input makes the film stale, and `story:film` renders only the stale ones (`--force` renders anyway). The site build warns when a film is older than its story.

@@ -13,6 +13,7 @@
 //
 // Nothing here reads a clock or a file: the film is a pure function of the runtime story. Owner: video-tool.
 import type { RuntimeStory, RuntimeBeat, RuntimeClip } from '../runtime.js';
+import { estimateMs } from '../runtime.js';
 import { FILM_PAD_S } from '../track.js';
 import { placePopup, inter, CANVAS_TYPE_MIN, type Rect, type PlaceOut } from '../place.js';
 
@@ -87,9 +88,26 @@ export function closingSeconds(rs: RuntimeStory): number {
   return c.durationMs / 1000;
 }
 
-export function filmClock(rs: RuntimeStory, o: { fps?: number } = {}): FilmClock {
+/**
+ * SILENT MODE. A silent film has no recorded voice, so its clock and its karaoke captions are timed by the same estimate the bake used for a lock with estimated durations
+ * (runtime.ts: 150 words a minute). `silentStory` hands back the story with a clip entry for every line the film captions (each beat's narration, an agent's line, the closing),
+ * the length of each being that estimate and its word timings left empty (captionCues then shares the clip's length among its words by their size). It adds nothing else: a beat's
+ * speechAt / sayAt are the bake's own. A clip the lock really recorded is kept as it is (a voiced bake can be filmed silent: the picture is then timed by the real voice).
+ * The result is still `durations: 'estimated'` when the bake was; `filmClock` accepts that only with `{ silent: true }`, and a voiced film still refuses it.
+ */
+export function silentStory(rs: RuntimeStory): RuntimeStory {
+  const audio = { ...rs.audio }, fake = (text: string, speaker: string): RuntimeClip => ({ file: '', sha256: '', bytes: 0, durationMs: estimateMs(text), words: [], voice: 'none', speaker });
+  for (const b of rs.beats) {
+    if (!audio[b.id]) audio[b.id] = fake(b.popup.body, 'narrator');
+    if (b.say && !audio[`${b.id}.say`]) audio[`${b.id}.say`] = fake(b.say.text, b.say.speaker);
+  }
+  if (!audio.closing) audio.closing = fake(`${rs.closing.body} UnCloud your life.`, 'narrator');
+  return { ...rs, audio };
+}
+
+export function filmClock(rs: RuntimeStory, o: { fps?: number; silent?: boolean } = {}): FilmClock {
   const fps = o.fps ?? FILM.fps;
-  if (rs.durations !== 'voice') throw new Error(`${rs.slug}: the film needs the recorded voice, and the bake used estimated durations (pnpm run story:voice -- ${rs.slug}; pnpm run story:bake -- ${rs.slug})`);
+  if (rs.durations !== 'voice' && !o.silent) throw new Error(`${rs.slug}: the film needs the recorded voice, and the bake used estimated durations (pnpm run story:voice -- ${rs.slug}; pnpm run story:bake -- ${rs.slug})`);
   if (!rs.film.parts.length) throw new Error(`${rs.slug}: no beat is flagged "film": true`);
   const first = FILM.titleS + FILM.padS;
   // Each part is the tour's beat from where the film cuts in to FILM.tailS after its last word: the tour holds a beat for its reading time, its

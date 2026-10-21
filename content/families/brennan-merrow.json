@@ -398,9 +398,9 @@
         ]
       },
       "camera": {
-        "framing": "medium",
-        "from": "left",
-        "side": "right"
+        "framing": "close",
+        "from": "front",
+        "side": "left"
       },
       "popup": {
         "title": "Thursday survives the sleeve",
@@ -494,7 +494,7 @@
         ]
       },
       "camera": {
-        "framing": "medium",
+        "framing": "close",
         "from": "front",
         "side": "left"
       },
@@ -539,7 +539,7 @@
       "camera": {
         "framing": "medium",
         "from": "front",
-        "side": "right"
+        "side": "left"
       },
       "popup": {
         "title": "The homework site comes back",
@@ -687,7 +687,7 @@
       },
       "camera": {
         "framing": "wide",
-        "from": "front",
+        "from": "left",
         "side": "right"
       },
       "popup": {
@@ -772,20 +772,25 @@
       "service": "apple-books",
       "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
       "anchor": {
-        "role": "bookshelf",
+        "role": "desk",
         "room": "kids",
         "nth": 0,
         "fallback": [
           {
+            "role": "bookshelf",
+            "room": "kids",
+            "nth": 2
+          },
+          {
             "role": "room",
             "room": "kids",
-            "nth": 0
+            "nth": 1
           }
         ]
       },
       "camera": {
-        "framing": "medium",
-        "from": "front",
+        "framing": "close",
+        "from": "behind",
         "side": "left"
       },
       "popup": {
@@ -883,7 +888,8 @@
         ]
       },
       "camera": {
-        "framing": "medium",
+        "framing": "close",
+        "from": "left",
         "side": "left"
       },
       "popup": {
@@ -1036,7 +1042,7 @@
       },
       "camera": {
         "framing": "wide",
-        "from": "left",
+        "from": "behind",
         "side": "auto"
       },
       "popup": {
@@ -1116,8 +1122,13 @@
       "service": "github",
       "capability": "host private Git repositories, pull requests and issues on your Core",
       "anchor": {
-        "role": "room",
-        "room": "garage"
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
       },
       "camera": {
         "framing": "close",
@@ -1158,12 +1169,17 @@
       },
       "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
       "anchor": {
-        "role": "room",
-        "room": "garage"
+        "role": "laundry",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
       },
       "camera": {
-        "framing": "wide",
-        "from": "behind",
+        "framing": "close",
+        "from": "front",
         "side": "auto"
       },
       "popup": {
@@ -1204,12 +1220,17 @@
       "service": "carbonite",
       "capability": "back up your files with encryption before they leave your Core",
       "anchor": {
-        "role": "room",
-        "room": "garage"
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
       },
       "camera": {
         "framing": "medium",
-        "from": "right",
+        "from": "front",
         "side": "left"
       },
       "popup": {
@@ -1256,8 +1277,8 @@
         ]
       },
       "camera": {
-        "framing": "wide",
-        "from": "behind",
+        "framing": "medium",
+        "from": "front",
         "side": "left"
       },
       "popup": {
@@ -1381,8 +1402,8 @@
       },
       "camera": {
         "framing": "wide",
-        "from": "front",
-        "eye": "aerial"
+        "eye": "aerial",
+        "from": "left"
       },
       "popup": {
         "title": "One Core, four different days",

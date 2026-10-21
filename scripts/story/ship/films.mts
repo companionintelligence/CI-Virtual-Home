@@ -7,6 +7,7 @@
 //   the films themselves are NOT copied: about 1 GB for sixty of them, over Cloudflare Pages' 25 MiB per file, and CI has no GPU or LFS to make them.
 //   They live at FILM_BASE_URL (R2 or Stream: the owner's choice), under the content-hashed names films.json records:
 //                                              $FILM_BASE_URL/<slug>.<aspect>.<hash10>.mp4                                    -> manifest film.src169, film.src916
+// A silent film (`sound: false` in films.json: captioned, no audio stream; its file is <slug>.<aspect>.silent.<hash10>.mp4) is a film like any other here.
 // The family page shows its film only when the manifest has a source for it, so a family with no entry in content/families/films.json, or a
 // build with FILM_BASE_URL unset, simply has no film button.
 //
@@ -50,7 +51,7 @@ export default async function shipFilms(ctx: FilmShipCtx): Promise<void> {
     if (!ship(e.vtt, 'film.vtt') || !(a169 ? ship(a169.poster, 'film.poster') : true)) continue;
     // is the film still the film of this story? Warn, do not fail: the film is hosted elsewhere and a copy edit should not stop a site build
     try {
-      const fam = await loadFamily(slug);
+      const fam = await loadFamily(slug, { silent: e.sound === false });     // (a silent film is compared with its own inputs: the bake lock, no voice)
       if (inputsShaOf(fam, a169 ? a169.height : 1080) !== e.inputsSha) console.log(`films: ${slug}: the film is older than its story, voice, bake or the film code (pnpm run story:film -- ${slug})`);
     } catch (err: any) { console.log(`films: ${slug}: cannot check freshness: ${err.message}`); }
     if (a169) ctx.register(slug, 'film.src169', `${base}/${a169.file}`);

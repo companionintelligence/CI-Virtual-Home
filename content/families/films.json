@@ -1,4 +1,83 @@
 {
   "v": 1,
-  "families": {}
+  "families": {
+    "brennan": {
+      "sound": false,
+      "durationMs": 104500,
+      "inputsSha": "4e1b69a03c59583359b770b0888c9a4b365a71067f8cf75fb6b1cbc42fa45cbc",
+      "vtt": "film/captions.758409b988.vtt",
+      "aspects": {
+        "16x9": {
+          "file": "brennan.16x9.silent.e584ca7dbf.mp4",
+          "sha256": "e584ca7dbfdbec34e54e419c2970e8865e4183e8126c530c8cd039fa9d12be3e",
+          "bytes": 17675533,
+          "width": 1920,
+          "height": 1080,
+          "durationMs": 104500,
+          "poster": "film/poster.f58c16113d.jpg"
+        },
+        "9x16": {
+          "file": "brennan.9x16.silent.39bde7048f.mp4",
+          "sha256": "39bde7048f54c87bd37b29af24d92563a19b024efdb598e8483a666aa32be6c3",
+          "bytes": 17254924,
+          "width": 1080,
+          "height": 1920,
+          "durationMs": 104500,
+          "poster": "film/poster-9x16.a12430ba00.jpg"
+        }
+      }
+    },
+    "brennan-hollin": {
+      "sound": false,
+      "durationMs": 106067,
+      "inputsSha": "e17ce1d4d5a750eaf7465cc12dc9a7d78f4f01beace5a3d045aaa0c181959dfe",
+      "vtt": "film/captions.6588d764d2.vtt",
+      "aspects": {
+        "16x9": {
+          "file": "brennan-hollin.16x9.silent.c24c3cd16f.mp4",
+          "sha256": "c24c3cd16fb9b7bcdb11a661fbf48071140916f06c0f2c0e5a1d00ce84a7e8d9",
+          "bytes": 15783728,
+          "width": 1920,
+          "height": 1080,
+          "durationMs": 106067,
+          "poster": "film/poster.b04394e7f6.jpg"
+        },
+        "9x16": {
+          "file": "brennan-hollin.9x16.silent.5b760e3e38.mp4",
+          "sha256": "5b760e3e38bfc21dd7f66d179ce123ccd9a727fc2cce5b3d92ff47a695e8c141",
+          "bytes": 14637457,
+          "width": 1080,
+          "height": 1920,
+          "durationMs": 106067,
+          "poster": "film/poster-9x16.2688b1d3fa.jpg"
+        }
+      }
+    },
+    "brennan-merrow": {
+      "sound": false,
+      "durationMs": 106567,
+      "inputsSha": "462c94816d13051d3a032852a34659b227307982a5c1a13782fcfdd639ea6428",
+      "vtt": "film/captions.f548bdd39a.vtt",
+      "aspects": {
+        "16x9": {
+          "file": "brennan-merrow.16x9.silent.d6e1f12f10.mp4",
+          "sha256": "d6e1f12f105549a138582574efe62ea7c144a387aacf5d7458d3035753f26a3e",
+          "bytes": 15809096,
+          "width": 1920,
+          "height": 1080,
+          "durationMs": 106567,
+          "poster": "film/poster.e31e0d701c.jpg"
+        },
+        "9x16": {
+          "file": "brennan-merrow.9x16.silent.4be001e795.mp4",
+          "sha256": "4be001e795989c79d93751143f8172e649ad347d52cb95ae403a68d59606cf2a",
+          "bytes": 15285086,
+          "width": 1080,
+          "height": 1920,
+          "durationMs": 106567,
+          "poster": "film/poster-9x16.c599640d5f.jpg"
+        }
+      }
+    }
+  }
 }
