@@ -8,7 +8,9 @@
 //
 // THE RESCUE LADDER. The planner's navigation grid (assets/shot-nav.ts) is a person's: it reads the digest's boxes at eye height, and the digest
 // draws an arched doorway as the arch's bounding boxes (the spandrel from the springline up: a box whose underside is 1.4 to 1.5 m over the floor),
-// a bed as its hull (1.35 m, the whole width of a narrow room) and a spiral stair as one column in the middle of a blocked footprint. A walk that
+// a bed as its hull (1.35 m, the whole width of a narrow room) and a spiral stair as one column in the middle of a blocked footprint. (Of the first, the digest
+// now starts the spandrels of a partition's arch at the crown, `archRise` in assets/features.ts, so the planner's grid has those doorways itself; the ladder is for
+// a header over a door, an arched head in a facade wall and a digest made before that.) A walk that
 // fails on that grid is retried, and only then, on a walker's grid built from the same boxes (`walkGrid`): rung 1 opens the doorways (a header over a
 // door is not a wall at the camera's eye) and climbs a spiral round its column the way the planner's own film does; rung 2 also lets the eye pass
 // over a hard piece up to 1.4 m tall (the eye is 1.55 m up). A walk that works on the planner's grid is never touched: the first rung is exactly
@@ -58,7 +60,7 @@ const rectDist = (x: number, z: number, b0: number, b2: number, b3: number, b5: 
 const walkGrids = new WeakMap<object, Map<string, Grid>>();
 
 /** The planner's grid of a storey with its doorways opened. A doorway of the plan's partitions (`nav.doorsOn`) is a gap `w` wide in a wall; the digest draws what
- *  closes it over the gap as boxes whose underside is at least 1.2 m over the floor (an arch's spandrels, a header: 1.4 to 1.5 m up) and the planner's grid, which reads the
+ *  closes it over the gap as boxes whose underside is at least 1.2 m over the floor (a header; an arch's spandrels before `archRise`: 1.4 to 1.5 m up) and the planner's grid, which reads the
  *  band 1.2 to 1.8 m, takes them for wall. Here the wall distance of the cells in and in front of the gap is taken again from the wall boxes without them, so the jambs
  *  (and any wall that really stands in the gap) are the only walls left. Nothing outside the doorways changes.
  *  Rung 2 also reads the furniture again: a piece whose top is under PASS_OVER_M is soft (the first three tiers avoid it, the last two walk over it).
@@ -229,16 +231,52 @@ export function flightsBetween(stairs: PoseCtx['world']['stairs'], a: string, b:
   return out;
 }
 
+// ---- a walk through something solid -------------------------------------------------------------------------------------------------------------
+/** the plan boxes of a storey that a standing eye cannot be inside: walls, glass and rails meeting the eye band (1.2 to 1.8 m over the floor) and furniture and fixtures meeting 1.1 to 2.0 m (the
+ *  planner grid's own hard band, assets/shot-nav.ts; lower pieces are soft and the eye passes over a sofa). [x0, z0, x1, z1] each; cached per nav and storey. */
+const hardBoxes = new WeakMap<object, Map<string, number[]>>();
+function hardOn(ctx: PoseCtx, level: string): number[] {
+  const { nav, world } = ctx;
+  let m = hardBoxes.get(nav); if (!m) hardBoxes.set(nav, m = new Map());
+  const hit = m.get(level); if (hit) return hit;
+  const y = nav.levelOf(level).y, B = world.boxes, out: number[] = [];
+  for (let n = 0; n < world.kinds.length; n++) {
+    const k = world.kinds[n], y0 = B[6 * n + 1], y1 = B[6 * n + 4];
+    if ((WALL_KINDS.has(k) && y1 >= y + 1.2 && y0 <= y + 1.8) || (ITEM_KINDS.has(k) && y1 >= y + 1.1 && y0 <= y + 2.0)) out.push(B[6 * n], B[6 * n + 2], B[6 * n + 3], B[6 * n + 5]);
+  }
+  m.set(level, out);
+  return out;
+}
+/** does a stretch of the walk (a walk on a storey, not a flight and not the lot) go more than 2 cm into a hard box of that storey? Sampled every 5 cm. */
+export function crossesSolid(ctx: PoseCtx, r: Route): boolean {
+  const IN = 0.02;
+  for (let i = 1; i < r.pts.length; i++) {
+    const lv = r.levels[i];
+    if (lv === null || lv !== r.levels[i - 1] || r.mode[i] !== 'walk' || r.mode[i - 1] !== 'walk') continue;
+    const bx = hardOn(ctx, lv), a = r.pts[i - 1], b = r.pts[i], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[2] - a[2]) / 0.05));
+    for (let k = 0; k <= n; k++) {
+      const x = a[0] + (b[0] - a[0]) * k / n, z = a[2] + (b[2] - a[2]) * k / n;
+      for (let q = 0; q < bx.length; q += 4) if (x > bx[q] + IN && x < bx[q + 2] - IN && z > bx[q + 1] + IN && z < bx[q + 3] - IN) return true;
+    }
+  }
+  return false;
+}
+
 /** The walk from one standing to the next. The planner's grid first, exactly as the router always did; when that gives no walk, or one over MAX_ROUTE_M, the rungs of the
  *  rescue ladder in turn (see the top of the file). The first walk within the cap wins; when none is, the last rung's reason is the answer (what is still in the way once the doorways are open). */
 export function routeBetween(ctx: PoseCtx, a: Standing, b: Standing): Route | NoRoute {
   const plain = attempt(ctx, a, b, 0);
-  if (!failed(plain)) return plain;
-  let last: NoRoute = plain;
+  // (A planner walk that goes through a wall or a hard piece of furniture is no walk. The planner's leg checks its string-pulled segments, but when an end is not itself passable, a pose over a sofa,
+  //  it routes to the nearest cell that is and then walks to the true end in a straight line nobody checked. That hop stayed hidden while the planner could not reach the doorway the walk goes
+  //  through, because such a walk was rescued; with the arched doorways open in the digest the planner reaches them, and the hop runs through the plant beside one. The ladder is asked instead,
+  //  whose first answer already asks for a tier at which both ends are passable; if it has nothing better, the planner's walk stands as it always did.)
+  if (!failed(plain) && !crossesSolid(ctx, plain)) return plain;
+  let last: NoRoute = failed(plain) ? plain : { ok: false, reason: 'the planner\'s walk goes through something solid' };
   for (const rung of [1, 2]) {
     const r = attempt(ctx, a, b, rung);
     if (failed(r)) last = r; else return { ...r, rescued: rung };
   }
+  if (!failed(plain)) return plain;
   // (a cut for length, or an entry above the ground, is the same whatever the grid: its reason is kept as it was. A cut because a grid has no way through says what is in the way on the best grid)
   return /no walkable leg|no way on or off/.test(plain.reason) ? last : plain;
 }
