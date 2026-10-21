@@ -1,0 +1,1394 @@
+{
+  "v": 3,
+  "slug": "banerjee",
+  "house": "palms",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/banerjee.json",
+    "sha1": "6bc0559eadbf6536084ef6d6bc87bd9628199cd2",
+    "beatsNow": 23,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-steady-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "planka",
+        "forgejo",
+        "tldraw",
+        "bookstack"
+      ],
+      "beatApps": {
+        "food": "grocy",
+        "iot": "pi-hole"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "ci-planning",
+          "planka",
+          "forgejo",
+          "open-webui",
+          "tldraw",
+          "jellyfin"
+        ],
+        "beatApps": {
+          "iot": "uptime-kuma",
+          "food": "grocy"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "ci-planning dropped: no beat tells it any more",
+        "open-webui dropped: no beat tells it any more",
+        "jellyfin dropped: no beat tells it any more",
+        "beatApps.iot uptime-kuma dropped",
+        "bookstack added: the organiser pool for ananya",
+        "beatApps.iot pi-hole added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 6,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "ananya": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      },
+      "rohan": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      }
+    },
+    "pairShare": 0.897,
+    "pairShareMin": 0.8,
+    "chapters": 8
+  },
+  "members": [
+    {
+      "id": "ananya",
+      "name": "Ananya",
+      "age": 40,
+      "role": "partner",
+      "archetype": "organiser",
+      "work": "runs a product design studio",
+      "companion": {
+        "name": "Sorbet",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "freelance-creative",
+        "business-office",
+        "designer-maker"
+      ],
+      "thread": "A product design studio from the living room: briefs, boards, contracts and invoices."
+    },
+    {
+      "id": "rohan",
+      "name": "Rohan",
+      "age": 42,
+      "role": "partner",
+      "archetype": "builder",
+      "work": "indie software developer",
+      "companion": {
+        "name": "Nibs",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "musician-listener"
+      ],
+      "thread": "An indie developer in the stair study, beside the grand piano."
+    }
+  ],
+  "character": {
+    "lede": "A desert-modern city villa joins blue-grey fieldstone and white render under stepped brown standing-seam roofs. A black-framed portal opens onto a planted court, and the back yard has a pool and a fire bowl.",
+    "spots": [
+      {
+        "room": "Stair Study",
+        "line": "A grand piano, a writing desk and a laptop share the stair study."
+      },
+      {
+        "room": "Living Room",
+        "line": "An L-shaped sectional, a fireplace and a television face one wall."
+      },
+      {
+        "room": "Laundry",
+        "line": "A washer, a dryer and a counter fill the laundry room."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 169,
+      "ground": "lawn",
+      "style": "Desert-modern city villa: blue-grey fieldstone and white render, a stone-and-glass west block showing its floating stair and grand piano through a timber spandrel band, a black-framed portal in the stone wall onto an open planted court, stepped brown standing-seam mono-pitches over black fascias, a resort back yard with terraced timber decks, an L-shaped pool, a spa gazebo and palms",
+      "rooms": [
+        "Stair Study",
+        "Living Room",
+        "Kitchen",
+        "Laundry",
+        "Mudroom",
+        "Cloak Lobby",
+        "Powder Room",
+        "Portal Frame",
+        "Gallery Landing",
+        "Guest Bedroom",
+        "Primary Bedroom",
+        "Primary Bath"
+      ],
+      "flags": []
+    },
+    "truths": "The Core sits on a desk in the Living Room. The living room has a fireplace and a television. The kitchen has an island. A grand piano stands in the stair study. Pool, fire bowl, pergola and string lights outside.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "penpot",
+      "name": "Penpot",
+      "member": "ananya",
+      "room": "Living Room",
+      "service": "Figma",
+      "serviceId": "figma",
+      "status": "add",
+      "beat": "living-design",
+      "seed": "Ananya lays out a screen for a client in Penpot, with the files kept on the Core.",
+      "line": "Penpot is where the studio designs a screen, with the files kept on the Core."
+    },
+    {
+      "app": "opencut",
+      "name": "OpenCut",
+      "member": "rohan",
+      "room": "The living room",
+      "service": "CapCut",
+      "serviceId": "capcut",
+      "status": "swap",
+      "beat": "living-film",
+      "seed": "Rohan cuts his stop-motion frames into a short film on the OpenCut timeline and keeps the export on his laptop.",
+      "line": "OpenCut trims clips, adds text and exports a short, with the footage kept in the browser."
+    },
+    {
+      "app": "lunalytics",
+      "name": "Lunalytics",
+      "member": "rohan",
+      "room": "The living room",
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "status": "swap",
+      "beat": "living-watch",
+      "seed": "Rohan sets Lunalytics to check that the studio's apps answer before the client call.",
+      "line": "Lunalytics checks that the shop site and the label printer answer."
+    },
+    {
+      "app": "airtrail",
+      "name": "AirTrail",
+      "member": null,
+      "room": "Living Room",
+      "service": "Flighty",
+      "serviceId": "flighty",
+      "status": "add",
+      "beat": "living-airtrail",
+      "seed": "AirTrail logs every flight the couple have taken and fills in the map of where they have been.",
+      "line": "AirTrail logs every flight the family has taken and fills in the map."
+    },
+    {
+      "app": "espocrm",
+      "name": "EspoCRM",
+      "member": null,
+      "room": "Kitchen",
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "status": "add",
+      "beat": "kitchen-espocrm",
+      "seed": "The studio logs a new enquiry from a product client in EspoCRM and sets the follow-up date.",
+      "line": "EspoCRM keeps a freelancer's enquiries and follow-ups in one list."
+    },
+    {
+      "app": "aider",
+      "name": "Aider",
+      "member": "rohan",
+      "room": "Stair Study",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "status": "add",
+      "beat": "study-assist",
+      "seed": "Rohan asks Aider to tidy a settings screen, then reads each commit it made before he keeps it.",
+      "line": "Aider edits the code and commits each change, so the builder reads it and can undo it."
+    },
+    {
+      "app": "akaunting",
+      "name": "Akaunting",
+      "member": "ananya",
+      "room": "The kitchen",
+      "service": "QuickBooks",
+      "serviceId": "quickbooks",
+      "status": "swap",
+      "beat": "kitchen-receipts",
+      "seed": "Ananya exports the studio's invoices from Akaunting for the accountant, one month at a time.",
+      "line": "Akaunting keeps the small business's books: bills, invoices and the month end."
+    },
+    {
+      "app": "bookstack",
+      "name": "BookStack",
+      "member": "ananya",
+      "room": "The living room",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "status": "swap",
+      "beat": "living-brief",
+      "seed": "Ananya writes a long client brief as chapters and pages in BookStack, with the history of each change.",
+      "line": "BookStack holds the house manual in books, chapters and pages: the stopcock, the boiler, the sitter's guide."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-brief",
+      "member": "ananya",
+      "chapter": "living",
+      "from": "nextcloud",
+      "fromName": "Nextcloud",
+      "to": "bookstack",
+      "toName": "BookStack",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ananya writes a long client brief as chapters and pages in BookStack, with the history of each change.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-quiet",
+      "member": "ananya",
+      "chapter": "living",
+      "from": "ci-planning",
+      "fromName": "Companion Planning",
+      "to": "vikunja",
+      "toName": "Vikunja",
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ananya clears Rohan's release day on the shared task lists in Vikunja, and the calendar app on each phone shows it.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-receipts",
+      "member": "ananya",
+      "chapter": "kitchen",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "akaunting",
+      "toName": "Akaunting",
+      "service": "QuickBooks",
+      "serviceId": "quickbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ananya exports the studio's invoices from Akaunting for the accountant, one month at a time.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-film",
+      "member": "rohan",
+      "chapter": "living",
+      "from": "jellyfin",
+      "fromName": "Jellyfin",
+      "to": "opencut",
+      "toName": "OpenCut",
+      "service": "CapCut",
+      "serviceId": "capcut",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Rohan cuts his stop-motion frames into a short film on the OpenCut timeline and keeps the export on his laptop.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "study-notebook",
+      "member": "rohan",
+      "chapter": "study",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "joplin",
+      "toName": "Joplin Server",
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Rohan jots a chord idea in the Joplin app mid-run, and it syncs to Joplin Server on the Core.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-watch",
+      "member": "rohan",
+      "chapter": "living",
+      "from": "uptime-kuma",
+      "fromName": "Uptime Kuma",
+      "to": "lunalytics",
+      "toName": "Lunalytics",
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Rohan sets Lunalytics to check that the studio's apps answer before the client call.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "beats": [
+        "study-notebook"
+      ],
+      "retoldAs": [
+        "study-notebook -> Joplin Server"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "ci-planning",
+      "name": "Companion Planning",
+      "beats": [
+        "living-quiet"
+      ],
+      "retoldAs": [
+        "living-quiet -> Vikunja"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "jellyfin",
+      "name": "Jellyfin",
+      "beats": [
+        "living-film"
+      ],
+      "retoldAs": [
+        "living-film -> OpenCut"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "nextcloud",
+      "name": "Nextcloud",
+      "beats": [
+        "living-brief"
+      ],
+      "retoldAs": [
+        "living-brief -> BookStack"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "living-brief"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "uptime-kuma",
+      "name": "Uptime Kuma",
+      "beats": [
+        "living-watch"
+      ],
+      "retoldAs": [
+        "living-watch -> Lunalytics"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "kitchen-receipts"
+      ],
+      "retoldAs": [
+        "kitchen-receipts -> Akaunting"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "planka",
+      "forgejo"
+    ],
+    "was": [
+      "planka",
+      "forgejo"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "living-sign",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "ananya",
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ananya sets a client's design agreement out in Docuseal, and the client signs it at the table."
+    },
+    {
+      "id": "living-sheet",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "ananya",
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ananya keeps the studio's prototype orders as a table in Grist, with a column that shows what is late."
+    },
+    {
+      "id": "living-design",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "ananya",
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "small-business",
+      "app": "penpot",
+      "appName": "Penpot",
+      "with": [],
+      "service": "Figma",
+      "serviceId": "figma",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ananya lays out a screen for a client in Penpot, with the files kept on the Core."
+    },
+    {
+      "id": "study-api",
+      "chapter": "study",
+      "newChapter": null,
+      "member": "rohan",
+      "also": [],
+      "room": "Stair Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Rohan tests his app's service from a Hoppscotch tab, and the collection stays in that browser."
+    },
+    {
+      "id": "study-assist",
+      "chapter": "study",
+      "newChapter": null,
+      "member": "rohan",
+      "also": [],
+      "room": "Stair Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "aider",
+      "appName": "Aider",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Rohan asks Aider to tidy a settings screen, then reads each commit it made before he keeps it."
+    },
+    {
+      "id": "living-pi-hole",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "pi-hole",
+      "appName": "Pi-hole",
+      "with": [],
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Once the router sends its lookups to the Core, Pi-hole answers the household's web addresses and blocks the ad domains for the devices that use it for DNS."
+    },
+    {
+      "id": "kitchen-espocrm",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "espocrm",
+      "appName": "EspoCRM",
+      "with": [],
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio logs a new enquiry from a product client in EspoCRM and sets the follow-up date."
+    },
+    {
+      "id": "entry-cryptgeon",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Cloak Lobby",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "cryptgeon",
+      "appName": "Cryptgeon",
+      "with": [],
+      "service": "Privnote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A Cryptgeon note holds the side-door code for the friends staying over, read on the home Wi-Fi, and opens once and is gone."
+    },
+    {
+      "id": "living-airtrail",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "airtrail",
+      "appName": "AirTrail",
+      "with": [],
+      "service": "Flighty",
+      "serviceId": "flighty",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "AirTrail logs every flight the couple have taken and fills in the map of where they have been."
+    },
+    {
+      "id": "garden-homebox",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple give every box a HomeBox label and a shelf, so each prototype part is found in one look."
+    },
+    {
+      "id": "garden-spliit",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "spliit",
+      "appName": "Spliit",
+      "with": [],
+      "service": "Splitwise",
+      "serviceId": "splitwise",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "After the weekend away the couple settle who paid for what in Spliit, a group that lives on the Core."
+    },
+    {
+      "id": "laundry-baikal",
+      "chapter": "laundry",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Laundry",
+      "roomRole": "laundry",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "baikal",
+      "appName": "Baikal",
+      "with": [],
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The household calendar and address book reach every phone at home from Baikal on the Core."
+    },
+    {
+      "id": "kitchen-readeck",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "readeck",
+      "appName": "Readeck",
+      "with": [],
+      "service": "Instapaper",
+      "serviceId": "instapaper",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A long read from the design writers and the local paper waits in Readeck on the sofa tablet, saved by whoever found it."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "The cloak lobby",
+        "place": "after:study"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "study",
+        "room": "office",
+        "title": "Rohan’s stair study",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "The cloak lobby",
+        "new": true
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "laundry",
+        "room": "laundry",
+        "title": "The laundry",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "study",
+      "title": "Rohan’s stair study",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk beside the grand piano",
+      "beats": [
+        {
+          "id": "study-tag",
+          "member": "rohan",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "study-notes",
+          "member": "rohan",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "study-notebook",
+          "member": "rohan",
+          "app": "joplin",
+          "service": "Evernote",
+          "origin": "swap"
+        },
+        {
+          "id": "study-api",
+          "member": "rohan",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        },
+        {
+          "id": "study-assist",
+          "member": "rohan",
+          "app": "aider",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "The cloak lobby",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-cryptgeon",
+          "member": null,
+          "app": "cryptgeon",
+          "service": "Privnote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the sectional and the desk where the Core sits",
+      "beats": [
+        {
+          "id": "living-quiet",
+          "member": "ananya",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "swap"
+        },
+        {
+          "id": "living-film",
+          "member": "rohan",
+          "app": "opencut",
+          "service": "CapCut",
+          "origin": "swap"
+        },
+        {
+          "id": "living-brief",
+          "member": "ananya",
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "swap"
+        },
+        {
+          "id": "living-watch",
+          "member": "rohan",
+          "app": "lunalytics",
+          "service": "UptimeRobot",
+          "origin": "swap"
+        },
+        {
+          "id": "living-strap",
+          "member": "ananya",
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "now"
+        },
+        {
+          "id": "living-board",
+          "member": "ananya",
+          "app": "planka",
+          "service": "Trello",
+          "origin": "now"
+        },
+        {
+          "id": "living-sample",
+          "member": "ananya",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-sign",
+          "member": "ananya",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "living-sheet",
+          "member": "ananya",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "living-design",
+          "member": "ananya",
+          "app": "penpot",
+          "service": "Figma",
+          "origin": "add"
+        },
+        {
+          "id": "living-pi-hole",
+          "member": null,
+          "app": "pi-hole",
+          "service": "NextDNS",
+          "origin": "add"
+        },
+        {
+          "id": "living-airtrail",
+          "member": null,
+          "app": "airtrail",
+          "service": "Flighty",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-pantry",
+          "member": "rohan",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-receipts",
+          "member": "ananya",
+          "app": "akaunting",
+          "service": "QuickBooks",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-vault",
+          "member": "rohan",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-espocrm",
+          "member": null,
+          "app": "espocrm",
+          "service": "Salesforce",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-readeck",
+          "member": null,
+          "app": "readeck",
+          "service": "Instapaper",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "laundry",
+      "title": "The laundry",
+      "roomRole": "laundry",
+      "isNew": false,
+      "subject": "the washer and dryer",
+      "beats": [
+        {
+          "id": "laundry-bedding",
+          "member": "rohan",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "now"
+        },
+        {
+          "id": "laundry-baikal",
+          "member": null,
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-swatches",
+          "member": "ananya",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "garden-court",
+          "member": "rohan",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-homebox",
+          "member": null,
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        },
+        {
+          "id": "garden-spliit",
+          "member": null,
+          "app": "spliit",
+          "service": "Splitwise",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "study-tag",
+      "line": "Rohan tags the release."
+    },
+    {
+      "at": "morning",
+      "beat": "living-quiet",
+      "line": "Ananya clears Rohan's release day."
+    },
+    {
+      "at": "midday",
+      "beat": "living-sign",
+      "line": "A client signs the design agreement."
+    },
+    {
+      "at": "afternoon",
+      "beat": "living-design",
+      "line": "Ananya lays out a screen for the client."
+    },
+    {
+      "at": "afternoon",
+      "beat": "living-watch",
+      "line": "Rohan checks the studio's apps before the call."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-film",
+      "line": "Rohan cuts his stop-motion film."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-spliit",
+      "line": "The shared costs get settled."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "GitHub",
+      "Plex",
+      "Google Drive",
+      "Datadog",
+      "Miro",
+      "Trello",
+      "AnyList",
+      "Evernote",
+      "LastPass",
+      "Google Photos"
+    ],
+    "servicesFinal": [
+      "GitHub",
+      "Evernote",
+      "Todoist",
+      "CapCut",
+      "Confluence",
+      "UptimeRobot",
+      "Miro",
+      "Trello",
+      "AnyList",
+      "QuickBooks",
+      "LastPass",
+      "Google Photos",
+      "DocuSign",
+      "Airtable",
+      "Figma",
+      "Postman",
+      "GitHub Copilot",
+      "NextDNS",
+      "Salesforce",
+      "Privnote",
+      "Flighty",
+      "Sortly",
+      "Splitwise",
+      "Google Calendar",
+      "Instapaper"
+    ],
+    "count": 25
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "living-design",
+      "living-film",
+      "living-watch",
+      "living-airtrail",
+      "kitchen-espocrm",
+      "study-assist",
+      "kitchen-receipts",
+      "living-brief"
+    ],
+    "mustCarry": {
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "joplin": [
+        "[note] Joplin Server only; the Joplin apps are separate.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "marketplace: Joplin Server carries its own Personal Use License: not open source and limited for business use."
+      ],
+      "vikunja": [
+        "[note] Supports CalDAV sync.",
+        "QA shot is a sign-in wall",
+        "CalDAV sync with calendar apps"
+      ],
+      "opencut": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Footage stays in the browser's storage on the editing machine, not on the Core",
+        "Compose points NEXT_PUBLIC_MARBLE_API_URL at api.marblecms.com with a disabled key: an outside call to check",
+        "No QA run and no screenshot"
+      ],
+      "bookstack": [],
+      "lunalytics": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "grocy": [
+        "[note] The listing is short. Describe pantry stock, shopping lists, recipes and chores only.",
+        "Short listing: describe pantry stock, shopping lists, recipes, tasks and habits only (catalog)",
+        "Upstream demo screenshot shows a dollar total: prices on screen"
+      ],
+      "akaunting": [
+        "[claims] Bookkeeping tool. No accounting, tax or legal advice.",
+        "marketplace: Source-available (Business Source License). Seafile and others carry umbrel strings: the admin email default is a placeholder address on umbrel.local."
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "grist": [],
+      "penpot": [
+        "Five containers (frontend, backend, exporter, Postgres, Redis).",
+        "QA screenshot is the log-in page: reject.",
+        "Listing images show community library tiles: marketing."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "aider": [
+        "[cloud-link] The Hub injects its own model endpoint, so it needs no cloud key. A model override field can point it at another OpenAI-compatible endpoint; leave it on the Hub model. A coding agent is private only on the C",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. Every edit is a git commit, which is the approval step: the person reviews and can undo it with git.",
+        "[note] The browser interface is marked experimental upstream. Do not call it finished.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "pi-hole": [
+        "[claims] Network-wide blocking at DNS. Do not call it parental control or promise safety.",
+        "Blocks ad, tracker and bad domains at DNS: not parental control and no promise of safety",
+        "Unblocked lookups are forwarded to an upstream resolver (the upstream demo dashboard lists a public DNS, dns.google), so a DNS provider still sees them and it is not offline",
+        "Overlaps AdGuard Home: one per household"
+      ],
+      "espocrm": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "cryptgeon": [
+        "Notes live only in RAM: a restart of the app wipes every unread note",
+        "Do not repeat the listing's encryption wording (sec-absolute); say a note opens once and is gone",
+        "Overlaps Enclosed and PrivateBin: one burn-after-reading tool per household"
+      ],
+      "airtrail": [
+        "Logbook and statistics, not live flight tracking (listing short_desc says \"flight tracking\")",
+        "First user becomes administrator",
+        "Does not claim live flight status; story must say logbook"
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "spliit": [],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "readeck": [
+        "listing says securely: do not repeat",
+        "QA shot is the first-run form"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "lunalytics",
+      "display": "Lunalytics",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "UptimeRobot",
+        "Statuspage"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "evidence": "CI-Marketplace apps/lunalytics/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "opencut",
+      "beats": [
+        "living-film"
+      ]
+    },
+    {
+      "app": "aider",
+      "beats": [
+        "study-assist"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "garden-homebox"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

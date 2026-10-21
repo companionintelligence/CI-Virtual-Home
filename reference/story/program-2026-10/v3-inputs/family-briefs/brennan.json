@@ -1,0 +1,1496 @@
+{
+  "v": 3,
+  "slug": "brennan",
+  "house": "seraphine",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/brennan.json",
+    "sha1": "cd25f5ffef2ee5d059233c01e28f417232d673a9",
+    "beatsNow": 27,
+    "chaptersNow": 9,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "older-kids",
+  "business": true,
+  "narrator": "v-clear-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "ci-planning",
+        "nextcloud",
+        "code-server",
+        "open-webui",
+        "steam-headless",
+        "kiwix"
+      ],
+      "beatApps": {
+        "iot": "home-assistant",
+        "food": "grocy"
+      },
+      "reviewNeeded": [
+        "code-server"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "ci-planning",
+          "nextcloud",
+          "code-server",
+          "open-webui",
+          "steam-headless",
+          "kiwix"
+        ],
+        "beatApps": {
+          "iot": "home-assistant",
+          "food": "yuvomi"
+        },
+        "reviewNeeded": [
+          "code-server"
+        ]
+      },
+      "notes": [
+        "beatApps.food yuvomi dropped",
+        "beatApps.food grocy added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 11,
+    "swaps": 7,
+    "householdBeats": 3,
+    "householdBeatsMax": 6,
+    "persona": {
+      "sally": {
+        "now": 7,
+        "add": 1,
+        "target": 8
+      },
+      "john": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      },
+      "steve": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "jean": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      }
+    },
+    "pairShare": 0.839,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "sally",
+      "name": "Sally",
+      "age": 43,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "consultant, runs her own small practice",
+      "companion": {
+        "name": "Juniper",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "business-office",
+        "writer"
+      ],
+      "thread": "The consultancy, run from the Library desk."
+    },
+    {
+      "id": "john",
+      "name": "John",
+      "age": 45,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "software engineer",
+      "companion": {
+        "name": "Quill",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro"
+      ],
+      "thread": "Software for a living, in the primary suite."
+    },
+    {
+      "id": "steve",
+      "name": "Steve",
+      "age": 16,
+      "role": "teen",
+      "archetype": "gamer",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-play"
+      ],
+      "thread": "Games and a shared world for the cousins."
+    },
+    {
+      "id": "jean",
+      "name": "Jean",
+      "age": 14,
+      "role": "teen",
+      "archetype": "learner",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-study",
+        "reader-collector"
+      ],
+      "thread": "Study, books and the pool garden."
+    }
+  ],
+  "character": {
+    "lede": "A brick farmhouse with front gables, a dark shingle roof and a white-columned porch stands on the lake. The ground floor opens through book-lined rooms, past a grand piano in the Library, to a pool garden.",
+    "spots": [
+      {
+        "room": "Library",
+        "line": "Shelves to the ceiling, a grand piano, and the Core on the writing desk."
+      },
+      {
+        "room": "Chess Hall",
+        "line": "A bistro table, two chairs and a fireplace make a place to linger."
+      },
+      {
+        "room": "Living Room",
+        "line": "Two chesterfield sofas and a wingback chair gather round the television stand."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 331,
+      "ground": "waterfront",
+      "style": "Queen Anne brick farmhouse: a cascade of front gables over a dark shingle roof with twin chimneys and dormers, white-columned front porch, book-lined open ground floor, lakeside pool garden",
+      "rooms": [
+        "Entry Hall",
+        "Master Suite",
+        "Kitchen",
+        "Dining",
+        "Chess Hall",
+        "Window Bay",
+        "Living Room",
+        "Library",
+        "Dark Bedroom",
+        "Dark Bath",
+        "Guest Room",
+        "Family Bath",
+        "Girl's Room",
+        "Boy's Room",
+        "Nursery",
+        "Landing Lounge",
+        "Gable Nook",
+        "Stair Landing"
+      ],
+      "flags": []
+    },
+    "truths": "The Core sits on the writing desk in the Library. The Nursery is a spare room and is never a scene. Pool, loungers, pergola and garden beds on the lake side. Cousins are visitors, never named.",
+    "mustNot": [
+      "no scene in the Nursery",
+      "name no cousin or grandparent"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "solidtime",
+      "name": "Solidtime",
+      "member": "sally",
+      "room": "Library",
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "status": "add",
+      "beat": "office-hours",
+      "seed": "Sally logs the week's hours by client in Solidtime at the Library shelves.",
+      "line": "Solidtime records a joiner's hours by job in a timer and a weekly view."
+    },
+    {
+      "app": "it-tools",
+      "name": "IT-Tools",
+      "member": "john",
+      "room": "Master Suite",
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "status": "add",
+      "beat": "suite-token",
+      "seed": "John pastes a token into IT-Tools and reads its claims, the tool running in the browser tab.",
+      "line": "IT-Tools holds the small developer utilities, from a colour picker to a token decoder, in one page."
+    },
+    {
+      "app": "mindustry",
+      "name": "Mindustry Server",
+      "member": "steve",
+      "room": "Boy's Room",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "steve-world",
+      "seed": "Steve starts a Mindustry Server world on the Core, and the cousins join from their own game clients on the home Wi-Fi.",
+      "line": "Mindustry Server hosts the cousins' factory world on the Core, so the world runs on the Core."
+    },
+    {
+      "app": "beatsync",
+      "name": "Beatsync",
+      "member": "jean",
+      "room": "Out in the garden",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "garden-beds",
+      "seed": "Jean and Steve join four phones to one Beatsync queue on the loungers, so the pool garden plays the same track.",
+      "line": "Beatsync joins every phone in the garden to one queue, so the lawn plays the same track together."
+    },
+    {
+      "app": "librephotos",
+      "name": "LibrePhotos",
+      "member": "steve",
+      "room": "Steve’s room",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "swap",
+      "beat": "steve-photos",
+      "seed": "Steve lets LibrePhotos sort the lake weekend by place, then finds the jetty picture with one search.",
+      "line": "LibrePhotos sorts the holiday folders by place and face on the Core and finds the beach day in one search."
+    },
+    {
+      "app": "aider",
+      "name": "Aider",
+      "member": "john",
+      "room": "Master Suite",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "status": "add",
+      "beat": "suite-assist",
+      "seed": "John asks Aider to tidy a module, then reads each commit it made before he keeps any of them.",
+      "line": "Aider edits the code and commits each change, so the builder reads it and can undo it."
+    },
+    {
+      "app": "open-notebook",
+      "name": "Open Notebook",
+      "member": "jean",
+      "room": "Girl's Room",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "status": "add",
+      "beat": "jean-sources",
+      "seed": "Jean puts three articles and her class notes into one Open Notebook notebook and asks for the argument they share.",
+      "line": "Open Notebook gathers three articles and the lecture notes into one notebook and answers from them."
+    },
+    {
+      "app": "cryptpad",
+      "name": "CryptPad",
+      "member": null,
+      "room": "Kitchen",
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "status": "add",
+      "beat": "kitchen-cryptpad",
+      "seed": "The consultancy drafts the proposal in a CryptPad document, and each edit appears as it is typed.",
+      "line": "CryptPad opens a shared pad and a kanban board that two people edit together at home."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "office-paper",
+      "member": "sally",
+      "chapter": "office",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "papra",
+      "toName": "Papra",
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "loose",
+      "qualifier": "a scanned-paper archive",
+      "seed": "Sally scans the school form and the plumber's receipt into Papra and finds each one by a word on it.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "office-pdf",
+      "member": "sally",
+      "chapter": "office",
+      "from": "stirling-pdf",
+      "fromName": "Stirling-PDF",
+      "to": "bentopdf",
+      "toName": "BentoPDF",
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Sally redacts an account number and signs the engagement letter in BentoPDF, in the browser tab.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "steve-photos",
+      "member": "steve",
+      "chapter": "steve",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "librephotos",
+      "toName": "LibrePhotos",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Steve lets LibrePhotos sort the lake weekend by place, then finds the jetty picture with one search.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-beds",
+      "member": "jean",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "beatsync",
+      "toName": "Beatsync",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Jean and Steve join four phones to one Beatsync queue on the loungers, so the pool garden plays the same track.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": "HortusFox is at its share target; the garden chapter keeps a beat"
+    },
+    {
+      "beat": "jean-homework",
+      "member": "jean",
+      "chapter": "jean",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "open-webui",
+      "toName": "Open WebUI",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Jean asks the model on the Core to walk through a proof in Open WebUI, and the chat sits on the Core.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [
+        "jupyterlab"
+      ],
+      "why": null
+    },
+    {
+      "beat": "kitchen-list",
+      "member": "sally",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "grocy",
+      "toName": "Grocy",
+      "service": "AnyList",
+      "serviceId": "anylist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Sally checks the pantry shelf in Grocy, and the dinners and the shopping list follow from what is nearly out.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-rota",
+      "member": "steve",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "donetick",
+      "toName": "Donetick",
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Steve holds his phone to the Donetick tag on the fridge and bin day is marked done.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "office-paper"
+      ],
+      "retoldAs": [
+        "office-paper -> Papra"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "stirling-pdf",
+      "name": "Stirling-PDF",
+      "beats": [
+        "office-pdf"
+      ],
+      "retoldAs": [
+        "office-pdf -> BentoPDF"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "kitchen-list",
+        "kitchen-rota"
+      ],
+      "retoldAs": [
+        "kitchen-list -> Grocy",
+        "kitchen-rota -> Donetick"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "steve-photos"
+      ],
+      "retoldAs": [
+        "steve-photos -> LibrePhotos"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "hortusfox",
+      "name": "HortusFox",
+      "beats": [
+        "garden-beds"
+      ],
+      "retoldAs": [
+        "garden-beds -> Beatsync"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "nextcloud",
+      "open-webui"
+    ],
+    "was": [
+      "nextcloud",
+      "open-webui"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "suite-assist",
+      "chapter": "suite",
+      "newChapter": null,
+      "member": "john",
+      "also": [],
+      "room": "Master Suite",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "aider",
+      "appName": "Aider",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "John asks Aider to tidy a module, then reads each commit it made before he keeps any of them."
+    },
+    {
+      "id": "suite-request",
+      "chapter": "suite",
+      "newChapter": null,
+      "member": "john",
+      "also": [],
+      "room": "Master Suite",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "John tests an endpoint from a Hoppscotch tab, and the request collection stays in that browser."
+    },
+    {
+      "id": "suite-token",
+      "chapter": "suite",
+      "newChapter": null,
+      "member": "john",
+      "also": [],
+      "room": "Master Suite",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "it-tools",
+      "appName": "IT-Tools",
+      "with": [],
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "John pastes a token into IT-Tools and reads its claims, the tool running in the browser tab."
+    },
+    {
+      "id": "steve-world",
+      "chapter": "steve",
+      "newChapter": null,
+      "member": "steve",
+      "also": [],
+      "room": "Boy's Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "mindustry",
+      "appName": "Mindustry Server",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Steve starts a Mindustry Server world on the Core, and the cousins join from their own game clients on the home Wi-Fi."
+    },
+    {
+      "id": "steve-model",
+      "chapter": "steve",
+      "newChapter": null,
+      "member": "steve",
+      "also": [],
+      "room": "Boy's Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "blockbench",
+      "appName": "Blockbench",
+      "with": [],
+      "service": "MagicaVoxel",
+      "serviceId": "magicavoxel",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Steve shapes the jetty as a block model for his game in Blockbench, and saves the file on his own machine."
+    },
+    {
+      "id": "jean-sources",
+      "chapter": "jean",
+      "newChapter": null,
+      "member": "jean",
+      "also": [],
+      "room": "Girl's Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "open-notebook",
+      "appName": "Open Notebook",
+      "with": [],
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jean puts three articles and her class notes into one Open Notebook notebook and asks for the argument they share."
+    },
+    {
+      "id": "jean-shelf",
+      "chapter": "jean",
+      "newChapter": null,
+      "member": "jean",
+      "also": [],
+      "room": "Girl's Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "calibre-web",
+      "appName": "Calibre-Web",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Jean finds her set text on the family's Calibre-Web shelf and reads it at the window."
+    },
+    {
+      "id": "office-hours",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "sally",
+      "also": [],
+      "room": "Library",
+      "roomRole": "office",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "solidtime",
+      "appName": "Solidtime",
+      "with": [],
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Sally logs the week's hours by client in Solidtime at the Library shelves."
+    },
+    {
+      "id": "living-super-productivity",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "super-productivity",
+      "appName": "Super Productivity",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "loose",
+      "qualifier": "with Nextcloud WebDAV sync, else the tasks sit in the browser",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The consultancy plans the week's client engagements in blocks in Super Productivity, with a timer beside each task."
+    },
+    {
+      "id": "kitchen-cryptpad",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cryptpad",
+      "appName": "CryptPad",
+      "with": [],
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The consultancy drafts the proposal in a CryptPad document, and each edit appears as it is typed."
+    },
+    {
+      "id": "landing-wallos",
+      "chapter": "landing",
+      "newChapter": "landing",
+      "member": null,
+      "also": [],
+      "room": "Gable Nook",
+      "roomRole": "living",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "wallos",
+      "appName": "Wallos",
+      "with": [],
+      "service": "Rocket Money",
+      "serviceId": "rocket-money",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Over coffee the consultancy lists the business's renewing subscriptions in Wallos and sees what the business still rents."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "landing",
+        "kind": "room",
+        "room": "living",
+        "title": "The upstairs landing",
+        "place": "after:jean"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "office",
+        "room": "office",
+        "title": "Sally in the library",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "suite",
+        "room": "bedroom",
+        "title": "John in the primary suite",
+        "new": false
+      },
+      {
+        "id": "steve",
+        "room": "kids",
+        "title": "Steve’s room",
+        "new": false
+      },
+      {
+        "id": "jean",
+        "room": "kids",
+        "title": "Jean’s room",
+        "new": false
+      },
+      {
+        "id": "landing",
+        "room": "living",
+        "title": "The upstairs landing",
+        "new": true
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "office",
+      "title": "Sally in the library",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the Library desk with the grand piano behind it",
+      "beats": [
+        {
+          "id": "office-plan",
+          "member": "sally",
+          "app": "ci-planning",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "office-paper",
+          "member": "sally",
+          "app": "papra",
+          "service": "Evernote",
+          "origin": "swap"
+        },
+        {
+          "id": "office-draft",
+          "member": "sally",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "office-pdf",
+          "member": "sally",
+          "app": "bentopdf",
+          "service": "Adobe Acrobat",
+          "origin": "swap"
+        },
+        {
+          "id": "office-contracts",
+          "member": "sally",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "office-hours",
+          "member": "sally",
+          "app": "solidtime",
+          "service": "Toggl Track",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-scene",
+          "member": "john",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "living-film",
+          "member": "steve",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-super-productivity",
+          "member": null,
+          "app": "super-productivity",
+          "service": "Todoist",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-list",
+          "member": "sally",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-rota",
+          "member": "steve",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-cryptpad",
+          "member": null,
+          "app": "cryptpad",
+          "service": "Microsoft Office",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "suite",
+      "title": "John in the primary suite",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the writing desk and laptop in the primary suite",
+      "beats": [
+        {
+          "id": "suite-code",
+          "member": "john",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "now"
+        },
+        {
+          "id": "suite-repos",
+          "member": "john",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "suite-quill",
+          "member": "john",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "suite-assist",
+          "member": "john",
+          "app": "aider",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        },
+        {
+          "id": "suite-request",
+          "member": "john",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        },
+        {
+          "id": "suite-token",
+          "member": "john",
+          "app": "it-tools",
+          "service": "DevUtils",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "steve",
+      "title": "Steve’s room",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "steve-play",
+          "member": "steve",
+          "app": "steam-headless",
+          "service": "GeForce Now",
+          "origin": "now"
+        },
+        {
+          "id": "steve-session",
+          "member": "steve",
+          "app": "steam-headless",
+          "service": "GeForce Now",
+          "origin": "now"
+        },
+        {
+          "id": "steve-photos",
+          "member": "steve",
+          "app": "librephotos",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "steve-world",
+          "member": "steve",
+          "app": "mindustry",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "steve-model",
+          "member": "steve",
+          "app": "blockbench",
+          "service": "MagicaVoxel",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "jean",
+      "title": "Jean’s room",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "jean-homework",
+          "member": "jean",
+          "app": "open-webui",
+          "service": "ChatGPT",
+          "origin": "swap"
+        },
+        {
+          "id": "jean-lookup",
+          "member": "jean",
+          "app": "kiwix",
+          "service": "Google Search",
+          "origin": "now"
+        },
+        {
+          "id": "jean-translate",
+          "member": "jean",
+          "app": "libretranslate",
+          "service": "Google Translate",
+          "origin": "now"
+        },
+        {
+          "id": "jean-notes",
+          "member": "jean",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "now"
+        },
+        {
+          "id": "jean-sources",
+          "member": "jean",
+          "app": "open-notebook",
+          "service": "NotebookLM",
+          "origin": "add"
+        },
+        {
+          "id": "jean-shelf",
+          "member": "jean",
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "landing",
+      "title": "The upstairs landing",
+      "roomRole": "living",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "landing-wallos",
+          "member": null,
+          "app": "wallos",
+          "service": "Rocket Money",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": "the loungers and the pergola by the pool",
+      "beats": [
+        {
+          "id": "garden-beds",
+          "member": "jean",
+          "app": "beatsync",
+          "service": null,
+          "origin": "swap"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "suite-code",
+      "line": "John opens his editor while the school run is still under way."
+    },
+    {
+      "at": "midday",
+      "beat": "office-contracts",
+      "line": "Sally files a signed contract and moves to the next client."
+    },
+    {
+      "at": "afternoon",
+      "beat": "office-paper",
+      "line": "Sally clears the school forms off the Library desk."
+    },
+    {
+      "at": "after-school",
+      "beat": "jean-sources",
+      "line": "Jean builds tomorrow's essay from her own notebook."
+    },
+    {
+      "at": "after-school",
+      "beat": "steve-world",
+      "line": "Steve sets up the cousins' world before supper."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-beds",
+      "line": "By the pool, four phones play one queue."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-super-productivity",
+      "line": "The day is planned in timed blocks."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Evernote",
+      "Adobe Acrobat",
+      "Google Drive",
+      "Google Home",
+      "Plex",
+      "Cursor",
+      "GitHub",
+      "GeForce Now",
+      "Google Photos",
+      "Google Search",
+      "Google Translate",
+      "Notion"
+    ],
+    "servicesFinal": [
+      "Evernote",
+      "Adobe Acrobat",
+      "Google Drive",
+      "Google Home",
+      "Plex",
+      "AnyList",
+      "Tody",
+      "Cursor",
+      "GitHub",
+      "GeForce Now",
+      "Google Photos",
+      "ChatGPT",
+      "Google Search",
+      "Google Translate",
+      "Notion",
+      "GitHub Copilot",
+      "Postman",
+      "DevUtils",
+      "MagicaVoxel",
+      "NotebookLM",
+      "Kindle",
+      "Toggl Track",
+      "Todoist",
+      "Microsoft Office",
+      "Rocket Money"
+    ],
+    "count": 25
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "office-hours",
+      "suite-token",
+      "steve-world",
+      "garden-beds",
+      "steve-photos",
+      "suite-assist",
+      "jean-sources",
+      "kitchen-cryptpad"
+    ],
+    "mustCarry": {
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "open-webui": [
+        "[note] The Hub onboarding wizard offers Open WebUI as a featured app.",
+        "[cloud-link] It can also connect to cloud models with an API key. Leave that off.",
+        "[note] Wired to the Core's local model by the Hub (hub_integration inference). Say \"a model on the Core\"; never claim it matches a hosted model and never give a speed figure.",
+        "Can connect to cloud models with an API key (field in the install form): leave out of any scene.",
+        "Hub wires it to the local model."
+      ],
+      "ci-planning": [
+        "[cloud-link] Two-way Google Calendar sync exists but is off by default and needs a Google OAuth client. Do not say it never touches Google.",
+        "[note] Local-model briefings, task extraction and auto-scheduling appear only when Ollama is reachable.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "[cloud-link] Crash reports go to Companion Intelligence unless \"Share crash reports\" is turned off at install (it is on by default). Credentials, file paths, request bodies and memories are stripped first. Do not write t",
+        "Two way Google Calendar sync exists, off by default: never say it never touches Google."
+      ],
+      "papra": [],
+      "bentopdf": [
+        "Dual licence: AGPL-3.0 or paid commercial; fine for household use",
+        "Listing says \"nothing to leak\": drop that wording",
+        "Overlaps Stirling-PDF (the persona PDF app)"
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "grocy": [
+        "[note] The listing is short. Describe pantry stock, shopping lists, recipes and chores only.",
+        "Short listing: describe pantry stock, shopping lists, recipes, tasks and habits only (catalog)",
+        "Upstream demo screenshot shows a dollar total: prices on screen"
+      ],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "steam-headless": [
+        "[cloud-link] Steam needs a Valve account to sign in, and the game library and the purchases are Valve's. The Core runs the session; the account stays with Valve. Say that, never \"no account\".",
+        "[hardware] The listing asks for GPU passthrough for best performance and the Hub package declares no GPU device, so a given Core may not run a given game well. Say what the Core does (it runs the session at home), never ",
+        "[claims] No frame rate, resolution or latency figure, and not \"smooth\". Never \"gaming PC\", \"console replacement\" or \"cloud gaming replacement\" in the text. The chip may read \"replaces GeForce Now\" or \"replaces Xbox Cloud",
+        "[note] It shows a streamed desktop with sound in a browser (noVNC), so the screen needs a browser, not a console. The container runs privileged with host access: do not call it sandboxed. Keep the stream on the home netw",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-account exclusion for the gamer archetype, with the caveats above."
+      ],
+      "librephotos": [
+        "[note] First setup takes 5 to 10 minutes while models and migrations start.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "Face recognition is sensitive: say what it does, never that it \"knows\" people",
+        "Overlaps Immich; use it to relieve Immich's share"
+      ],
+      "jupyterlab": [
+        "[note] One password set at install. The notebook kernel runs the code on the Core; installing a Python package reaches the internet.",
+        "[claims] Neither the manifest, the live store nor the Portal alternatives table (origin/main) names anything it replaces, so there is no replaces chip. The CI-Common campaign reference says MATLAB or RStudio, from a sour",
+        "Packages install from the internet.",
+        "QA screenshot is the token and password wall: reject.",
+        "Logo file shows only the orange arcs, not the Jupyter wordmark."
+      ],
+      "kiwix": [
+        "[note] Needs content files (ZIM) downloaded once.",
+        "marketplace: Ships with an empty library: the compose runs kiwix-serve on /data/library.xml with no content and no way in the Hub to add or register ZIM files; the QA capture shows \"No result\"."
+      ],
+      "libretranslate": [
+        "[note] Works offline once language models are downloaded.",
+        "Listing says \"works fully offline\": banned wording (sec-offline)",
+        "Say nothing about quality",
+        "Likely already heavy in the existing stories"
+      ],
+      "obsidian": [
+        "[licence] Obsidian is not open source. Do not call it open source.",
+        "[note] An Obsidian MCP entry exists so an agent can read and write the vault.",
+        "not open source (catalog: never say so)",
+        "listing says private and offline: do not repeat",
+        "notes are files on the Core, the app is streamed"
+      ],
+      "beatsync": [
+        "Rights to the music are the household's; the app plays what you upload",
+        "Do not print the millisecond-accurate sync claim or any timing figure",
+        "Public URL field is optional; leave it blank for home-network use"
+      ],
+      "aider": [
+        "[cloud-link] The Hub injects its own model endpoint, so it needs no cloud key. A model override field can point it at another OpenAI-compatible endpoint; leave it on the Hub model. A coding agent is private only on the C",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. Every edit is a git commit, which is the approval step: the person reviews and can undo it with git.",
+        "[note] The browser interface is marked experimental upstream. Do not call it finished.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "it-tools": [
+        "Listing says it keeps working with the network unplugged: do not repeat (install and updates use the internet).",
+        "Everything computes in the browser; the Core serves static files only."
+      ],
+      "mindustry": [
+        "[note] Headless game server; no web interface. Players use the game client.",
+        "[claims] No frame rate or player-count claims.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Headless: the household needs a console to run commands such as host and gameover",
+        "No QA run recorded"
+      ],
+      "blockbench": [
+        "Projects live in the browser (IndexedDB) or in files the person saves: the Core serves the app, it does not hold the models",
+        "The listing names Minecraft models; say \"game models\" or \"block models\" in copy",
+        "Free-text store claim \"never sees your models\" is accurate for the container"
+      ],
+      "open-notebook": [
+        "[cloud-link] Supports 18 plus providers including cloud ones. Ollama is the local path.",
+        "[heavy] Podcast-style audio overviews need a speech model.",
+        "Install form has OpenAI, Anthropic, Google and Groq key fields: leave blank; Ollama is the local path.",
+        "Podcast style audio overviews need a speech model: do not mention.",
+        "Capture shows sample notebook content, not personal data."
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: Documented default admin credentials (admin / admin123); no QA capture."
+      ],
+      "solidtime": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "listing mentions invoices: say nothing about billing or tax"
+      ],
+      "super-productivity": [
+        "by default tasks live in the browser local storage, not on the Core",
+        "no sync means no custody on the Core"
+      ],
+      "cryptpad": [
+        "Listing says \"end-to-end encrypted\": banned wording (f-security-guarantee), do not repeat",
+        "Collaboration with people outside the home needs outside reach"
+      ],
+      "wallos": [
+        "[note] Fetches logos for popular services from outside.",
+        "[claims] Do not promise savings."
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "beatsync",
+      "display": "Beatsync",
+      "reason": "not in catalog-apps.json",
+      "replaces": [],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Rights to the music are the household's; the app plays what you upload",
+        "Do not print the millisecond-accurate sync claim or any timing figure",
+        "Public URL field is optional; leave it blank for home-network use",
+        "Image tags are latest (companionintelligence/beatsync is a Companion build)"
+      ],
+      "evidence": "CI-Marketplace apps/beatsync/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m6)"
+    },
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "it-tools",
+      "display": "IT-Tools",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "DevUtils",
+        "Browserling Tools"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Listing says it keeps working with the network unplugged: do not repeat (install and updates use the internet).",
+        "Everything computes in the browser; the Core serves static files only."
+      ],
+      "evidence": "CI-Marketplace apps/it-tools/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "aider",
+      "beats": [
+        "suite-assist"
+      ]
+    },
+    {
+      "app": "mindustry",
+      "beats": [
+        "steve-world"
+      ]
+    },
+    {
+      "app": "calibre-web",
+      "beats": [
+        "jean-shelf"
+      ]
+    },
+    {
+      "app": "solidtime",
+      "beats": [
+        "office-hours"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

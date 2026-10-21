@@ -1,0 +1,1435 @@
+{
+  "v": 3,
+  "slug": "iyer",
+  "house": "mesamariposa",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/iyer.json",
+    "sha1": "af56f3a3c3320e49437b018f07f1acd1cef16067",
+    "beatsNow": 25,
+    "chaptersNow": 9,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "older-kids",
+  "business": true,
+  "narrator": "v-young-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "onlyoffice",
+        "libretranslate",
+        "navidrome",
+        "audiomass",
+        "steam-headless"
+      ],
+      "beatApps": {
+        "iot": "ntfy",
+        "food": "homehub",
+        "privacy": "vaultwarden"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "onlyoffice",
+          "libretranslate",
+          "navidrome",
+          "audiomass",
+          "steam-headless",
+          "kiwix"
+        ],
+        "beatApps": {
+          "iot": "ntfy",
+          "food": "homehub",
+          "privacy": "vaultwarden"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "kiwix dropped: no beat tells it any more"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 13,
+    "swaps": 5,
+    "householdBeats": 4,
+    "householdBeatsMax": 6,
+    "persona": {
+      "meenakshi": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "ravi": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "arjun": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      },
+      "kavya": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      }
+    },
+    "pairShare": 0.839,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "meenakshi",
+      "name": "Meenakshi",
+      "age": 45,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "translator, runs a small agency",
+      "companion": {
+        "name": "Clover",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "business-office",
+        "writer"
+      ],
+      "thread": "A translation and tutoring agency at the conservatory table."
+    },
+    {
+      "id": "ravi",
+      "name": "Ravi",
+      "age": 47,
+      "role": "parent",
+      "archetype": "maker",
+      "work": "sound designer",
+      "companion": {
+        "name": "Maple",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "musician-listener",
+        "freelance-creative"
+      ],
+      "thread": "Sound design beside a record player, upstairs."
+    },
+    {
+      "id": "arjun",
+      "name": "Arjun",
+      "age": 15,
+      "role": "teen",
+      "archetype": "gamer",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-play"
+      ],
+      "thread": "Games, block models and a streak, in the guest bedroom."
+    },
+    {
+      "id": "kavya",
+      "name": "Kavya",
+      "age": 10,
+      "role": "child",
+      "archetype": "learner",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker",
+        "reader-collector"
+      ],
+      "thread": "A ten-year-old's desk, easel and reading."
+    }
+  ],
+  "character": {
+    "lede": "A mid-century desert villa has split dark-tile roofs over caramel stucco and a glass-roofed conservatory on the corner. A walled resort garden wraps a turtle-mosaic pool, with a deck and a firepit.",
+    "spots": [
+      {
+        "room": "Conservatory Dining",
+        "line": "A trestle table, eight chairs and a fireplace sit under glass."
+      },
+      {
+        "room": "Primary Bedroom",
+        "line": "A record player stands beside the bed."
+      },
+      {
+        "room": "Kids' Room",
+        "line": "A house bed, a small desk and an easel share the room."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 280,
+      "ground": "desert",
+      "style": "Mid-century desert villa: split dark-tile shed roofs with thick rust fascias over caramel stucco, a glass-roofed conservatory dining room on the street corner, a vertical-timber tower, a recessed double-door entry under a slatted canopy, one-bay garage; a walled resort garden round a turtle-mosaic pool",
+      "rooms": [
+        "Conservatory Dining",
+        "Living Room",
+        "Kitchen",
+        "Utility",
+        "Entry Hall",
+        "Stair Hall",
+        "Garage",
+        "Sun Room",
+        "Porch",
+        "Covered Lounge",
+        "Primary Bedroom",
+        "Primary Bath",
+        "Upper Passage",
+        "Family Bath",
+        "Kids' Room",
+        "Upper Lounge",
+        "Guest Bedroom"
+      ],
+      "flags": [
+        "tv: none",
+        "kitchen-island: none"
+      ]
+    },
+    "truths": "The Core sits on a credenza in the Living Room. There is no television and no kitchen island. Pool, deck, firepit, swing set and pergolas in a walled garden. The conservatory dining room has a fireplace.",
+    "mustNot": [
+      "no television",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "whisper-webui",
+      "name": "Whisper-WebUI",
+      "member": "meenakshi",
+      "room": "Conservatory Dining",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "table-subs",
+      "seed": "Meenakshi turns a recorded interview into a transcript with Whisper-WebUI on the Core, before she starts the translation.",
+      "line": "Whisper-WebUI turns a recorded episode into subtitles on the Core."
+    },
+    {
+      "app": "baikal",
+      "name": "Baikal",
+      "member": "ravi",
+      "room": "Ravi and the record player",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "status": "swap",
+      "beat": "records-week",
+      "seed": "Ravi fits the recording week into the family calendar that Baikal serves from the Core to his phone.",
+      "line": "Baikal serves the household calendar from the Core, and the calendar app on each phone reads it at home."
+    },
+    {
+      "app": "librephotos",
+      "name": "LibrePhotos",
+      "member": "arjun",
+      "room": "Arjun’s room",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "swap",
+      "beat": "guest-match",
+      "seed": "Arjun lets LibrePhotos sort his phone's match pictures by place and by face and finds the goal in one search.",
+      "line": "LibrePhotos sorts the holiday folders by place and face on the Core and finds the beach day in one search."
+    },
+    {
+      "app": "searxng",
+      "name": "SearXNG",
+      "member": "kavya",
+      "room": "Kavya’s room",
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "status": "swap",
+      "beat": "kids-tortoise",
+      "seed": "Kavya and Arjun settle a tortoise argument with one SearXNG search, which asks several search engines at once.",
+      "line": "SearXNG asks several search engines at once and shows one list."
+    },
+    {
+      "app": "airtrail",
+      "name": "AirTrail",
+      "member": null,
+      "room": "Living Room",
+      "service": "Flighty",
+      "serviceId": "flighty",
+      "status": "add",
+      "beat": "living-airtrail",
+      "seed": "AirTrail logs every flight the family have taken and fills in the map of where they have been.",
+      "line": "AirTrail logs every flight the family has taken and fills in the map."
+    },
+    {
+      "app": "kokoro",
+      "name": "Kokoro",
+      "member": "kavya",
+      "room": "Kids' Room",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "kids-stories",
+      "seed": "Kavya types a story about the tortoise, and Kokoro reads it back in a synthetic voice made on the Core.",
+      "line": "Kokoro reads a story aloud in a synthetic voice made on the Core."
+    },
+    {
+      "app": "baserow",
+      "name": "Baserow",
+      "member": null,
+      "room": "Living Room",
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "status": "add",
+      "beat": "living-baserow",
+      "seed": "The agency keeps the week's translation jobs as a table in Baserow, with a view for what is late.",
+      "line": "Baserow is a table with views for the stall's stock and orders."
+    },
+    {
+      "app": "pairdrop",
+      "name": "PairDrop",
+      "member": "arjun",
+      "room": "Guest Bedroom",
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "status": "add",
+      "beat": "guest-drop",
+      "seed": "Arjun sends a screenshot from his phone to the screen on his desk with PairDrop over the home Wi-Fi.",
+      "line": "PairDrop sends a photo or a file to the screen in the next room across the home Wi-Fi."
+    }
+  ],
+  "chipFixes": [
+    {
+      "beat": "table-clearing",
+      "app": "homehub",
+      "from": "OurHome",
+      "to": "Cozi",
+      "why": "the first listed name is a service that no longer exists as named, so the chip and the detail use the next name"
+    }
+  ],
+  "swaps": [
+    {
+      "beat": "kids-tortoise",
+      "member": "kavya",
+      "chapter": "kids",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "searxng",
+      "toName": "SearXNG",
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "pairQuality": "loose",
+      "qualifier": "the search engines it asks still see the question",
+      "seed": "Kavya and Arjun settle a tortoise argument with one SearXNG search, which asks several search engines at once.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "guest-match",
+      "member": "arjun",
+      "chapter": "guest",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "librephotos",
+      "toName": "LibrePhotos",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Arjun lets LibrePhotos sort his phone's match pictures by place and by face and finds the goal in one search.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kids-journal",
+      "member": "kavya",
+      "chapter": "kids",
+      "from": "obsidian",
+      "fromName": "Obsidian",
+      "to": "calibre-web",
+      "toName": "Calibre-Web",
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Kavya's reading journal starts from the shelf: she picks her next book in Calibre-Web and notes what she thought.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-planter",
+      "member": "kavya",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "excalidraw",
+      "toName": "Excalidraw",
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Kavya and Ravi sketch the new pergola bench on Excalidraw before they cut a board.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "records-week",
+      "member": "ravi",
+      "chapter": "records",
+      "from": "ci-planning",
+      "fromName": "Companion Planning",
+      "to": "baikal",
+      "toName": "Baikal",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ravi fits the recording week into the family calendar that Baikal serves from the Core to his phone.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "guest-match"
+      ],
+      "retoldAs": [
+        "guest-match -> LibrePhotos"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "kids-tortoise"
+      ],
+      "retoldAs": [
+        "kids-tortoise -> SearXNG"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "ci-planning",
+      "name": "Companion Planning",
+      "beats": [
+        "records-week"
+      ],
+      "retoldAs": [
+        "records-week -> Baikal"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "hortusfox",
+      "name": "HortusFox",
+      "beats": [
+        "garden-planter"
+      ],
+      "retoldAs": [
+        "garden-planter -> Excalidraw"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "onlyoffice",
+      "libretranslate"
+    ],
+    "was": [
+      "onlyoffice",
+      "libretranslate"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "table-pad",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "meenakshi",
+      "also": [],
+      "room": "Conservatory Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "etherpad",
+      "appName": "Etherpad",
+      "with": [],
+      "service": "Google Docs",
+      "serviceId": "google-docs",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Meenakshi and her proofreader sit at the conservatory table and revise a bilingual brochure together in Etherpad on the home Wi-Fi."
+    },
+    {
+      "id": "table-subs",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "meenakshi",
+      "also": [],
+      "room": "Conservatory Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "whisper-webui",
+      "appName": "Whisper-WebUI",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Meenakshi turns a recorded interview into a transcript with Whisper-WebUI on the Core, before she starts the translation."
+    },
+    {
+      "id": "records-sync",
+      "chapter": "records",
+      "newChapter": null,
+      "member": "ravi",
+      "also": [],
+      "room": "Primary Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom"
+      },
+      "category": "creative",
+      "segment": "small-business",
+      "app": "syncthing",
+      "appName": "Syncthing",
+      "with": [],
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ravi keeps a folder of session stems in step between his laptop and the Core with Syncthing."
+    },
+    {
+      "id": "records-notes",
+      "chapter": "records",
+      "newChapter": null,
+      "member": "ravi",
+      "also": [],
+      "room": "Primary Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom"
+      },
+      "category": "creative",
+      "segment": "small-business",
+      "app": "obsidian",
+      "appName": "Obsidian",
+      "with": [],
+      "service": "Notion",
+      "serviceId": "notion",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ravi keeps his session notes as plain Markdown files in Obsidian, one note for each recording day."
+    },
+    {
+      "id": "guest-model",
+      "chapter": "guest",
+      "newChapter": null,
+      "member": "arjun",
+      "also": [],
+      "room": "Guest Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "blockbench",
+      "appName": "Blockbench",
+      "with": [],
+      "service": "MagicaVoxel",
+      "serviceId": "magicavoxel",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Arjun shapes a block model of the tortoise for a game in Blockbench and saves the file on his own machine."
+    },
+    {
+      "id": "guest-streak",
+      "chapter": "guest",
+      "newChapter": null,
+      "member": "arjun",
+      "also": [],
+      "room": "Guest Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "habitica",
+      "appName": "Habitica",
+      "with": [],
+      "service": "Habitify",
+      "serviceId": "habitify",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Arjun keeps a practice streak in Habitica, and the household chore game adds it to the board."
+    },
+    {
+      "id": "guest-drop",
+      "chapter": "guest",
+      "newChapter": null,
+      "member": "arjun",
+      "also": [],
+      "room": "Guest Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pairdrop",
+      "appName": "PairDrop",
+      "with": [],
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Arjun sends a screenshot from his phone to the screen on his desk with PairDrop over the home Wi-Fi."
+    },
+    {
+      "id": "kids-stories",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "kavya",
+      "also": [],
+      "room": "Kids' Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "kokoro",
+      "appName": "Kokoro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kavya types a story about the tortoise, and Kokoro reads it back in a synthetic voice made on the Core."
+    },
+    {
+      "id": "kids-library",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "kavya",
+      "also": [],
+      "room": "Kids' Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "koodo-reader",
+      "appName": "Koodo Reader",
+      "with": [],
+      "service": "Amazon Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kavya reads her library book in Koodo Reader with the type enlarged and a bookmark where she stops."
+    },
+    {
+      "id": "living-baserow",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "baserow",
+      "appName": "Baserow",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The agency keeps the week's translation jobs as a table in Baserow, with a view for what is late."
+    },
+    {
+      "id": "kitchen-bentopdf",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "bentopdf",
+      "appName": "BentoPDF",
+      "with": [],
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The agency merges and shrinks the bilingual brochure into one PDF in BentoPDF, in the browser tab, before it goes to a translation client."
+    },
+    {
+      "id": "living-airtrail",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "airtrail",
+      "appName": "AirTrail",
+      "with": [],
+      "service": "Flighty",
+      "serviceId": "flighty",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "AirTrail logs every flight the family have taken and fills in the map of where they have been."
+    },
+    {
+      "id": "garage-solidtime",
+      "chapter": "garage",
+      "newChapter": "garage",
+      "member": null,
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "solidtime",
+      "appName": "Solidtime",
+      "with": [],
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The agency logs the week's hours by job in Solidtime."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "garage",
+        "kind": "room",
+        "room": "garage",
+        "title": "The garage",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "table",
+        "room": "dining",
+        "title": "The conservatory table",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "The garage",
+        "new": true
+      },
+      {
+        "id": "guest",
+        "room": "bedroom",
+        "title": "Arjun’s room",
+        "new": false
+      },
+      {
+        "id": "kids",
+        "room": "kids",
+        "title": "Kavya’s room",
+        "new": false
+      },
+      {
+        "id": "records",
+        "room": "bedroom",
+        "title": "Ravi and the record player",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the pool",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-playlist",
+          "member": "ravi",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "living-baserow",
+          "member": null,
+          "app": "baserow",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "living-airtrail",
+          "member": null,
+          "app": "airtrail",
+          "service": "Flighty",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "table",
+      "title": "The conservatory table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": "the long table under the conservatory glass",
+      "beats": [
+        {
+          "id": "table-brochure",
+          "member": "meenakshi",
+          "app": "libretranslate",
+          "service": "Google Translate",
+          "origin": "now"
+        },
+        {
+          "id": "table-reschedule",
+          "member": "meenakshi",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "table-clearing",
+          "member": "arjun",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "table-columns",
+          "member": "meenakshi",
+          "app": "onlyoffice",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "table-glossary",
+          "member": "meenakshi",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "table-pad",
+          "member": "meenakshi",
+          "app": "etherpad",
+          "service": "Google Docs",
+          "origin": "add"
+        },
+        {
+          "id": "table-subs",
+          "member": "meenakshi",
+          "app": "whisper-webui",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-recipe",
+          "member": "kavya",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-bell",
+          "member": "ravi",
+          "app": "ntfy",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-bentopdf",
+          "member": null,
+          "app": "bentopdf",
+          "service": "Adobe Acrobat",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "The garage",
+      "roomRole": "garage",
+      "isNew": true,
+      "subject": "the workbench and bicycle",
+      "beats": [
+        {
+          "id": "garage-solidtime",
+          "member": null,
+          "app": "solidtime",
+          "service": "Toggl Track",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "guest",
+      "title": "Arjun’s room",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "guest-session",
+          "member": "arjun",
+          "app": "steam-headless",
+          "service": "GeForce Now",
+          "origin": "now"
+        },
+        {
+          "id": "guest-vault",
+          "member": "arjun",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "guest-match",
+          "member": "arjun",
+          "app": "librephotos",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "guest-model",
+          "member": "arjun",
+          "app": "blockbench",
+          "service": "MagicaVoxel",
+          "origin": "add"
+        },
+        {
+          "id": "guest-streak",
+          "member": "arjun",
+          "app": "habitica",
+          "service": "Habitify",
+          "origin": "add"
+        },
+        {
+          "id": "guest-drop",
+          "member": "arjun",
+          "app": "pairdrop",
+          "service": "AirDrop",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kids",
+      "title": "Kavya’s room",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kids-tortoise",
+          "member": "kavya",
+          "app": "searxng",
+          "service": "Google Search",
+          "origin": "swap"
+        },
+        {
+          "id": "kids-label",
+          "member": "kavya",
+          "app": "libretranslate",
+          "service": "Google Translate",
+          "origin": "now"
+        },
+        {
+          "id": "kids-journal",
+          "member": "kavya",
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "swap"
+        },
+        {
+          "id": "kids-stories",
+          "member": "kavya",
+          "app": "kokoro",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "kids-library",
+          "member": "kavya",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "records",
+      "title": "Ravi and the record player",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the record player upstairs",
+      "beats": [
+        {
+          "id": "records-trim",
+          "member": "ravi",
+          "app": "audiomass",
+          "service": "Adobe Audition",
+          "origin": "now"
+        },
+        {
+          "id": "records-week",
+          "member": "ravi",
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "records-delivery",
+          "member": "ravi",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "records-sync",
+          "member": "ravi",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "add"
+        },
+        {
+          "id": "records-notes",
+          "member": "ravi",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the pool",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-planter",
+          "member": "kavya",
+          "app": "excalidraw",
+          "service": "Miro",
+          "origin": "swap"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "table-brochure",
+      "line": "Meenakshi gives the brochure a first pass."
+    },
+    {
+      "at": "midday",
+      "beat": "table-subs",
+      "line": "The interview becomes a transcript before lunch."
+    },
+    {
+      "at": "afternoon",
+      "beat": "records-trim",
+      "line": "Ravi trims a record upstairs."
+    },
+    {
+      "at": "after-school",
+      "beat": "kids-stories",
+      "line": "Kavya hears her tortoise story read back."
+    },
+    {
+      "at": "after-school",
+      "beat": "guest-streak",
+      "line": "Arjun ticks off his practice streak."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-planter",
+      "line": "The pergola bench gets a drawing first."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-airtrail",
+      "line": "The flight map fills in."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Spotify",
+      "Google Translate",
+      "OurHome",
+      "Microsoft Office",
+      "Google Drive",
+      "Cozi",
+      "GeForce Now",
+      "LastPass",
+      "Google Photos",
+      "Google Search",
+      "Notion",
+      "Adobe Audition"
+    ],
+    "servicesFinal": [
+      "Spotify",
+      "Google Translate",
+      "Cozi",
+      "Microsoft Office",
+      "Google Drive",
+      "GeForce Now",
+      "LastPass",
+      "Google Photos",
+      "Google Search",
+      "Kindle",
+      "Adobe Audition",
+      "Google Calendar",
+      "Miro",
+      "Google Docs",
+      "Dropbox",
+      "Notion",
+      "MagicaVoxel",
+      "Habitify",
+      "AirDrop",
+      "Amazon Kindle",
+      "Airtable",
+      "Adobe Acrobat",
+      "Flighty",
+      "Toggl Track"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "table-subs",
+      "records-week",
+      "guest-match",
+      "kids-tortoise",
+      "living-airtrail",
+      "kids-stories",
+      "living-baserow",
+      "guest-drop"
+    ],
+    "mustCarry": {
+      "onlyoffice": [
+        "[note] This is the Desktop Editors suite (Writer, Calc, Impress, PDF editor) in a browser session. ONLYOFFICE Document Server and ONLYOFFICE Workspace are different listings; name this one in full. LibreOffice does the s",
+        "[note] amd64 only. One access password set at install; the container includes a privileged desktop environment, so do not call it sandboxed.",
+        "marketplace: e2e/screenshots/onlyoffice.png shows ONLYOFFICE Docs (Document Server) not Desktop Editors."
+      ],
+      "libretranslate": [
+        "[note] Works offline once language models are downloaded.",
+        "Listing says \"works fully offline\": banned wording (sec-offline)",
+        "Say nothing about quality",
+        "Likely already heavy in the existing stories"
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "ntfy": [
+        "[cloud-link] iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "No sign-in is configured: anyone who can reach the URL can publish and subscribe. Keep it on the home network.",
+        "iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "QA screenshot is an empty app with a notifications-blocked banner (shows the product)."
+      ],
+      "steam-headless": [
+        "[cloud-link] Steam needs a Valve account to sign in, and the game library and the purchases are Valve's. The Core runs the session; the account stays with Valve. Say that, never \"no account\".",
+        "[hardware] The listing asks for GPU passthrough for best performance and the Hub package declares no GPU device, so a given Core may not run a given game well. Say what the Core does (it runs the session at home), never ",
+        "[claims] No frame rate, resolution or latency figure, and not \"smooth\". Never \"gaming PC\", \"console replacement\" or \"cloud gaming replacement\" in the text. The chip may read \"replaces GeForce Now\" or \"replaces Xbox Cloud",
+        "[note] It shows a streamed desktop with sound in a browser (noVNC), so the screen needs a browser, not a console. The container runs privileged with host access: do not call it sandboxed. Keep the stream on the home netw",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-account exclusion for the gamer archetype, with the caveats above."
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "librephotos": [
+        "[note] First setup takes 5 to 10 minutes while models and migrations start.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "Face recognition is sensitive: say what it does, never that it \"knows\" people",
+        "Overlaps Immich; use it to relieve Immich's share"
+      ],
+      "searxng": [
+        "[cloud-link] It queries outside search engines for you. Say \"private search\", not \"offline search\".",
+        "cloud-link: the engines still see the query from the Core",
+        "listing says users are not tracked: do not repeat"
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: Documented default admin credentials (admin / admin123); no QA capture."
+      ],
+      "audiomass": [
+        "The Core only serves the page: decoded audio and edits live in the viewer's browser, so \"sits on the Core\" is false until the person saves a file where they choose",
+        "Short description says \"audio never leaves the appliance\": an absolute; paraphrase",
+        "Third-party image (ceramicwhite/audiomass), tag latest"
+      ],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "excalidraw": [
+        "[note] amd64 only. An Excalidraw MCP entry exists for agents.",
+        "marketplace: Manifest source points to ozencb/excalidraw-persist, a 105-star wrapper, not excalidraw/excalidraw."
+      ],
+      "etherpad": [],
+      "whisper-webui": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Model weights download from the internet on first use.",
+        "YouTube URL input, DeepL translation and pyannote diarization models are outside services or accounts: leave out.",
+        "Open access on the LAN unless a username and password are set."
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "obsidian": [
+        "[licence] Obsidian is not open source. Do not call it open source.",
+        "[note] An Obsidian MCP entry exists so an agent can read and write the vault.",
+        "not open source (catalog: never say so)",
+        "listing says private and offline: do not repeat",
+        "notes are files on the Core, the app is streamed"
+      ],
+      "blockbench": [
+        "Projects live in the browser (IndexedDB) or in files the person saves: the Core serves the app, it does not hold the models",
+        "The listing names Minecraft models; say \"game models\" or \"block models\" in copy",
+        "Free-text store claim \"never sees your models\" is accurate for the container"
+      ],
+      "habitica": [
+        "The sign-up page in the capture carries a cookie-consent banner: check the self-hosted build for analytics scripts before saying it sends nothing out",
+        "Game, not a health or behaviour tool: no outcomes"
+      ],
+      "pairdrop": [
+        "none from the catalog"
+      ],
+      "kokoro": [
+        "[note] OpenAI-compatible speech API. No GPU requirement in the listing.",
+        "OpenAI-compatible speech API; web player included.",
+        "No GPU requirement in the listing; no speed claim.",
+        "Capture is real (FastKoko player) on a dark purple background."
+      ],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "baserow": [
+        "[note] Overlaps NocoDB, Grist and Teable."
+      ],
+      "bentopdf": [
+        "Dual licence: AGPL-3.0 or paid commercial; fine for household use",
+        "Listing says \"nothing to leak\": drop that wording",
+        "Overlaps Stirling-PDF (the persona PDF app)"
+      ],
+      "airtrail": [
+        "Logbook and statistics, not live flight tracking (listing short_desc says \"flight tracking\")",
+        "First user becomes administrator",
+        "Does not claim live flight status; story must say logbook"
+      ],
+      "solidtime": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "listing mentions invoices: say nothing about billing or tax"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "etherpad",
+      "display": "Etherpad",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Google Docs"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [],
+      "evidence": "CI-Marketplace apps/etherpad/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m3)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "calibre-web",
+      "beats": [
+        "kids-journal"
+      ]
+    },
+    {
+      "app": "whisper-webui",
+      "beats": [
+        "table-subs"
+      ]
+    },
+    {
+      "app": "syncthing",
+      "beats": [
+        "records-sync"
+      ]
+    },
+    {
+      "app": "solidtime",
+      "beats": [
+        "garage-solidtime"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

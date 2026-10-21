@@ -1,0 +1,1531 @@
+{
+  "v": 3,
+  "slug": "tesfaye",
+  "house": "mirage",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/tesfaye.json",
+    "sha1": "a1c149742cab0c2610c2db53c03689834bff54b3",
+    "beatsNow": 23,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "older-kids",
+  "business": false,
+  "narrator": "v-young-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-memory",
+        "vikunja",
+        "cryptpad",
+        "gitea",
+        "photoprism",
+        "libretranslate"
+      ],
+      "beatApps": {
+        "food": "grocy",
+        "iot": "ntfy"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-memory",
+          "vikunja",
+          "cryptpad",
+          "gitea",
+          "jupyterlab",
+          "photoprism",
+          "home-assistant"
+        ],
+        "beatApps": {
+          "food": "kitchenowl"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "jupyterlab dropped: no beat tells it any more",
+        "home-assistant dropped: no beat tells it any more",
+        "beatApps.food kitchenowl dropped",
+        "libretranslate added: the learner pool for selam",
+        "beatApps.food grocy added",
+        "beatApps.iot ntfy added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 15,
+    "swaps": 5,
+    "householdBeats": 4,
+    "householdBeatsMax": 6,
+    "persona": {
+      "hana": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "dawit": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "selam": {
+        "now": 3,
+        "add": 4,
+        "target": 7
+      },
+      "bruk": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      }
+    },
+    "pairShare": 0.839,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "hana",
+      "name": "Hana",
+      "age": 49,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "hospital operations manager",
+      "companion": {
+        "name": "Fennel",
+        "runtime": "Hermes",
+        "memory": true
+      },
+      "lens": [
+        "household-manager"
+      ],
+      "thread": "Running the house's calendar and paperwork from the Den, with Companion Memory (beta)."
+    },
+    {
+      "id": "dawit",
+      "name": "Dawit",
+      "age": 51,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "systems engineer",
+      "companion": {
+        "name": "Bramble",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "household-manager"
+      ],
+      "thread": "Systems work at the kitchen table, and the rota that keeps the house in step."
+    },
+    {
+      "id": "selam",
+      "name": "Selam",
+      "age": 15,
+      "role": "teen",
+      "archetype": "learner",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-study",
+        "tinkerer"
+      ],
+      "thread": "The reading loft, a telescope and a poem."
+    },
+    {
+      "id": "bruk",
+      "name": "Bruk",
+      "age": 19,
+      "role": "adult-child",
+      "archetype": "maker",
+      "work": "photography student",
+      "companion": null,
+      "lens": [
+        "photographer",
+        "musician-listener",
+        "student-adult"
+      ],
+      "thread": "A photography student who also plays the upright piano."
+    }
+  ],
+  "character": {
+    "lede": "A terraced modern house climbs a lake bank on a fieldstone plinth, with a glass stair tower and a lily pond below. A pool terrace sits beside the loggia, and a reading loft with a telescope tops the house.",
+    "spots": [
+      {
+        "room": "Reading Loft",
+        "line": "A daybed, low shelves and a telescope fill the loft."
+      },
+      {
+        "room": "Living Salon",
+        "line": "An upright piano stands among the sofas and armchairs."
+      },
+      {
+        "room": "Loggia Dining",
+        "line": "A long trestle table and four columns make the loggia."
+      }
+    ],
+    "facts": {
+      "storeys": 4,
+      "areaSqm": 412,
+      "ground": "lawn",
+      "style": "Terraced hillside modern on a lake: a fieldstone plinth lifts the main floor, loggia and pool terrace a storey above a jungle bank and lily pond; a glass stair tower with stone piers, a bedroom floor cantilevered over the loggia on walnut fascias, a dark-timber clerestory, an olive lap-siding den and a pale stucco entry block",
+      "rooms": [
+        "Entry Lobby",
+        "Entry Gallery",
+        "Stair Hall",
+        "Storage & Laundry",
+        "Den",
+        "Stair Tower",
+        "Living Salon",
+        "Kitchen",
+        "Loggia Dining",
+        "Stair Tower",
+        "Stair Landing",
+        "Upper Hall",
+        "Bedroom Two",
+        "Family Bath",
+        "Primary Bedroom",
+        "Primary Bath",
+        "Reading Loft",
+        "Loft Stair"
+      ],
+      "flags": [
+        "tv: none",
+        "kitchen-island: none",
+        "desk: core-shelf-only"
+      ]
+    },
+    "truths": "The Core sits on the breakfast bar in the Kitchen. No television, no kitchen island. The upright piano is in the Living Salon; the telescope is in the Reading Loft. Pool terrace and lily pond outside.",
+    "mustNot": [
+      "no television",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "baikal",
+      "name": "Baikal",
+      "member": "hana",
+      "room": "Den",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "status": "add",
+      "beat": "den-cal",
+      "seed": "Hana puts the airport run and the regatta on the calendar that Baikal serves from the Core to every phone.",
+      "line": "Baikal serves the household calendar from the Core, and the calendar app on each phone reads it at home."
+    },
+    {
+      "app": "aider",
+      "name": "Aider",
+      "member": "dawit",
+      "room": "Kitchen",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "status": "add",
+      "beat": "kitchen-assist",
+      "seed": "Dawit asks Aider to tidy a deploy script, then reads each commit it made before he keeps it.",
+      "line": "Aider edits the code and commits each change, so the builder reads it and can undo it."
+    },
+    {
+      "app": "skybro",
+      "name": "SkyBro",
+      "member": "selam",
+      "room": "Reading Loft",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "loft-sky",
+      "seed": "Selam checks the tablet beside the telescope for the aircraft that crosses the lake at noon, using SkyBro.",
+      "line": "SkyBro shows the aircraft and satellites overhead on a tablet by the telescope."
+    },
+    {
+      "app": "penpot",
+      "name": "Penpot",
+      "member": "bruk",
+      "room": "Living Salon",
+      "service": "Figma",
+      "serviceId": "figma",
+      "status": "add",
+      "beat": "living-shrink",
+      "seed": "Bruk lays out his portfolio pages in Penpot, with the files kept on the Core, before he shows his tutor.",
+      "line": "Penpot is where the studio designs a screen, with the files kept on the Core."
+    },
+    {
+      "app": "adventurelog",
+      "name": "AdventureLog",
+      "member": null,
+      "room": "Loggia Dining",
+      "service": "Polarsteps",
+      "serviceId": "polarsteps",
+      "status": "add",
+      "beat": "loggia-adventurelog",
+      "seed": "AdventureLog keeps the regatta weekends as a map and a journal, one entry for each place.",
+      "line": "AdventureLog keeps the family's trips as a map and a journal."
+    },
+    {
+      "app": "dropgate",
+      "name": "Dropgate",
+      "member": null,
+      "room": "Loggia Dining",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "loggia-dropgate",
+      "seed": "A short code sends a big video from the Living Salon to the laptop in the next room with Dropgate, over the home Wi-Fi.",
+      "line": "Dropgate sends a camera-card video across the room by a short code."
+    },
+    {
+      "app": "open-notebook",
+      "name": "Open Notebook",
+      "member": "bruk",
+      "room": "Living Salon",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "status": "add",
+      "beat": "living-essay",
+      "seed": "Bruk gathers four essays on documentary photography into Open Notebook and asks what they agree on.",
+      "line": "Open Notebook gathers three articles and the lecture notes into one notebook and answers from them."
+    },
+    {
+      "app": "audiomass",
+      "name": "AudioMass",
+      "member": "bruk",
+      "room": "Living Salon",
+      "service": "Adobe Audition",
+      "serviceId": "adobe-audition",
+      "status": "add",
+      "beat": "living-take",
+      "seed": "Bruk levels a piano take in AudioMass, in the browser tab, and saves the clean file where he chooses.",
+      "line": "AudioMass trims and levels a choir take in the browser tab, and the edited file goes where the person saves it."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "loft-lookup",
+      "member": "selam",
+      "chapter": "loft",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "calibre-web",
+      "toName": "Calibre-Web",
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Selam finds the poem's author in the anthology on the family's Calibre-Web shelf and reads the whole page.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-scene",
+      "member": "dawit",
+      "chapter": "living",
+      "from": "home-assistant",
+      "fromName": "Home Assistant",
+      "to": "ntfy",
+      "toName": "ntfy",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Dawit sends one ntfy note to the phone in the piano room when it is time for Bruk's practice hour.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-model",
+      "member": "dawit",
+      "chapter": "kitchen",
+      "from": "gitea",
+      "fromName": "Gitea",
+      "to": "gitea",
+      "toName": "Gitea",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Dawit asks nothing of a model today: he reviews the rota's history in Gitea line by line.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "loft-coots",
+      "member": "selam",
+      "chapter": "loft",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "obsidian",
+      "toName": "Obsidian",
+      "service": "Notion",
+      "serviceId": "notion",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Selam tallies the coots from the loft in an Obsidian note and keeps the count week by week.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "loggia-meals",
+      "member": "hana",
+      "chapter": "loggia",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "grocy",
+      "toName": "Grocy",
+      "service": "AnyList",
+      "serviceId": "anylist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Teff flour goes on the list in Grocy, which also counts what is in the pantry.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "kitchen-model"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kitchenowl",
+      "name": "KitchenOwl",
+      "beats": [
+        "loggia-meals"
+      ],
+      "retoldAs": [
+        "loggia-meals -> Grocy"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "home-assistant",
+      "name": "Home Assistant",
+      "beats": [
+        "living-scene"
+      ],
+      "retoldAs": [
+        "living-scene -> ntfy"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "beats": [
+        "loft-coots"
+      ],
+      "retoldAs": [
+        "loft-coots -> Obsidian"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "loft-lookup"
+      ],
+      "retoldAs": [
+        "loft-lookup -> Calibre-Web"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "vikunja",
+      "gitea"
+    ],
+    "was": [
+      "vikunja",
+      "gitea"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "den-cal",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "hana",
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "baikal",
+      "appName": "Baikal",
+      "with": [],
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hana puts the airport run and the regatta on the calendar that Baikal serves from the Core to every phone."
+    },
+    {
+      "id": "den-renew",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "hana",
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "wallos",
+      "appName": "Wallos",
+      "with": [],
+      "service": "Rocket Money",
+      "serviceId": "rocket-money",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hana lists every renewing subscription in Wallos and sees which ones nobody opens."
+    },
+    {
+      "id": "kitchen-assist",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "dawit",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "dining-table",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "aider",
+      "appName": "Aider",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Dawit asks Aider to tidy a deploy script, then reads each commit it made before he keeps it."
+    },
+    {
+      "id": "kitchen-request",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "dawit",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "dining-table",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Dawit tests a service from a Hoppscotch tab, and the request collection stays in that browser."
+    },
+    {
+      "id": "loft-sky",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "selam",
+      "also": [],
+      "room": "Reading Loft",
+      "roomRole": "living",
+      "anchor": {
+        "role": "telescope",
+        "room": "living"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "skybro",
+      "appName": "SkyBro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Selam checks the tablet beside the telescope for the aircraft that crosses the lake at noon, using SkyBro."
+    },
+    {
+      "id": "loft-notes",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "selam",
+      "also": [],
+      "room": "Reading Loft",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "joplin",
+      "appName": "Joplin Server",
+      "with": [],
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Selam syncs her reading notes from the Joplin app on her laptop to Joplin Server on the Core."
+    },
+    {
+      "id": "loft-pad",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "selam",
+      "also": [],
+      "room": "Reading Loft",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "etherpad",
+      "appName": "Etherpad",
+      "with": [],
+      "service": "Google Docs",
+      "serviceId": "google-docs",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Selam and a classmate write a comparison of two poems together in Etherpad on the home Wi-Fi."
+    },
+    {
+      "id": "loft-reader",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "selam",
+      "also": [],
+      "room": "Reading Loft",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "koodo-reader",
+      "appName": "Koodo Reader",
+      "with": [],
+      "service": "Amazon Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Selam reads a novel on the daybed in Koodo Reader with larger type and a bookmark."
+    },
+    {
+      "id": "living-shrink",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "bruk",
+      "also": [],
+      "room": "Living Salon",
+      "roomRole": "living",
+      "anchor": {
+        "role": "music",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "penpot",
+      "appName": "Penpot",
+      "with": [],
+      "service": "Figma",
+      "serviceId": "figma",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Bruk lays out his portfolio pages in Penpot, with the files kept on the Core, before he shows his tutor."
+    },
+    {
+      "id": "living-take",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "bruk",
+      "also": [],
+      "room": "Living Salon",
+      "roomRole": "living",
+      "anchor": {
+        "role": "music",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "audiomass",
+      "appName": "AudioMass",
+      "with": [],
+      "service": "Adobe Audition",
+      "serviceId": "adobe-audition",
+      "pairQuality": "loose",
+      "qualifier": "a single-file audio editor",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Bruk levels a piano take in AudioMass, in the browser tab, and saves the clean file where he chooses."
+    },
+    {
+      "id": "living-essay",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "bruk",
+      "also": [],
+      "room": "Living Salon",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "open-notebook",
+      "appName": "Open Notebook",
+      "with": [],
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Bruk gathers four essays on documentary photography into Open Notebook and asks what they agree on."
+    },
+    {
+      "id": "loggia-dropgate",
+      "chapter": "loggia",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Loggia Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "dropgate",
+      "appName": "Dropgate",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A short code sends a big video from the Living Salon to the laptop in the next room with Dropgate, over the home Wi-Fi."
+    },
+    {
+      "id": "laundry-enclosed",
+      "chapter": "laundry",
+      "newChapter": "laundry",
+      "member": null,
+      "also": [],
+      "room": "Storage & Laundry",
+      "roomRole": "laundry",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "enclosed",
+      "appName": "Enclosed",
+      "with": [],
+      "service": "PrivNote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "An Enclosed note holds the entry code for the regatta crew staying over, read on the home Wi-Fi, with an expiry that closes it after a day."
+    },
+    {
+      "id": "loggia-adventurelog",
+      "chapter": "loggia",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Loggia Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "adventurelog",
+      "appName": "AdventureLog",
+      "with": [],
+      "service": "Polarsteps",
+      "serviceId": "polarsteps",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "AdventureLog keeps the regatta weekends as a map and a journal, one entry for each place."
+    },
+    {
+      "id": "den-miniflux",
+      "chapter": "den",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "miniflux",
+      "appName": "Miniflux",
+      "with": [],
+      "service": "Feedly",
+      "serviceId": "feedly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Miniflux follows the sailing writers and the lake paper, with the read list kept on the Core."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "laundry",
+        "kind": "room",
+        "room": "laundry",
+        "title": "Down in the laundry",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "laundry",
+        "room": "laundry",
+        "title": "Down in the laundry",
+        "new": true
+      },
+      {
+        "id": "loggia",
+        "room": "dining",
+        "title": "The loggia table",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out on the balcony",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "Bruk's living salon",
+        "new": false
+      },
+      {
+        "id": "den",
+        "room": "office",
+        "title": "Hana's den",
+        "new": false
+      },
+      {
+        "id": "loft",
+        "room": "living",
+        "title": "Selam's reading loft",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": "the breakfast bar where the Core sits",
+      "beats": [
+        {
+          "id": "kitchen-gitea",
+          "member": "dawit",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-paper",
+          "member": "hana",
+          "app": "paperless",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-errand",
+          "member": "dawit",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-model",
+          "member": "dawit",
+          "app": "gitea",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-assist",
+          "member": "dawit",
+          "app": "aider",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-request",
+          "member": "dawit",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "laundry",
+      "title": "Down in the laundry",
+      "roomRole": "laundry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "laundry-enclosed",
+          "member": null,
+          "app": "enclosed",
+          "service": "PrivNote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "loggia",
+      "title": "The loggia table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "loggia-meals",
+          "member": "hana",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "swap"
+        },
+        {
+          "id": "loggia-dropgate",
+          "member": null,
+          "app": "dropgate",
+          "service": "WeTransfer",
+          "origin": "add"
+        },
+        {
+          "id": "loggia-adventurelog",
+          "member": null,
+          "app": "adventurelog",
+          "service": "Polarsteps",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out on the balcony",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-herbs",
+          "member": "dawit",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "now"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "Bruk's living salon",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the upright piano",
+      "beats": [
+        {
+          "id": "living-photos",
+          "member": "bruk",
+          "app": "photoprism",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "living-scene",
+          "member": "dawit",
+          "app": "ntfy",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "living-takes",
+          "member": "bruk",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "living-crit",
+          "member": "bruk",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "now"
+        },
+        {
+          "id": "living-shrink",
+          "member": "bruk",
+          "app": "penpot",
+          "service": "Figma",
+          "origin": "add"
+        },
+        {
+          "id": "living-take",
+          "member": "bruk",
+          "app": "audiomass",
+          "service": "Adobe Audition",
+          "origin": "add"
+        },
+        {
+          "id": "living-essay",
+          "member": "bruk",
+          "app": "open-notebook",
+          "service": "NotebookLM",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "den",
+      "title": "Hana's den",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "den-tasks",
+          "member": "hana",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "now"
+        },
+        {
+          "id": "den-pad",
+          "member": "bruk",
+          "app": "cryptpad",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "den-memory",
+          "member": "hana",
+          "app": "ci-memory",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "den-cal",
+          "member": "hana",
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "add"
+        },
+        {
+          "id": "den-renew",
+          "member": "hana",
+          "app": "wallos",
+          "service": "Rocket Money",
+          "origin": "add"
+        },
+        {
+          "id": "den-miniflux",
+          "member": null,
+          "app": "miniflux",
+          "service": "Feedly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "loft",
+      "title": "Selam's reading loft",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the telescope and daybed under the roof",
+      "beats": [
+        {
+          "id": "loft-coots",
+          "member": "selam",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "swap"
+        },
+        {
+          "id": "loft-lookup",
+          "member": "selam",
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "swap"
+        },
+        {
+          "id": "loft-poem",
+          "member": "selam",
+          "app": "libretranslate",
+          "service": "Google Translate",
+          "origin": "now"
+        },
+        {
+          "id": "loft-sky",
+          "member": "selam",
+          "app": "skybro",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "loft-notes",
+          "member": "selam",
+          "app": "joplin",
+          "service": "Evernote",
+          "origin": "add"
+        },
+        {
+          "id": "loft-pad",
+          "member": "selam",
+          "app": "etherpad",
+          "service": "Google Docs",
+          "origin": "add"
+        },
+        {
+          "id": "loft-reader",
+          "member": "selam",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-paper",
+      "line": "Hana finds the boiler letter before work."
+    },
+    {
+      "at": "morning",
+      "beat": "kitchen-gitea",
+      "line": "Dawit opens the rota's history at the table."
+    },
+    {
+      "at": "midday",
+      "beat": "den-cal",
+      "line": "Hana moves the airport run on the calendar."
+    },
+    {
+      "at": "afternoon",
+      "beat": "loft-pad",
+      "line": "Selam writes with a classmate under the roof."
+    },
+    {
+      "at": "after-school",
+      "beat": "living-take",
+      "line": "Bruk levels a piano take."
+    },
+    {
+      "at": "after-school",
+      "beat": "living-shrink",
+      "line": "Bruk lays out the portfolio pages."
+    },
+    {
+      "at": "weekend",
+      "beat": "laundry-enclosed",
+      "line": "A note with an expiry holds the door code."
+    },
+    {
+      "at": "weekend",
+      "beat": "loggia-dropgate",
+      "line": "A short code sends a big video next door."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "GitHub",
+      "Google Drive",
+      "Todoist",
+      "Google Photos",
+      "Google Home",
+      "Spotify",
+      "Notion",
+      "Microsoft Office",
+      "Google Search",
+      "Google Translate"
+    ],
+    "servicesFinal": [
+      "GitHub",
+      "Google Drive",
+      "AnyList",
+      "Todoist",
+      "Google Photos",
+      "Spotify",
+      "Notion",
+      "Microsoft Office",
+      "Kindle",
+      "Google Translate",
+      "Google Calendar",
+      "Rocket Money",
+      "GitHub Copilot",
+      "Postman",
+      "Evernote",
+      "Google Docs",
+      "Amazon Kindle",
+      "Figma",
+      "Adobe Audition",
+      "NotebookLM",
+      "WeTransfer",
+      "PrivNote",
+      "Polarsteps",
+      "Feedly"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "den-cal",
+      "kitchen-assist",
+      "loft-sky",
+      "living-shrink",
+      "loggia-adventurelog",
+      "loggia-dropgate",
+      "living-essay",
+      "living-take"
+    ],
+    "mustCarry": {
+      "vikunja": [
+        "[note] Supports CalDAV sync.",
+        "QA shot is a sign-in wall",
+        "CalDAV sync with calendar apps"
+      ],
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "paperless": [
+        "[note] AI features are off by default. If you turn them on they can use a local model.",
+        "[note] Office document conversion is not wired up in this build; OCR and archiving of PDFs and scans works."
+      ],
+      "grocy": [
+        "[note] The listing is short. Describe pantry stock, shopping lists, recipes and chores only.",
+        "Short listing: describe pantry stock, shopping lists, recipes, tasks and habits only (catalog)",
+        "Upstream demo screenshot shows a dollar total: prices on screen"
+      ],
+      "photoprism": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "ntfy": [
+        "[cloud-link] iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "No sign-in is configured: anyone who can reach the URL can publish and subscribe. Keep it on the home network.",
+        "iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "QA screenshot is an empty app with a notifications-blocked banner (shows the product)."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "obsidian": [
+        "[licence] Obsidian is not open source. Do not call it open source.",
+        "[note] An Obsidian MCP entry exists so an agent can read and write the vault.",
+        "not open source (catalog: never say so)",
+        "listing says private and offline: do not repeat",
+        "notes are files on the Core, the app is streamed"
+      ],
+      "cryptpad": [
+        "Listing says \"end-to-end encrypted\": banned wording (f-security-guarantee), do not repeat",
+        "Collaboration with people outside the home needs outside reach"
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: Documented default admin credentials (admin / admin123); no QA capture."
+      ],
+      "libretranslate": [
+        "[note] Works offline once language models are downloaded.",
+        "Listing says \"works fully offline\": banned wording (sec-offline)",
+        "Say nothing about quality",
+        "Likely already heavy in the existing stories"
+      ],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "wallos": [
+        "[note] Fetches logos for popular services from outside.",
+        "[claims] Do not promise savings."
+      ],
+      "aider": [
+        "[cloud-link] The Hub injects its own model endpoint, so it needs no cloud key. A model override field can point it at another OpenAI-compatible endpoint; leave it on the Hub model. A coding agent is private only on the C",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. Every edit is a git commit, which is the approval step: the person reviews and can undo it with git.",
+        "[note] The browser interface is marked experimental upstream. Do not call it finished.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "skybro": [
+        "[cloud-link] Reads outside data feeds (ADS-B, weather). Alerts go to Pushover or Discord.",
+        "The map and alerts depend on outside data; the Core hosts the dashboard",
+        "Home location defaults to Los Angeles from the time zone until changed",
+        "Dark map UI with a welcome dialog"
+      ],
+      "joplin": [
+        "[note] Joplin Server only; the Joplin apps are separate.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "marketplace: Joplin Server carries its own Personal Use License: not open source and limited for business use."
+      ],
+      "etherpad": [],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "penpot": [
+        "Five containers (frontend, backend, exporter, Postgres, Redis).",
+        "QA screenshot is the log-in page: reject.",
+        "Listing images show community library tiles: marketing."
+      ],
+      "audiomass": [
+        "The Core only serves the page: decoded audio and edits live in the viewer's browser, so \"sits on the Core\" is false until the person saves a file where they choose",
+        "Short description says \"audio never leaves the appliance\": an absolute; paraphrase",
+        "Third-party image (ceramicwhite/audiomass), tag latest"
+      ],
+      "open-notebook": [
+        "[cloud-link] Supports 18 plus providers including cloud ones. Ollama is the local path.",
+        "[heavy] Podcast-style audio overviews need a speech model.",
+        "Install form has OpenAI, Anthropic, Google and Groq key fields: leave blank; Ollama is the local path.",
+        "Podcast style audio overviews need a speech model: do not mention.",
+        "Capture shows sample notebook content, not personal data."
+      ],
+      "dropgate": [
+        "The QA build shows \"Standard uploads are disabled on this server\": only direct transfer worked in the capture",
+        "\"Beyond your network\" sharing needs outside reach to the Core"
+      ],
+      "enclosed": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "adventurelog": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "miniflux": [
+        "[note] Overlaps FreshRSS.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Integrations push to outside services if switched on (Pocket, Telegram, webhooks)",
+        "No QA screenshot",
+        "Overlaps FreshRSS (utilities slice)"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "etherpad",
+      "display": "Etherpad",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Google Docs"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [],
+      "evidence": "CI-Marketplace apps/etherpad/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m3)"
+    },
+    {
+      "app": "dropgate",
+      "display": "Dropgate",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "WeTransfer",
+        "Dropbox"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The QA build shows \"Standard uploads are disabled on this server\": only direct transfer worked in the capture",
+        "\"Beyond your network\" sharing needs outside reach to the Core"
+      ],
+      "evidence": "CI-Marketplace apps/dropgate/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "enclosed",
+      "display": "Enclosed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "PrivNote"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "evidence": "CI-Marketplace apps/enclosed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "calibre-web",
+      "beats": [
+        "loft-lookup"
+      ]
+    },
+    {
+      "app": "aider",
+      "beats": [
+        "kitchen-assist"
+      ]
+    },
+    {
+      "app": "adventurelog",
+      "beats": [
+        "loggia-adventurelog"
+      ]
+    },
+    {
+      "app": "miniflux",
+      "beats": [
+        "den-miniflux"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

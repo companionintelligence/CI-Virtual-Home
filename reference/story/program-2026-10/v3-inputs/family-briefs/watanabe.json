@@ -1,0 +1,1412 @@
+{
+  "v": 3,
+  "slug": "watanabe",
+  "house": "riverbend",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/watanabe.json",
+    "sha1": "abe8e308c160df3471195310b777627484531fe7",
+    "beatsNow": 23,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "grandparents",
+  "business": false,
+  "narrator": "v-storyteller-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "homehub",
+        "navidrome",
+        "gitea",
+        "immich",
+        "frigate",
+        "audiobookshelf"
+      ],
+      "beatApps": {},
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "homehub",
+          "navidrome",
+          "gitea",
+          "immich",
+          "kiwix",
+          "frigate"
+        ],
+        "beatApps": {},
+        "reviewNeeded": []
+      },
+      "notes": [
+        "kiwix dropped: no beat tells it any more",
+        "audiobookshelf added: the learner pool for kenji"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 15,
+    "swaps": 2,
+    "householdBeats": 3,
+    "householdBeatsMax": 6,
+    "persona": {
+      "yoshiko": {
+        "now": 6,
+        "add": 1,
+        "target": 7
+      },
+      "haruo": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      },
+      "emi": {
+        "now": 3,
+        "add": 4,
+        "target": 7
+      },
+      "kenji": {
+        "now": 3,
+        "add": 3,
+        "target": 6
+      },
+      "sora": {
+        "now": 1,
+        "add": 1,
+        "target": 2
+      }
+    },
+    "pairShare": 0.806,
+    "pairShareMin": 0.8,
+    "chapters": 8
+  },
+  "members": [
+    {
+      "id": "yoshiko",
+      "name": "Yoshiko",
+      "age": 67,
+      "role": "grandparent",
+      "archetype": "host",
+      "work": "cooks for the whole house",
+      "companion": {
+        "name": "Cinnamon",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "host-cook",
+        "elder-day"
+      ],
+      "thread": "Cooking for the whole house: the recipe cards, the boiler manual and the geese."
+    },
+    {
+      "id": "haruo",
+      "name": "Haruo",
+      "age": 70,
+      "role": "grandparent",
+      "archetype": "maker",
+      "work": "retired surveyor, keeps a record collection",
+      "companion": {
+        "name": "Sesame",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "elder-day",
+        "musician-listener",
+        "reader-collector"
+      ],
+      "thread": "A retired surveyor with a record collection, a bookshelf and a file of old survey papers."
+    },
+    {
+      "id": "emi",
+      "name": "Emi",
+      "age": 38,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "backend developer, works from home",
+      "companion": {
+        "name": "Chestnut",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro"
+      ],
+      "thread": "Backend work from Bedroom Two, around the baby's naps."
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji",
+      "age": 9,
+      "role": "child",
+      "archetype": "learner",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker",
+        "reader-collector"
+      ],
+      "thread": "A nine-year-old with a bridge model, a reading shelf and a streak."
+    },
+    {
+      "id": "sora",
+      "name": "Sora",
+      "age": 0,
+      "role": "baby",
+      "archetype": null,
+      "work": null,
+      "companion": null,
+      "lens": [
+        "baby-year"
+      ],
+      "thread": "A first year with a nursery, a clothes box and a list."
+    }
+  ],
+  "character": {
+    "lede": "A two-tone brick family house stands on a riverside lot, with three gables across the front and a glazed entry. A two-car garage, a pond and a picnic table sit around it.",
+    "spots": [
+      {
+        "room": "Family Room",
+        "line": "A record player, two wingback chairs and a toy box share the family room."
+      },
+      {
+        "room": "Nursery",
+        "line": "A crib, a glider and a changing table fill the upstairs nursery."
+      },
+      {
+        "room": "Two-Car Garage",
+        "line": "An exercise bike, a bench and a workbench share the garage."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 494,
+      "ground": "waterfront",
+      "style": "Two-storey two-tone brick family traditional on a riverside lot: one long side-gabled ridge with a single dormer, three wall gables across the front (brick over the garage, a tall brick centre gable, a whitewashed gable over a recessed glazed entry), a pent roof over the garage, a bay under its own hip, a lower hipped east wing with the hearth chimney; a rock-edged stream and topiary cones in front, a lily pond and willow on the west lawn, the river behind",
+      "rooms": [
+        "Two-Car Garage",
+        "Mudroom & Laundry",
+        "Kitchen",
+        "Dining",
+        "Formal Living",
+        "Foyer & Stair Hall",
+        "Family Room",
+        "Primary Suite",
+        "Primary Bath",
+        "Upper Hall",
+        "Family Bath",
+        "Landing",
+        "East Hall",
+        "Bedroom Two",
+        "Nursery",
+        "Bedroom Three",
+        "Guest Bedroom"
+      ],
+      "flags": [
+        "tv: none",
+        "kitchen-island: none"
+      ]
+    },
+    "truths": "The Core sits on a credenza in the Family Room, in sight of the door. There is no television and no kitchen island. Riverside lot with ponds, a picnic table and a barbecue. Three generations live here; the baby sleeps in the upstairs nursery.",
+    "mustNot": [
+      "no television",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "bookstack",
+      "name": "BookStack",
+      "member": "yoshiko",
+      "room": "The kitchen",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "status": "swap",
+      "beat": "kitchen-boiler",
+      "seed": "Haruo finds the boiler steps in the house manual in BookStack, with a page for every machine in the house.",
+      "line": "BookStack holds the house manual in books, chapters and pages: the stopcock, the boiler, the sitter's guide."
+    },
+    {
+      "app": "audiomass",
+      "name": "AudioMass",
+      "member": "haruo",
+      "room": "Family Room",
+      "service": "Adobe Audition",
+      "serviceId": "adobe-audition",
+      "status": "add",
+      "beat": "living-trim",
+      "seed": "Haruo trims the click from a copied record in AudioMass, in the browser tab, and saves the clean file where he chooses.",
+      "line": "AudioMass trims and levels a choir take in the browser tab, and the edited file goes where the person saves it."
+    },
+    {
+      "app": "ollama",
+      "name": "Ollama",
+      "member": "emi",
+      "room": "Bedroom Two",
+      "service": "OpenAI",
+      "serviceId": "openai",
+      "status": "add",
+      "beat": "emi-model",
+      "seed": "Emi pulls an open-weight model onto the Core with Ollama, and the prompts she used to send out are answered at home.",
+      "line": "Ollama runs an open-weight model on the Core for the prompts a builder used to send out."
+    },
+    {
+      "app": "project-nomad",
+      "name": "Project N.O.M.A.D.",
+      "member": "kenji",
+      "room": "Kenji’s room",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "kenji-river",
+      "seed": "Kenji follows a Project N.O.M.A.D. lesson on rivers, with the maps and the encyclopaedia fetched once at setup and served from the Core.",
+      "line": "Project N.O.M.A.D. gives the kids' desk lessons, maps and an encyclopaedia served from the Core."
+    },
+    {
+      "app": "homebox",
+      "name": "HomeBox",
+      "member": "sora",
+      "room": "Nursery",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "status": "add",
+      "beat": "nursery-boxes",
+      "seed": "Sora's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once.",
+      "line": "HomeBox gives every box in the loft and garage a label, a place and a note about what is inside."
+    },
+    {
+      "app": "yamtrack",
+      "name": "Yamtrack",
+      "member": null,
+      "room": "Family Room",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "living-yamtrack",
+      "seed": "Yamtrack keeps one list of the books finished, the films watched and the series still to come.",
+      "line": "Yamtrack keeps one list of the books finished, the films watched and the series to come."
+    },
+    {
+      "app": "karakeep",
+      "name": "Karakeep",
+      "member": null,
+      "room": "Family Room",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "status": "add",
+      "beat": "living-karakeep",
+      "seed": "The three generations gather clippings for the next project in Karakeep, tagged by hand.",
+      "line": "Karakeep gathers the clippings for a project in one place, tagged by hand."
+    },
+    {
+      "app": "booklore",
+      "name": "BookLore",
+      "member": "haruo",
+      "room": "Family Room",
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "status": "add",
+      "beat": "living-library",
+      "seed": "Haruo shelves his survey handbooks by series and author in BookLore, and each shelf reads in order.",
+      "line": "BookLore shelves the family library by series and author, with covers filled in when books arrive."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "kenji-river",
+      "member": "kenji",
+      "chapter": "kenji",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "project-nomad",
+      "toName": "Project N.O.M.A.D.",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Kenji follows a Project N.O.M.A.D. lesson on rivers, with the maps and the encyclopaedia fetched once at setup and served from the Core.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-boiler",
+      "member": "yoshiko",
+      "chapter": "kitchen",
+      "from": "homehub",
+      "fromName": "HomeHub",
+      "to": "bookstack",
+      "toName": "BookStack",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Haruo finds the boiler steps in the house manual in BookStack, with a page for every machine in the house.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "kenji-river"
+      ],
+      "retoldAs": [
+        "kenji-river -> Project N.O.M.A.D."
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "homehub",
+      "immich"
+    ],
+    "was": [
+      "homehub",
+      "immich"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "kitchen-card",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "yoshiko",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen"
+      },
+      "category": "food",
+      "segment": "consumer",
+      "app": "mealie",
+      "appName": "Mealie",
+      "with": [],
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Yoshiko types her mother's rice recipe into Mealie, so it scales for the whole house and the list follows."
+    },
+    {
+      "id": "living-library",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "haruo",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "booklore",
+      "appName": "BookLore",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Haruo shelves his survey handbooks by series and author in BookLore, and each shelf reads in order."
+    },
+    {
+      "id": "living-trim",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "haruo",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "music",
+        "room": "living"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "audiomass",
+      "appName": "AudioMass",
+      "with": [],
+      "service": "Adobe Audition",
+      "serviceId": "adobe-audition",
+      "pairQuality": "loose",
+      "qualifier": "a single-file audio editor",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Haruo trims the click from a copied record in AudioMass, in the browser tab, and saves the clean file where he chooses."
+    },
+    {
+      "id": "living-papers",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "haruo",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "papra",
+      "appName": "Papra",
+      "with": [],
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "loose",
+      "qualifier": "a scanned-paper archive",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Haruo files his old survey certificates in Papra and finds each one by its name."
+    },
+    {
+      "id": "emi-assist",
+      "chapter": "emi",
+      "newChapter": null,
+      "member": "emi",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "opencode",
+      "appName": "OpenCode",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "OpenCode reads Emi's repository and proposes a fix with the model on the Core, and she reads the diff first."
+    },
+    {
+      "id": "emi-model",
+      "chapter": "emi",
+      "newChapter": null,
+      "member": "emi",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "ollama",
+      "appName": "Ollama",
+      "with": [],
+      "service": "OpenAI",
+      "serviceId": "openai",
+      "pairQuality": "loose",
+      "qualifier": "a model on the Core, not a chat window",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emi pulls an open-weight model onto the Core with Ollama, and the prompts she used to send out are answered at home."
+    },
+    {
+      "id": "emi-tools",
+      "chapter": "emi",
+      "newChapter": null,
+      "member": "emi",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "it-tools",
+      "appName": "IT-Tools",
+      "with": [],
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emi converts a timestamp and checks a hash in IT-Tools, the page running in the browser tab."
+    },
+    {
+      "id": "emi-api",
+      "chapter": "emi",
+      "newChapter": null,
+      "member": "emi",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emi tests a service from a Hoppscotch tab in the baby's nap, and the collection stays in that browser."
+    },
+    {
+      "id": "kenji-blocks",
+      "chapter": "kenji",
+      "newChapter": null,
+      "member": "kenji",
+      "also": [],
+      "room": "Bedroom Three",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "blockbench",
+      "appName": "Blockbench",
+      "with": [],
+      "service": "MagicaVoxel",
+      "serviceId": "magicavoxel",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kenji builds his water-wheel model as blocks in Blockbench and saves the file on the family laptop."
+    },
+    {
+      "id": "kenji-streak",
+      "chapter": "kenji",
+      "newChapter": null,
+      "member": "kenji",
+      "also": [],
+      "room": "Bedroom Three",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "habitica",
+      "appName": "Habitica",
+      "with": [],
+      "service": "Habitify",
+      "serviceId": "habitify",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kenji keeps a reading streak in Habitica, and the household chore game cheers him on."
+    },
+    {
+      "id": "kenji-reader",
+      "chapter": "kenji",
+      "newChapter": null,
+      "member": "kenji",
+      "also": [],
+      "room": "Bedroom Three",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "calibre-web",
+      "appName": "Calibre-Web",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kenji picks his library book from the family's Calibre-Web shelf and reads it in the laptop browser."
+    },
+    {
+      "id": "nursery-boxes",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "sora",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Sora's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once."
+    },
+    {
+      "id": "living-yamtrack",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "yamtrack",
+      "appName": "Yamtrack",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Yamtrack keeps one list of the books finished, the films watched and the series still to come."
+    },
+    {
+      "id": "kitchen-blinko",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "blinko",
+      "appName": "Blinko",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Anyone at the kitchen counter catches a half-formed idea in Blinko before it is lost."
+    },
+    {
+      "id": "living-karakeep",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "karakeep",
+      "appName": "Karakeep",
+      "with": [],
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three generations gather clippings for the next project in Karakeep, tagged by hand."
+    }
+  ],
+  "chapters": {
+    "add": [],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The Family Room",
+        "new": false
+      },
+      {
+        "id": "kenji",
+        "room": "bedroom",
+        "title": "Kenji’s room",
+        "new": false
+      },
+      {
+        "id": "nursery",
+        "room": "kids",
+        "title": "The nursery",
+        "new": false
+      },
+      {
+        "id": "emi",
+        "room": "bedroom",
+        "title": "Emi’s room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the pond",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The Family Room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the record player and the wingback chairs",
+      "beats": [
+        {
+          "id": "living-scratch",
+          "member": "haruo",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "living-chapter",
+          "member": "kenji",
+          "app": "audiobookshelf",
+          "service": "Audible",
+          "origin": "now"
+        },
+        {
+          "id": "living-field",
+          "member": "haruo",
+          "app": "bookstack",
+          "service": "Notion",
+          "origin": "now"
+        },
+        {
+          "id": "living-caption",
+          "member": "haruo",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-library",
+          "member": "haruo",
+          "app": "booklore",
+          "service": "Kindle",
+          "origin": "add"
+        },
+        {
+          "id": "living-trim",
+          "member": "haruo",
+          "app": "audiomass",
+          "service": "Adobe Audition",
+          "origin": "add"
+        },
+        {
+          "id": "living-papers",
+          "member": "haruo",
+          "app": "papra",
+          "service": "Evernote",
+          "origin": "add"
+        },
+        {
+          "id": "living-yamtrack",
+          "member": null,
+          "app": "yamtrack",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "living-karakeep",
+          "member": null,
+          "app": "karakeep",
+          "service": "Raindrop.io",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kenji",
+      "title": "Kenji’s room",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the desk in Bedroom Three",
+      "beats": [
+        {
+          "id": "kenji-river",
+          "member": "kenji",
+          "app": "project-nomad",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "kenji-bridge",
+          "member": "kenji",
+          "app": "excalidraw",
+          "service": "Miro",
+          "origin": "now"
+        },
+        {
+          "id": "kenji-blocks",
+          "member": "kenji",
+          "app": "blockbench",
+          "service": "MagicaVoxel",
+          "origin": "add"
+        },
+        {
+          "id": "kenji-streak",
+          "member": "kenji",
+          "app": "habitica",
+          "service": "Habitify",
+          "origin": "add"
+        },
+        {
+          "id": "kenji-reader",
+          "member": "kenji",
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "nursery",
+      "title": "The nursery",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "nursery-light",
+          "member": "yoshiko",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "nursery-list",
+          "member": "sora",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "nursery-boxes",
+          "member": "sora",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "emi",
+      "title": "Emi’s room",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the writing desk in Bedroom Two",
+      "beats": [
+        {
+          "id": "emi-hours",
+          "member": "emi",
+          "app": "ci-planning",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "emi-quiz",
+          "member": "emi",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "emi-issue",
+          "member": "emi",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "emi-assist",
+          "member": "emi",
+          "app": "opencode",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        },
+        {
+          "id": "emi-model",
+          "member": "emi",
+          "app": "ollama",
+          "service": "OpenAI",
+          "origin": "add"
+        },
+        {
+          "id": "emi-tools",
+          "member": "emi",
+          "app": "it-tools",
+          "service": "DevUtils",
+          "origin": "add"
+        },
+        {
+          "id": "emi-api",
+          "member": "emi",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-pickles",
+          "member": "yoshiko",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-split",
+          "member": "yoshiko",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-boiler",
+          "member": "yoshiko",
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-card",
+          "member": "yoshiko",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-blinko",
+          "member": null,
+          "app": "blinko",
+          "service": "Google Keep",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the pond",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-willow",
+          "member": "haruo",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "garden-geese",
+          "member": "yoshiko",
+          "app": "frigate",
+          "service": "Ring",
+          "origin": "now"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-pickles",
+      "line": "Yoshiko writes down her mother's pickles."
+    },
+    {
+      "at": "morning",
+      "beat": "emi-hours",
+      "line": "Emi plans the work around the nap."
+    },
+    {
+      "at": "midday",
+      "beat": "living-papers",
+      "line": "Haruo files an old survey certificate."
+    },
+    {
+      "at": "afternoon",
+      "beat": "living-scratch",
+      "line": "Haruo plays the clean copy of a record."
+    },
+    {
+      "at": "after-school",
+      "beat": "kenji-blocks",
+      "line": "Kenji builds the water wheel as blocks."
+    },
+    {
+      "at": "after-school",
+      "beat": "emi-api",
+      "line": "Emi tests a service in the baby's nap."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-willow",
+      "line": "Haruo photographs the willow again."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-library",
+      "line": "Haruo shelves the new novel by series."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Spotify",
+      "Audible",
+      "Notion",
+      "Google Search",
+      "Miro",
+      "Google Home",
+      "Cozi",
+      "GitHub",
+      "Google Photos",
+      "Ring"
+    ],
+    "servicesFinal": [
+      "Spotify",
+      "Audible",
+      "Notion",
+      "Miro",
+      "Google Home",
+      "Cozi",
+      "GitHub",
+      "Confluence",
+      "Google Photos",
+      "Ring",
+      "Paprika",
+      "Kindle",
+      "Adobe Audition",
+      "Evernote",
+      "GitHub Copilot",
+      "OpenAI",
+      "DevUtils",
+      "Postman",
+      "MagicaVoxel",
+      "Habitify",
+      "Sortly",
+      "Google Keep",
+      "Raindrop.io"
+    ],
+    "count": 23
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "kitchen-boiler",
+      "living-trim",
+      "emi-model",
+      "kenji-river",
+      "nursery-boxes",
+      "living-yamtrack",
+      "living-karakeep",
+      "living-library"
+    ],
+    "mustCarry": {
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "audiobookshelf": [],
+      "bookstack": [],
+      "project-nomad": [
+        "[public-access] Ships without authentication. For trusted home networks only. Never describe it as exposed.",
+        "[note] amd64 only (fine on the Core). Internet is needed once for setup and downloads.",
+        "[claims] Educational content comes from third-party sources. Do not promise grades.",
+        "Ships without authentication: home network only, never described as exposed.",
+        "Needs the internet once for setup and downloads; never \"fully offline\" or \"anywhere\"."
+      ],
+      "excalidraw": [
+        "[note] amd64 only. An Excalidraw MCP entry exists for agents.",
+        "marketplace: Manifest source points to ozencb/excalidraw-persist, a 105-star wrapper, not excalidraw/excalidraw."
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "ci-planning": [
+        "[cloud-link] Two-way Google Calendar sync exists but is off by default and needs a Google OAuth client. Do not say it never touches Google.",
+        "[note] Local-model briefings, task extraction and auto-scheduling appear only when Ollama is reachable.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "[cloud-link] Crash reports go to Companion Intelligence unless \"Share crash reports\" is turned off at install (it is on by default). Credentials, file paths, request bodies and memories are stripped first. Do not write t",
+        "Two way Google Calendar sync exists, off by default: never say it never touches Google."
+      ],
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "frigate": [
+        "[hardware] Needs IP cameras that stream over RTSP. Cameras are not part of the Core.",
+        "[public-access] Watching cameras from away from home is remote access, which the sheet leaves unfinished.",
+        "[claims] No detection-speed or accuracy numbers. Do not say it prevents anything.",
+        "QA screenshot shows \"No frames have been received, check error logs\": reject. The store listing image shows a real backyard photo that is not a Hub capture.",
+        "Watching away from home is remote access: not claimed."
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "booklore": [
+        "[cloud-link] Fetches metadata and covers from outside."
+      ],
+      "audiomass": [
+        "The Core only serves the page: decoded audio and edits live in the viewer's browser, so \"sits on the Core\" is false until the person saves a file where they choose",
+        "Short description says \"audio never leaves the appliance\": an absolute; paraphrase",
+        "Third-party image (ceramicwhite/audiomass), tag latest"
+      ],
+      "papra": [],
+      "opencode": [
+        "[cloud-link] The Hub wires it to the Core's local model by default (hub_integration inference). The app can also connect to cloud providers with a key you add inside it; leave that off. A coding agent is private only on ",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. The agent edits files, so the beat shows the person approving the change (agents prepare, people approve).",
+        "[note] The web interface has no sign-in unless a server password is set at install. The older OpenCode Web listing is superseded; name only OpenCode.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "ollama": [
+        "[note] The Hub also has its own built-in Ollama service. Many listings say \"the Hub built-in Ollama\".",
+        "[claims] Model sizes and speeds come only from the fact sheet table. No own tok/s.",
+        "[claims] This package serves on the CPU unless the host passes a GPU in (not enabled by default), so say nothing about speed. It has no chat window of its own: it sits behind Open WebUI or an agent. It asks for no cloud ",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No chat UI of its own: sits behind Open WebUI or an agent."
+      ],
+      "it-tools": [
+        "Listing says it keeps working with the network unplugged: do not repeat (install and updates use the internet).",
+        "Everything computes in the browser; the Core serves static files only."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "blockbench": [
+        "Projects live in the browser (IndexedDB) or in files the person saves: the Core serves the app, it does not hold the models",
+        "The listing names Minecraft models; say \"game models\" or \"block models\" in copy",
+        "Free-text store claim \"never sees your models\" is accurate for the container"
+      ],
+      "habitica": [
+        "The sign-up page in the capture carries a cookie-consent banner: check the self-hosted build for analytics scripts before saying it sends nothing out",
+        "Game, not a health or behaviour tool: no outcomes"
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: Documented default admin credentials (admin / admin123); no QA capture."
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "yamtrack": [
+        "[cloud-link] Imports from Trakt, MyAnimeList and TMDB are outside services.",
+        "Lists and ratings only: no health or behaviour claims"
+      ],
+      "blinko": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI search and chat need a model provider added in the app (OpenAI, Ollama, LiteLLM...): not wired by the Hub.",
+        "No QA run; gallery frame is upstream marketing with a \"#Password\" tagged note and a gmail file name: reject.",
+        "Companion desktop and mobile clients are separate downloads."
+      ],
+      "karakeep": [
+        "[cloud-link] The install form asks for an OpenAI key. Automatic tagging can use a local model instead; do not imply the key is needed.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI tagging is optional: never imply the key is needed (catalog)",
+        "No QA screenshot",
+        "Listing names OpenAI or a self-hosted Ollama; only the OpenAI route is in the form"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "it-tools",
+      "display": "IT-Tools",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "DevUtils",
+        "Browserling Tools"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Listing says it keeps working with the network unplugged: do not repeat (install and updates use the internet).",
+        "Everything computes in the browser; the Core serves static files only."
+      ],
+      "evidence": "CI-Marketplace apps/it-tools/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-card"
+      ]
+    },
+    {
+      "app": "opencode",
+      "beats": [
+        "emi-assist"
+      ]
+    },
+    {
+      "app": "ollama",
+      "beats": [
+        "emi-model"
+      ]
+    },
+    {
+      "app": "calibre-web",
+      "beats": [
+        "kenji-reader"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "nursery-boxes"
+      ]
+    },
+    {
+      "app": "blinko",
+      "beats": [
+        "kitchen-blinko"
+      ]
+    },
+    {
+      "app": "karakeep",
+      "beats": [
+        "living-karakeep"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

@@ -1,0 +1,1328 @@
+{
+  "v": 3,
+  "slug": "whitaker",
+  "house": "familyhome",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/whitaker.json",
+    "sha1": "ea9b6e487a62cc27943ca226a03ff62b473b2b66",
+    "beatsNow": 24,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "young-family",
+  "business": true,
+  "narrator": "v-warm-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "akaunting",
+        "paperless",
+        "home-assistant",
+        "koodo-reader",
+        "immich"
+      ],
+      "beatApps": {
+        "food": "yuvomi"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "akaunting",
+          "paperless",
+          "kitchenowl",
+          "home-assistant",
+          "koodo-reader",
+          "immich"
+        ],
+        "beatApps": {},
+        "reviewNeeded": []
+      },
+      "notes": [
+        "kitchenowl dropped: no beat tells it any more",
+        "beatApps.food yuvomi added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 37,
+    "add": 13,
+    "swaps": 3,
+    "householdBeats": 6,
+    "householdBeatsMax": 6,
+    "persona": {
+      "hannah": {
+        "now": 8,
+        "add": 0,
+        "target": 8
+      },
+      "callum": {
+        "now": 6,
+        "add": 1,
+        "target": 7
+      },
+      "nell": {
+        "now": 3,
+        "add": 4,
+        "target": 7
+      },
+      "alfie": {
+        "now": 1,
+        "add": 2,
+        "target": 3
+      }
+    },
+    "pairShare": 0.833,
+    "pairShareMin": 0.8,
+    "chapters": 8
+  },
+  "members": [
+    {
+      "id": "hannah",
+      "name": "Hannah",
+      "age": 35,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "self-employed bookkeeper",
+      "companion": {
+        "name": "Biscotti",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "business-office"
+      ],
+      "thread": "Bookkeeping for small local businesses, at the dining table."
+    },
+    {
+      "id": "callum",
+      "name": "Callum",
+      "age": 37,
+      "role": "parent",
+      "archetype": "host",
+      "work": "at home with Alfie",
+      "companion": {
+        "name": "Mallow",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "host-cook",
+        "baby-year",
+        "grower"
+      ],
+      "thread": "At home with Alfie: the kitchen, the greenhouse and the mudroom rota."
+    },
+    {
+      "id": "nell",
+      "name": "Nell",
+      "age": 7,
+      "role": "child",
+      "archetype": "learner",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker"
+      ],
+      "thread": "A seven-year-old with a drawing habit, a streak and a story voice."
+    },
+    {
+      "id": "alfie",
+      "name": "Alfie",
+      "age": 1,
+      "role": "baby",
+      "archetype": null,
+      "work": null,
+      "companion": null,
+      "lens": [
+        "baby-year"
+      ],
+      "thread": "A first year of rhymes and labelled boxes."
+    }
+  ],
+  "character": {
+    "lede": "A sage-yellow farmhouse with a hipped roof, two street gables and a picket-railed wrap veranda stands behind slate-blue shutters and flower boxes. A greenhouse, a gazebo, a pond and rows of garden beds fill the back.",
+    "spots": [
+      {
+        "room": "Playroom",
+        "line": "A play kitchen, an easel and a toy box fill the playroom."
+      },
+      {
+        "room": "Nursery",
+        "line": "A glider and a crib stand in the quiet upstairs nursery."
+      },
+      {
+        "room": "Veranda",
+        "line": "Two rocking chairs and a small table face the garden."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 177,
+      "ground": "lawn",
+      "style": "Two-storey sage-yellow lap-siding Victorian-farmhouse family home on a raised foundation: hipped roof with two overlapping street gables, a one-storey gabled west wing, a gabled entry portico and a picket-railed wrap veranda, slate-blue louvred shutters and flower boxes on every window, a warm cream wainscoted living room with a canted garden bay, and a backyard homestead (lily pond with a gazebo on a boardwalk, glass greenhouse, staggered raised beds, monkey bars)",
+      "rooms": [
+        "Entry & Stair Hall",
+        "Living Room",
+        "Kitchen",
+        "Dining Room",
+        "Playroom",
+        "Mudroom",
+        "Powder Room",
+        "Veranda",
+        "Wrap Porch",
+        "Back Porch",
+        "Path Lights",
+        "Kids' Bedroom",
+        "Nursery",
+        "Family Bathroom",
+        "Upper Hall",
+        "Primary Bedroom",
+        "Primary Ensuite"
+      ],
+      "flags": [
+        "tv: none"
+      ]
+    },
+    "truths": "The Core sits on a console table in the Living Room, in sight of the door. There is no television. The kitchen has a breakfast bar. A crib stands in the Living Room as well as the Nursery. Greenhouse, gazebo, pond, garden beds and monkey bars.",
+    "mustNot": [
+      "no television"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "bentopdf",
+      "name": "BentoPDF",
+      "member": "hannah",
+      "room": "The living room",
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "status": "swap",
+      "beat": "living-pdf",
+      "seed": "Hannah splits a client's bank statements into months in BentoPDF, in the browser tab, and sends just one month.",
+      "line": "BentoPDF signs, redacts and recognises text in a PDF without leaving the browser tab."
+    },
+    {
+      "app": "tandoor",
+      "name": "Tandoor Recipes",
+      "member": "callum",
+      "room": "Callum in the kitchen",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "status": "swap",
+      "beat": "kitchen-list",
+      "seed": "Nell calls out for bananas and Callum adds them to the shopping list in Tandoor Recipes, which keeps it beside the week's recipes.",
+      "line": "Tandoor Recipes scales a recipe to the number at the table and adds the missing items to the list."
+    },
+    {
+      "app": "kokoro",
+      "name": "Kokoro",
+      "member": "nell",
+      "room": "Kids' Bedroom",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "kids-aloud",
+      "seed": "Nell types her story about the pond, and Kokoro reads it back in a synthetic voice made on the Core.",
+      "line": "Kokoro reads a story aloud in a synthetic voice made on the Core."
+    },
+    {
+      "app": "homebox",
+      "name": "HomeBox",
+      "member": "alfie",
+      "room": "Nursery",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "status": "add",
+      "beat": "nursery-boxes",
+      "seed": "Alfie's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once.",
+      "line": "HomeBox gives every box in the loft and garage a label, a place and a note about what is inside."
+    },
+    {
+      "app": "pingvin-share",
+      "name": "Pingvin Share",
+      "member": null,
+      "room": "Dining Room",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "dining-pingvin-share",
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day.",
+      "line": "Pingvin Share makes a link for a big file that someone in the house opens."
+    },
+    {
+      "app": "twenty",
+      "name": "Twenty",
+      "member": null,
+      "room": "Living Room",
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "status": "add",
+      "beat": "living-twenty",
+      "seed": "The office records a bakery client and the next follow-up in Twenty.",
+      "line": "Twenty keeps the small business's contacts, deals and follow-ups."
+    },
+    {
+      "app": "donetick",
+      "name": "Donetick",
+      "member": "callum",
+      "room": "Mudroom",
+      "service": "Tody",
+      "serviceId": "tody",
+      "status": "add",
+      "beat": "mudroom-rota",
+      "seed": "Callum holds his phone to the Donetick tag by the mudroom door, and the boots and the bins are marked done.",
+      "line": "Donetick turns the chore rota into a tap of a phone on a tag stuck to the fridge or the laundry door."
+    },
+    {
+      "app": "excalidraw",
+      "name": "Excalidraw",
+      "member": "nell",
+      "room": "Kids' Bedroom",
+      "service": "Miro",
+      "serviceId": "miro",
+      "status": "add",
+      "beat": "kids-sketch",
+      "seed": "Nell and her mother draw the garden as one picture on Excalidraw, and each adds a flower.",
+      "line": "Excalidraw is a whiteboard where a parent and a child sketch the marble run together."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "kitchen-list",
+      "member": "callum",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "tandoor",
+      "toName": "Tandoor Recipes",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Nell calls out for bananas and Callum adds them to the shopping list in Tandoor Recipes, which keeps it beside the week's recipes.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-pdf",
+      "member": "hannah",
+      "chapter": "living",
+      "from": "stirling-pdf",
+      "fromName": "Stirling-PDF",
+      "to": "bentopdf",
+      "toName": "BentoPDF",
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Hannah splits a client's bank statements into months in BentoPDF, in the browser tab, and sends just one month.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-meals",
+      "member": "callum",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "memos",
+      "toName": "Memos",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Callum jots the foods Alfie has tried, one line a day, in Memos on the Core.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "kitchenowl",
+      "name": "KitchenOwl",
+      "beats": [
+        "ftue-pick",
+        "kitchen-list",
+        "kitchen-meals"
+      ],
+      "retoldAs": [
+        "kitchen-list -> Tandoor Recipes",
+        "kitchen-meals -> Memos"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "stirling-pdf",
+      "name": "Stirling-PDF",
+      "beats": [
+        "living-pdf"
+      ],
+      "retoldAs": [
+        "living-pdf -> BentoPDF"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "paperless",
+      "nextcloud"
+    ],
+    "was": [
+      "paperless",
+      "kitchenowl"
+    ],
+    "changed": [
+      {
+        "from": "kitchenowl",
+        "to": "nextcloud"
+      }
+    ],
+    "note": "ftue-pick names apps in `with` that the plan retells away; set `with` to this list and name each one in the popup body (the first-install list), so the fleet counts are the ones in fleet-simulation.md"
+  },
+  "adds": [
+    {
+      "id": "kids-sketch",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "nell",
+      "also": [],
+      "room": "Kids' Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "excalidraw",
+      "appName": "Excalidraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nell and her mother draw the garden as one picture on Excalidraw, and each adds a flower."
+    },
+    {
+      "id": "kids-streak",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "nell",
+      "also": [],
+      "room": "Kids' Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "habitica",
+      "appName": "Habitica",
+      "with": [],
+      "service": "Habitify",
+      "serviceId": "habitify",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nell keeps a reading streak in Habitica, and the household chore game cheers her on."
+    },
+    {
+      "id": "kids-aloud",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "nell",
+      "also": [],
+      "room": "Kids' Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "kokoro",
+      "appName": "Kokoro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nell types her story about the pond, and Kokoro reads it back in a synthetic voice made on the Core."
+    },
+    {
+      "id": "kids-pad",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "nell",
+      "also": [],
+      "room": "Kids' Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "etherpad",
+      "appName": "Etherpad",
+      "with": [],
+      "service": "Google Docs",
+      "serviceId": "google-docs",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nell and her cousin write a story together in Etherpad on the home Wi-Fi, each in her own colour."
+    },
+    {
+      "id": "mudroom-rota",
+      "chapter": "mudroom",
+      "newChapter": "mudroom",
+      "member": "callum",
+      "also": [],
+      "room": "Mudroom",
+      "roomRole": "laundry",
+      "anchor": {
+        "role": "room",
+        "room": "laundry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "donetick",
+      "appName": "Donetick",
+      "with": [],
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Callum holds his phone to the Donetick tag by the mudroom door, and the boots and the bins are marked done."
+    },
+    {
+      "id": "nursery-boxes",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "alfie",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Alfie's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once."
+    },
+    {
+      "id": "nursery-rhymes",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "alfie",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "audiobookshelf",
+      "appName": "Audiobookshelf",
+      "with": [],
+      "service": "Apple Podcasts",
+      "serviceId": "apple-podcasts",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Alfie's rhymes play from files the family owns in Audiobookshelf, and the nap chapter resumes where it stopped."
+    },
+    {
+      "id": "dining-pingvin-share",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Room",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pingvin-share",
+      "appName": "Pingvin Share",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day."
+    },
+    {
+      "id": "kitchen-miniflux",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "miniflux",
+      "appName": "Miniflux",
+      "with": [],
+      "service": "Feedly",
+      "serviceId": "feedly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Miniflux follows the gardening writers and the parenting writers, with the read list kept on the Core."
+    },
+    {
+      "id": "living-twenty",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "twenty",
+      "appName": "Twenty",
+      "with": [],
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The office records a bakery client and the next follow-up in Twenty."
+    },
+    {
+      "id": "mudroom-planka",
+      "chapter": "mudroom",
+      "newChapter": "mudroom",
+      "member": null,
+      "also": [],
+      "room": "Mudroom",
+      "roomRole": "laundry",
+      "anchor": {
+        "role": "room",
+        "room": "laundry"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "planka",
+      "appName": "Planka",
+      "with": [],
+      "service": "Trello",
+      "serviceId": "trello",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The office keeps the week's client books as cards on a Planka board and moves each one along."
+    },
+    {
+      "id": "living-solidtime",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "solidtime",
+      "appName": "Solidtime",
+      "with": [],
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The office logs the week's hours by job in Solidtime."
+    },
+    {
+      "id": "kitchen-baserow",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "baserow",
+      "appName": "Baserow",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The office keeps the week's client books as a table in Baserow, with a view for what is late."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "mudroom",
+        "kind": "room",
+        "room": "laundry",
+        "title": "The mudroom",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "Callum in the kitchen",
+        "new": false
+      },
+      {
+        "id": "mudroom",
+        "room": "laundry",
+        "title": "The mudroom",
+        "new": true
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "Hannah at the dining table",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "kids",
+        "room": "kids",
+        "title": "Nell and Alfie upstairs",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the sofa and the console where the Core sits",
+      "beats": [
+        {
+          "id": "living-week",
+          "member": "hannah",
+          "app": "yuvomi",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-photos",
+          "member": "callum",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "living-pdf",
+          "member": "hannah",
+          "app": "bentopdf",
+          "service": "Adobe Acrobat",
+          "origin": "swap"
+        },
+        {
+          "id": "living-twenty",
+          "member": null,
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "add"
+        },
+        {
+          "id": "living-solidtime",
+          "member": null,
+          "app": "solidtime",
+          "service": "Toggl Track",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "Callum in the kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-list",
+          "member": "callum",
+          "app": "tandoor",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-vault",
+          "member": "hannah",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-lunch",
+          "member": "callum",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-meals",
+          "member": "callum",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-miniflux",
+          "member": null,
+          "app": "miniflux",
+          "service": "Feedly",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-baserow",
+          "member": null,
+          "app": "baserow",
+          "service": "Airtable",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "mudroom",
+      "title": "The mudroom",
+      "roomRole": "laundry",
+      "isNew": true,
+      "subject": "the bench and the coat hooks",
+      "beats": [
+        {
+          "id": "mudroom-rota",
+          "member": "callum",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "add"
+        },
+        {
+          "id": "mudroom-planka",
+          "member": null,
+          "app": "planka",
+          "service": "Trello",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "Hannah at the dining table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-invoice",
+          "member": "hannah",
+          "app": "akaunting",
+          "service": "QuickBooks",
+          "origin": "now"
+        },
+        {
+          "id": "dining-reminder",
+          "member": "hannah",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "dining-receipt",
+          "member": "callum",
+          "app": "paperless",
+          "service": "Evernote",
+          "origin": "now"
+        },
+        {
+          "id": "dining-folder",
+          "member": "hannah",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "dining-quarter",
+          "member": "hannah",
+          "app": "libreoffice",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "dining-pingvin-share",
+          "member": null,
+          "app": "pingvin-share",
+          "service": "WeTransfer",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-bed",
+          "member": "nell",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-fan",
+          "member": "callum",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        }
+      ]
+    },
+    {
+      "chapter": "kids",
+      "title": "Nell and Alfie upstairs",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the desk and the beanbag in Nell's room",
+      "beats": [
+        {
+          "id": "kids-lookup",
+          "member": "nell",
+          "app": "kiwix",
+          "service": "Google Search",
+          "origin": "now"
+        },
+        {
+          "id": "kids-story",
+          "member": "nell",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "now"
+        },
+        {
+          "id": "kids-lullaby",
+          "member": "alfie",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "kids-sketch",
+          "member": "nell",
+          "app": "excalidraw",
+          "service": "Miro",
+          "origin": "add"
+        },
+        {
+          "id": "kids-streak",
+          "member": "nell",
+          "app": "habitica",
+          "service": "Habitify",
+          "origin": "add"
+        },
+        {
+          "id": "kids-aloud",
+          "member": "nell",
+          "app": "kokoro",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "kids-pad",
+          "member": "nell",
+          "app": "etherpad",
+          "service": "Google Docs",
+          "origin": "add"
+        },
+        {
+          "id": "nursery-boxes",
+          "member": "alfie",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        },
+        {
+          "id": "nursery-rhymes",
+          "member": "alfie",
+          "app": "audiobookshelf",
+          "service": "Apple Podcasts",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "living-week",
+      "line": "Monday coffee settles the week."
+    },
+    {
+      "at": "morning",
+      "beat": "mudroom-rota",
+      "line": "The boots and the bins get their tap."
+    },
+    {
+      "at": "midday",
+      "beat": "dining-invoice",
+      "line": "Hannah invoices the bakery at the dining table."
+    },
+    {
+      "at": "afternoon",
+      "beat": "nursery-rhymes",
+      "line": "Alfie's rhymes play through his nap."
+    },
+    {
+      "at": "after-school",
+      "beat": "kids-aloud",
+      "line": "Nell hears her pond story read back."
+    },
+    {
+      "at": "after-school",
+      "beat": "kids-lookup",
+      "line": "Nell asks how a rainbow forms."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-fan",
+      "line": "Callum gives the greenhouse a rule."
+    },
+    {
+      "at": "weekend",
+      "beat": "dining-pingvin-share",
+      "line": "A big video goes out as an expiring link."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Google Photos",
+      "Adobe Acrobat",
+      "LastPass",
+      "QuickBooks",
+      "Evernote",
+      "Google Drive",
+      "Microsoft Office",
+      "Google Home",
+      "Google Search",
+      "Amazon Kindle",
+      "Spotify"
+    ],
+    "servicesFinal": [
+      "Google Photos",
+      "Adobe Acrobat",
+      "Paprika",
+      "LastPass",
+      "Google Keep",
+      "QuickBooks",
+      "Evernote",
+      "Google Drive",
+      "Microsoft Office",
+      "Google Home",
+      "Google Search",
+      "Amazon Kindle",
+      "Spotify",
+      "Miro",
+      "Habitify",
+      "Google Docs",
+      "Tody",
+      "Sortly",
+      "Apple Podcasts",
+      "WeTransfer",
+      "Feedly",
+      "Salesforce",
+      "Trello",
+      "Toggl Track",
+      "Airtable"
+    ],
+    "count": 25
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "living-pdf",
+      "kitchen-list",
+      "kids-aloud",
+      "nursery-boxes",
+      "dining-pingvin-share",
+      "living-twenty",
+      "mudroom-rota",
+      "kids-sketch"
+    ],
+    "mustCarry": {
+      "paperless": [
+        "[note] AI features are off by default. If you turn them on they can use a local model.",
+        "[note] Office document conversion is not wired up in this build; OCR and archiving of PDFs and scans works."
+      ],
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "yuvomi": [
+        "[note] Stored in SQLite on your Core. CalDAV and CardDAV sync are optional.",
+        "one household planner, not an account per person",
+        "already in the persona pool: share cap risk"
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "bentopdf": [
+        "Dual licence: AGPL-3.0 or paid commercial; fine for household use",
+        "Listing says \"nothing to leak\": drop that wording",
+        "Overlaps Stirling-PDF (the persona PDF app)"
+      ],
+      "tandoor": [
+        "[note] Overlaps Mealie; pick one per story.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "no QA screenshot",
+        "overlaps Mealie (pick one per story)"
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "memos": [],
+      "akaunting": [
+        "[claims] Bookkeeping tool. No accounting, tax or legal advice.",
+        "marketplace: Source-available (Business Source License). Seafile and others carry umbrel strings: the admin email default is a placeholder address on umbrel.local."
+      ],
+      "libreoffice": [
+        "[note] The listing is generic. Name the suite, not specific features.",
+        "[note] ONLYOFFICE Desktop Editors does the same job: one suite per household."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "kiwix": [
+        "[note] Needs content files (ZIM) downloaded once.",
+        "marketplace: Ships with an empty library: the compose runs kiwix-serve on /data/library.xml with no content and no way in the Hub to add or register ZIM files; the QA capture shows \"No result\"."
+      ],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "excalidraw": [
+        "[note] amd64 only. An Excalidraw MCP entry exists for agents.",
+        "marketplace: Manifest source points to ozencb/excalidraw-persist, a 105-star wrapper, not excalidraw/excalidraw."
+      ],
+      "habitica": [
+        "The sign-up page in the capture carries a cookie-consent banner: check the self-hosted build for analytics scripts before saying it sends nothing out",
+        "Game, not a health or behaviour tool: no outcomes"
+      ],
+      "kokoro": [
+        "[note] OpenAI-compatible speech API. No GPU requirement in the listing.",
+        "OpenAI-compatible speech API; web player included.",
+        "No GPU requirement in the listing; no speed claim.",
+        "Capture is real (FastKoko player) on a dark purple background."
+      ],
+      "etherpad": [],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "audiobookshelf": [],
+      "pingvin-share": [
+        "[public-access] Recipients outside your home network need to reach your Core.",
+        "public-access for anyone outside the house"
+      ],
+      "miniflux": [
+        "[note] Overlaps FreshRSS.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Integrations push to outside services if switched on (Pocket, Telegram, webhooks)",
+        "No QA screenshot",
+        "Overlaps FreshRSS (utilities slice)"
+      ],
+      "twenty": [
+        "marketplace: QA capture shows real company names and logos."
+      ],
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "solidtime": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "listing mentions invoices: say nothing about billing or tax"
+      ],
+      "baserow": [
+        "[note] Overlaps NocoDB, Grist and Teable."
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "etherpad",
+      "display": "Etherpad",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Google Docs"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [],
+      "evidence": "CI-Marketplace apps/etherpad/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m3)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "tandoor",
+      "beats": [
+        "kitchen-list"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "nursery-boxes"
+      ]
+    },
+    {
+      "app": "miniflux",
+      "beats": [
+        "kitchen-miniflux"
+      ]
+    },
+    {
+      "app": "solidtime",
+      "beats": [
+        "living-solidtime"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

@@ -1,0 +1,1533 @@
+{
+  "v": 3,
+  "slug": "haddad",
+  "house": "epiphany",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/haddad.json",
+    "sha1": "02083c69c8b4a79e98593d88c949bff5e9313da7",
+    "beatsNow": 22,
+    "chaptersNow": 9,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "older-kids",
+  "business": true,
+  "narrator": "v-clear-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "twenty",
+        "nextcloud",
+        "forgejo",
+        "wallos",
+        "drawio",
+        "jupyterlab"
+      ],
+      "beatApps": {
+        "food": "homehub",
+        "iot": "home-assistant"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "twenty",
+          "nextcloud",
+          "forgejo",
+          "open-webui",
+          "wallos",
+          "drawio"
+        ],
+        "beatApps": {
+          "iot": "uptime-kuma",
+          "food": "homehub"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "open-webui dropped: no beat tells it any more",
+        "beatApps.iot uptime-kuma dropped",
+        "jupyterlab added: the learner pool for yasmin",
+        "beatApps.iot home-assistant added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 14,
+    "swaps": 6,
+    "householdBeats": 6,
+    "householdBeatsMax": 6,
+    "persona": {
+      "dalia": {
+        "now": 6,
+        "add": 2,
+        "target": 8
+      },
+      "samir": {
+        "now": 5,
+        "add": 3,
+        "target": 8
+      },
+      "yasmin": {
+        "now": 5,
+        "add": 3,
+        "target": 8
+      }
+    },
+    "pairShare": 0.862,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "dalia",
+      "name": "Dalia",
+      "age": 46,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "runs a visualisation studio",
+      "companion": {
+        "name": "Pippin",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "business-office",
+        "freelance-creative"
+      ],
+      "thread": "A visualisation studio run from the Den."
+    },
+    {
+      "id": "samir",
+      "name": "Samir",
+      "age": 48,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "technical lead at the studio",
+      "companion": {
+        "name": "Nutmeg",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "tinkerer"
+      ],
+      "thread": "The studio's technical lead, between the Lounge and the garage."
+    },
+    {
+      "id": "yasmin",
+      "name": "Yasmin",
+      "age": 20,
+      "role": "adult-child",
+      "archetype": "learner",
+      "work": "university student",
+      "companion": null,
+      "lens": [
+        "student-adult"
+      ],
+      "thread": "Geography at university: sources, a dissertation and fieldwork."
+    }
+  ],
+  "character": {
+    "lede": "An oxblood-brick house sits under one steep bronze roof that steps down past a glass-roofed link to a low garage. A two-storey glazed slot, a light-blue entry bay and a gravel forecourt with topiary face the street.",
+    "spots": [
+      {
+        "room": "Den",
+        "line": "A club chair, a bookshelf and the Core on a desk."
+      },
+      {
+        "room": "Garage",
+        "line": "A workbench and a bicycle fill the garage beyond the glass link."
+      },
+      {
+        "room": "Lounge",
+        "line": "Two sofas and a slipper chair gather round a trunk table."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 377,
+      "ground": "lawn",
+      "style": "1.5-storey oxblood-brick house under one steep bronze standing-seam roof that steps down west past a glass-roofed link to a low garage; a two-storey black-framed glazed slot notched into the front slope, a light-blue recessed entry bay with a black glazed pair, a gravel forecourt with a rock-edged sweep bed and cloud-pruned topiary",
+      "rooms": [
+        "Foyer",
+        "Stair Hall",
+        "Hall",
+        "Bath",
+        "Dining Room",
+        "Kitchen",
+        "Den",
+        "Bedroom",
+        "Lounge",
+        "Garage",
+        "Link Hall",
+        "Stair Gallery",
+        "Bedroom Two",
+        "Primary Suite"
+      ],
+      "flags": [
+        "tv: none",
+        "desk: core-desk-only"
+      ]
+    },
+    "truths": "The Core sits on a desk in the Den. There is no television: never say TV. The kitchen has an island. Patio with a fire bowl, gravel forecourt, topiary.",
+    "mustNot": [
+      "no television"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "comfyui",
+      "name": "ComfyUI",
+      "member": "dalia",
+      "room": "Den",
+      "service": "Midjourney",
+      "serviceId": "midjourney",
+      "status": "add",
+      "beat": "den-render",
+      "seed": "Dalia tests mood-board ideas for a client in ComfyUI, drawing on the Core's own graphics hardware.",
+      "line": "ComfyUI builds a node graph of poster ideas and makes the pictures on the Core's own graphics hardware."
+    },
+    {
+      "app": "samba",
+      "name": "Samba",
+      "member": "samir",
+      "room": "Garage",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "garage-share",
+      "seed": "Samir shares a folder from the Core with Samba, and the studio PC saves straight into it as a network drive.",
+      "line": "Samba shares a folder from the Core as a network drive for the editing PC."
+    },
+    {
+      "app": "quarkdown",
+      "name": "Quarkdown",
+      "member": "yasmin",
+      "room": "Bedroom Two",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "bedroom-thesis",
+      "seed": "Yasmin typesets a dissertation chapter from plain text in Quarkdown and checks the figure numbers.",
+      "line": "Quarkdown typesets a report from plain text, ready for printing."
+    },
+    {
+      "app": "minio",
+      "name": "MinIO",
+      "member": "samir",
+      "room": "Garage",
+      "service": "Amazon S3",
+      "serviceId": "amazon-s3",
+      "status": "add",
+      "beat": "garage-bucket",
+      "seed": "Samir gives the studio's finished visualisations a bucket of their own on the Core with MinIO.",
+      "line": "MinIO gives a side project a bucket of its own on the Core."
+    },
+    {
+      "app": "cyberchef",
+      "name": "CyberChef",
+      "member": "samir",
+      "room": "Lounge",
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "status": "add",
+      "beat": "lounge-decode",
+      "seed": "Samir decodes a file header from the plotter with CyberChef, one recipe step at a time in the browser tab.",
+      "line": "CyberChef decodes a cipher puzzle step by step in a browser tab."
+    },
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "member": "yasmin",
+      "room": "Yasmin upstairs",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "bed-stats",
+      "seed": "Yasmin untangles a date column in a JupyterLab notebook on the Core.",
+      "line": "JupyterLab runs the statistics homework as a notebook on the Core."
+    },
+    {
+      "app": "librephotos",
+      "name": "LibrePhotos",
+      "member": null,
+      "room": "Kitchen",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "add",
+      "beat": "kitchen-librephotos",
+      "seed": "LibrePhotos sorts the studio pictures by place and by face on the Core, and the family find the best day in one search.",
+      "line": "LibrePhotos sorts the holiday folders by place and face on the Core and finds the beach day in one search."
+    },
+    {
+      "app": "airtrail",
+      "name": "AirTrail",
+      "member": null,
+      "room": "Lounge",
+      "service": "Flighty",
+      "serviceId": "flighty",
+      "status": "add",
+      "beat": "lounge-airtrail",
+      "seed": "AirTrail logs every flight the family have taken and fills in the map of where they have been.",
+      "line": "AirTrail logs every flight the family has taken and fills in the map."
+    }
+  ],
+  "chipFixes": [
+    {
+      "beat": "kitchen-supper",
+      "app": "homehub",
+      "from": "OurHome",
+      "to": "Cozi",
+      "why": "the first listed name is a service that no longer exists as named, so the chip and the detail use the next name"
+    }
+  ],
+  "swaps": [
+    {
+      "beat": "bed-lookup",
+      "member": "yasmin",
+      "chapter": "bedroom",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "open-notebook",
+      "toName": "Open Notebook",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Yasmin loads three delta studies into Open Notebook and asks where their findings disagree.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "bed-translate",
+      "member": "yasmin",
+      "chapter": "bedroom",
+      "from": "libretranslate",
+      "fromName": "LibreTranslate",
+      "to": "linkwarden",
+      "toName": "Linkwarden",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Yasmin saves each planning report she cites into Linkwarden, which keeps a screenshot and a PDF of the page.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "bed-stats",
+      "member": "yasmin",
+      "chapter": "bedroom",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "jupyterlab",
+      "toName": "JupyterLab",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Yasmin untangles a date column in a JupyterLab notebook on the Core.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "lounge-read",
+      "member": "dalia",
+      "chapter": "lounge",
+      "from": "koodo-reader",
+      "fromName": "Koodo Reader",
+      "to": "calibre-web",
+      "toName": "Calibre-Web",
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Dalia finishes her novel from the Calibre-Web shelf, reading on the sofa from the family's own files.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-topiary",
+      "member": "samir",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "home-assistant",
+      "toName": "Home Assistant",
+      "service": "Google Home",
+      "serviceId": "google-home",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Samir sets a morning sprinkler scene for the topiary in Home Assistant, from the Core.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garage-plotter",
+      "member": "samir",
+      "chapter": "garage",
+      "from": "uptime-kuma",
+      "fromName": "Uptime Kuma",
+      "to": "lunalytics",
+      "toName": "Lunalytics",
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Samir sets Lunalytics to check that the plotter and the studio machines answer.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "koodo-reader",
+      "name": "Koodo Reader",
+      "beats": [
+        "lounge-read"
+      ],
+      "retoldAs": [
+        "lounge-read -> Calibre-Web"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "uptime-kuma",
+      "name": "Uptime Kuma",
+      "beats": [
+        "garage-plotter"
+      ],
+      "retoldAs": [
+        "garage-plotter -> Lunalytics"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "bed-lookup"
+      ],
+      "retoldAs": [
+        "bed-lookup -> Open Notebook"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "libretranslate",
+      "name": "LibreTranslate",
+      "beats": [
+        "bed-translate"
+      ],
+      "retoldAs": [
+        "bed-translate -> Linkwarden"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "bed-stats"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "hortusfox",
+      "name": "HortusFox",
+      "beats": [
+        "garden-topiary"
+      ],
+      "retoldAs": [
+        "garden-topiary -> Home Assistant"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "nextcloud",
+      "twenty"
+    ],
+    "was": [
+      "nextcloud",
+      "twenty"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "den-render",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "dalia",
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "creative",
+      "segment": "small-business",
+      "app": "comfyui",
+      "appName": "ComfyUI",
+      "with": [],
+      "service": "Midjourney",
+      "serviceId": "midjourney",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Dalia tests mood-board ideas for a client in ComfyUI, drawing on the Core's own graphics hardware."
+    },
+    {
+      "id": "den-quote",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "dalia",
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "invoice-ninja",
+      "appName": "Invoice Ninja",
+      "with": [],
+      "service": "QuickBooks",
+      "serviceId": "quickbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Dalia raises a quote and the invoice for a finished visualisation in Invoice Ninja."
+    },
+    {
+      "id": "garage-bucket",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "samir",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "minio",
+      "appName": "MinIO",
+      "with": [],
+      "service": "Amazon S3",
+      "serviceId": "amazon-s3",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Samir gives the studio's finished visualisations a bucket of their own on the Core with MinIO."
+    },
+    {
+      "id": "lounge-decode",
+      "chapter": "lounge",
+      "newChapter": null,
+      "member": "samir",
+      "also": [],
+      "room": "Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "cyberchef",
+      "appName": "CyberChef",
+      "with": [],
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Samir decodes a file header from the plotter with CyberChef, one recipe step at a time in the browser tab."
+    },
+    {
+      "id": "garage-share",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "samir",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "samba",
+      "appName": "Samba",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Samir shares a folder from the Core with Samba, and the studio PC saves straight into it as a network drive."
+    },
+    {
+      "id": "bedroom-thesis",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "yasmin",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "quarkdown",
+      "appName": "Quarkdown",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Yasmin typesets a dissertation chapter from plain text in Quarkdown and checks the figure numbers."
+    },
+    {
+      "id": "bedroom-plan",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "yasmin",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "super-productivity",
+      "appName": "Super Productivity",
+      "with": [
+        "nextcloud"
+      ],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "loose",
+      "qualifier": "with Nextcloud WebDAV sync, else the tasks sit in the browser",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Yasmin plans her term in Super Productivity, and the task list syncs to Nextcloud on the Core."
+    },
+    {
+      "id": "bedroom-pad",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "yasmin",
+      "also": [],
+      "room": "Bedroom Two",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "etherpad",
+      "appName": "Etherpad",
+      "with": [],
+      "service": "Google Docs",
+      "serviceId": "google-docs",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Yasmin and a course-mate write a lab summary together in Etherpad on the home Wi-Fi."
+    },
+    {
+      "id": "garden-cryptgeon",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cryptgeon",
+      "appName": "Cryptgeon",
+      "with": [],
+      "service": "Privnote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "At the table, a Cryptgeon note holds the project-folder password for an architecture client, read on the home Wi-Fi, and opens once and is gone."
+    },
+    {
+      "id": "garage-lubelogger",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "lubelogger",
+      "appName": "LubeLogger",
+      "with": [],
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "LubeLogger keeps the service history, fuel and reminders of Samir's van in one log that the household shares."
+    },
+    {
+      "id": "foyer-bentopdf",
+      "chapter": "foyer",
+      "newChapter": "foyer",
+      "member": null,
+      "also": [],
+      "room": "Foyer",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "bentopdf",
+      "appName": "BentoPDF",
+      "with": [],
+      "service": "Adobe Acrobat",
+      "serviceId": "adobe-acrobat",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio merges and shrinks the visualisation brief into one PDF in BentoPDF, in the browser tab, before it goes to an architecture client."
+    },
+    {
+      "id": "kitchen-librephotos",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "librephotos",
+      "appName": "LibrePhotos",
+      "with": [],
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "LibrePhotos sorts the studio pictures by place and by face on the Core, and the family find the best day in one search."
+    },
+    {
+      "id": "kitchen-monetr",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "monetr",
+      "appName": "monetr",
+      "with": [],
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The family plan the month's bills into envelopes in monetr and see what is left to spend."
+    },
+    {
+      "id": "lounge-airtrail",
+      "chapter": "lounge",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "airtrail",
+      "appName": "AirTrail",
+      "with": [],
+      "service": "Flighty",
+      "serviceId": "flighty",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "AirTrail logs every flight the family have taken and fills in the map of where they have been."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "foyer",
+        "kind": "room",
+        "room": "entry",
+        "title": "At the front door",
+        "place": "after:den"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "den",
+        "room": "office",
+        "title": "The Den",
+        "new": false
+      },
+      {
+        "id": "foyer",
+        "room": "entry",
+        "title": "At the front door",
+        "new": true
+      },
+      {
+        "id": "lounge",
+        "room": "living",
+        "title": "The lounge",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "The garage",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "At the dining table",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "bedroom",
+        "room": "bedroom",
+        "title": "Yasmin upstairs",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "The front garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "den",
+      "title": "The Den",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk in the Den where the Core sits",
+      "beats": [
+        {
+          "id": "den-enquiry",
+          "member": "dalia",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "den-pipeline",
+          "member": "samir",
+          "app": "drawio",
+          "service": "Lucidchart",
+          "origin": "now"
+        },
+        {
+          "id": "den-brief",
+          "member": "dalia",
+          "app": "nextcloud",
+          "service": "Dropbox",
+          "origin": "now"
+        },
+        {
+          "id": "den-render",
+          "member": "dalia",
+          "app": "comfyui",
+          "service": "Midjourney",
+          "origin": "add"
+        },
+        {
+          "id": "den-quote",
+          "member": "dalia",
+          "app": "invoice-ninja",
+          "service": "QuickBooks",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "foyer",
+      "title": "At the front door",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "foyer-bentopdf",
+          "member": null,
+          "app": "bentopdf",
+          "service": "Adobe Acrobat",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "lounge",
+      "title": "The lounge",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the sofas and the trunk table",
+      "beats": [
+        {
+          "id": "lounge-repo",
+          "member": "samir",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "lounge-read",
+          "member": "dalia",
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "swap"
+        },
+        {
+          "id": "lounge-errand",
+          "member": "samir",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "lounge-decode",
+          "member": "samir",
+          "app": "cyberchef",
+          "service": "DevUtils",
+          "origin": "add"
+        },
+        {
+          "id": "lounge-airtrail",
+          "member": null,
+          "app": "airtrail",
+          "service": "Flighty",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "The garage",
+      "roomRole": "garage",
+      "isNew": false,
+      "subject": "the workbench beyond the glass link",
+      "beats": [
+        {
+          "id": "garage-plotter",
+          "member": "samir",
+          "app": "lunalytics",
+          "service": "UptimeRobot",
+          "origin": "swap"
+        },
+        {
+          "id": "garage-bucket",
+          "member": "samir",
+          "app": "minio",
+          "service": "Amazon S3",
+          "origin": "add"
+        },
+        {
+          "id": "garage-share",
+          "member": "samir",
+          "app": "samba",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "garage-lubelogger",
+          "member": null,
+          "app": "lubelogger",
+          "service": "Fuelly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "At the dining table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-week",
+          "member": "yasmin",
+          "app": "nextcloud",
+          "service": "iCloud",
+          "origin": "now"
+        },
+        {
+          "id": "dining-renewal",
+          "member": "dalia",
+          "app": "wallos",
+          "service": "Rocket Money",
+          "origin": "now"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-supper",
+          "member": "yasmin",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-expiry",
+          "member": "dalia",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-librephotos",
+          "member": null,
+          "app": "librephotos",
+          "service": "Google Photos",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-monetr",
+          "member": null,
+          "app": "monetr",
+          "service": "YNAB",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "bedroom",
+      "title": "Yasmin upstairs",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "bed-lookup",
+          "member": "yasmin",
+          "app": "open-notebook",
+          "service": "NotebookLM",
+          "origin": "swap"
+        },
+        {
+          "id": "bed-translate",
+          "member": "yasmin",
+          "app": "linkwarden",
+          "service": "Raindrop.io",
+          "origin": "swap"
+        },
+        {
+          "id": "bed-stats",
+          "member": "yasmin",
+          "app": "jupyterlab",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "bedroom-thesis",
+          "member": "yasmin",
+          "app": "quarkdown",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "bedroom-plan",
+          "member": "yasmin",
+          "app": "super-productivity",
+          "service": "Todoist",
+          "origin": "add"
+        },
+        {
+          "id": "bedroom-pad",
+          "member": "yasmin",
+          "app": "etherpad",
+          "service": "Google Docs",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "The front garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-topiary",
+          "member": "samir",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "swap"
+        },
+        {
+          "id": "garden-cryptgeon",
+          "member": null,
+          "app": "cryptgeon",
+          "service": "Privnote",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-expiry",
+      "line": "Dalia clears the fridge before the studio call."
+    },
+    {
+      "at": "midday",
+      "beat": "den-render",
+      "line": "Dalia tries a mood board for the afternoon review."
+    },
+    {
+      "at": "afternoon",
+      "beat": "bedroom-thesis",
+      "line": "Yasmin sets a dissertation chapter in type."
+    },
+    {
+      "at": "after-school",
+      "beat": "garage-bucket",
+      "line": "Samir files the day's finished work into its bucket."
+    },
+    {
+      "at": "after-school",
+      "beat": "lounge-decode",
+      "line": "Samir decodes a plotter file from the lounge sofa."
+    },
+    {
+      "at": "weekend",
+      "beat": "kitchen-librephotos",
+      "line": "The best day is found in one search."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-cryptgeon",
+      "line": "A one-time note holds the project password."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Salesforce",
+      "Lucidchart",
+      "Dropbox",
+      "GitHub",
+      "Amazon Kindle",
+      "Datadog",
+      "iCloud",
+      "Rocket Money",
+      "OurHome",
+      "Cozi",
+      "Google Search",
+      "Google Translate"
+    ],
+    "servicesFinal": [
+      "Salesforce",
+      "Lucidchart",
+      "Dropbox",
+      "GitHub",
+      "Kindle",
+      "UptimeRobot",
+      "iCloud",
+      "Rocket Money",
+      "Cozi",
+      "NotebookLM",
+      "Raindrop.io",
+      "Google Home",
+      "Midjourney",
+      "QuickBooks",
+      "Amazon S3",
+      "DevUtils",
+      "Todoist",
+      "Google Docs",
+      "Privnote",
+      "Fuelly",
+      "Adobe Acrobat",
+      "Google Photos",
+      "YNAB",
+      "Flighty"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "den-render",
+      "garage-share",
+      "bedroom-thesis",
+      "garage-bucket",
+      "lounge-decode",
+      "bed-stats",
+      "kitchen-librephotos",
+      "lounge-airtrail"
+    ],
+    "mustCarry": {
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "twenty": [
+        "marketplace: QA capture shows real company names and logos."
+      ],
+      "drawio": [
+        "Stateless: diagrams live in the browser or as .drawio files on the person's own device. The Core serves the editor only, so never say the diagram sits on the Core.",
+        "Listing says nothing else phones home: leave it.",
+        "QA screenshot is a blank editor."
+      ],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: Documented default admin credentials (admin / admin123); no QA capture."
+      ],
+      "lunalytics": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "wallos": [
+        "[note] Fetches logos for popular services from outside.",
+        "[claims] Do not promise savings."
+      ],
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "open-notebook": [
+        "[cloud-link] Supports 18 plus providers including cloud ones. Ollama is the local path.",
+        "[heavy] Podcast-style audio overviews need a speech model.",
+        "Install form has OpenAI, Anthropic, Google and Groq key fields: leave blank; Ollama is the local path.",
+        "Podcast style audio overviews need a speech model: do not mention.",
+        "Capture shows sample notebook content, not personal data."
+      ],
+      "linkwarden": [
+        "Sharing links publicly needs inbound reach: keep the story to saving, not sharing",
+        "The Pocket name in replaces is stale"
+      ],
+      "jupyterlab": [
+        "[note] One password set at install. The notebook kernel runs the code on the Core; installing a Python package reaches the internet.",
+        "[claims] Neither the manifest, the live store nor the Portal alternatives table (origin/main) names anything it replaces, so there is no replaces chip. The CI-Common campaign reference says MATLAB or RStudio, from a sour",
+        "Packages install from the internet.",
+        "QA screenshot is the token and password wall: reject.",
+        "Logo file shows only the orange arcs, not the Jupyter wordmark."
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "comfyui": [
+        "[amd-gpu] Built for AMD Ryzen AI Max (Strix Halo) with ROCm, the same family as the Core. Needs /dev/kfd and /dev/dri. No speed or model-fit claims beyond the fact sheet table.",
+        "[note] Linux host, amd64.",
+        "Built for AMD Strix Halo with ROCm: needs /dev/kfd and /dev/dri (the Core family).",
+        "First start needs the internet to clone ComfyUI-Manager; checkpoints must be added by the household from outside sources.",
+        "No speed or model fit claim beyond the sheet."
+      ],
+      "invoice-ninja": [
+        "[cloud-link] Taking card payments needs a payment provider. Say invoicing, not payment processing.",
+        "marketplace: Elastic License 2.0 (source-available)."
+      ],
+      "minio": [
+        "Developer plumbing: the story needs a script or app using buckets.",
+        "Do not frame a bucket on the Core as an off-site backup.",
+        "No QA screenshot."
+      ],
+      "cyberchef": [
+        "Listing says nothing pasted is ever sent anywhere and that it works with no internet connection: do not repeat either (sec-never-leaves, sec-offline)",
+        "A tool, not a store of anything: nothing is held after the tab closes"
+      ],
+      "samba": [
+        "[note] No web interface; protocol only. Not useful as an on-screen hero.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Headless: no web interface, so nothing to show on a screen",
+        "Not exposable",
+        "Do not call it a NAS or a file server box"
+      ],
+      "quarkdown": [
+        "Pinned to a Linux x64 release while the manifest lists arm64 too (verify).",
+        "No QA screenshot; the listing image is a sample page.",
+        "The listing says local-first: files stay in the app data directory."
+      ],
+      "super-productivity": [
+        "by default tasks live in the browser local storage, not on the Core",
+        "no sync means no custody on the Core"
+      ],
+      "etherpad": [],
+      "cryptgeon": [
+        "Notes live only in RAM: a restart of the app wipes every unread note",
+        "Do not repeat the listing's encryption wording (sec-absolute); say a note opens once and is gone",
+        "Overlaps Enclosed and PrivateBin: one burn-after-reading tool per household"
+      ],
+      "lubelogger": [
+        "Do not claim savings or economy figures",
+        "No sign-in until the user sets one (unverified)"
+      ],
+      "bentopdf": [
+        "Dual licence: AGPL-3.0 or paid commercial; fine for household use",
+        "Listing says \"nothing to leak\": drop that wording",
+        "Overlaps Stirling-PDF (the persona PDF app)"
+      ],
+      "librephotos": [
+        "[note] First setup takes 5 to 10 minutes while models and migrations start.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "Face recognition is sensitive: say what it does, never that it \"knows\" people",
+        "Overlaps Immich; use it to relieve Immich's share"
+      ],
+      "monetr": [
+        "[claims] No financial advice.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024.",
+        "marketplace: Licence is the Functional Source License (not open source)."
+      ],
+      "airtrail": [
+        "Logbook and statistics, not live flight tracking (listing short_desc says \"flight tracking\")",
+        "First user becomes administrator",
+        "Does not claim live flight status; story must say logbook"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "lunalytics",
+      "display": "Lunalytics",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "UptimeRobot",
+        "Statuspage"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "evidence": "CI-Marketplace apps/lunalytics/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "minio",
+      "display": "MinIO",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Amazon S3"
+      ],
+      "qa": "none",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Developer plumbing: the story needs a script or app using buckets.",
+        "Do not frame a bucket on the Core as an off-site backup.",
+        "No QA screenshot."
+      ],
+      "evidence": "CI-Marketplace apps/minio/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "cyberchef",
+      "display": "CyberChef",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "DevUtils",
+        "Browserling Tools"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Listing says nothing pasted is ever sent anywhere and that it works with no internet connection: do not repeat either (sec-never-leaves, sec-offline)",
+        "A tool, not a store of anything: nothing is held after the tab closes"
+      ],
+      "evidence": "CI-Marketplace apps/cyberchef/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "quarkdown",
+      "display": "Quarkdown",
+      "reason": "not in catalog-apps.json",
+      "replaces": [],
+      "qa": "none",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Pinned to a Linux x64 release while the manifest lists arm64 too (verify).",
+        "No QA screenshot; the listing image is a sample page.",
+        "The listing says local-first: files stay in the app data directory."
+      ],
+      "evidence": "CI-Marketplace apps/quarkdown/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "etherpad",
+      "display": "Etherpad",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Google Docs"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [],
+      "evidence": "CI-Marketplace apps/etherpad/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m3)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "calibre-web",
+      "beats": [
+        "lounge-read"
+      ]
+    },
+    {
+      "app": "minio",
+      "beats": [
+        "garage-bucket"
+      ]
+    },
+    {
+      "app": "samba",
+      "beats": [
+        "garage-share"
+      ]
+    },
+    {
+      "app": "quarkdown",
+      "beats": [
+        "bedroom-thesis"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}
