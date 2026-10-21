@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { joinRuntime, voiceShaOf, type RuntimeStory } from '../../assets/story/runtime.js';
 import type { Story, VoiceLock, BakeLock } from '../../assets/story/types.js';
-import { FILM_KEYS, type FilmKey } from '../../assets/story/film/layout.js';
+import { FILM_KEYS, silentStory, type FilmKey, type Cue } from '../../assets/story/film/layout.js';
 
 export const ROOT = path.resolve(import.meta.dirname, '..', '..');
 /** the authored files, the locks and the films.json: content/families, or $CI_STORY_FAMILIES_DIR (the voice-over tool's switch, kept the same) */
@@ -25,27 +25,50 @@ export const readJson = (f: string) => JSON.parse(fs.readFileSync(f, 'utf8'));
 
 // ---- the names ---------------------------------------------------------------------------------------------------------------------------
 export const aspectLabel = (k: FilmKey): string => (k === '16x9' ? '16:9' : '9:16');
-/** the web file's name: content-hashed, so it can be cached for a year wherever it is hosted */
-export const webFileName = (slug: string, k: FilmKey, bytes: Uint8Array): string => `${slug}.${k}.${hash10(bytes)}.mp4`;
+/** the web file's name: content-hashed, so it can be cached for a year wherever it is hosted. A silent film carries `.silent` before the hash, so it can never be
+ *  mistaken for (or overwrite) the voiced film of the same family. */
+export const webFileName = (slug: string, k: FilmKey, bytes: Uint8Array, silent = false): string => `${slug}.${k}${silent ? '.silent' : ''}.${hash10(bytes)}.mp4`;
 export const posterFileName = (k: FilmKey, bytes: Uint8Array): string => (k === '16x9' ? 'poster' : 'poster-9x16') + `.${hash10(bytes)}.jpg`;
 export const vttFileName = (bytes: Uint8Array): string => `captions.${hash10(bytes)}.vtt`;
-export const FILM_FILE_RE = /^(?<slug>[a-z][a-z0-9-]*)\.(?<aspect>16x9|9x16)\.(?<hash>[0-9a-f]{10})\.mp4$/;
+export const FILM_FILE_RE = /^(?<slug>[a-z][a-z0-9-]*)\.(?<aspect>16x9|9x16)(?<silent>\.silent)?\.(?<hash>[0-9a-f]{10})\.mp4$/;
+/** the name of a rendering's side files (the gates' report, a rejected film): silent ones are their own */
+export const sideName = (slug: string, k: FilmKey, silent: boolean): string => `${slug}.${k}${silent ? '.silent' : ''}`;
 
 // ---- reading a family -----------------------------------------------------------------------------------------------------------------------
-export type Family = { slug: string; story: Story; voice: VoiceLock; bake: BakeLock; rs: RuntimeStory; shas: { story: string; voice: string; bake: string } };
+export type Family = {
+  slug: string; story: Story; voice: VoiceLock | null; bake: BakeLock; rs: RuntimeStory;
+  /** a silent film: no voice lock is needed, the bake's estimated durations time the clock and the captions (rs has the estimated clips filled in) */
+  silent: boolean;
+  shas: { story: string; voice: string; bake: string };
+};
 
-/** The film needs all three of a family's files, and a bake made from THIS voice lock (else the offsets under the sound are someone else's). */
-export async function loadFamily(slug: string): Promise<Family> {
-  const dir = familiesDir(), p = (ext: string) => path.join(dir, `${slug}${ext}`);
-  for (const [ext, how] of [['.json', 'the authored story'], ['.voice.json', `the voice lock (pnpm run story:voice -- ${slug})`], ['.bake.json', `the bake lock (pnpm run story:bake -- ${slug})`]]) {
-    if (!fs.existsSync(p(ext))) throw new Error(`${slug}: no ${how}: ${path.relative(ROOT, p(ext))}`);
+/** Does the family have a voice lock? (`--silent` is chosen for it, with a notice, when it does not.) */
+export const hasVoiceLock = (slug: string): boolean => fs.existsSync(path.join(familiesDir(), `${slug}.voice.json`));
+
+/**
+ * A voiced film needs all three of a family's files, and a bake made from THIS voice lock (else the offsets under the sound are someone else's); it refuses estimated
+ * durations. A silent film (`opts.silent`) needs the story and the bake lock only: estimated durations are accepted here and only here, and the voice lock, if there is one and
+ * the bake was made from it, still times the picture (the film then simply has no sound).
+ */
+export async function loadFamily(slug: string, opts: { silent?: boolean } = {}): Promise<Family> {
+  const dir = familiesDir(), p = (ext: string) => path.join(dir, `${slug}${ext}`), silent = !!opts.silent;
+  const need: Array<[string, string]> = [['.json', 'the authored story'], ['.bake.json', `the bake lock (pnpm run story:bake -- ${slug})`]];
+  if (!silent) need.splice(1, 0, ['.voice.json', `the voice lock (pnpm run story:voice -- ${slug}; or --silent for a captioned film with no sound)`]);
+  for (const [ext, how] of need) if (!fs.existsSync(p(ext))) throw new Error(`${slug}: no ${how}: ${path.relative(ROOT, p(ext))}`);
+  const story: Story = readJson(p('.json')), bake: BakeLock = readJson(p('.bake.json'));
+  const voice: VoiceLock | null = fs.existsSync(p('.voice.json')) ? readJson(p('.voice.json')) : null;
+  if (!silent && bake.durations !== 'voice') throw new Error(`${slug}: the bake lock used estimated durations; record the voice (pnpm run story:voice -- ${slug}) and bake again, or render a silent film (--silent)`);
+  // the voice only counts when the bake was made from it; an estimated bake is joined without it (its offsets are the estimate's)
+  let joinWith: VoiceLock | null = null;
+  if (bake.durations === 'voice') {
+    if (!voice) throw new Error(`${slug}: the bake lock was made from a voice lock that is not there (${path.relative(ROOT, p('.voice.json'))})`);
+    const now = await voiceShaOf(story, voice);
+    if (bake.voiceSha !== now) throw new Error(`${slug}: the bake lock was made from a different voice lock; run pnpm run story:bake -- ${slug}`);
+    joinWith = voice;
   }
-  const story: Story = readJson(p('.json')), voice: VoiceLock = readJson(p('.voice.json')), bake: BakeLock = readJson(p('.bake.json'));
-  if (bake.durations !== 'voice') throw new Error(`${slug}: the bake lock used estimated durations; record the voice (pnpm run story:voice -- ${slug}) and bake again`);
-  const now = await voiceShaOf(story, voice);
-  if (bake.voiceSha !== now) throw new Error(`${slug}: the bake lock was made from a different voice lock; run pnpm run story:bake -- ${slug}`);
-  const rs = joinRuntime(story, voice, bake);
-  return { slug, story, voice, bake, rs, shas: { story: sha256(fs.readFileSync(p('.json'))), voice: sha256(fs.readFileSync(p('.voice.json'))), bake: sha256(fs.readFileSync(p('.bake.json'))) } };
+  const joined = joinRuntime(story, joinWith, bake), rs = silent ? silentStory(joined) : joined;
+  const sha = (ext: string) => (fs.existsSync(p(ext)) ? sha256(fs.readFileSync(p(ext))) : '');
+  return { slug, story, voice: joinWith, bake, rs, silent, shas: { story: sha('.json'), voice: joinWith ? sha('.voice.json') : '', bake: sha('.bake.json') } };
 }
 
 /** every slug with a bake lock (the film needs one): `--all` */
@@ -76,9 +99,11 @@ export type FilmText = {
   badge: string;
   names: Record<string, string>;
 };
-export function filmText(rs: RuntimeStory, claims: Claims = loadClaims()): FilmText {
+/** A silent film has no voice, so it does not print the synthetic-voice line (claims.json places it on the end card of a film with narration; saying a voice was generated under a silent film would be false). */
+export function filmText(rs: RuntimeStory, claims: Claims = loadClaims(), o: { silent?: boolean } = {}): FilmText {
   const fam = rs.family, fictional = disclosure(claims, 'fictional-family');
-  const lines = [disclosure(claims, 'beta-short'), disclosure(claims, 'scripted-scenes'), disclosure(claims, 'stylised-art'), disclosure(claims, 'synthetic-voice')];
+  const lines = [disclosure(claims, 'beta-short'), disclosure(claims, 'scripted-scenes'), disclosure(claims, 'stylised-art')];
+  if (!o.silent) lines.push(disclosure(claims, 'synthetic-voice'));
   if (namesAgentRuntime(rs, rs.film.parts.map(p => p.id))) lines.push(disclosure(claims, 'attribution-agents'));
   const url = rs.closing.cta.url.replace(/^https?:\/\//, '');
   const names: Record<string, string> = {}; for (const m of rs.members) names[m.id] = m.companion ? m.companion.name : m.name;
@@ -94,9 +119,12 @@ export type FilmAspect = {
   file: string; sha256: string; bytes: number; width: number; height: number; durationMs: number;
   /** relative to content/families/<slug>/ : the committed poster */
   poster: string;
-  loudness: { I: number; TP: number };
+  /** the encoded file's loudness; a silent film has no audio stream and records none */
+  loudness?: { I: number; TP: number };
 };
 export type FilmEntry = {
+  /** false: a silent, captioned film (no audio stream, the clock timed by the bake's estimated durations); absent or true: it has the recorded voice under it */
+  sound?: boolean;
   durationMs: number;
   /** a hash of everything the film was made from, so a stale film is found without rendering */
   inputsSha: string;
@@ -122,6 +150,8 @@ export function filmsProblems(films: FilmsFile, opts: { maxBytes?: number } = {}
   if (!films || films.v !== 1 || typeof films.families !== 'object') return ['films.json: not { v: 1, families: {} }'];
   for (const [slug, e] of Object.entries(films.families)) {
     const at = (m: string) => why.push(`films.json ${slug}: ${m}`);
+    if (e.sound !== undefined && typeof e.sound !== 'boolean') at('sound must be true or false');
+    const silent = e.sound === false;
     if (!/^[a-z][a-z0-9-]*$/.test(slug)) at('the slug is not a public slug');
     if (!(e.durationMs > 0)) at('no duration');
     if (!/^[0-9a-f]{64}$/.test(e.inputsSha || '')) at('no inputsSha');
@@ -132,14 +162,16 @@ export function filmsProblems(films: FilmsFile, opts: { maxBytes?: number } = {}
       const a = (e.aspects as any)[k] as FilmAspect;
       if (!FILM_KEYS.includes(k as FilmKey)) { at(`unknown aspect ${k}`); continue; }
       const m = FILM_FILE_RE.exec(a.file || '');
-      if (!m || m.groups!.slug !== slug || m.groups!.aspect !== k) at(`${k}: file ${a.file} is not ${slug}.${k}.<hash10>.mp4`);
+      if (!m || m.groups!.slug !== slug || m.groups!.aspect !== k) at(`${k}: file ${a.file} is not ${slug}.${k}${silent ? '.silent' : ''}.<hash10>.mp4`);
+      else if (!!m.groups!.silent !== silent) at(silent ? `${k}: a silent film's file must be ${slug}.${k}.silent.<hash10>.mp4 (got ${a.file})` : `${k}: ${a.file} is named as a silent film but the entry has sound`);
       else if (!/^[0-9a-f]{64}$/.test(a.sha256 || '') || a.sha256.slice(0, 10) !== m.groups!.hash) at(`${k}: the hash in the file name is not the sha256's first ten`);
       if (!(a.bytes > 0)) at(`${k}: no bytes`); else if (a.bytes > max) at(`${k}: ${(a.bytes / 1048576).toFixed(1)} MiB is over the ${(max / 1048576).toFixed(0)} MiB limit`);
       if (!(a.width > 0 && a.height > 0)) at(`${k}: no size`);
       if (k === '16x9' && a.width <= a.height) at('16x9 is not landscape'); if (k === '9x16' && a.width >= a.height) at('9x16 is not portrait');
       if (!(a.durationMs > 0)) at(`${k}: no duration`);
       if (!new RegExp(`^film/${k === '16x9' ? 'poster' : 'poster-9x16'}\\.[0-9a-f]{10}\\.jpg$`).test(a.poster || '')) at(`${k}: poster must be film/${k === '16x9' ? 'poster' : 'poster-9x16'}.<hash10>.jpg`);
-      if (!a.loudness || !Number.isFinite(a.loudness.I)) at(`${k}: no loudness`);
+      if (silent) { if (a.loudness) at(`${k}: a silent film has no loudness`); }
+      else if (!a.loudness || !Number.isFinite(a.loudness.I)) at(`${k}: no loudness`);
     }
   }
   return why;
@@ -161,4 +193,27 @@ export function toolSha(): string {
   for (const f of files) if (fs.existsSync(f)) h.update(path.relative(ROOT, f)).update(fs.readFileSync(f));
   return h.digest('hex');
 }
-export const inputsShaOf = (fam: Family, res: number, tool = toolSha()): string => sha256(JSON.stringify([fam.shas.story, fam.shas.voice, fam.shas.bake, tool, res]));
+/** (a silent film hashes a marker too, so a silent and a voiced film of one family are never taken for each other; a voiced film's hash is what it always was) */
+export const inputsShaOf = (fam: Family, res: number, tool = toolSha()): string => sha256(JSON.stringify([fam.shas.story, fam.shas.voice, fam.shas.bake, tool, res, ...(fam.silent ? ['silent'] : [])]));
+
+// ---- the captions of a silent film ---------------------------------------------------------------------------------------------------------------
+/** reading speed in characters a second: broadcast captions aim at 17 to 20 for adults; above WARN is hard to read, above FAIL cannot be read at all */
+export const READ_CPS = { warn: 21, fail: 30 } as const;
+/**
+ * The caption legibility checks that need no pixels (the pixels are checked in the page: the painted type audit, which fails a film whose smallest type is under the 36 design px floor, and
+ * the room's spread, which fails a blank render). A cue must end inside the film, must not overlap the one before it, must hold at least a second and a half for three or more words,
+ * and must be readable at the rate its words are spoken. In a silent film the estimate is the reader's only clock, so this is the check that it is a slow enough one.
+ */
+export function captionProblems(cues: Cue[], durationS: number): { errors: string[]; warnings: string[]; maxCps: number } {
+  const errors: string[] = [], warnings: string[] = []; let maxCps = 0;
+  cues.forEach((c, i) => {
+    const at = `caption ${i + 1} (${c.start.toFixed(1)} s)`, chars = c.text.length, shown = Math.max(1e-6, c.end - c.start), cps = chars / shown;
+    maxCps = Math.max(maxCps, cps);
+    if (c.end > durationS + 1e-6) errors.push(`${at} ends at ${c.end.toFixed(2)} s, after the film does`);
+    if (i && c.start < cues[i - 1].end - 1e-6) errors.push(`${at} starts before the caption before it ends`);
+    if (c.words.length >= 3 && shown < 1.5) warnings.push(`${at} is up for ${shown.toFixed(2)} s`);
+    if (cps > READ_CPS.fail) errors.push(`${at} needs ${cps.toFixed(0)} characters a second to read`);
+    else if (cps > READ_CPS.warn) warnings.push(`${at} needs ${cps.toFixed(0)} characters a second to read`);
+  });
+  return { errors, warnings, maxCps: +maxCps.toFixed(1) };
+}

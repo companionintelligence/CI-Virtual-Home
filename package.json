@@ -54,6 +54,8 @@
     "story:bake": "node --experimental-strip-types scripts/story-bake.mts",
     "story:voice": "node --experimental-strip-types scripts/build-voiceover.mts",
     "story:film": "node --experimental-strip-types scripts/render-family-film.mts",
+    "story:spline": "node --experimental-strip-types scripts/story/spline-report.mts",
+    "story:spline:sheets": "node --experimental-strip-types scripts/story/spline-sheets.mts",
     "// ---- ad kit ----": "story:ads renders the silent persona ad cuts and refreshes content/story/ads.json; story:ads:test is its pure-Node test (reference/story/ads.md)",
     "story:ads": "node --experimental-strip-types scripts/render-persona-cuts.mts",
     "story:ads:test": "node --experimental-strip-types --test scripts/test-ads.mts",

@@ -426,8 +426,8 @@
         "role": "core"
       },
       "camera": {
-        "framing": "medium",
-        "side": "left"
+        "framing": "close",
+        "side": "right"
       },
       "popup": {
         "title": "Monday’s admin hour comes first",
@@ -523,7 +523,7 @@
       },
       "camera": {
         "framing": "medium",
-        "side": "left"
+        "side": "right"
       },
       "popup": {
         "title": "One word finds the piano’s receipts",
@@ -558,18 +558,11 @@
       },
       "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
       "anchor": {
-        "role": "room",
-        "room": "office",
-        "nth": 0,
-        "fallback": [
-          {
-            "role": "core"
-          }
-        ]
+        "role": "core"
       },
       "camera": {
         "framing": "medium",
-        "side": "right"
+        "side": "left"
       },
       "popup": {
         "title": "Sally fixes a date, then sends",
@@ -668,7 +661,7 @@
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "side": "left"
       },
       "popup": {
@@ -710,7 +703,7 @@
       },
       "camera": {
         "framing": "medium",
-        "side": "right"
+        "side": "left"
       },
       "popup": {
         "title": "Four people, three stools, one planner",
@@ -802,7 +795,7 @@
         ]
       },
       "camera": {
-        "framing": "medium",
+        "framing": "close",
         "side": "right"
       },
       "popup": {
@@ -858,7 +851,8 @@
       },
       "camera": {
         "framing": "medium",
-        "side": "left"
+        "side": "right",
+        "from": "left"
       },
       "popup": {
         "title": "Where John’s stack trace goes",
@@ -912,8 +906,8 @@
         ]
       },
       "camera": {
-        "framing": "close",
-        "side": "left"
+        "framing": "medium",
+        "side": "right"
       },
       "popup": {
         "title": "What only John knows, written down",
@@ -962,7 +956,7 @@
       },
       "camera": {
         "framing": "medium",
-        "from": "behind"
+        "side": "left"
       },
       "popup": {
         "title": "The session runs in the library",
@@ -1000,19 +994,19 @@
       "capability": "back up, search and organise your family photos and videos",
       "service": "google-photos",
       "anchor": {
-        "role": "room",
+        "role": "desk",
         "room": "kids",
-        "nth": 2,
+        "nth": 1,
         "fallback": [
           {
-            "role": "desk",
+            "role": "room",
             "room": "kids",
-            "nth": 1
+            "nth": 2
           }
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "close",
         "side": "left"
       },
       "popup": {
@@ -1110,7 +1104,8 @@
         ]
       },
       "camera": {
-        "framing": "medium",
+        "framing": "close",
+        "from": "behind",
         "side": "right"
       },
       "popup": {
@@ -1207,7 +1202,7 @@
       },
       "camera": {
         "framing": "medium",
-        "from": "behind",
+        "from": "front",
         "side": "left"
       },
       "popup": {
@@ -1295,7 +1290,7 @@
       "service": "audible",
       "anchor": {
         "role": "deck",
-        "nth": 1,
+        "nth": 0,
         "fallback": [
           {
             "role": "garden"
@@ -1303,7 +1298,7 @@
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "eye": "standing"
       },
       "popup": {

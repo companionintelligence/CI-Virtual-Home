@@ -407,7 +407,7 @@
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "side": "left",
         "from": "right"
       },
@@ -457,7 +457,7 @@
       },
       "camera": {
         "framing": "medium",
-        "from": "front"
+        "from": "right"
       },
       "popup": {
         "title": "Steve builds the porch in blocks",
@@ -503,8 +503,8 @@
         ]
       },
       "camera": {
-        "framing": "close",
-        "side": "left"
+        "framing": "medium",
+        "side": "right"
       },
       "popup": {
         "title": "Jean designs the school fair poster",
@@ -552,7 +552,7 @@
         ]
       },
       "camera": {
-        "framing": "close",
+        "framing": "medium",
         "side": "left"
       },
       "popup": {
@@ -691,7 +691,7 @@
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "side": "left"
       },
       "popup": {
@@ -748,8 +748,8 @@
         ]
       },
       "camera": {
-        "framing": "medium",
-        "side": "right"
+        "framing": "close",
+        "side": "left"
       },
       "popup": {
         "title": "Juniper drafts the client's follow-ups",
@@ -808,7 +808,7 @@
       },
       "camera": {
         "framing": "medium",
-        "side": "left"
+        "side": "right"
       },
       "popup": {
         "title": "A checklist becomes a workflow",
@@ -862,7 +862,7 @@
       },
       "camera": {
         "framing": "medium",
-        "side": "right"
+        "side": "left"
       },
       "popup": {
         "title": "One list of what still renews",
@@ -910,7 +910,7 @@
       },
       "camera": {
         "framing": "close",
-        "side": "left"
+        "side": "right"
       },
       "popup": {
         "title": "Smaller pictures, nothing uploaded",
@@ -948,7 +948,7 @@
         "role": "core"
       },
       "camera": {
-        "framing": "medium",
+        "framing": "close",
         "side": "left"
       },
       "popup": {
@@ -991,8 +991,9 @@
         "role": "core"
       },
       "camera": {
-        "framing": "close",
-        "side": "left"
+        "framing": "medium",
+        "side": "left",
+        "eye": "seated"
       },
       "popup": {
         "title": "Quill files, John corrects one",
@@ -1043,7 +1044,9 @@
         ]
       },
       "camera": {
-        "framing": "medium"
+        "framing": "medium",
+        "side": "left",
+        "from": "right"
       },
       "popup": {
         "title": "House jobs get one board",
@@ -1086,7 +1089,7 @@
         ]
       },
       "camera": {
-        "framing": "medium",
+        "framing": "wide",
         "side": "left",
         "from": "front"
       },
@@ -1130,9 +1133,9 @@
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "from": "front",
-        "side": "right"
+        "side": "left"
       },
       "popup": {
         "title": "Runs that start at the door",
@@ -1177,7 +1180,7 @@
         ]
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "side": "left"
       },
       "popup": {
@@ -1224,7 +1227,8 @@
       },
       "camera": {
         "framing": "medium",
-        "side": "left"
+        "from": "front",
+        "side": "right"
       },
       "popup": {
         "title": "Steve logs the oil check",
@@ -1305,8 +1309,9 @@
         "role": "street"
       },
       "camera": {
-        "framing": "wide",
+        "framing": "medium",
         "from": "front",
+        "side": "left",
         "eye": "aerial"
       },
       "popup": {

@@ -53,12 +53,14 @@ export function freezes(file: string): Span[] {
   return spans;
 }
 
-export type Expect = { w: number; h: number; fps: number; frames: number; durationS: number; titleEnd: number; outroTail: number; web: boolean; channels: number };
+/** `silent`: a captioned film with no audio stream. The picture gates stay (streams, H.264 yuv420p, size, 30 fps, exact frames, length, freeze, bytes); the sound gates (an AAC stream, dead air, loudness) do not apply. */
+export type Expect = { w: number; h: number; fps: number; frames: number; durationS: number; titleEnd: number; outroTail: number; web: boolean; channels: number; silent?: boolean };
 export type Report = { errors: string[]; warnings: string[]; probe: Probe; loudness: { I: number; TP: number; LRA: number } | null; silences: Span[]; freezes: Span[] };
 
 export function gate(file: string, e: Expect, over: { maxBytes?: number } = {}): Report {
   const errors: string[] = [], warnings: string[] = [], p = probe(file);
-  if (p.streams !== 2 || !p.video || !p.audio) errors.push(`expected one video and one audio stream, found ${p.streams}`);
+  if (e.silent) { if (p.streams !== 1 || !p.video || p.audio) errors.push(`expected one video stream and no audio (a silent film), found ${p.streams} stream(s)${p.audio ? ' with audio' : ''}`); }
+  else if (p.streams !== 2 || !p.video || !p.audio) errors.push(`expected one video and one audio stream, found ${p.streams}`);
   if (p.video) {
     if (p.video.codec !== 'h264') errors.push(`video is ${p.video.codec}, not h264`);
     if (p.video.pix !== 'yuv420p') errors.push(`pixel format ${p.video.pix}, not yuv420p`);
@@ -74,8 +76,8 @@ export function gate(file: string, e: Expect, over: { maxBytes?: number } = {}):
   if (p.duration > FILM.maxS + 0.05) errors.push(`length ${p.duration.toFixed(1)} s is over the ${FILM.maxS} s cap`);
   else if (p.duration < 75) warnings.push(`length ${p.duration.toFixed(1)} s is under the 75 s a family film is designed for`);
   if (e.web) { const g = sizeGuard(p.bytes, 'the web film', over.maxBytes ?? WEB_MAX_BYTES); if (g) errors.push(g); }
-  // dead air: the title card is silent by design, and so is the end card after the last word; nothing else may be
-  const sil = silences(file);
+  // dead air: the title card is silent by design, and so is the end card after the last word; nothing else may be (a silent film has no sound to be dead)
+  const sil = e.silent ? [] : silences(file);
   for (const [s, en] of sil) {
     const end = Number.isFinite(en) ? en : p.duration, len = end - s;
     if (s < 0.1 && end <= e.titleEnd + 1.2) continue;                       // the title card (and the first beat's lead)
@@ -85,8 +87,9 @@ export function gate(file: string, e: Expect, over: { maxBytes?: number } = {}):
   }
   const fr = freezes(file);
   for (const [s, en] of fr) { const len = (Number.isFinite(en) ? en : p.duration) - s; if (len >= FREEZE_S) errors.push(`the picture is frozen for ${len.toFixed(1)} s at ${s.toFixed(1)} s`); else warnings.push(`the picture holds still for ${len.toFixed(1)} s at ${s.toFixed(1)} s`); }
-  const loud = measure(file);
-  if (!loud) errors.push('no measurable audio');
+  const loud = e.silent ? null : measure(file);
+  if (e.silent) { /* no loudness gate: there is no audio */ }
+  else if (!loud) errors.push('no measurable audio');
   else {
     if (Math.abs(loud.I - TARGET.I) > LOUDNESS_TOL_LU) errors.push(`loudness ${loud.I.toFixed(1)} LUFS is more than ${LOUDNESS_TOL_LU} LU from ${TARGET.I}`);
     if (loud.TP > TARGET.TP) errors.push(`true peak ${loud.TP.toFixed(1)} dBTP is above ${TARGET.TP}`);

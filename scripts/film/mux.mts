@@ -86,19 +86,20 @@ export function buildAudio(placements: Placement[], clipFile: (p: Placement) => 
 }
 
 export type EncodeArgs = {
-  /** the audio WAV from buildAudio */
-  wav: string; fps: number;
+  /** the audio WAV from buildAudio; null: a SILENT film, which has no audio stream at all (`-an`, one input, one stream) */
+  wav: string | null; fps: number;
   web: string; master?: string | null;
 };
 /** The ffmpeg command line for the two outputs from ONE stream of JPEG frames on stdin (no generation loss: the web file is not made from the master). */
 export function encodeArgs(a: EncodeArgs): string[] {
+  const silent = !a.wav;
   // -threads 1 on purpose: libx264 with frame threads is not reproducible (the same 241 JPEGs gave a different stream on each of three runs; with one thread, the same bytes every time).
-  const common = ['-map', '0:v', '-map', '1:a', '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
+  const common = ['-map', '0:v', ...(silent ? ['-an'] : ['-map', '1:a']), '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
     '-c:v', 'libx264', '-threads', '1', '-pix_fmt', 'yuv420p', '-g', '90', '-flags:v', '+bitexact', '-flags:a', '+bitexact', '-fflags', '+bitexact', '-map_metadata', '-1', '-movflags', '+faststart'];
-  const args = ['-y', '-loglevel', 'error', '-nostdin', '-fflags', '+bitexact', '-f', 'image2pipe', '-c:v', 'mjpeg', '-framerate', String(a.fps), '-i', '-', '-i', a.wav];
-  // web: H.264 High, CRF 28 capped at 1.5 Mbit/s, AAC 64k mono
-  args.push(...common, '-profile:v', 'high', '-preset', 'medium', '-crf', '28', '-maxrate', '1500k', '-bufsize', '3000k', '-c:a', 'aac', '-b:a', '64k', '-ac', '1', '-ar', String(OUT_RATE), a.web);
+  const args = ['-y', '-loglevel', 'error', '-nostdin', '-fflags', '+bitexact', '-f', 'image2pipe', '-c:v', 'mjpeg', '-framerate', String(a.fps), '-i', '-', ...(silent ? [] : ['-i', a.wav!])];
+  // web: H.264 High, CRF 28 capped at 1.5 Mbit/s, AAC 64k mono (none when silent)
+  args.push(...common, '-profile:v', 'high', '-preset', 'medium', '-crf', '28', '-maxrate', '1500k', '-bufsize', '3000k', ...(silent ? [] : ['-c:a', 'aac', '-b:a', '64k', '-ac', '1', '-ar', String(OUT_RATE)]), a.web);
   // master: CRF 18, AAC 128k stereo; outside git and dist
-  if (a.master) args.push(...common, '-profile:v', 'high', '-preset', 'slow', '-crf', '18', '-c:a', 'aac', '-b:a', '128k', '-ac', '2', '-ar', String(OUT_RATE), a.master);
+  if (a.master) args.push(...common, '-profile:v', 'high', '-preset', 'slow', '-crf', '18', ...(silent ? [] : ['-c:a', 'aac', '-b:a', '128k', '-ac', '2', '-ar', String(OUT_RATE)]), a.master);
   return args;
 }
