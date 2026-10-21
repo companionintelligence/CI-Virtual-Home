@@ -1,0 +1,1461 @@
+{
+  "v": 3,
+  "slug": "chaudhry",
+  "house": "lakecabin",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/chaudhry.json",
+    "sha1": "33a787a6954d5f02f48ae43764506b3b6a17f615",
+    "beatsNow": 23,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "young-family",
+  "business": false,
+  "narrator": "v-warm-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "gitea",
+        "open-webui",
+        "navidrome",
+        "frigate",
+        "foldergram"
+      ],
+      "beatApps": {
+        "home": "grocy"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "gitea",
+          "open-webui",
+          "navidrome",
+          "kitchenowl",
+          "frigate",
+          "foldergram"
+        ],
+        "beatApps": {},
+        "reviewNeeded": []
+      },
+      "notes": [
+        "kitchenowl dropped: no beat tells it any more",
+        "beatApps.home grocy added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 10,
+    "householdBeats": 5,
+    "householdBeatsMax": 6,
+    "persona": {
+      "noor": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      },
+      "imran": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      },
+      "zara": {
+        "now": 1,
+        "add": 2,
+        "target": 3
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "noor",
+      "name": "Noor",
+      "age": 36,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "backend developer, works from home",
+      "companion": {
+        "name": "Sparrowhawk",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro"
+      ],
+      "thread": "Backend code from the study, with an agent labelling the issues."
+    },
+    {
+      "id": "imran",
+      "name": "Imran",
+      "age": 38,
+      "role": "parent",
+      "archetype": "host",
+      "work": "at home with the baby",
+      "companion": {
+        "name": "Pebble",
+        "runtime": "OpenClaw",
+        "memory": true
+      },
+      "lens": [
+        "host-cook",
+        "baby-year",
+        "photographer"
+      ],
+      "thread": "At home with Zara: the kitchen, the lake deck and the family's photos."
+    },
+    {
+      "id": "zara",
+      "name": "Zara",
+      "age": 1,
+      "role": "baby",
+      "archetype": null,
+      "work": null,
+      "companion": null,
+      "lens": [
+        "baby-year"
+      ],
+      "thread": "A first year beside the lake: songs, boxes and a voice."
+    }
+  ],
+  "character": {
+    "lede": "A craftsman lake house stands in the water, with a glazed prow, a long catslide roof and a fieldstone chimney. A dark deck with a telescope looks over the pond, and a planted bank runs down to it.",
+    "spots": [
+      {
+        "room": "Lake Deck",
+        "line": "Rocking chairs and a telescope face the pond from the deck."
+      },
+      {
+        "room": "Study",
+        "line": "An easel, a bookshelf and a gallery wall surround the desk."
+      },
+      {
+        "room": "Nursery",
+        "line": "A crib, a changing table and a glider fill the nursery."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 228,
+      "ground": "lawn",
+      "style": "Craftsman lake house standing in the water: a greige gable block with a glazed prow, a long catslide over a set-back upper floor with a fieldstone breast and chimney, a slate-sided single-storey wing with a clerestory and a glass corner, a planted bank and a dark deck with a telescope over the pond",
+      "rooms": [
+        "Living Room",
+        "Bath",
+        "Dining",
+        "Kitchen",
+        "Lake Passage",
+        "Lake Deck",
+        "Lake Hall",
+        "Study",
+        "Stair Hall",
+        "Foyer",
+        "Master Bedroom",
+        "Glass Prow",
+        "Upper Hall",
+        "Landing",
+        "Upper Bath",
+        "Nursery"
+      ],
+      "flags": [
+        "desk: core-desk-only"
+      ]
+    },
+    "truths": "The Core sits on the desk in the Study. The house has a television in the Living Room and a kitchen with a breakfast bar. Lake deck with a telescope, pond, planted bank. The nursery is upstairs.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "drawdb",
+      "name": "drawDB",
+      "member": "noor",
+      "room": "Study",
+      "service": "dbdiagram.io",
+      "serviceId": "dbdiagram-io",
+      "status": "add",
+      "beat": "study-schema",
+      "seed": "Noor sketches the new schema in drawDB, and the diagram is saved in the browser on her laptop.",
+      "line": "drawDB sketches a database schema in the browser, saved on the device."
+    },
+    {
+      "app": "skybro",
+      "name": "SkyBro",
+      "member": "imran",
+      "room": "Lake Deck",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "deck-sky",
+      "seed": "Imran lifts Zara to the telescope while the tablet beside it names the plane crossing the lake, using SkyBro.",
+      "line": "SkyBro shows the aircraft and satellites overhead on a tablet by the telescope."
+    },
+    {
+      "app": "homebox",
+      "name": "HomeBox",
+      "member": "zara",
+      "room": "Nursery",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "status": "add",
+      "beat": "nursery-boxes",
+      "seed": "Zara's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once.",
+      "line": "HomeBox gives every box in the loft and garage a label, a place and a note about what is inside."
+    },
+    {
+      "app": "strix",
+      "name": "Strix",
+      "member": "noor",
+      "room": "Out on the deck",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "garden-camera",
+      "seed": "Noor lets Strix find the stream address of the new camera on the deck and write the settings Frigate needs.",
+      "line": "Strix finds the stream address of a new camera and writes the settings for Frigate."
+    },
+    {
+      "app": "lubelogger",
+      "name": "LubeLogger",
+      "member": null,
+      "room": "Foyer",
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "status": "add",
+      "beat": "foyer-lubelogger",
+      "seed": "LubeLogger keeps the service history, fuel and reminders of the family estate car in one log that the household shares.",
+      "line": "LubeLogger keeps the van's service history, fuel and reminders in one log."
+    },
+    {
+      "app": "pingvin-share",
+      "name": "Pingvin Share",
+      "member": null,
+      "room": "Living Room",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "living-pingvin-share",
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day.",
+      "line": "Pingvin Share makes a link for a big file that someone in the house opens."
+    },
+    {
+      "app": "photoview",
+      "name": "Photoview",
+      "member": "imran",
+      "room": "Noor in the study",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "swap",
+      "beat": "study-weekend",
+      "seed": "Imran points Photoview at the folder that Noor's script sorted, and it builds a gallery he can scroll with Zara on his knee.",
+      "line": "Photoview builds a gallery from a folder of camera files, with the camera details beside each frame."
+    },
+    {
+      "app": "firefly-iii",
+      "name": "Firefly III",
+      "member": "imran",
+      "room": "Imran in the kitchen",
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "status": "swap",
+      "beat": "kitchen-spend",
+      "seed": "Imran adds the grocery delivery, one tin short, to the month's ledger in Firefly III and notes the refund.",
+      "line": "Firefly III records the household's money from a bank export and sorts it with rules."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "study-easel",
+      "member": "noor",
+      "chapter": "study",
+      "from": "gitea",
+      "fromName": "Gitea",
+      "to": "tldraw",
+      "toName": "tldraw",
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Noor sketches the new service on tldraw at the easel before she writes a line.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "study-model",
+      "member": "noor",
+      "chapter": "study",
+      "from": "open-webui",
+      "fromName": "Open WebUI",
+      "to": "open-webui",
+      "toName": "Open WebUI",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Noor asks the model on the Core about a slow query in Open WebUI, and reads its answer beside the plan.",
+      "filmBeat": false,
+      "dropWith": [
+        "gitea"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-couch",
+      "member": "noor",
+      "chapter": "living",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "grocy",
+      "toName": "Grocy",
+      "service": "AnyList",
+      "serviceId": "anylist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Coffee beans join the list in Grocy, which counts the pantry and notes that the tin is nearly out.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-swap",
+      "member": "imran",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Imran finds a buttermilk swap in Mealie's notes on the recipe, and the list updates.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-spend",
+      "member": "imran",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "firefly-iii",
+      "toName": "Firefly III",
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Imran adds the grocery delivery, one tin short, to the month's ledger in Firefly III and notes the refund.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-camera",
+      "member": "noor",
+      "chapter": "garden",
+      "from": "frigate",
+      "fromName": "Frigate",
+      "to": "strix",
+      "toName": "Strix",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Noor lets Strix find the stream address of the new camera on the deck and write the settings Frigate needs.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [
+        "frigate"
+      ],
+      "why": null
+    },
+    {
+      "beat": "study-weekend",
+      "member": "imran",
+      "chapter": "study",
+      "from": "foldergram",
+      "fromName": "Foldergram",
+      "to": "photoview",
+      "toName": "Photoview",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "loose",
+      "qualifier": "for photos already on the Core",
+      "seed": "Imran points Photoview at the folder that Noor's script sorted, and it builds a gallery he can scroll with Zara on his knee.",
+      "filmBeat": false,
+      "dropWith": [
+        "gitea"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-week",
+      "member": "imran",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "jotty",
+      "toName": "Jotty",
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Imran plans the next day's dinners as a checklist in Jotty, kept as a plain Markdown file on the Core.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-pebble",
+      "member": "imran",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "grocy",
+      "toName": "Grocy",
+      "service": "AnyList",
+      "serviceId": "anylist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Imran checks the basket against the pantry count in Grocy before he orders, and the list shows what is really short.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-playlist",
+      "member": "noor",
+      "chapter": "kitchen",
+      "from": "navidrome",
+      "fromName": "Navidrome",
+      "to": "mstream",
+      "toName": "mStream",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "seed": "Noor starts lunch with a playlist from the family's music folder through mStream.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "kitchenowl",
+      "name": "KitchenOwl",
+      "beats": [
+        "ftue-pick",
+        "living-couch",
+        "kitchen-week",
+        "kitchen-swap",
+        "kitchen-pebble",
+        "kitchen-spend"
+      ],
+      "retoldAs": [
+        "living-couch -> Grocy",
+        "kitchen-swap -> Mealie",
+        "kitchen-spend -> Firefly III",
+        "kitchen-week -> Jotty",
+        "kitchen-pebble -> Grocy"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "gitea",
+      "baikal"
+    ],
+    "was": [
+      "gitea",
+      "kitchenowl"
+    ],
+    "changed": [
+      {
+        "from": "kitchenowl",
+        "to": "baikal"
+      }
+    ],
+    "note": "ftue-pick names apps in `with` that the plan retells away; set `with` to this list and name each one in the popup body (the first-install list), so the fleet counts are the ones in fleet-simulation.md"
+  },
+  "adds": [
+    {
+      "id": "study-editor",
+      "chapter": "study",
+      "newChapter": null,
+      "member": "noor",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "code-server",
+      "appName": "Code Server",
+      "with": [],
+      "service": "Cursor",
+      "serviceId": "cursor",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noor opens her editor in the laptop browser from Code Server, and the editor runs on the Core."
+    },
+    {
+      "id": "study-schema",
+      "chapter": "study",
+      "newChapter": null,
+      "member": "noor",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "easel",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "drawdb",
+      "appName": "drawDB",
+      "with": [],
+      "service": "dbdiagram.io",
+      "serviceId": "dbdiagram-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noor sketches the new schema in drawDB, and the diagram is saved in the browser on her laptop."
+    },
+    {
+      "id": "study-api",
+      "chapter": "study",
+      "newChapter": null,
+      "member": "noor",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noor tests an endpoint from a Hoppscotch tab, and the request collection stays in that browser."
+    },
+    {
+      "id": "kitchen-notes",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "imran",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "memos",
+      "appName": "Memos",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Imran jots the day's small firsts in Memos, one line each, and the notes run as one timeline on the Core."
+    },
+    {
+      "id": "deck-sky",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": "imran",
+      "also": [],
+      "room": "Lake Deck",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "telescope",
+        "room": "garden"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "skybro",
+      "appName": "SkyBro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Imran lifts Zara to the telescope while the tablet beside it names the plane crossing the lake, using SkyBro."
+    },
+    {
+      "id": "nursery-boxes",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "zara",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "homebox",
+      "appName": "HomeBox",
+      "with": [],
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Zara's outgrown clothes go into boxes with a HomeBox label for each size, so the next box is found at once."
+    },
+    {
+      "id": "nursery-rhymes",
+      "chapter": "nursery",
+      "newChapter": null,
+      "member": "zara",
+      "also": [],
+      "room": "Nursery",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "crib",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "audiobookshelf",
+      "appName": "Audiobookshelf",
+      "with": [],
+      "service": "Apple Podcasts",
+      "serviceId": "apple-podcasts",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Zara's rhymes play from files the family owns in Audiobookshelf, and the nap chapter resumes where it stopped."
+    },
+    {
+      "id": "kitchen-readeck",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "readeck",
+      "appName": "Readeck",
+      "with": [],
+      "service": "Instapaper",
+      "serviceId": "instapaper",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A long read from the lake paper and the parenting writers waits in Readeck on the sofa tablet, saved by whoever found it."
+    },
+    {
+      "id": "living-pingvin-share",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pingvin-share",
+      "appName": "Pingvin Share",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day."
+    },
+    {
+      "id": "dining-booklore",
+      "chapter": "dining",
+      "newChapter": "dining",
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "booklore",
+      "appName": "BookLore",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "BookLore shelves the family library by series and author, so each shelf reads in order."
+    },
+    {
+      "id": "foyer-lubelogger",
+      "chapter": "foyer",
+      "newChapter": "foyer",
+      "member": null,
+      "also": [],
+      "room": "Foyer",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "lubelogger",
+      "appName": "LubeLogger",
+      "with": [],
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "LubeLogger keeps the service history, fuel and reminders of the family estate car in one log that the household shares."
+    },
+    {
+      "id": "kitchen-baikal",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "baikal",
+      "appName": "Baikal",
+      "with": [],
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The household calendar and address book reach every phone at home from Baikal on the Core."
+    },
+    {
+      "id": "living-memory",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "imran",
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "ci-memory",
+      "appName": "Companion Memory",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": true,
+      "film": false,
+      "when": null,
+      "seed": "Pebble pulls up the playgroup dates Imran chose to import into Companion Memory (beta), and he checks each one before it goes on the calendar."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "dining",
+        "kind": "room",
+        "room": "dining",
+        "title": "The dining room",
+        "place": "after:kitchen"
+      },
+      {
+        "id": "foyer",
+        "kind": "room",
+        "room": "entry",
+        "title": "At the front steps",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "study",
+        "room": "office",
+        "title": "Noor in the study",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out on the deck",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "foyer",
+        "room": "entry",
+        "title": "At the front steps",
+        "new": true
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "Imran in the kitchen",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining room",
+        "new": true
+      },
+      {
+        "id": "nursery",
+        "room": "kids",
+        "title": "Zara's nursery",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "study",
+      "title": "Noor in the study",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk, the easel and the gallery wall",
+      "beats": [
+        {
+          "id": "study-repo",
+          "member": "noor",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "study-model",
+          "member": "noor",
+          "app": "open-webui",
+          "service": "ChatGPT",
+          "origin": "swap"
+        },
+        {
+          "id": "study-weekend",
+          "member": "imran",
+          "app": "photoview",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "study-easel",
+          "member": "noor",
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "swap"
+        },
+        {
+          "id": "study-triage",
+          "member": "noor",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "study-editor",
+          "member": "noor",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "add"
+        },
+        {
+          "id": "study-schema",
+          "member": "noor",
+          "app": "drawdb",
+          "service": "dbdiagram.io",
+          "origin": "add"
+        },
+        {
+          "id": "study-api",
+          "member": "noor",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out on the deck",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": "the lake deck with the telescope",
+      "beats": [
+        {
+          "id": "garden-camera",
+          "member": "noor",
+          "app": "strix",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "garden-heron",
+          "member": "imran",
+          "app": "frigate",
+          "service": "Nest Cam",
+          "origin": "now"
+        },
+        {
+          "id": "deck-sky",
+          "member": "imran",
+          "app": "skybro",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-tv",
+          "member": "imran",
+          "app": "foldergram",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-couch",
+          "member": "noor",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "swap"
+        },
+        {
+          "id": "living-pingvin-share",
+          "member": null,
+          "app": "pingvin-share",
+          "service": "WeTransfer",
+          "origin": "add"
+        },
+        {
+          "id": "living-memory",
+          "member": "imran",
+          "app": "ci-memory",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "foyer",
+      "title": "At the front steps",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "foyer-lubelogger",
+          "member": null,
+          "app": "lubelogger",
+          "service": "Fuelly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "Imran in the kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-week",
+          "member": "imran",
+          "app": "jotty",
+          "service": "Todoist",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-swap",
+          "member": "imran",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-playlist",
+          "member": "noor",
+          "app": "mstream",
+          "service": "Spotify",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-pebble",
+          "member": "imran",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-spend",
+          "member": "imran",
+          "app": "firefly-iii",
+          "service": "YNAB",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-notes",
+          "member": "imran",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-readeck",
+          "member": null,
+          "app": "readeck",
+          "service": "Instapaper",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-baikal",
+          "member": null,
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining room",
+      "roomRole": "dining",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-booklore",
+          "member": null,
+          "app": "booklore",
+          "service": "Kindle",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "nursery",
+      "title": "Zara's nursery",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the crib and the glider",
+      "beats": [
+        {
+          "id": "nursery-lullaby",
+          "member": "imran",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "nursery-album",
+          "member": "zara",
+          "app": "foldergram",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "nursery-boxes",
+          "member": "zara",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "add"
+        },
+        {
+          "id": "nursery-rhymes",
+          "member": "zara",
+          "app": "audiobookshelf",
+          "service": "Apple Podcasts",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-week",
+      "line": "Imran plans dinners a day ahead."
+    },
+    {
+      "at": "morning",
+      "beat": "study-repo",
+      "line": "Noor merges before Zara's first nap."
+    },
+    {
+      "at": "midday",
+      "beat": "nursery-lullaby",
+      "line": "The nap lullaby plays from the family's music."
+    },
+    {
+      "at": "afternoon",
+      "beat": "deck-sky",
+      "line": "Imran and Zara watch a plane cross the lake."
+    },
+    {
+      "at": "afternoon",
+      "beat": "study-schema",
+      "line": "Noor sketches tomorrow's schema."
+    },
+    {
+      "at": "weekend",
+      "beat": "kitchen-baikal",
+      "line": "The calendar reaches every phone at home."
+    },
+    {
+      "at": "weekend",
+      "beat": "dining-booklore",
+      "line": "The family library is shelved by series."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "GitHub",
+      "ChatGPT",
+      "Nest Cam",
+      "Spotify"
+    ],
+    "servicesFinal": [
+      "GitHub",
+      "ChatGPT",
+      "Google Photos",
+      "Miro",
+      "Nest Cam",
+      "AnyList",
+      "Todoist",
+      "Paprika",
+      "Spotify",
+      "YNAB",
+      "Cursor",
+      "dbdiagram.io",
+      "Postman",
+      "Google Keep",
+      "Sortly",
+      "Apple Podcasts",
+      "Instapaper",
+      "WeTransfer",
+      "Kindle",
+      "Fuelly",
+      "Google Calendar"
+    ],
+    "count": 21
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "study-schema",
+      "deck-sky",
+      "nursery-boxes",
+      "garden-camera",
+      "foyer-lubelogger",
+      "living-pingvin-share",
+      "study-weekend",
+      "kitchen-spend"
+    ],
+    "mustCarry": {
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "open-webui": [
+        "[note] The Hub onboarding wizard offers Open WebUI as a featured app.",
+        "[cloud-link] It can also connect to cloud models with an API key. Leave that off.",
+        "[note] Wired to the Core's local model by the Hub (hub_integration inference). Say \"a model on the Core\"; never claim it matches a hosted model and never give a speed figure.",
+        "Can connect to cloud models with an API key (field in the install form): leave out of any scene.",
+        "Hub wires it to the local model."
+      ],
+      "photoview": [
+        "[cloud-link] Map view uses a Mapbox token you can add. Leave it off for a fully local gallery.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Public sharing links need inbound reach: keep out of stories",
+        "Face recognition is a feature, not a claim to amplify"
+      ],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "strix": [
+        "[hardware] Needs a camera on the LAN.",
+        "[note] Works fully offline once installed.",
+        "A helper, not a recorder: it finds a stream address and writes settings",
+        "Listing says it works fully offline once installed: do not repeat",
+        "Cameras only on the family's own property with the household aware (f-surveillance)"
+      ],
+      "frigate": [
+        "[hardware] Needs IP cameras that stream over RTSP. Cameras are not part of the Core.",
+        "[public-access] Watching cameras from away from home is remote access, which the sheet leaves unfinished.",
+        "[claims] No detection-speed or accuracy numbers. Do not say it prevents anything.",
+        "QA screenshot shows \"No frames have been received, check error logs\": reject. The store listing image shows a real backyard photo that is not a Hub capture.",
+        "Watching away from home is remote access: not claimed."
+      ],
+      "foldergram": [
+        "Description says \"private\": do not repeat as a claim",
+        "Leaves the original folder structure untouched"
+      ],
+      "grocy": [
+        "[note] The listing is short. Describe pantry stock, shopping lists, recipes and chores only.",
+        "Short listing: describe pantry stock, shopping lists, recipes, tasks and habits only (catalog)",
+        "Upstream demo screenshot shows a dollar total: prices on screen"
+      ],
+      "jotty": [
+        "Public share links need outside reach",
+        "Everything is Markdown and JSON files, no database"
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "mstream": [
+        "[note] Overlaps Navidrome.",
+        "Description says \"from anywhere\", \"completely private\" and \"no data collection\": absolute and remote claims, paraphrase",
+        "Overlaps Navidrome"
+      ],
+      "firefly-iii": [
+        "[cloud-link] Bank import through GoCardless or Spectre is an outside service. CSV import stays local.",
+        "[claims] Bookkeeping tool. No financial advice and no savings promises.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "drawdb": [
+        "Diagrams are saved in the browser (IndexedDB), per device: not on the Core.",
+        "QA screenshot is the upstream landing page."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "memos": [],
+      "skybro": [
+        "[cloud-link] Reads outside data feeds (ADS-B, weather). Alerts go to Pushover or Discord.",
+        "The map and alerts depend on outside data; the Core hosts the dashboard",
+        "Home location defaults to Los Angeles from the time zone until changed",
+        "Dark map UI with a welcome dialog"
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "audiobookshelf": [],
+      "readeck": [
+        "listing says securely: do not repeat",
+        "QA shot is the first-run form"
+      ],
+      "pingvin-share": [
+        "[public-access] Recipients outside your home network need to reach your Core.",
+        "public-access for anyone outside the house"
+      ],
+      "booklore": [
+        "[cloud-link] Fetches metadata and covers from outside."
+      ],
+      "lubelogger": [
+        "Do not claim savings or economy figures",
+        "No sign-in until the user sets one (unverified)"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "drawdb",
+      "display": "drawDB",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "dbdiagram.io",
+        "Vertabelo"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Diagrams are saved in the browser (IndexedDB), per device: not on the Core.",
+        "QA screenshot is the upstream landing page."
+      ],
+      "evidence": "CI-Marketplace apps/drawdb/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "photoview",
+      "beats": [
+        "study-weekend"
+      ]
+    },
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-swap"
+      ]
+    },
+    {
+      "app": "code-server",
+      "beats": [
+        "study-editor"
+      ]
+    },
+    {
+      "app": "homebox",
+      "beats": [
+        "nursery-boxes"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

@@ -1,0 +1,1385 @@
+{
+  "v": 3,
+  "slug": "adler",
+  "house": "sunnyhome",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/adler.json",
+    "sha1": "47ec2faaab49c9ef0e80e1f7a973a8c05f075756",
+    "beatsNow": 24,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-clear-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "nextcloud",
+        "espocrm",
+        "n8n",
+        "gitea",
+        "vaultwarden",
+        "penpot"
+      ],
+      "beatApps": {
+        "iot": "pi-hole",
+        "home": "homehub"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "nextcloud",
+          "espocrm",
+          "n8n",
+          "gitea",
+          "vaultwarden",
+          "penpot"
+        ],
+        "beatApps": {
+          "iot": "pi-hole",
+          "food": "yuvomi"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "beatApps.food yuvomi dropped",
+        "beatApps.home homehub added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 12,
+    "swaps": 6,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "ruth": {
+        "now": 11,
+        "add": 0,
+        "target": 11
+      },
+      "noam": {
+        "now": 7,
+        "add": 4,
+        "target": 11
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "ruth",
+      "name": "Ruth",
+      "age": 39,
+      "role": "partner",
+      "archetype": "organiser",
+      "work": "runs a small design agency",
+      "companion": {
+        "name": "Dahlia",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "business-office",
+        "freelance-creative"
+      ],
+      "thread": "A small design agency from the library lounge: clients, files and approvals."
+    },
+    {
+      "id": "noam",
+      "name": "Noam",
+      "age": 41,
+      "role": "partner",
+      "archetype": "builder",
+      "work": "robotics software engineer",
+      "companion": {
+        "name": "Lupin",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "tinkerer"
+      ],
+      "thread": "Robotics software on a standing desk, and a rover for the garden."
+    }
+  ],
+  "character": {
+    "lede": "A modern barn cluster pairs a brick lounge gable with a taller charcoal curtain-wall gable under a black roof. A black-tile court with a round plunge pool sits below the dining deck.",
+    "spots": [
+      {
+        "room": "Library Lounge",
+        "line": "A sofa, two barrel chairs and a trunk table fill the library lounge."
+      },
+      {
+        "room": "Upper Landing",
+        "line": "A standing desk and a bookshelf make a workspace on the landing."
+      },
+      {
+        "room": "Loft",
+        "line": "A tuxedo sofa, two slipper chairs and a bookshelf fill the loft."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 201,
+      "ground": "lawn",
+      "style": "Modern barn cluster: a brick lounge gable and a taller charcoal curtain-wall gable, each glazed to the apex under a solid black roof, a set-back vertical-timber entry wing, a brick chimney, cypresses, a stone-edged gravel path, and a black-tile court with a round plunge pool below a dining deck",
+      "rooms": [
+        "Library Lounge",
+        "Dining",
+        "Kitchen",
+        "Stair Hall",
+        "Vestibule",
+        "WC",
+        "Primary Bedroom",
+        "Dressing Nook",
+        "Deck Dining",
+        "Plunge Court",
+        "Loft",
+        "Upper Landing"
+      ],
+      "flags": [
+        "tv: none",
+        "kitchen-island: none"
+      ]
+    },
+    "truths": "The Core sits on a credenza in the Library Lounge. There is no television and no kitchen island. Noam works at a standing desk on the upper landing. Plunge pool in a black-tile court below a dining deck.",
+    "mustNot": [
+      "no television",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "homebox",
+      "name": "HomeBox",
+      "member": "ruth",
+      "room": "The kitchen counter",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "status": "swap",
+      "beat": "kitchen-receipts",
+      "seed": "The oven warranty turns up in a HomeBox record with the receipt photo, a label and a shelf.",
+      "line": "HomeBox gives every box in the loft and garage a label, a place and a note about what is inside."
+    },
+    {
+      "app": "influxdb2",
+      "name": "InfluxDB 2",
+      "member": "noam",
+      "room": "Upper Landing",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "landing-telemetry",
+      "seed": "Noam writes the rover's wheel readings into InfluxDB 2 and plots a run against the drift.",
+      "line": "InfluxDB 2 keeps the greenhouse and garden sensor readings in one time-series store."
+    },
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "member": "noam",
+      "room": "Noam at the standing desk",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "landing-notebook",
+      "seed": "Noam finds why the rover drifts left in a JupyterLab notebook of its wheel readings.",
+      "line": "JupyterLab runs the statistics homework as a notebook on the Core."
+    },
+    {
+      "app": "pingvin-share",
+      "name": "Pingvin Share",
+      "member": null,
+      "room": "Library Lounge",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "living-pingvin-share",
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day.",
+      "line": "Pingvin Share makes a link for a big file that someone in the house opens."
+    },
+    {
+      "app": "drawio",
+      "name": "draw.io",
+      "member": "noam",
+      "room": "Upper Landing",
+      "service": "Lucidchart",
+      "serviceId": "lucidchart",
+      "status": "add",
+      "beat": "landing-wiring",
+      "seed": "Noam draws the rover's wiring in draw.io and saves the diagram as a file on his own machine.",
+      "line": "draw.io draws the flow chart and saves the file where the person chooses."
+    },
+    {
+      "app": "cryptpad",
+      "name": "CryptPad",
+      "member": null,
+      "room": "Library Lounge",
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "status": "add",
+      "beat": "ruth-cryptpad",
+      "seed": "The studio drafts the project brief in a CryptPad document, and each edit appears as it is typed.",
+      "line": "CryptPad opens a shared pad and a kanban board that two people edit together at home."
+    },
+    {
+      "app": "baikal",
+      "name": "Baikal",
+      "member": "ruth",
+      "room": "The kitchen counter",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "status": "swap",
+      "beat": "kitchen-visit",
+      "seed": "Ruth makes room for a visitor on the calendar that Baikal serves from the Core to both phones.",
+      "line": "Baikal serves the household calendar from the Core, and the calendar app on each phone reads it at home."
+    },
+    {
+      "app": "mstream",
+      "name": "mStream",
+      "member": "ruth",
+      "room": "The sofa and the Core",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "status": "swap",
+      "beat": "living-music",
+      "seed": "The old CDs play again from the family's own music folder through the lounge speaker with mStream.",
+      "line": "mStream plays a record collection, digitised years ago, through the living-room speaker."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "kitchen-lemons",
+      "member": "noam",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "homehub",
+      "toName": "HomeHub",
+      "service": "Cozi",
+      "serviceId": "cozi",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Noam adds a bottle of oil to the shared shopping list in HomeHub, and Ruth sees it on her phone.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-music",
+      "member": "ruth",
+      "chapter": "living",
+      "from": "navidrome",
+      "fromName": "Navidrome",
+      "to": "mstream",
+      "toName": "mStream",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "seed": "The old CDs play again from the family's own music folder through the lounge speaker with mStream.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-receipts",
+      "member": "ruth",
+      "chapter": "kitchen",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "homebox",
+      "toName": "HomeBox",
+      "service": "Sortly",
+      "serviceId": "sortly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "The oven warranty turns up in a HomeBox record with the receipt photo, a label and a shelf.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-visit",
+      "member": "ruth",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "baikal",
+      "toName": "Baikal",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ruth makes room for a visitor on the calendar that Baikal serves from the Core to both phones.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "landing-notebook",
+      "member": "noam",
+      "chapter": "landing",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "jupyterlab",
+      "toName": "JupyterLab",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Noam finds why the rover drifts left in a JupyterLab notebook of its wheel readings.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-rover",
+      "member": "noam",
+      "chapter": "garden",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "photoview",
+      "toName": "Photoview",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "loose",
+      "qualifier": "for photos already on the Core",
+      "seed": "Noam copies the rover's wiring pictures into a folder, and Photoview builds a gallery with the camera details beside each one.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "navidrome",
+      "name": "Navidrome",
+      "beats": [
+        "living-music"
+      ],
+      "retoldAs": [
+        "living-music -> mStream"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "kitchen-lemons",
+        "kitchen-visit"
+      ],
+      "retoldAs": [
+        "kitchen-lemons -> HomeHub",
+        "kitchen-visit -> Baikal"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "kitchen-receipts"
+      ],
+      "retoldAs": [
+        "kitchen-receipts -> HomeBox"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "landing-notebook"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "garden-rover"
+      ],
+      "retoldAs": [
+        "garden-rover -> Photoview"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "nextcloud",
+      "gitea"
+    ],
+    "was": [
+      "nextcloud",
+      "gitea"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "landing-telemetry",
+      "chapter": "landing",
+      "newChapter": null,
+      "member": "noam",
+      "also": [],
+      "room": "Upper Landing",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "influxdb2",
+      "appName": "InfluxDB 2",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noam writes the rover's wheel readings into InfluxDB 2 and plots a run against the drift."
+    },
+    {
+      "id": "landing-wiring",
+      "chapter": "landing",
+      "newChapter": null,
+      "member": "noam",
+      "also": [],
+      "room": "Upper Landing",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "drawio",
+      "appName": "draw.io",
+      "with": [],
+      "service": "Lucidchart",
+      "serviceId": "lucidchart",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noam draws the rover's wiring in draw.io and saves the diagram as a file on his own machine."
+    },
+    {
+      "id": "landing-assist",
+      "chapter": "landing",
+      "newChapter": null,
+      "member": "noam",
+      "also": [],
+      "room": "Upper Landing",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "aider",
+      "appName": "Aider",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noam asks Aider to tidy the steering module, then reads each commit it made before he keeps it."
+    },
+    {
+      "id": "landing-sync",
+      "chapter": "landing",
+      "newChapter": null,
+      "member": "noam",
+      "also": [],
+      "room": "Upper Landing",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "syncthing",
+      "appName": "Syncthing",
+      "with": [],
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Noam keeps the rover's log folder in step between the laptop and the Core with Syncthing."
+    },
+    {
+      "id": "ruth-cryptpad",
+      "chapter": "ruth",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Library Lounge",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cryptpad",
+      "appName": "CryptPad",
+      "with": [],
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio drafts the project brief in a CryptPad document, and each edit appears as it is typed."
+    },
+    {
+      "id": "ruth-solidtime",
+      "chapter": "ruth",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Library Lounge",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "solidtime",
+      "appName": "Solidtime",
+      "with": [],
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio logs the week's hours by job in Solidtime."
+    },
+    {
+      "id": "ruth-akaunting",
+      "chapter": "ruth",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Library Lounge",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "akaunting",
+      "appName": "Akaunting",
+      "with": [],
+      "service": "QuickBooks",
+      "serviceId": "quickbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio files the month's bills and invoices in Akaunting for the month end."
+    },
+    {
+      "id": "entry-enclosed",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Vestibule",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "enclosed",
+      "appName": "Enclosed",
+      "with": [],
+      "service": "PrivNote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "At the table, an Enclosed note holds the project-folder password for a design client, read on the home Wi-Fi, and closes after a day."
+    },
+    {
+      "id": "ruth-invoice-ninja",
+      "chapter": "ruth",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Library Lounge",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "invoice-ninja",
+      "appName": "Invoice Ninja",
+      "with": [],
+      "service": "FreshBooks",
+      "serviceId": "freshbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio raises a quote and an invoice for a design client in Invoice Ninja."
+    },
+    {
+      "id": "kitchen-papra",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "papra",
+      "appName": "Papra",
+      "with": [],
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "loose",
+      "qualifier": "a scanned-paper archive",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple file the warranty cards and letters in Papra and find each one by its name."
+    },
+    {
+      "id": "kitchen-bookstack",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "bookstack",
+      "appName": "BookStack",
+      "with": [],
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple write the house manual in BookStack: the stopcock, the boiler and the sitter's notes, with page history."
+    },
+    {
+      "id": "living-pingvin-share",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Library Lounge",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pingvin-share",
+      "appName": "Pingvin Share",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "The vestibule",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The sofa and the Core",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "The vestibule",
+        "new": true
+      },
+      {
+        "id": "ruth",
+        "room": "office",
+        "title": "Ruth in the library lounge",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The trestle table",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen counter",
+        "new": false
+      },
+      {
+        "id": "landing",
+        "room": "office",
+        "title": "Noam at the standing desk",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The sofa and the Core",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-music",
+          "member": "ruth",
+          "app": "mstream",
+          "service": "Spotify",
+          "origin": "swap"
+        },
+        {
+          "id": "living-dns",
+          "member": "noam",
+          "app": "pi-hole",
+          "service": "AdGuard",
+          "origin": "now"
+        },
+        {
+          "id": "living-pingvin-share",
+          "member": null,
+          "app": "pingvin-share",
+          "service": "WeTransfer",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "The vestibule",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-enclosed",
+          "member": null,
+          "app": "enclosed",
+          "service": "PrivNote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "ruth",
+      "title": "Ruth in the library lounge",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the library lounge sofa",
+      "beats": [
+        {
+          "id": "ruth-pipeline",
+          "member": "ruth",
+          "app": "espocrm",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "ruth-clients",
+          "member": "ruth",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "ruth-flow",
+          "member": "noam",
+          "app": "n8n",
+          "service": "Zapier",
+          "origin": "now"
+        },
+        {
+          "id": "ruth-draft",
+          "member": "ruth",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "ruth-vault",
+          "member": "ruth",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "ruth-cryptpad",
+          "member": null,
+          "app": "cryptpad",
+          "service": "Microsoft Office",
+          "origin": "add"
+        },
+        {
+          "id": "ruth-solidtime",
+          "member": null,
+          "app": "solidtime",
+          "service": "Toggl Track",
+          "origin": "add"
+        },
+        {
+          "id": "ruth-akaunting",
+          "member": null,
+          "app": "akaunting",
+          "service": "QuickBooks",
+          "origin": "add"
+        },
+        {
+          "id": "ruth-invoice-ninja",
+          "member": null,
+          "app": "invoice-ninja",
+          "service": "FreshBooks",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The trestle table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "ruth-print",
+          "member": "ruth",
+          "app": "stirling-pdf",
+          "service": "Adobe Acrobat",
+          "origin": "now"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen counter",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-lemons",
+          "member": "noam",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-receipts",
+          "member": "ruth",
+          "app": "homebox",
+          "service": "Sortly",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-visit",
+          "member": "ruth",
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-papra",
+          "member": null,
+          "app": "papra",
+          "service": "Evernote",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-bookstack",
+          "member": null,
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "landing",
+      "title": "Noam at the standing desk",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the standing desk on the upper landing",
+      "beats": [
+        {
+          "id": "landing-notebook",
+          "member": "noam",
+          "app": "jupyterlab",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "landing-repo",
+          "member": "noam",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "landing-lupin",
+          "member": "noam",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "landing-telemetry",
+          "member": "noam",
+          "app": "influxdb2",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "landing-wiring",
+          "member": "noam",
+          "app": "drawio",
+          "service": "Lucidchart",
+          "origin": "add"
+        },
+        {
+          "id": "landing-assist",
+          "member": "noam",
+          "app": "aider",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        },
+        {
+          "id": "landing-sync",
+          "member": "noam",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": "the dining deck above the plunge court",
+      "beats": [
+        {
+          "id": "garden-deck",
+          "member": "ruth",
+          "app": "penpot",
+          "service": "Figma",
+          "origin": "now"
+        },
+        {
+          "id": "garden-border",
+          "member": "ruth",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-rover",
+          "member": "noam",
+          "app": "photoview",
+          "service": "Google Photos",
+          "origin": "swap"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "living-music",
+      "line": "The old CDs play from the family's folder."
+    },
+    {
+      "at": "morning",
+      "beat": "ruth-clients",
+      "line": "A client's label files arrive."
+    },
+    {
+      "at": "midday",
+      "beat": "ruth-cryptpad",
+      "line": "A shared document fills in as people type."
+    },
+    {
+      "at": "afternoon",
+      "beat": "landing-telemetry",
+      "line": "Noam plots a run against the drift."
+    },
+    {
+      "at": "afternoon",
+      "beat": "ruth-draft",
+      "line": "Dahlia drafts the delay note."
+    },
+    {
+      "at": "weekend",
+      "beat": "landing-lupin",
+      "line": "Lupin fills in the parts order."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-rover",
+      "line": "The rover's wiring pictures become a gallery."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Spotify",
+      "AdGuard",
+      "Salesforce",
+      "Google Drive",
+      "Zapier",
+      "LastPass",
+      "Adobe Acrobat",
+      "Evernote",
+      "GitHub",
+      "Figma",
+      "Google Photos"
+    ],
+    "servicesFinal": [
+      "Spotify",
+      "AdGuard",
+      "Salesforce",
+      "Google Drive",
+      "Zapier",
+      "LastPass",
+      "Adobe Acrobat",
+      "Cozi",
+      "Sortly",
+      "Google Calendar",
+      "GitHub",
+      "Figma",
+      "Google Photos",
+      "Lucidchart",
+      "GitHub Copilot",
+      "Dropbox",
+      "Microsoft Office",
+      "Toggl Track",
+      "QuickBooks",
+      "PrivNote",
+      "FreshBooks",
+      "Evernote",
+      "Confluence",
+      "WeTransfer"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "kitchen-receipts",
+      "landing-telemetry",
+      "landing-notebook",
+      "living-pingvin-share",
+      "landing-wiring",
+      "ruth-cryptpad",
+      "kitchen-visit",
+      "living-music"
+    ],
+    "mustCarry": {
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "mstream": [
+        "[note] Overlaps Navidrome.",
+        "Description says \"from anywhere\", \"completely private\" and \"no data collection\": absolute and remote claims, paraphrase",
+        "Overlaps Navidrome"
+      ],
+      "pi-hole": [
+        "[claims] Network-wide blocking at DNS. Do not call it parental control or promise safety.",
+        "Blocks ad, tracker and bad domains at DNS: not parental control and no promise of safety",
+        "Unblocked lookups are forwarded to an upstream resolver (the upstream demo dashboard lists a public DNS, dns.google), so a DNS provider still sees them and it is not offline",
+        "Overlaps AdGuard Home: one per household"
+      ],
+      "espocrm": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "n8n": [
+        "[licence] Fair-code licence, not open source. Say \"source-available\"; do not say \"open source\".",
+        "[note] An n8n MCP entry exists for agents.",
+        "Fair-code licence: say source-available, never open source.",
+        "Public URL setting is for webhooks; leave off the scene.",
+        "Listing says full control over data: connectors to cloud services still pass data to them."
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "stirling-pdf": [
+        "QA screenshot is a sign-in wall that prints default credentials",
+        "already in the persona pool: share cap risk"
+      ],
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "homebox": [
+        "[note] Barcode and Open Food Facts lookups call outside services.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "No QA screenshot on origin/main",
+        "Self-registration on by default (form toggle)",
+        "Analytics are switched off in the manifest (good)"
+      ],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "jupyterlab": [
+        "[note] One password set at install. The notebook kernel runs the code on the Core; installing a Python package reaches the internet.",
+        "[claims] Neither the manifest, the live store nor the Portal alternatives table (origin/main) names anything it replaces, so there is no replaces chip. The CI-Common campaign reference says MATLAB or RStudio, from a sour",
+        "Packages install from the internet.",
+        "QA screenshot is the token and password wall: reject.",
+        "Logo file shows only the orange arcs, not the Jupyter wordmark."
+      ],
+      "penpot": [
+        "Five containers (frontend, backend, exporter, Postgres, Redis).",
+        "QA screenshot is the log-in page: reject.",
+        "Listing images show community library tiles: marketing."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "photoview": [
+        "[cloud-link] Map view uses a Mapbox token you can add. Leave it off for a fully local gallery.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Public sharing links need inbound reach: keep out of stories",
+        "Face recognition is a feature, not a claim to amplify"
+      ],
+      "influxdb2": [
+        "Not the 1.x line.",
+        "QA screenshot is the welcome page.",
+        "Needs something writing to it (Home Assistant or sensors)."
+      ],
+      "drawio": [
+        "Stateless: diagrams live in the browser or as .drawio files on the person's own device. The Core serves the editor only, so never say the diagram sits on the Core.",
+        "Listing says nothing else phones home: leave it.",
+        "QA screenshot is a blank editor."
+      ],
+      "aider": [
+        "[cloud-link] The Hub injects its own model endpoint, so it needs no cloud key. A model override field can point it at another OpenAI-compatible endpoint; leave it on the Hub model. A coding agent is private only on the C",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. Every edit is a git commit, which is the approval step: the person reviews and can undo it with git.",
+        "[note] The browser interface is marked experimental upstream. Do not call it finished.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "cryptpad": [
+        "Listing says \"end-to-end encrypted\": banned wording (f-security-guarantee), do not repeat",
+        "Collaboration with people outside the home needs outside reach"
+      ],
+      "solidtime": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "listing mentions invoices: say nothing about billing or tax"
+      ],
+      "akaunting": [
+        "[claims] Bookkeeping tool. No accounting, tax or legal advice.",
+        "marketplace: Source-available (Business Source License). Seafile and others carry umbrel strings: the admin email default is a placeholder address on umbrel.local."
+      ],
+      "enclosed": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "invoice-ninja": [
+        "[cloud-link] Taking card payments needs a payment provider. Say invoicing, not payment processing.",
+        "marketplace: Elastic License 2.0 (source-available)."
+      ],
+      "papra": [],
+      "bookstack": [],
+      "pingvin-share": [
+        "[public-access] Recipients outside your home network need to reach your Core.",
+        "public-access for anyone outside the house"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "influxdb2",
+      "display": "InfluxDB 2",
+      "reason": "not in catalog-apps.json",
+      "replaces": [],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 2",
+      "caveats": [
+        "Not the 1.x line.",
+        "QA screenshot is the welcome page.",
+        "Needs something writing to it (Home Assistant or sensors)."
+      ],
+      "evidence": "CI-Marketplace apps/influxdb2/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "enclosed",
+      "display": "Enclosed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "PrivNote"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "evidence": "CI-Marketplace apps/enclosed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "homebox",
+      "beats": [
+        "kitchen-receipts"
+      ]
+    },
+    {
+      "app": "photoview",
+      "beats": [
+        "garden-rover"
+      ]
+    },
+    {
+      "app": "aider",
+      "beats": [
+        "landing-assist"
+      ]
+    },
+    {
+      "app": "syncthing",
+      "beats": [
+        "landing-sync"
+      ]
+    },
+    {
+      "app": "solidtime",
+      "beats": [
+        "ruth-solidtime"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

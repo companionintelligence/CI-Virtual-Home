@@ -1,0 +1,1480 @@
+{
+  "v": 3,
+  "slug": "adeniran",
+  "house": "asymmetry",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/adeniran.json",
+    "sha1": "fc6d420e2a25e166581036371bedd919242542a4",
+    "beatsNow": 24,
+    "chaptersNow": 8,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "older-kids",
+  "business": true,
+  "narrator": "v-clear-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "akaunting",
+        "gitea",
+        "steam-headless",
+        "anything-llm",
+        "wingfit"
+      ],
+      "beatApps": {
+        "iot": "frigate",
+        "food": "homehub"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "akaunting",
+          "paperless",
+          "gitea",
+          "steam-headless",
+          "anything-llm",
+          "wingfit"
+        ],
+        "beatApps": {
+          "iot": "frigate",
+          "food": "homehub"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "paperless dropped: no beat tells it any more"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 14,
+    "swaps": 5,
+    "householdBeats": 4,
+    "householdBeatsMax": 6,
+    "persona": {
+      "folake": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "kunle": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "tobi": {
+        "now": 3,
+        "add": 4,
+        "target": 7
+      },
+      "ife": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      }
+    },
+    "pairShare": 0.839,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "folake",
+      "name": "Folake",
+      "age": 47,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "bookkeeper with her own practice",
+      "companion": {
+        "name": "Marlow",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "business-office"
+      ],
+      "thread": "A bookkeeping practice run from the living room."
+    },
+    {
+      "id": "kunle",
+      "name": "Kunle",
+      "age": 49,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "firmware contractor",
+      "companion": {
+        "name": "Tilly",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "tinkerer",
+        "athlete"
+      ],
+      "thread": "Firmware at the garage bench, and the morning ride."
+    },
+    {
+      "id": "tobi",
+      "name": "Tobi",
+      "age": 17,
+      "role": "teen",
+      "archetype": "gamer",
+      "work": "sixth form",
+      "companion": null,
+      "lens": [
+        "teen-play"
+      ],
+      "thread": "The loft at the top: games, models and a streak."
+    },
+    {
+      "id": "ife",
+      "name": "Ife",
+      "age": 15,
+      "role": "teen",
+      "archetype": "learner",
+      "work": "secondary school",
+      "companion": null,
+      "lens": [
+        "teen-study"
+      ],
+      "thread": "Chemistry, geography and the lake, from the green bedroom."
+    }
+  ],
+  "character": {
+    "lede": "A lake house climbs in four stepped tiers, from a teal-brick garage podium to dark timber penthouse boxes. An octagonal plunge pool crowns the podium, and the rooms below hold a gym and a wine cellar.",
+    "spots": [
+      {
+        "room": "Spa & Gym",
+        "line": "An exercise bike, a bench and a yoga mat fill the gym."
+      },
+      {
+        "room": "Wine Cellar",
+        "line": "Wine racks and two bar stools line the cellar."
+      },
+      {
+        "room": "Garage",
+        "line": "A workbench and a bicycle share the podium garage."
+      }
+    ],
+    "facts": {
+      "storeys": 4,
+      "areaSqm": 432,
+      "ground": "waterfront",
+      "style": "Four stepped tiers on a lake lot: a teal-brick garage podium, a raised main floor reached up an exterior stair between stepped timber planters, three dark timber bays, an octagonal plunge pool on the podium roof, corner balconies with timber rails and two offset dark-timber penthouse boxes with copper ends, all under thin dark flat roofs",
+      "rooms": [
+        "Lower Hall",
+        "Bar Lounge",
+        "Garage",
+        "Wine Cellar",
+        "Laundry",
+        "Spa & Gym",
+        "Entry",
+        "Stair Hall",
+        "Kitchen",
+        "Dining",
+        "Entry Passage",
+        "Living",
+        "Green Bedroom",
+        "Bay Alcoves",
+        "Upper Landing",
+        "Primary Bedroom",
+        "Stair Landing",
+        "Primary Bath",
+        "Upper Hall",
+        "Window Seat",
+        "Loft Bedroom",
+        "Loft Ensuite"
+      ],
+      "flags": [
+        "tv: none"
+      ]
+    },
+    "truths": "The Core sits on a credenza in the Living room. There is no television in this house: never say TV. Kitchen has an island. The plunge pool is on the podium roof; balconies have timber rails.",
+    "mustNot": [
+      "no television"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "bookstack",
+      "name": "BookStack",
+      "member": "folake",
+      "room": "The kitchen",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "status": "swap",
+      "beat": "kitchen-hours",
+      "seed": "Folake writes the practice's client handbook in BookStack: how to hand over receipts, and when each month's books close.",
+      "line": "BookStack holds the house manual in books, chapters and pages: the stopcock, the boiler, the sitter's guide."
+    },
+    {
+      "app": "cyberchef",
+      "name": "CyberChef",
+      "member": "kunle",
+      "room": "Garage",
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "status": "add",
+      "beat": "garage-decode",
+      "seed": "Kunle decodes the header of a firmware image with CyberChef, one recipe step at a time in the browser tab.",
+      "line": "CyberChef decodes a cipher puzzle step by step in a browser tab."
+    },
+    {
+      "app": "mindustry",
+      "name": "Mindustry Server",
+      "member": "tobi",
+      "room": "Loft Bedroom",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "loft-world",
+      "seed": "Tobi starts a Mindustry Server world on the Core, and his cousins join from their own game clients on the home Wi-Fi.",
+      "line": "Mindustry Server hosts the cousins' factory world on the Core, so the world runs on the Core."
+    },
+    {
+      "app": "beatsync",
+      "name": "Beatsync",
+      "member": "ife",
+      "room": "Out front",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "garden-planters",
+      "seed": "Ife and Tobi join their phones to one Beatsync queue on the terrace, so the whole tier plays the same song.",
+      "line": "Beatsync joins every phone in the garden to one queue, so the lawn plays the same track together."
+    },
+    {
+      "app": "teampass",
+      "name": "TeamPass",
+      "member": null,
+      "room": "Dining",
+      "service": "LastPass",
+      "serviceId": "lastpass",
+      "status": "add",
+      "beat": "dining-teampass",
+      "seed": "The practice keeps the client sign-ins in TeamPass folders, each folder with its own permissions.",
+      "line": "TeamPass keeps the crew's shared sign-ins in folders, with its own permissions for each."
+    },
+    {
+      "app": "linkwarden",
+      "name": "Linkwarden",
+      "member": "ife",
+      "room": "Ife’s green bedroom",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "status": "swap",
+      "beat": "green-translate",
+      "seed": "Ife saves the pages for her geography project into Linkwarden, and each one is kept with a screenshot and a PDF.",
+      "line": "Linkwarden keeps a screenshot and a PDF of every page cited in an essay, so a dead link cannot hurt it."
+    },
+    {
+      "app": "open-notebook",
+      "name": "Open Notebook",
+      "member": "ife",
+      "room": "Ife’s green bedroom",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "status": "swap",
+      "beat": "green-lookup",
+      "seed": "Ife drops the lake survey pages into Open Notebook and asks which winter the lake froze over.",
+      "line": "Open Notebook gathers three articles and the lecture notes into one notebook and answers from them."
+    },
+    {
+      "app": "baserow",
+      "name": "Baserow",
+      "member": null,
+      "room": "Garage",
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "status": "add",
+      "beat": "garage-baserow",
+      "seed": "The practice keeps the month-end client runs as a table in Baserow, with a view for what is late.",
+      "line": "Baserow is a table with views for the stall's stock and orders."
+    }
+  ],
+  "chipFixes": [
+    {
+      "beat": "kitchen-fridge",
+      "app": "homehub",
+      "from": "OurHome",
+      "to": "Cozi",
+      "why": "the first listed name is a service that no longer exists as named, so the chip and the detail use the next name"
+    }
+  ],
+  "swaps": [
+    {
+      "beat": "green-lookup",
+      "member": "ife",
+      "chapter": "green",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "open-notebook",
+      "toName": "Open Notebook",
+      "service": "NotebookLM",
+      "serviceId": "notebooklm",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ife drops the lake survey pages into Open Notebook and asks which winter the lake froze over.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-hours",
+      "member": "folake",
+      "chapter": "kitchen",
+      "from": "akaunting",
+      "fromName": "Akaunting",
+      "to": "bookstack",
+      "toName": "BookStack",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Folake writes the practice's client handbook in BookStack: how to hand over receipts, and when each month's books close.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-paper",
+      "member": "folake",
+      "chapter": "living",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "papra",
+      "toName": "Papra",
+      "service": "Evernote",
+      "serviceId": "evernote",
+      "pairQuality": "loose",
+      "qualifier": "a scanned-paper archive",
+      "seed": "Folake empties a shoebox of receipts into Papra and finds each one by a word on it.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-planters",
+      "member": "ife",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "beatsync",
+      "toName": "Beatsync",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Ife and Tobi join their phones to one Beatsync queue on the terrace, so the whole tier plays the same song.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "green-translate",
+      "member": "ife",
+      "chapter": "green",
+      "from": "libretranslate",
+      "fromName": "LibreTranslate",
+      "to": "linkwarden",
+      "toName": "Linkwarden",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Ife saves the pages for her geography project into Linkwarden, and each one is kept with a screenshot and a PDF.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "ftue-pick",
+        "living-paper"
+      ],
+      "retoldAs": [
+        "living-paper -> Papra"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "green-lookup"
+      ],
+      "retoldAs": [
+        "green-lookup -> Open Notebook"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "libretranslate",
+      "name": "LibreTranslate",
+      "beats": [
+        "green-translate"
+      ],
+      "retoldAs": [
+        "green-translate -> Linkwarden"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "hortusfox",
+      "name": "HortusFox",
+      "beats": [
+        "garden-planters"
+      ],
+      "retoldAs": [
+        "garden-planters -> Beatsync"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "gitea",
+      "immich"
+    ],
+    "was": [
+      "paperless",
+      "gitea"
+    ],
+    "changed": [
+      {
+        "from": "paperless",
+        "to": "immich"
+      }
+    ],
+    "note": "ftue-pick names apps in `with` that the plan retells away; set `with` to this list and name each one in the popup body (the first-install list), so the fleet counts are the ones in fleet-simulation.md"
+  },
+  "adds": [
+    {
+      "id": "living-sign",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "folake",
+      "also": [],
+      "room": "Living",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Folake sets a client's engagement letter out in Docuseal, and the client signs it at the table."
+    },
+    {
+      "id": "living-ledger",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "folake",
+      "also": [],
+      "room": "Living",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Folake keeps a client's chart of accounts as a table in Grist, and a column totals itself with a formula."
+    },
+    {
+      "id": "garage-decode",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "kunle",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cyberchef",
+      "appName": "CyberChef",
+      "with": [],
+      "service": "DevUtils",
+      "serviceId": "devutils",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kunle decodes the header of a firmware image with CyberChef, one recipe step at a time in the browser tab."
+    },
+    {
+      "id": "garage-sync",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": "kunle",
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "syncthing",
+      "appName": "Syncthing",
+      "with": [],
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kunle keeps a build folder in step between the bench PC and the Core with Syncthing."
+    },
+    {
+      "id": "loft-world",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "tobi",
+      "also": [],
+      "room": "Loft Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "mindustry",
+      "appName": "Mindustry Server",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tobi starts a Mindustry Server world on the Core, and his cousins join from their own game clients on the home Wi-Fi."
+    },
+    {
+      "id": "loft-model",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "tobi",
+      "also": [],
+      "room": "Loft Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "blockbench",
+      "appName": "Blockbench",
+      "with": [],
+      "service": "MagicaVoxel",
+      "serviceId": "magicavoxel",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tobi shapes a block model for a game in Blockbench and saves the file on his own machine."
+    },
+    {
+      "id": "loft-streak",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "tobi",
+      "also": [],
+      "room": "Loft Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "habitica",
+      "appName": "Habitica",
+      "with": [],
+      "service": "Habitify",
+      "serviceId": "habitify",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tobi keeps a practice streak in Habitica, and the household chore game adds it to the board."
+    },
+    {
+      "id": "loft-drop",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "tobi",
+      "also": [],
+      "room": "Loft Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pairdrop",
+      "appName": "PairDrop",
+      "with": [],
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tobi sends a screenshot from his phone to the screen on his desk with PairDrop over the home Wi-Fi."
+    },
+    {
+      "id": "green-notes",
+      "chapter": "green",
+      "newChapter": null,
+      "member": "ife",
+      "also": [],
+      "room": "Green Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "memos",
+      "appName": "Memos",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ife jots the afternoon's questions in Memos, one line each, and sorts them after supper."
+    },
+    {
+      "id": "green-sketch",
+      "chapter": "green",
+      "newChapter": null,
+      "member": "ife",
+      "also": [],
+      "room": "Green Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "tldraw",
+      "appName": "tldraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ife draws the carbon cycle as one picture in tldraw and exports it for her class."
+    },
+    {
+      "id": "kitchen-solidtime",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "solidtime",
+      "appName": "Solidtime",
+      "with": [],
+      "service": "Toggl Track",
+      "serviceId": "toggl-track",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice logs the week's hours by job in Solidtime."
+    },
+    {
+      "id": "dining-teampass",
+      "chapter": "dining",
+      "newChapter": "dining",
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "teampass",
+      "appName": "TeamPass",
+      "with": [],
+      "service": "LastPass",
+      "serviceId": "lastpass",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice keeps the client sign-ins in TeamPass folders, each folder with its own permissions."
+    },
+    {
+      "id": "dining-invoice-ninja",
+      "chapter": "dining",
+      "newChapter": "dining",
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "invoice-ninja",
+      "appName": "Invoice Ninja",
+      "with": [],
+      "service": "FreshBooks",
+      "serviceId": "freshbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice raises a quote and an invoice for a bookkeeping client in Invoice Ninja."
+    },
+    {
+      "id": "garage-baserow",
+      "chapter": "garage",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "baserow",
+      "appName": "Baserow",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice keeps the month-end client runs as a table in Baserow, with a view for what is late."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "dining",
+        "kind": "room",
+        "room": "dining",
+        "title": "The dining room",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining room",
+        "new": true
+      },
+      {
+        "id": "green",
+        "room": "bedroom",
+        "title": "Ife’s green bedroom",
+        "new": false
+      },
+      {
+        "id": "loft",
+        "room": "bedroom",
+        "title": "Tobi’s loft",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "Kunle’s garage bench",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out front",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-books",
+          "member": "folake",
+          "app": "akaunting",
+          "service": "QuickBooks",
+          "origin": "now"
+        },
+        {
+          "id": "living-music",
+          "member": "kunle",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "living-paper",
+          "member": "folake",
+          "app": "papra",
+          "service": "Evernote",
+          "origin": "swap"
+        },
+        {
+          "id": "living-marlow",
+          "member": "folake",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-sign",
+          "member": "folake",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "living-ledger",
+          "member": "folake",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-fridge",
+          "member": "ife",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-market",
+          "member": "tobi",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-hours",
+          "member": "folake",
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-solidtime",
+          "member": null,
+          "app": "solidtime",
+          "service": "Toggl Track",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining room",
+      "roomRole": "dining",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-teampass",
+          "member": null,
+          "app": "teampass",
+          "service": "LastPass",
+          "origin": "add"
+        },
+        {
+          "id": "dining-invoice-ninja",
+          "member": null,
+          "app": "invoice-ninja",
+          "service": "FreshBooks",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "green",
+      "title": "Ife’s green bedroom",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "Ife's writing desk",
+      "beats": [
+        {
+          "id": "green-revision",
+          "member": "ife",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "now"
+        },
+        {
+          "id": "green-lookup",
+          "member": "ife",
+          "app": "open-notebook",
+          "service": "NotebookLM",
+          "origin": "swap"
+        },
+        {
+          "id": "green-translate",
+          "member": "ife",
+          "app": "linkwarden",
+          "service": "Raindrop.io",
+          "origin": "swap"
+        },
+        {
+          "id": "green-notes",
+          "member": "ife",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "green-sketch",
+          "member": "ife",
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "loft",
+      "title": "Tobi’s loft",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the loft bed under the roof",
+      "beats": [
+        {
+          "id": "loft-play",
+          "member": "tobi",
+          "app": "steam-headless",
+          "service": "GeForce Now",
+          "origin": "now"
+        },
+        {
+          "id": "loft-photos",
+          "member": "tobi",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "loft-world",
+          "member": "tobi",
+          "app": "mindustry",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "loft-model",
+          "member": "tobi",
+          "app": "blockbench",
+          "service": "MagicaVoxel",
+          "origin": "add"
+        },
+        {
+          "id": "loft-streak",
+          "member": "tobi",
+          "app": "habitica",
+          "service": "Habitify",
+          "origin": "add"
+        },
+        {
+          "id": "loft-drop",
+          "member": "tobi",
+          "app": "pairdrop",
+          "service": "AirDrop",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "Kunle’s garage bench",
+      "roomRole": "garage",
+      "isNew": false,
+      "subject": "the workbench and the bicycle on the podium",
+      "beats": [
+        {
+          "id": "garage-repos",
+          "member": "kunle",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "garage-tilly",
+          "member": "kunle",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garage-ride",
+          "member": "kunle",
+          "app": "wingfit",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garage-decode",
+          "member": "kunle",
+          "app": "cyberchef",
+          "service": "DevUtils",
+          "origin": "add"
+        },
+        {
+          "id": "garage-sync",
+          "member": "kunle",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "add"
+        },
+        {
+          "id": "garage-baserow",
+          "member": null,
+          "app": "baserow",
+          "service": "Airtable",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out front",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-planters",
+          "member": "ife",
+          "app": "beatsync",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "garden-drive",
+          "member": "kunle",
+          "app": "frigate",
+          "service": "Ring",
+          "origin": "now"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "garage-ride",
+      "line": "Kunle logs the morning ride before the bench."
+    },
+    {
+      "at": "morning",
+      "beat": "living-books",
+      "line": "Folake closes the month on the sofa."
+    },
+    {
+      "at": "midday",
+      "beat": "living-sign",
+      "line": "A client signs at the table before lunch."
+    },
+    {
+      "at": "afternoon",
+      "beat": "green-lookup",
+      "line": "Ife reads her own sources for chemistry."
+    },
+    {
+      "at": "after-school",
+      "beat": "loft-world",
+      "line": "Tobi opens the world his cousins join."
+    },
+    {
+      "at": "after-school",
+      "beat": "garage-sync",
+      "line": "Kunle starts the build sync and heads to supper."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-planters",
+      "line": "The terrace plays one queue."
+    },
+    {
+      "at": "weekend",
+      "beat": "dining-teampass",
+      "line": "The shared codes sit in permissioned folders."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "QuickBooks",
+      "Spotify",
+      "Google Drive",
+      "OurHome",
+      "Cozi",
+      "Notion",
+      "Google Search",
+      "Google Translate",
+      "GeForce Now",
+      "Google Photos",
+      "GitHub",
+      "Ring"
+    ],
+    "servicesFinal": [
+      "QuickBooks",
+      "Spotify",
+      "Evernote",
+      "Cozi",
+      "Confluence",
+      "Notion",
+      "NotebookLM",
+      "Raindrop.io",
+      "GeForce Now",
+      "Google Photos",
+      "GitHub",
+      "Ring",
+      "DocuSign",
+      "Airtable",
+      "DevUtils",
+      "Dropbox",
+      "MagicaVoxel",
+      "Habitify",
+      "AirDrop",
+      "Google Keep",
+      "Miro",
+      "Toggl Track",
+      "LastPass",
+      "FreshBooks"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "kitchen-hours",
+      "garage-decode",
+      "loft-world",
+      "garden-planters",
+      "dining-teampass",
+      "green-translate",
+      "green-lookup",
+      "garage-baserow"
+    ],
+    "mustCarry": {
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "akaunting": [
+        "[claims] Bookkeeping tool. No accounting, tax or legal advice.",
+        "marketplace: Source-available (Business Source License). Seafile and others carry umbrel strings: the admin email default is a placeholder address on umbrel.local."
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "papra": [],
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "bookstack": [],
+      "obsidian": [
+        "[licence] Obsidian is not open source. Do not call it open source.",
+        "[note] An Obsidian MCP entry exists so an agent can read and write the vault.",
+        "not open source (catalog: never say so)",
+        "listing says private and offline: do not repeat",
+        "notes are files on the Core, the app is streamed"
+      ],
+      "anything-llm": [
+        "[cloud-link] Works with local or cloud models. Pick the local one in the story.",
+        "Works with local or cloud models: pick Ollama (the default) in the story.",
+        "Telemetry is disabled by default in the Hub package (good).",
+        "Per app multi user with permissions: fine as one household login set."
+      ],
+      "open-notebook": [
+        "[cloud-link] Supports 18 plus providers including cloud ones. Ollama is the local path.",
+        "[heavy] Podcast-style audio overviews need a speech model.",
+        "Install form has OpenAI, Anthropic, Google and Groq key fields: leave blank; Ollama is the local path.",
+        "Podcast style audio overviews need a speech model: do not mention.",
+        "Capture shows sample notebook content, not personal data."
+      ],
+      "linkwarden": [
+        "Sharing links publicly needs inbound reach: keep the story to saving, not sharing",
+        "The Pocket name in replaces is stale"
+      ],
+      "steam-headless": [
+        "[cloud-link] Steam needs a Valve account to sign in, and the game library and the purchases are Valve's. The Core runs the session; the account stays with Valve. Say that, never \"no account\".",
+        "[hardware] The listing asks for GPU passthrough for best performance and the Hub package declares no GPU device, so a given Core may not run a given game well. Say what the Core does (it runs the session at home), never ",
+        "[claims] No frame rate, resolution or latency figure, and not \"smooth\". Never \"gaming PC\", \"console replacement\" or \"cloud gaming replacement\" in the text. The chip may read \"replaces GeForce Now\" or \"replaces Xbox Cloud",
+        "[note] It shows a streamed desktop with sound in a browser (noVNC), so the screen needs a browser, not a console. The container runs privileged with host access: do not call it sandboxed. Keep the stream on the home netw",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-account exclusion for the gamer archetype, with the caveats above."
+      ],
+      "wingfit": [
+        "[claims] Logging only. No health outcomes.",
+        "logging only: no health outcomes",
+        "QA shot is a sign-in wall with an error toast"
+      ],
+      "beatsync": [
+        "Rights to the music are the household's; the app plays what you upload",
+        "Do not print the millisecond-accurate sync claim or any timing figure",
+        "Public URL field is optional; leave it blank for home-network use"
+      ],
+      "frigate": [
+        "[hardware] Needs IP cameras that stream over RTSP. Cameras are not part of the Core.",
+        "[public-access] Watching cameras from away from home is remote access, which the sheet leaves unfinished.",
+        "[claims] No detection-speed or accuracy numbers. Do not say it prevents anything.",
+        "QA screenshot shows \"No frames have been received, check error logs\": reject. The store listing image shows a real backyard photo that is not a Hub capture.",
+        "Watching away from home is remote access: not claimed."
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "grist": [],
+      "cyberchef": [
+        "Listing says nothing pasted is ever sent anywhere and that it works with no internet connection: do not repeat either (sec-never-leaves, sec-offline)",
+        "A tool, not a store of anything: nothing is held after the tab closes"
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "mindustry": [
+        "[note] Headless game server; no web interface. Players use the game client.",
+        "[claims] No frame rate or player-count claims.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Headless: the household needs a console to run commands such as host and gameover",
+        "No QA run recorded"
+      ],
+      "blockbench": [
+        "Projects live in the browser (IndexedDB) or in files the person saves: the Core serves the app, it does not hold the models",
+        "The listing names Minecraft models; say \"game models\" or \"block models\" in copy",
+        "Free-text store claim \"never sees your models\" is accurate for the container"
+      ],
+      "habitica": [
+        "The sign-up page in the capture carries a cookie-consent banner: check the self-hosted build for analytics scripts before saying it sends nothing out",
+        "Game, not a health or behaviour tool: no outcomes"
+      ],
+      "pairdrop": [
+        "none from the catalog"
+      ],
+      "memos": [],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "solidtime": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "listing mentions invoices: say nothing about billing or tax"
+      ],
+      "teampass": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Listing claims secrets never leave the appliance (banned word, banned claim)",
+        "Per-person roles sit close to the cap-multi-user rule: phrase it as the app's folders and permissions",
+        "No QA screenshot"
+      ],
+      "invoice-ninja": [
+        "[cloud-link] Taking card payments needs a payment provider. Say invoicing, not payment processing.",
+        "marketplace: Elastic License 2.0 (source-available)."
+      ],
+      "baserow": [
+        "[note] Overlaps NocoDB, Grist and Teable."
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "beatsync",
+      "display": "Beatsync",
+      "reason": "not in catalog-apps.json",
+      "replaces": [],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Rights to the music are the household's; the app plays what you upload",
+        "Do not print the millisecond-accurate sync claim or any timing figure",
+        "Public URL field is optional; leave it blank for home-network use",
+        "Image tags are latest (companionintelligence/beatsync is a Companion build)"
+      ],
+      "evidence": "CI-Marketplace apps/beatsync/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m6)"
+    },
+    {
+      "app": "cyberchef",
+      "display": "CyberChef",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "DevUtils",
+        "Browserling Tools"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Listing says nothing pasted is ever sent anywhere and that it works with no internet connection: do not repeat either (sec-never-leaves, sec-offline)",
+        "A tool, not a store of anything: nothing is held after the tab closes"
+      ],
+      "evidence": "CI-Marketplace apps/cyberchef/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "syncthing",
+      "beats": [
+        "garage-sync"
+      ]
+    },
+    {
+      "app": "mindustry",
+      "beats": [
+        "loft-world"
+      ]
+    },
+    {
+      "app": "solidtime",
+      "beats": [
+        "kitchen-solidtime"
+      ]
+    },
+    {
+      "app": "teampass",
+      "beats": [
+        "dining-teampass"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

@@ -1,0 +1,1374 @@
+{
+  "v": 3,
+  "slug": "rahimi",
+  "house": "modernhouse-nora",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/rahimi.json",
+    "sha1": "1138b3b9b4ae7702d7b20dac48c53ed15d3eca9a",
+    "beatsNow": 23,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-light-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "navidrome",
+        "audiomass",
+        "baikal",
+        "vaultwarden",
+        "jellyfin"
+      ],
+      "beatApps": {
+        "iot": "ntfy",
+        "food": "homehub"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "ci-planning",
+          "opnform",
+          "navidrome",
+          "audiomass",
+          "baikal",
+          "vaultwarden"
+        ],
+        "beatApps": {
+          "iot": "ntfy",
+          "food": "homehub"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "ci-planning dropped: no beat tells it any more",
+        "opnform dropped: no beat tells it any more",
+        "jellyfin added: story:cast-lint needs the story-rich app in at least three families of the cast plan"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 6,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "parisa": {
+        "now": 10,
+        "add": 1,
+        "target": 11
+      },
+      "kian": {
+        "now": 7,
+        "add": 4,
+        "target": 11
+      }
+    },
+    "pairShare": 0.897,
+    "pairShareMin": 0.8,
+    "chapters": 8
+  },
+  "members": [
+    {
+      "id": "parisa",
+      "name": "Parisa",
+      "age": 41,
+      "role": "partner",
+      "archetype": "organiser",
+      "work": "runs an online music school",
+      "companion": {
+        "name": "Quince",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "business-office",
+        "musician-listener"
+      ],
+      "thread": "An online music school: timetable, forms and invitations, from the hall desk."
+    },
+    {
+      "id": "kian",
+      "name": "Kian",
+      "age": 43,
+      "role": "partner",
+      "archetype": "maker",
+      "work": "guitarist and teacher",
+      "companion": {
+        "name": "Plum",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "musician-listener",
+        "freelance-creative"
+      ],
+      "thread": "A guitarist and teacher: demos, lesson sheets and stems, upstairs."
+    }
+  ],
+  "character": {
+    "lede": "Two near-equal modern volumes stand under opposed dark sheds, a walnut wing beside a blue-grey two-storey block. A charcoal forecourt with a reflecting basin leads to a timber pool deck.",
+    "spots": [
+      {
+        "room": "Desk Hall",
+        "line": "The Core sits on a desk in the hall, beside a tall plant."
+      },
+      {
+        "room": "Primary Bedroom",
+        "line": "A platform bed and a guitar stand share the bedroom."
+      },
+      {
+        "room": "Deck Bar",
+        "line": "Two bar stools sit at the deck bar by the pool."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 190,
+      "ground": "lawn",
+      "style": "Two near-equal modern volumes under opposed dark sheds: a one-storey walnut west wing falling west over a fin-framed recessed porch, and a two-storey blue-grey east block falling east with its upper storey set back behind a planted white band; walnut pilasters, a charcoal forecourt and a reflecting basin in front, a timber pool deck wrapping the back",
+      "rooms": [
+        "Kitchen",
+        "Pantry",
+        "Entry",
+        "Reading Corner",
+        "Coat Nook",
+        "Dining",
+        "Bath",
+        "Back Hall",
+        "Living Room",
+        "Stair Hall",
+        "Desk Hall",
+        "Porch Steps",
+        "Deck Bar",
+        "Primary Bedroom",
+        "Landing",
+        "Roof Terrace"
+      ],
+      "flags": [
+        "desk: core-desk-only"
+      ]
+    },
+    "truths": "The Core sits on a desk in the Desk Hall. The living room has a television. The kitchen has a breakfast bar. Forecourt with a reflecting basin, a timber pool deck, a roof terrace.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "listmonk",
+      "name": "Listmonk",
+      "member": "parisa",
+      "room": "The kitchen",
+      "service": "Mailchimp",
+      "serviceId": "mailchimp",
+      "status": "swap",
+      "beat": "kitchen-intake",
+      "seed": "Parisa sends the trial-lesson invitations from a list in Listmonk, and the mail leaves through the sender she set.",
+      "line": "Listmonk keeps the club mailing list on the Core, and the mail leaves through the sender the household sets."
+    },
+    {
+      "app": "inkscape",
+      "name": "Inkscape",
+      "member": "kian",
+      "room": "Primary Bedroom",
+      "service": "Adobe Illustrator",
+      "serviceId": "adobe-illustrator",
+      "status": "add",
+      "beat": "bed-charts",
+      "seed": "Kian draws chord charts for a beginner class in Inkscape, in a browser session the Core serves.",
+      "line": "Inkscape draws the lettering for the van door, running in a browser session served from the Core."
+    },
+    {
+      "app": "adguardhome",
+      "name": "AdGuard Home",
+      "member": null,
+      "room": "Living Room",
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "status": "add",
+      "beat": "living-adguardhome",
+      "seed": "Once the router sends its lookups to the Core, AdGuard Home filters the ad domains for the devices that use it for DNS, with its own rule for each.",
+      "line": "AdGuard Home does the same job as a DNS filter, with its own rules for each device."
+    },
+    {
+      "app": "lubelogger",
+      "name": "LubeLogger",
+      "member": null,
+      "room": "Desk Hall",
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "status": "add",
+      "beat": "office-lubelogger",
+      "seed": "LubeLogger keeps the service history, fuel and reminders of Kian's amp-loaded car in one log that the household shares.",
+      "line": "LubeLogger keeps the van's service history, fuel and reminders in one log."
+    },
+    {
+      "app": "blinko",
+      "name": "Blinko",
+      "member": "kian",
+      "room": "Primary Bedroom",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "status": "add",
+      "beat": "bed-riffs",
+      "seed": "Kian catches a riff in Blinko by the bed before he forgets it, and tags it later.",
+      "line": "Blinko catches a half-formed idea on the kitchen counter before it is lost."
+    },
+    {
+      "app": "photoprism",
+      "name": "PhotoPrism",
+      "member": "parisa",
+      "room": "The living room",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "swap",
+      "beat": "living-photos",
+      "seed": "Parisa searches for the sea in PhotoPrism and finds the whole summer sorted into one album.",
+      "line": "PhotoPrism sorts a shoebox of scanned prints into albums the family browses on a phone or a laptop."
+    },
+    {
+      "app": "bentopdf",
+      "name": "BentoPDF",
+      "member": "kian",
+      "room": "Primary Bedroom",
+      "service": "Smallpdf",
+      "serviceId": "smallpdf",
+      "status": "add",
+      "beat": "bed-sheets",
+      "seed": "Kian merges the week's lesson sheets into one PDF in BentoPDF, in the browser tab.",
+      "line": "BentoPDF signs, redacts and recognises text in a PDF without leaving the browser tab."
+    },
+    {
+      "app": "docuseal",
+      "name": "Docuseal",
+      "member": "parisa",
+      "room": "Desk Hall",
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "status": "add",
+      "beat": "office-consent",
+      "seed": "Parisa turns the parent consent form into a Docuseal page that each family fills in and signs.",
+      "line": "Docuseal turns a form into a page that a client fills and signs at the table."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-photos",
+      "member": "parisa",
+      "chapter": "living",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "photoprism",
+      "toName": "PhotoPrism",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Parisa searches for the sea in PhotoPrism and finds the whole summer sorted into one album.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-papers",
+      "member": "parisa",
+      "chapter": "kitchen",
+      "from": "paperless",
+      "fromName": "Paperless-ngx",
+      "to": "nextcloud",
+      "toName": "Nextcloud",
+      "service": "Google Drive",
+      "serviceId": "google-drive",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Parisa files the insurer's letter in the Nextcloud folder for the school and the house.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-flowers",
+      "member": "kian",
+      "chapter": "garden",
+      "from": "hortusfox",
+      "fromName": "HortusFox",
+      "to": "grist",
+      "toName": "Grist",
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Kian keeps the lesson attendance as a table in Grist, with a column that counts each pupil's term.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-intake",
+      "member": "parisa",
+      "chapter": "kitchen",
+      "from": "opnform",
+      "fromName": "OpnForm",
+      "to": "listmonk",
+      "toName": "Listmonk",
+      "service": "Mailchimp",
+      "serviceId": "mailchimp",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Parisa sends the trial-lesson invitations from a list in Listmonk, and the mail leaves through the sender she set.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-stew",
+      "member": "kian",
+      "chapter": "kitchen",
+      "from": "homehub",
+      "fromName": "HomeHub",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Kian types his aunt's stew into Mealie, and the recipe scales to the number at the table.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "bed-term",
+      "member": "parisa",
+      "chapter": "bedroom",
+      "from": "ci-planning",
+      "fromName": "Companion Planning",
+      "to": "vikunja",
+      "toName": "Vikunja",
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Parisa gives admin its own task lists in Vikunja, and the calendar app on her phone shows each block.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "living-photos"
+      ],
+      "retoldAs": [
+        "living-photos -> PhotoPrism"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "opnform",
+      "name": "OpnForm",
+      "beats": [
+        "kitchen-intake"
+      ],
+      "retoldAs": [
+        "kitchen-intake -> Listmonk"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "paperless",
+      "name": "Paperless-ngx",
+      "beats": [
+        "kitchen-papers"
+      ],
+      "retoldAs": [
+        "kitchen-papers -> Nextcloud"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "hortusfox",
+      "name": "HortusFox",
+      "beats": [
+        "garden-flowers"
+      ],
+      "retoldAs": [
+        "garden-flowers -> Grist"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "ci-planning",
+      "name": "Companion Planning",
+      "beats": [
+        "bed-term"
+      ],
+      "retoldAs": [
+        "bed-term -> Vikunja"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "baikal",
+      "navidrome"
+    ],
+    "was": [
+      "baikal",
+      "navidrome"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "office-consent",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "parisa",
+      "also": [],
+      "room": "Desk Hall",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Parisa turns the parent consent form into a Docuseal page that each family fills in and signs."
+    },
+    {
+      "id": "bed-stems",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "kian",
+      "also": [],
+      "room": "Primary Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "syncthing",
+      "appName": "Syncthing",
+      "with": [],
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kian keeps a folder of backing stems in step between his laptop and the Core with Syncthing."
+    },
+    {
+      "id": "bed-sheets",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "kian",
+      "also": [],
+      "room": "Primary Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "bentopdf",
+      "appName": "BentoPDF",
+      "with": [],
+      "service": "Smallpdf",
+      "serviceId": "smallpdf",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kian merges the week's lesson sheets into one PDF in BentoPDF, in the browser tab."
+    },
+    {
+      "id": "bed-charts",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "kian",
+      "also": [],
+      "room": "Primary Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "inkscape",
+      "appName": "Inkscape",
+      "with": [],
+      "service": "Adobe Illustrator",
+      "serviceId": "adobe-illustrator",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kian draws chord charts for a beginner class in Inkscape, in a browser session the Core serves."
+    },
+    {
+      "id": "bed-riffs",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "kian",
+      "also": [],
+      "room": "Primary Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "blinko",
+      "appName": "Blinko",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Kian catches a riff in Blinko by the bed before he forgets it, and tags it later."
+    },
+    {
+      "id": "kitchen-espocrm",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "espocrm",
+      "appName": "EspoCRM",
+      "with": [],
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The school logs a new enquiry from a pupil's parent in EspoCRM and sets the follow-up date."
+    },
+    {
+      "id": "garden-cryptgeon",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Deck Bar",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cryptgeon",
+      "appName": "Cryptgeon",
+      "with": [],
+      "service": "Privnote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "At the table, a Cryptgeon note holds the studio door code for a pupil's parent, read on the home Wi-Fi, and opens once and is gone."
+    },
+    {
+      "id": "living-planka",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "planka",
+      "appName": "Planka",
+      "with": [],
+      "service": "Trello",
+      "serviceId": "trello",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The school keeps the term's lessons and invitations as cards on a Planka board and moves each one along."
+    },
+    {
+      "id": "entry-cryptpad",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Entry",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "cryptpad",
+      "appName": "CryptPad",
+      "with": [],
+      "service": "Microsoft Office",
+      "serviceId": "microsoft-office",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The school drafts the term timetable in a CryptPad document, and each edit appears as it is typed."
+    },
+    {
+      "id": "office-pingvin-share",
+      "chapter": "office",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Desk Hall",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pingvin-share",
+      "appName": "Pingvin Share",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A big video leaves the laptop as a Pingvin Share link that opens on any phone at home and expires after a day."
+    },
+    {
+      "id": "living-adguardhome",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "adguardhome",
+      "appName": "AdGuard Home",
+      "with": [],
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Once the router sends its lookups to the Core, AdGuard Home filters the ad domains for the devices that use it for DNS, with its own rule for each."
+    },
+    {
+      "id": "office-lubelogger",
+      "chapter": "office",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Desk Hall",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "lubelogger",
+      "appName": "LubeLogger",
+      "with": [],
+      "service": "Fuelly",
+      "serviceId": "fuelly",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "LubeLogger keeps the service history, fuel and reminders of Kian's amp-loaded car in one log that the household shares."
+    },
+    {
+      "id": "kitchen-changedetection",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Pantry",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "changedetection",
+      "appName": "changedetection.io",
+      "with": [],
+      "service": "Visualping",
+      "serviceId": "visualping",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "changedetection.io watches the concert hall's booking page and tells the house when it changes."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "At the entry",
+        "place": "after:office"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "office",
+        "room": "office",
+        "title": "Parisa's hall desk",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "At the entry",
+        "new": true
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the pool",
+        "new": false
+      },
+      {
+        "id": "bedroom",
+        "room": "bedroom",
+        "title": "Kian and the guitar stand",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "office",
+      "title": "Parisa's hall desk",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk in the hall",
+      "beats": [
+        {
+          "id": "office-slots",
+          "member": "parisa",
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "now"
+        },
+        {
+          "id": "office-quince",
+          "member": "parisa",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "office-vault",
+          "member": "parisa",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "office-consent",
+          "member": "parisa",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "office-pingvin-share",
+          "member": null,
+          "app": "pingvin-share",
+          "service": "WeTransfer",
+          "origin": "add"
+        },
+        {
+          "id": "office-lubelogger",
+          "member": null,
+          "app": "lubelogger",
+          "service": "Fuelly",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "At the entry",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-cryptpad",
+          "member": null,
+          "app": "cryptpad",
+          "service": "Microsoft Office",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-photos",
+          "member": "parisa",
+          "app": "photoprism",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "living-tv",
+          "member": "kian",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-planka",
+          "member": null,
+          "app": "planka",
+          "service": "Trello",
+          "origin": "add"
+        },
+        {
+          "id": "living-adguardhome",
+          "member": null,
+          "app": "adguardhome",
+          "service": "NextDNS",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-intake",
+          "member": "parisa",
+          "app": "listmonk",
+          "service": "Mailchimp",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-stew",
+          "member": "kian",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-papers",
+          "member": "parisa",
+          "app": "nextcloud",
+          "service": "Google Drive",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-fridge",
+          "member": "parisa",
+          "app": "homehub",
+          "service": "Cozi",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-espocrm",
+          "member": null,
+          "app": "espocrm",
+          "service": "Salesforce",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-changedetection",
+          "member": null,
+          "app": "changedetection",
+          "service": "Visualping",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the pool",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": "the deck bar by the pool",
+      "beats": [
+        {
+          "id": "garden-ntfy",
+          "member": "parisa",
+          "app": "ntfy",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-flowers",
+          "member": "kian",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "swap"
+        },
+        {
+          "id": "garden-cryptgeon",
+          "member": null,
+          "app": "cryptgeon",
+          "service": "Privnote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "bedroom",
+      "title": "Kian and the guitar stand",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the guitar stand beside the bed",
+      "beats": [
+        {
+          "id": "bed-demo",
+          "member": "kian",
+          "app": "audiomass",
+          "service": "Adobe Audition",
+          "origin": "now"
+        },
+        {
+          "id": "bed-notes",
+          "member": "kian",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "now"
+        },
+        {
+          "id": "bed-term",
+          "member": "parisa",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "swap"
+        },
+        {
+          "id": "bed-backing",
+          "member": "kian",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "now"
+        },
+        {
+          "id": "bed-strings",
+          "member": "kian",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "bed-stems",
+          "member": "kian",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "add"
+        },
+        {
+          "id": "bed-sheets",
+          "member": "kian",
+          "app": "bentopdf",
+          "service": "Smallpdf",
+          "origin": "add"
+        },
+        {
+          "id": "bed-charts",
+          "member": "kian",
+          "app": "inkscape",
+          "service": "Adobe Illustrator",
+          "origin": "add"
+        },
+        {
+          "id": "bed-riffs",
+          "member": "kian",
+          "app": "blinko",
+          "service": "Google Keep",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "office-slots",
+      "line": "Parisa moves two lessons on the calendar."
+    },
+    {
+      "at": "morning",
+      "beat": "office-consent",
+      "line": "A new family signs the consent form."
+    },
+    {
+      "at": "midday",
+      "beat": "kitchen-intake",
+      "line": "Trial-lesson invitations go out."
+    },
+    {
+      "at": "afternoon",
+      "beat": "bed-charts",
+      "line": "Kian draws chord charts for the beginners."
+    },
+    {
+      "at": "afternoon",
+      "beat": "bed-demo",
+      "line": "Kian trims the chord change."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-flowers",
+      "line": "Kian updates the term's attendance table."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-adguardhome",
+      "line": "The ad domains are filtered for the devices that ask."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Google Calendar",
+      "LastPass",
+      "Google Photos",
+      "Plex",
+      "Typeform",
+      "Cozi",
+      "Google Drive",
+      "Adobe Audition",
+      "Notion",
+      "Spotify"
+    ],
+    "servicesFinal": [
+      "Google Calendar",
+      "LastPass",
+      "Google Photos",
+      "Plex",
+      "Mailchimp",
+      "Paprika",
+      "Google Drive",
+      "Cozi",
+      "Airtable",
+      "Adobe Audition",
+      "Notion",
+      "Todoist",
+      "Spotify",
+      "DocuSign",
+      "Dropbox",
+      "Smallpdf",
+      "Adobe Illustrator",
+      "Google Keep",
+      "Salesforce",
+      "Privnote",
+      "Trello",
+      "Microsoft Office",
+      "WeTransfer",
+      "NextDNS",
+      "Fuelly",
+      "Visualping"
+    ],
+    "count": 26
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "kitchen-intake",
+      "bed-charts",
+      "living-adguardhome",
+      "office-lubelogger",
+      "bed-riffs",
+      "living-photos",
+      "bed-sheets",
+      "office-consent"
+    ],
+    "mustCarry": {
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "photoprism": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "listmonk": [
+        "[cloud-link] Sending at volume needs an SMTP provider or mail server. Do not promise delivery.",
+        "Do not promise delivery",
+        "Overlaps Keila",
+        "short_desc is the description"
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "nextcloud": [
+        "[note] The Hub onboarding wizard offers Nextcloud as a recommended app.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "homehub": [
+        "No passwords: a \"Select your user\" box offers every name including Administrator (anyone on the network can pick one)",
+        "Extras bundled: recipes, expiry tracker, link shortener, PDF compressor, QR generator"
+      ],
+      "ntfy": [
+        "[cloud-link] iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "No sign-in is configured: anyone who can reach the URL can publish and subscribe. Keep it on the home network.",
+        "iOS push goes through an upstream relay setting; Android and web can stay local.",
+        "QA screenshot is an empty app with a notifications-blocked banner (shows the product)."
+      ],
+      "grist": [],
+      "audiomass": [
+        "The Core only serves the page: decoded audio and edits live in the viewer's browser, so \"sits on the Core\" is false until the person saves a file where they choose",
+        "Short description says \"audio never leaves the appliance\": an absolute; paraphrase",
+        "Third-party image (ceramicwhite/audiomass), tag latest"
+      ],
+      "obsidian": [
+        "[licence] Obsidian is not open source. Do not call it open source.",
+        "[note] An Obsidian MCP entry exists so an agent can read and write the vault.",
+        "not open source (catalog: never say so)",
+        "listing says private and offline: do not repeat",
+        "notes are files on the Core, the app is streamed"
+      ],
+      "vikunja": [
+        "[note] Supports CalDAV sync.",
+        "QA shot is a sign-in wall",
+        "CalDAV sync with calendar apps"
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "bentopdf": [
+        "Dual licence: AGPL-3.0 or paid commercial; fine for household use",
+        "Listing says \"nothing to leak\": drop that wording",
+        "Overlaps Stirling-PDF (the persona PDF app)"
+      ],
+      "inkscape": [
+        "Runs as a remote-desktop style session in the browser, not a native window",
+        "Image tag is the Kasm image version, not the Inkscape version"
+      ],
+      "blinko": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI search and chat need a model provider added in the app (OpenAI, Ollama, LiteLLM...): not wired by the Hub.",
+        "No QA run; gallery frame is upstream marketing with a \"#Password\" tagged note and a gmail file name: reject.",
+        "Companion desktop and mobile clients are separate downloads."
+      ],
+      "espocrm": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "cryptgeon": [
+        "Notes live only in RAM: a restart of the app wipes every unread note",
+        "Do not repeat the listing's encryption wording (sec-absolute); say a note opens once and is gone",
+        "Overlaps Enclosed and PrivateBin: one burn-after-reading tool per household"
+      ],
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "cryptpad": [
+        "Listing says \"end-to-end encrypted\": banned wording (f-security-guarantee), do not repeat",
+        "Collaboration with people outside the home needs outside reach"
+      ],
+      "pingvin-share": [
+        "[public-access] Recipients outside your home network need to reach your Core.",
+        "public-access for anyone outside the house"
+      ],
+      "adguardhome": [
+        "[note] Overlaps Pi-hole; pick one per story.",
+        "[claims] Same as Pi-hole: no parental-control promise.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Overlaps Pi-hole: one per household",
+        "Listing mentions adult-content parental controls: never repeat it (sec-safety-people)"
+      ],
+      "lubelogger": [
+        "Do not claim savings or economy figures",
+        "No sign-in until the user sets one (unverified)"
+      ],
+      "changedetection": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "changedetection",
+      "display": "changedetection.io",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Visualping",
+        "Distill"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "The UI shows a \"Let us host your instance!\" banner linking to the vendor's hosted service",
+        "Does not hide the Core from the sites it watches"
+      ],
+      "evidence": "CI-Marketplace apps/changedetection/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-stew"
+      ]
+    },
+    {
+      "app": "syncthing",
+      "beats": [
+        "bed-stems"
+      ]
+    },
+    {
+      "app": "blinko",
+      "beats": [
+        "bed-riffs"
+      ]
+    },
+    {
+      "app": "adguardhome",
+      "beats": [
+        "living-adguardhome"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

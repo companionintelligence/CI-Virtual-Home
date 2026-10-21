@@ -156,7 +156,9 @@ test/review/baselines/     the rig's frozen BEFORE and the stability baselines (
                            prop-boxes.json, build-neutrality.json, compose-fixtures.json)
 reference/                 HOUSE-SPEC.md (the schema), APARTMENTS.md (a unit in a block: the recipe, the six, what adding a home changes),
                            PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
-                           HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
+                           HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review), geometry/ (the detectors' baseline),
+                           office/ (the parked /office design, not shipped), story/program-2026-10/ (records of the October 2026
+                           marketing program); reference/README.md indexes it all
 test/goldens/macos-metal/  150 committed baseline frames of the first 30 homes (Git LFS; the apartments' come with `goldens:update --house`) + PROFILE.json (the renderer that made them)
 test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the frames it moves and why, and
                            <stream>/<profile>/ what each golden moved to (see How verification works)

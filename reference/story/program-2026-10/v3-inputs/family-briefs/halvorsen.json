@@ -1,0 +1,1432 @@
+{
+  "v": 3,
+  "slug": "halvorsen",
+  "house": "aurora",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/halvorsen.json",
+    "sha1": "897ab3a92708bb89152432ada622bc387712b61f",
+    "beatsNow": 22,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-deep-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "twenty",
+        "kimai",
+        "stirling-pdf",
+        "forgejo",
+        "home-assistant",
+        "tandoor"
+      ],
+      "beatApps": {
+        "home": "ci-planning"
+      },
+      "reviewNeeded": [
+        "tandoor"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "twenty",
+          "kimai",
+          "stirling-pdf",
+          "forgejo",
+          "home-assistant",
+          "spliit"
+        ],
+        "beatApps": {
+          "food": "yuvomi"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "beatApps.food yuvomi dropped",
+        "beatApps.home ci-planning added",
+        "spliit dropped to make room",
+        "tandoor added: carries food"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 14,
+    "swaps": 4,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "ingrid": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      },
+      "mats": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      }
+    },
+    "pairShare": 0.862,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "ingrid",
+      "name": "Ingrid",
+      "age": 38,
+      "role": "partner",
+      "archetype": "organiser",
+      "work": "runs an events consultancy",
+      "companion": {
+        "name": "Rosemary",
+        "runtime": "OpenClaw",
+        "memory": true
+      },
+      "lens": [
+        "business-office",
+        "club-volunteer"
+      ],
+      "thread": "An events consultancy: contracts, run sheets and guest lists, with Companion Memory (beta)."
+    },
+    {
+      "id": "mats",
+      "name": "Mats",
+      "age": 41,
+      "role": "partner",
+      "archetype": "builder",
+      "work": "freelance backend developer",
+      "companion": {
+        "name": "Thyme",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "business-office"
+      ],
+      "thread": "A freelance backend developer upstairs: clients, code and hours."
+    }
+  ],
+  "character": {
+    "lede": "A layered white modern villa stands on a canal, its picture-frame boxes topped by a floating roof slab over two dark pavilions. A carport terrace, a front balcony and a pool forecourt sit below a roof terrace.",
+    "spots": [
+      {
+        "room": "Sky Lounge",
+        "line": "A modular sectional and a television stand fill the lounge under the roof."
+      },
+      {
+        "room": "Balcony",
+        "line": "A bistro table, two chairs and an easel stand on the balcony."
+      },
+      {
+        "room": "Kitchen",
+        "line": "A breakfast bar and three stools sit in the kitchen."
+      }
+    ],
+    "facts": {
+      "storeys": 3,
+      "areaSqm": 336,
+      "ground": "lawn",
+      "style": "Layered white modern villa on a canal: picture-frame boxes with charcoal and taupe-board infill, a floating roof slab over two dark pavilions, a carport terrace, a front balcony and a pool forecourt",
+      "rooms": [
+        "Kitchen",
+        "Dining",
+        "Foyer",
+        "Study",
+        "Living",
+        "Laundry",
+        "Mudroom",
+        "Guest Bath",
+        "Covered Patio",
+        "Carport",
+        "Garden Lounge",
+        "Hall",
+        "Landing",
+        "Study",
+        "Shower Room",
+        "Dressing Room",
+        "Primary Bedroom",
+        "Bath",
+        "Balcony",
+        "Roof Terrace",
+        "Roof Store",
+        "Sky Lounge"
+      ],
+      "flags": []
+    },
+    "truths": "The Core sits on a desk in the downstairs Study, in sight of the door. Television in the Living room and the Sky Lounge. Kitchen has an island. Pool forecourt, carport, balcony and roof terrace.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "docuseal",
+      "name": "Docuseal",
+      "member": "ingrid",
+      "room": "Study",
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "status": "add",
+      "beat": "office-venue",
+      "seed": "Ingrid sets the venue contract out in Docuseal, and the venue manager signs it at the table.",
+      "line": "Docuseal turns a form into a page that a client fills and signs at the table."
+    },
+    {
+      "app": "minio",
+      "name": "MinIO",
+      "member": "mats",
+      "room": "Study",
+      "service": "Amazon S3",
+      "serviceId": "amazon-s3",
+      "status": "add",
+      "beat": "up-bucket",
+      "seed": "Mats gives a client's uploads a bucket of their own on the Core with MinIO.",
+      "line": "MinIO gives a side project a bucket of its own on the Core."
+    },
+    {
+      "app": "hermitstash",
+      "name": "HermitStash",
+      "member": null,
+      "room": "Living",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "living-hermitstash",
+      "seed": "Guests drop their party pictures on the home Wi-Fi in HermitStash, and the couple gather them in one place.",
+      "line": "HermitStash lets party guests drop their photos on the home Wi-Fi."
+    },
+    {
+      "app": "tandoor",
+      "name": "Tandoor Recipes",
+      "member": "mats",
+      "room": "The kitchen",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "status": "swap",
+      "beat": "kitchen-dinner",
+      "seed": "Wednesday's dinner needs dill: Mats opens the recipe in Tandoor Recipes, which scales it and adds the dill to the list.",
+      "line": "Tandoor Recipes scales a recipe to the number at the table and adds the missing items to the list."
+    },
+    {
+      "app": "librespeed",
+      "name": "LibreSpeed",
+      "member": null,
+      "room": "Foyer",
+      "service": "Speedtest by Ookla",
+      "serviceId": "speedtest-by-ookla",
+      "status": "add",
+      "beat": "foyer-librespeed",
+      "seed": "Someone walks to the Living room with a phone and tests the Wi-Fi to the Core with LibreSpeed after the router moves.",
+      "line": "LibreSpeed tests the Wi-Fi from this room to the Core after the router moves."
+    },
+    {
+      "app": "opencode",
+      "name": "OpenCode",
+      "member": "mats",
+      "room": "Study",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "status": "add",
+      "beat": "up-assist",
+      "seed": "OpenCode reads Mats's repository and proposes a fix with the model on the Core, and he reads the diff first.",
+      "line": "OpenCode reads the repository and proposes a change with the model on the Core."
+    },
+    {
+      "app": "grist",
+      "name": "Grist",
+      "member": "ingrid",
+      "room": "Study",
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "status": "add",
+      "beat": "office-runsheet",
+      "seed": "Ingrid keeps a wedding's run of show as a table in Grist, with a column that works out each cue.",
+      "line": "Grist keeps the club's accounts as a spreadsheet and a database in one portable file."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-week",
+      "member": "mats",
+      "chapter": "living",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "radicale",
+      "toName": "Radicale",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "The week fits on one calendar that Radicale serves from the Core to both phones.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-dinner",
+      "member": "mats",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "tandoor",
+      "toName": "Tandoor Recipes",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Wednesday's dinner needs dill: Mats opens the recipe in Tandoor Recipes, which scales it and adds the dill to the list.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "garden-pool",
+      "member": "mats",
+      "chapter": "garden",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "planka",
+      "toName": "Planka",
+      "service": "Trello",
+      "serviceId": "trello",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Pool day goes on a Planka board as a card, between the cover and the chlorine.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "up-model",
+      "member": "mats",
+      "chapter": "upstairs",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "aider",
+      "toName": "Aider",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Mats asks Aider about a failing test, then reads each commit it made before he keeps any of them.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "living-week",
+        "kitchen-dinner",
+        "garden-pool"
+      ],
+      "retoldAs": [
+        "living-week -> Radicale",
+        "kitchen-dinner -> Tandoor Recipes",
+        "garden-pool -> Planka"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "beats": [
+        "up-model"
+      ],
+      "retoldAs": [
+        "up-model -> Aider"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "up-model"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "twenty",
+      "kimai"
+    ],
+    "was": [
+      "twenty",
+      "kimai"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "office-venue",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "ingrid",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ingrid sets the venue contract out in Docuseal, and the venue manager signs it at the table."
+    },
+    {
+      "id": "office-runsheet",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "ingrid",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ingrid keeps a wedding's run of show as a table in Grist, with a column that works out each cue."
+    },
+    {
+      "id": "office-memory",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "ingrid",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "ci-memory",
+      "appName": "Companion Memory",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": true,
+      "film": false,
+      "when": null,
+      "seed": "Rosemary pulls up the supplier dates Ingrid chose to import into Companion Memory (beta), and she checks each one before it goes on the plan."
+    },
+    {
+      "id": "up-editor",
+      "chapter": "upstairs",
+      "newChapter": null,
+      "member": "mats",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "code-server",
+      "appName": "Code Server",
+      "with": [],
+      "service": "Cursor",
+      "serviceId": "cursor",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Mats opens his editor in the laptop browser from Code Server, and the editor runs on the Core."
+    },
+    {
+      "id": "up-bucket",
+      "chapter": "upstairs",
+      "newChapter": null,
+      "member": "mats",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "minio",
+      "appName": "MinIO",
+      "with": [],
+      "service": "Amazon S3",
+      "serviceId": "amazon-s3",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Mats gives a client's uploads a bucket of their own on the Core with MinIO."
+    },
+    {
+      "id": "up-assist",
+      "chapter": "upstairs",
+      "newChapter": null,
+      "member": "mats",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "opencode",
+      "appName": "OpenCode",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "OpenCode reads Mats's repository and proposes a fix with the model on the Core, and he reads the diff first."
+    },
+    {
+      "id": "living-hermitstash",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "hermitstash",
+      "appName": "HermitStash",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Guests drop their party pictures on the home Wi-Fi in HermitStash, and the couple gather them in one place."
+    },
+    {
+      "id": "laundry-enclosed",
+      "chapter": "laundry",
+      "newChapter": "laundry",
+      "member": null,
+      "also": [],
+      "room": "Laundry",
+      "roomRole": "laundry",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "enclosed",
+      "appName": "Enclosed",
+      "with": [],
+      "service": "PrivNote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "At the table, an Enclosed note holds the project-folder password for a wedding client, read on the home Wi-Fi, and closes after a day."
+    },
+    {
+      "id": "foyer-librespeed",
+      "chapter": "foyer",
+      "newChapter": "foyer",
+      "member": null,
+      "also": [],
+      "room": "Foyer",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "librespeed",
+      "appName": "LibreSpeed",
+      "with": [],
+      "service": "Speedtest by Ookla",
+      "serviceId": "speedtest-by-ookla",
+      "pairQuality": "loose",
+      "qualifier": "measures the link to the Core, not the broadband line",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone walks to the Living room with a phone and tests the Wi-Fi to the Core with LibreSpeed after the router moves."
+    },
+    {
+      "id": "dining-drawio",
+      "chapter": "dining",
+      "newChapter": "dining",
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "drawio",
+      "appName": "draw.io",
+      "with": [],
+      "service": "Lucidchart",
+      "serviceId": "lucidchart",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple draw the garden plan in draw.io and save the diagram as a file on a laptop."
+    },
+    {
+      "id": "dining-photoprism",
+      "chapter": "dining",
+      "newChapter": "dining",
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "photoprism",
+      "appName": "PhotoPrism",
+      "with": [],
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple browse the canal pictures as albums in PhotoPrism, a library that lives on the Core."
+    },
+    {
+      "id": "kitchen-readeck",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "readeck",
+      "appName": "Readeck",
+      "with": [],
+      "service": "Instapaper",
+      "serviceId": "instapaper",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A long read from the events trade writers and the city paper waits in Readeck on the sofa tablet, saved by whoever found it."
+    },
+    {
+      "id": "kitchen-blinko",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "blinko",
+      "appName": "Blinko",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Anyone at the breakfast bar catches a half-formed idea in Blinko before it is lost."
+    },
+    {
+      "id": "kitchen-super-productivity",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "super-productivity",
+      "appName": "Super Productivity",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "loose",
+      "qualifier": "with Nextcloud WebDAV sync, else the tasks sit in the browser",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple plan the day in blocks in Super Productivity, with a timer beside each task."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "laundry",
+        "kind": "room",
+        "room": "laundry",
+        "title": "The laundry room",
+        "place": "after:kitchen"
+      },
+      {
+        "id": "foyer",
+        "kind": "room",
+        "room": "entry",
+        "title": "The foyer",
+        "place": "after:office"
+      },
+      {
+        "id": "dining",
+        "kind": "room",
+        "room": "dining",
+        "title": "The dining room",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "office",
+        "room": "office",
+        "title": "Ingrid’s ground-floor study",
+        "new": false
+      },
+      {
+        "id": "foyer",
+        "room": "entry",
+        "title": "The foyer",
+        "new": true
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining room",
+        "new": true
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "laundry",
+        "room": "laundry",
+        "title": "The laundry room",
+        "new": true
+      },
+      {
+        "id": "upstairs",
+        "room": "office",
+        "title": "Mats in the upstairs study",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the pool",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "office",
+      "title": "Ingrid’s ground-floor study",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the downstairs desk by the front door",
+      "beats": [
+        {
+          "id": "office-deal",
+          "member": "ingrid",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "office-hold",
+          "member": "ingrid",
+          "app": "ci-planning",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "office-pack",
+          "member": "ingrid",
+          "app": "stirling-pdf",
+          "service": "Adobe Acrobat",
+          "origin": "now"
+        },
+        {
+          "id": "office-guests",
+          "member": "ingrid",
+          "app": "twenty",
+          "service": "Salesforce",
+          "origin": "now"
+        },
+        {
+          "id": "office-venue",
+          "member": "ingrid",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "office-runsheet",
+          "member": "ingrid",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "office-memory",
+          "member": "ingrid",
+          "app": "ci-memory",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "foyer",
+      "title": "The foyer",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "foyer-librespeed",
+          "member": null,
+          "app": "librespeed",
+          "service": "Speedtest by Ookla",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-week",
+          "member": "mats",
+          "app": "radicale",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "living-scene",
+          "member": "mats",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "living-hermitstash",
+          "member": null,
+          "app": "hermitstash",
+          "service": "WeTransfer",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining room",
+      "roomRole": "dining",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-drawio",
+          "member": null,
+          "app": "drawio",
+          "service": "Lucidchart",
+          "origin": "add"
+        },
+        {
+          "id": "dining-photoprism",
+          "member": null,
+          "app": "photoprism",
+          "service": "Google Photos",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": "the breakfast bar",
+      "beats": [
+        {
+          "id": "kitchen-dinner",
+          "member": "mats",
+          "app": "tandoor",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-crew",
+          "member": "ingrid",
+          "app": "spliit",
+          "service": "Splitwise",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-readeck",
+          "member": null,
+          "app": "readeck",
+          "service": "Instapaper",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-blinko",
+          "member": null,
+          "app": "blinko",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-super-productivity",
+          "member": null,
+          "app": "super-productivity",
+          "service": "Todoist",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "laundry",
+      "title": "The laundry room",
+      "roomRole": "laundry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "laundry-enclosed",
+          "member": null,
+          "app": "enclosed",
+          "service": "PrivNote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "upstairs",
+      "title": "Mats in the upstairs study",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the dual-monitor desk upstairs",
+      "beats": [
+        {
+          "id": "up-push",
+          "member": "mats",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "up-model",
+          "member": "mats",
+          "app": "aider",
+          "service": "GitHub Copilot",
+          "origin": "swap"
+        },
+        {
+          "id": "up-issue",
+          "member": "ingrid",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "up-hours",
+          "member": "mats",
+          "app": "kimai",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "up-thyme",
+          "member": "mats",
+          "app": "kimai",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "up-editor",
+          "member": "mats",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "add"
+        },
+        {
+          "id": "up-bucket",
+          "member": "mats",
+          "app": "minio",
+          "service": "Amazon S3",
+          "origin": "add"
+        },
+        {
+          "id": "up-assist",
+          "member": "mats",
+          "app": "opencode",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the pool",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-plants",
+          "member": "ingrid",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "garden-pool",
+          "member": "mats",
+          "app": "planka",
+          "service": "Trello",
+          "origin": "swap"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "office-venue",
+      "line": "Ingrid sets the venue contract out for signing."
+    },
+    {
+      "at": "morning",
+      "beat": "up-push",
+      "line": "Mats pushes a fix before lunch."
+    },
+    {
+      "at": "midday",
+      "beat": "office-memory",
+      "line": "Rosemary lines up the supplier dates."
+    },
+    {
+      "at": "afternoon",
+      "beat": "up-assist",
+      "line": "Mats reads OpenCode's proposed diff."
+    },
+    {
+      "at": "afternoon",
+      "beat": "kitchen-crew",
+      "line": "Ingrid settles the crew lunch."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-pool",
+      "line": "Pool day goes on the board."
+    },
+    {
+      "at": "weekend",
+      "beat": "kitchen-super-productivity",
+      "line": "The day is planned in timed blocks."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Salesforce",
+      "Adobe Acrobat",
+      "Google Home",
+      "Splitwise",
+      "GitHub"
+    ],
+    "servicesFinal": [
+      "Salesforce",
+      "Adobe Acrobat",
+      "Google Calendar",
+      "Google Home",
+      "Paprika",
+      "Splitwise",
+      "GitHub",
+      "GitHub Copilot",
+      "Trello",
+      "DocuSign",
+      "Airtable",
+      "Cursor",
+      "Amazon S3",
+      "WeTransfer",
+      "PrivNote",
+      "Speedtest by Ookla",
+      "Lucidchart",
+      "Google Photos",
+      "Instapaper",
+      "Google Keep",
+      "Todoist"
+    ],
+    "count": 21
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "office-venue",
+      "up-bucket",
+      "living-hermitstash",
+      "kitchen-dinner",
+      "foyer-librespeed",
+      "up-assist",
+      "office-runsheet"
+    ],
+    "mustCarry": {
+      "twenty": [
+        "marketplace: QA capture shows real company names and logos."
+      ],
+      "kimai": [
+        "Do not call it a billing or tax tool"
+      ],
+      "ci-planning": [
+        "[cloud-link] Two-way Google Calendar sync exists but is off by default and needs a Google OAuth client. Do not say it never touches Google.",
+        "[note] Local-model briefings, task extraction and auto-scheduling appear only when Ollama is reachable.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "[cloud-link] Crash reports go to Companion Intelligence unless \"Share crash reports\" is turned off at install (it is on by default). Credentials, file paths, request bodies and memories are stripped first. Do not write t",
+        "Two way Google Calendar sync exists, off by default: never say it never touches Google."
+      ],
+      "stirling-pdf": [
+        "QA screenshot is a sign-in wall that prints default credentials",
+        "already in the persona pool: share cap risk"
+      ],
+      "radicale": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot (the app has a bare web page)",
+        "sync away from home is not claimed",
+        "listing says secure"
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "tandoor": [
+        "[note] Overlaps Mealie; pick one per story.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "no QA screenshot",
+        "overlaps Mealie (pick one per story)"
+      ],
+      "spliit": [],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "aider": [
+        "[cloud-link] The Hub injects its own model endpoint, so it needs no cloud key. A model override field can point it at another OpenAI-compatible endpoint; leave it on the Hub model. A coding agent is private only on the C",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. Every edit is a git commit, which is the approval step: the person reviews and can undo it with git.",
+        "[note] The browser interface is marked experimental upstream. Do not call it finished.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "planka": [
+        "screenshot is a sign-in wall"
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "grist": [],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "minio": [
+        "Developer plumbing: the story needs a script or app using buckets.",
+        "Do not frame a bucket on the Core as an off-site backup.",
+        "No QA screenshot."
+      ],
+      "opencode": [
+        "[cloud-link] The Hub wires it to the Core's local model by default (hub_integration inference). The app can also connect to cloud providers with a key you add inside it; leave that off. A coding agent is private only on ",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. The agent edits files, so the beat shows the person approving the change (agents prepare, people approve).",
+        "[note] The web interface has no sign-in unless a server password is set at install. The older OpenCode Web listing is superseded; name only OpenCode.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "hermitstash": [
+        "Listing claims post-quantum encryption and that every field is encrypted: do not repeat (sec-absolute)",
+        "Dark-theme UI",
+        "Public Drop page lets visitors upload without an account"
+      ],
+      "enclosed": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "librespeed": [
+        "Say \"the link to the Core\" or \"the Wi-Fi in this room\"; never \"internet speed\"",
+        "No speed figures in copy (num rules): show the act, not a number",
+        "Listing says \"privacy-focused\" and \"no tracking\": do not repeat"
+      ],
+      "drawio": [
+        "Stateless: diagrams live in the browser or as .drawio files on the person's own device. The Core serves the editor only, so never say the diagram sits on the Core.",
+        "Listing says nothing else phones home: leave it.",
+        "QA screenshot is a blank editor."
+      ],
+      "photoprism": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "readeck": [
+        "listing says securely: do not repeat",
+        "QA shot is the first-run form"
+      ],
+      "blinko": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI search and chat need a model provider added in the app (OpenAI, Ollama, LiteLLM...): not wired by the Hub.",
+        "No QA run; gallery frame is upstream marketing with a \"#Password\" tagged note and a gmail file name: reject.",
+        "Companion desktop and mobile clients are separate downloads."
+      ],
+      "super-productivity": [
+        "by default tasks live in the browser local storage, not on the Core",
+        "no sync means no custody on the Core"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "minio",
+      "display": "MinIO",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Amazon S3"
+      ],
+      "qa": "none",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Developer plumbing: the story needs a script or app using buckets.",
+        "Do not frame a bucket on the Core as an off-site backup.",
+        "No QA screenshot."
+      ],
+      "evidence": "CI-Marketplace apps/minio/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m5)"
+    },
+    {
+      "app": "hermitstash",
+      "display": "HermitStash",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "WeTransfer",
+        "Dropbox"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 2",
+      "caveats": [
+        "Listing claims post-quantum encryption and that every field is encrypted: do not repeat (sec-absolute)",
+        "Dark-theme UI",
+        "Public Drop page lets visitors upload without an account"
+      ],
+      "evidence": "CI-Marketplace apps/hermitstash/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "enclosed",
+      "display": "Enclosed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "PrivNote"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "evidence": "CI-Marketplace apps/enclosed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "librespeed",
+      "display": "LibreSpeed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Speedtest by Ookla"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Say \"the link to the Core\" or \"the Wi-Fi in this room\"; never \"internet speed\"",
+        "No speed figures in copy (num rules): show the act, not a number",
+        "Listing says \"privacy-focused\" and \"no tracking\": do not repeat"
+      ],
+      "evidence": "CI-Marketplace apps/librespeed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "radicale",
+      "beats": [
+        "living-week"
+      ]
+    },
+    {
+      "app": "tandoor",
+      "beats": [
+        "kitchen-dinner"
+      ]
+    },
+    {
+      "app": "aider",
+      "beats": [
+        "up-model"
+      ]
+    },
+    {
+      "app": "code-server",
+      "beats": [
+        "up-editor"
+      ]
+    },
+    {
+      "app": "minio",
+      "beats": [
+        "up-bucket"
+      ]
+    },
+    {
+      "app": "opencode",
+      "beats": [
+        "up-assist"
+      ]
+    },
+    {
+      "app": "blinko",
+      "beats": [
+        "kitchen-blinko"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

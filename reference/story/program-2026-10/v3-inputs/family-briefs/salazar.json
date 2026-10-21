@@ -1,0 +1,1268 @@
+{
+  "v": 3,
+  "slug": "salazar",
+  "house": "payorote",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/salazar.json",
+    "sha1": "ad0e6b9886cacf3152b400ec9a912db3eff58806",
+    "beatsNow": 23,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "solo-or-couple",
+  "business": true,
+  "narrator": "v-deep-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-openclaw",
+        "forgejo",
+        "inkscape",
+        "wordpress",
+        "mazanoke",
+        "wanderer",
+        "adguardhome"
+      ],
+      "beatApps": {
+        "food": "grocy"
+      },
+      "reviewNeeded": [
+        "adguardhome"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-openclaw",
+          "forgejo",
+          "inkscape",
+          "wordpress",
+          "mazanoke",
+          "home-assistant",
+          "wanderer"
+        ],
+        "beatApps": {
+          "food": "grocy"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "home-assistant dropped: no beat tells it any more",
+        "adguardhome added: carries iot"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 13,
+    "swaps": 3,
+    "householdBeats": 8,
+    "householdBeatsMax": 8,
+    "persona": {
+      "valeria": {
+        "now": 9,
+        "add": 2,
+        "target": 11
+      },
+      "rafael": {
+        "now": 8,
+        "add": 3,
+        "target": 11
+      }
+    },
+    "pairShare": 0.862,
+    "pairShareMin": 0.8,
+    "chapters": 7
+  },
+  "members": [
+    {
+      "id": "valeria",
+      "name": "Valeria",
+      "age": 36,
+      "role": "partner",
+      "archetype": "maker",
+      "work": "painter, sells prints",
+      "companion": {
+        "name": "Hazel",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "freelance-creative",
+        "shop-owner",
+        "traveller-rider"
+      ],
+      "thread": "A painter who sells prints: lines, orders and contracts, from the dressing loft."
+    },
+    {
+      "id": "rafael",
+      "name": "Rafael",
+      "age": 38,
+      "role": "partner",
+      "archetype": "builder",
+      "work": "freelance developer",
+      "companion": {
+        "name": "Aspen",
+        "runtime": "OpenClaw",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "business-office"
+      ],
+      "thread": "A freelance developer in the sleeping nook: clients, invoices and code."
+    }
+  ],
+  "character": {
+    "lede": "A treehouse of dark-timber pods is lodged in a giant lantern-hung tree, with a ladder up from a wildflower meadow. A clapboard block with French doors, a crow's nest and a roof terrace sit among the branches above the lake.",
+    "spots": [
+      {
+        "room": "Dressing Loft",
+        "line": "A writing desk and an easel share the dressing loft."
+      },
+      {
+        "room": "Living & Hearth",
+        "line": "A fireplace and a chesterfield sofa gather round a trunk table."
+      },
+      {
+        "room": "Lantern Tree",
+        "line": "Lanterns hang in rows from the host tree."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 82,
+      "ground": "lawn",
+      "style": "Treehouse: dark-timber pods lodged in a giant lantern-hung host tree, a grey-blue clapboard French-door block beside a dark-brick pod with a bay, a ladder up from a wildflower meadow, a crow's nest, a roof terrace and a canopy pod above, a lake behind",
+      "rooms": [
+        "Sleeping Nook & Study",
+        "Living & Hearth",
+        "Kitchen",
+        "Lantern Tree",
+        "Canopy Bath",
+        "Closet",
+        "Dressing Loft",
+        "Tree Bedroom"
+      ],
+      "flags": [
+        "kitchen-island: none",
+        "dining-table: none"
+      ]
+    },
+    "truths": "The Core sits on a desk in the Sleeping Nook and Study. A television and a fireplace are in the Living and Hearth room. There is no dining table and no kitchen island: the kitchen has a bistro table. Decks run through the branches.",
+    "mustNot": [
+      "no dining table",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "docuseal",
+      "name": "Docuseal",
+      "member": "valeria",
+      "room": "Dressing Loft",
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "status": "add",
+      "beat": "loft-commission",
+      "seed": "Valeria sets a commission agreement out in Docuseal, and the client signs it at the table.",
+      "line": "Docuseal turns a form into a page that a client fills and signs at the table."
+    },
+    {
+      "app": "opencode",
+      "name": "OpenCode",
+      "member": "rafael",
+      "room": "Rafael in the study nook",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "status": "swap",
+      "beat": "nook-model",
+      "seed": "OpenCode hunts a missing row in Rafael's repository with the model on the Core, and he reads the diff before he approves it.",
+      "line": "OpenCode reads the repository and proposes a change with the model on the Core."
+    },
+    {
+      "app": "hermitstash",
+      "name": "HermitStash",
+      "member": null,
+      "room": "Lantern Tree",
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "status": "add",
+      "beat": "garden-hermitstash",
+      "seed": "Guests drop their party pictures on the home Wi-Fi in HermitStash, and the couple gather them in one place.",
+      "line": "HermitStash lets party guests drop their photos on the home Wi-Fi."
+    },
+    {
+      "app": "teampass",
+      "name": "TeamPass",
+      "member": null,
+      "room": "Kitchen",
+      "service": "LastPass",
+      "serviceId": "lastpass",
+      "status": "add",
+      "beat": "kitchen-teampass",
+      "seed": "The studio keeps the client sign-ins in TeamPass folders, each folder with its own permissions.",
+      "line": "TeamPass keeps the crew's shared sign-ins in folders, with its own permissions for each."
+    },
+    {
+      "app": "invoice-ninja",
+      "name": "Invoice Ninja",
+      "member": "rafael",
+      "room": "Sleeping Nook & Study",
+      "service": "QuickBooks",
+      "serviceId": "quickbooks",
+      "status": "add",
+      "beat": "nook-invoice",
+      "seed": "Rafael raises a client's quote and invoice in Invoice Ninja from the study desk.",
+      "line": "Invoice Ninja raises the quote and the invoice for a job from the desk in the workshop."
+    },
+    {
+      "app": "donetick",
+      "name": "Donetick",
+      "member": "rafael",
+      "room": "The kitchen",
+      "service": "Tody",
+      "serviceId": "tody",
+      "status": "swap",
+      "beat": "kitchen-chores",
+      "seed": "Recycling and compost swap hands: whoever carries them down taps the Donetick tag by the kitchen door.",
+      "line": "Donetick turns the chore rota into a tap of a phone on a tag stuck to the fridge or the laundry door."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-scene",
+      "member": "rafael",
+      "chapter": "living",
+      "from": "home-assistant",
+      "fromName": "Home Assistant",
+      "to": "navidrome",
+      "toName": "Navidrome",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "seed": "Rafael starts the afternoon playlist from the family's own music through the hearth speaker with Navidrome.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-chores",
+      "member": "rafael",
+      "chapter": "kitchen",
+      "from": "grocy",
+      "fromName": "Grocy",
+      "to": "donetick",
+      "toName": "Donetick",
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Recycling and compost swap hands: whoever carries them down taps the Donetick tag by the kitchen door.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "nook-model",
+      "member": "rafael",
+      "chapter": "nook",
+      "from": "jupyterlab",
+      "fromName": "JupyterLab",
+      "to": "opencode",
+      "toName": "OpenCode",
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "OpenCode hunts a missing row in Rafael's repository with the model on the Core, and he reads the diff before he approves it.",
+      "filmBeat": false,
+      "dropWith": [
+        "open-webui"
+      ],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "jupyterlab",
+      "name": "JupyterLab",
+      "beats": [
+        "nook-model"
+      ],
+      "retoldAs": [
+        "nook-model -> OpenCode"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "beats": [
+        "nook-model"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "home-assistant",
+      "name": "Home Assistant",
+      "beats": [
+        "living-scene"
+      ],
+      "retoldAs": [
+        "living-scene -> Navidrome"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "inkscape",
+      "forgejo"
+    ],
+    "was": [
+      "inkscape",
+      "forgejo"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "loft-sheet",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "valeria",
+      "also": [],
+      "room": "Dressing Loft",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "easel",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Valeria keeps her print stock and orders as a table in Grist, with a column that shows what to reprint."
+    },
+    {
+      "id": "loft-commission",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": "valeria",
+      "also": [],
+      "room": "Dressing Loft",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "easel",
+        "room": "bedroom"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Valeria sets a commission agreement out in Docuseal, and the client signs it at the table."
+    },
+    {
+      "id": "nook-editor",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "rafael",
+      "also": [],
+      "room": "Sleeping Nook & Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "code-server",
+      "appName": "Code Server",
+      "with": [],
+      "service": "Cursor",
+      "serviceId": "cursor",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Rafael opens his editor in the laptop browser from Code Server, and the editor runs on the Core."
+    },
+    {
+      "id": "nook-invoice",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "rafael",
+      "also": [],
+      "room": "Sleeping Nook & Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "invoice-ninja",
+      "appName": "Invoice Ninja",
+      "with": [],
+      "service": "QuickBooks",
+      "serviceId": "quickbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Rafael raises a client's quote and invoice in Invoice Ninja from the study desk."
+    },
+    {
+      "id": "nook-api",
+      "chapter": "nook",
+      "newChapter": null,
+      "member": "rafael",
+      "also": [],
+      "room": "Sleeping Nook & Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "desk",
+        "room": "office"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Rafael tests a client's endpoint from a Hoppscotch tab, and the collection stays in that browser."
+    },
+    {
+      "id": "kitchen-teampass",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "teampass",
+      "appName": "TeamPass",
+      "with": [],
+      "service": "LastPass",
+      "serviceId": "lastpass",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The studio keeps the client sign-ins in TeamPass folders, each folder with its own permissions."
+    },
+    {
+      "id": "living-adguardhome",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living & Hearth",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "adguardhome",
+      "appName": "AdGuard Home",
+      "with": [],
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Once the router sends its lookups to the Core, AdGuard Home filters the ad domains for the devices that use it for DNS, with its own rule for each."
+    },
+    {
+      "id": "garden-hermitstash",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Lantern Tree",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "hermitstash",
+      "appName": "HermitStash",
+      "with": [],
+      "service": "WeTransfer",
+      "serviceId": "wetransfer",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Guests drop their party pictures on the home Wi-Fi in HermitStash, and the couple gather them in one place."
+    },
+    {
+      "id": "living-photoprism",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living & Hearth",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "photoprism",
+      "appName": "PhotoPrism",
+      "with": [],
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple browse the canvas photos as albums in PhotoPrism, a library that lives on the Core."
+    },
+    {
+      "id": "kitchen-jotty",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "jotty",
+      "appName": "Jotty",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple keep room checklists as plain Markdown files in Jotty, one list for each part of the house."
+    },
+    {
+      "id": "garden-spliit",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Lantern Tree",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "spliit",
+      "appName": "Spliit",
+      "with": [],
+      "service": "Splitwise",
+      "serviceId": "splitwise",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "After the lake weekend the couple settle who paid for what in Spliit, a group that lives on the Core."
+    },
+    {
+      "id": "kitchen-monetr",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "monetr",
+      "appName": "monetr",
+      "with": [],
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple plan the month's bills into envelopes in monetr and see what is left to spend."
+    },
+    {
+      "id": "loft-calibre-web",
+      "chapter": "loft",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dressing Loft",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "calibre-web",
+      "appName": "Calibre-Web",
+      "with": [],
+      "service": "Kindle",
+      "serviceId": "kindle",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The couple keep the family's own ebooks on one shelf in Calibre-Web and read at the window."
+    }
+  ],
+  "chapters": {
+    "add": [],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "nook",
+        "room": "office",
+        "title": "Rafael in the study nook",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The hearth room",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "loft",
+        "room": "bedroom",
+        "title": "Valeria in the studio loft",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Decks and meadow",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "nook",
+      "title": "Rafael in the study nook",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk in the sleeping nook where the Core sits",
+      "beats": [
+        {
+          "id": "nook-tag",
+          "member": "rafael",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "nook-aspen",
+          "member": "rafael",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "nook-model",
+          "member": "rafael",
+          "app": "opencode",
+          "service": "GitHub Copilot",
+          "origin": "swap"
+        },
+        {
+          "id": "nook-flow",
+          "member": "valeria",
+          "app": "n8n",
+          "service": "Zapier",
+          "origin": "now"
+        },
+        {
+          "id": "nook-pdf",
+          "member": "rafael",
+          "app": "stirling-pdf",
+          "service": "Adobe Acrobat",
+          "origin": "now"
+        },
+        {
+          "id": "nook-editor",
+          "member": "rafael",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "add"
+        },
+        {
+          "id": "nook-invoice",
+          "member": "rafael",
+          "app": "invoice-ninja",
+          "service": "QuickBooks",
+          "origin": "add"
+        },
+        {
+          "id": "nook-api",
+          "member": "rafael",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The hearth room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the hearth and the screen",
+      "beats": [
+        {
+          "id": "living-scene",
+          "member": "rafael",
+          "app": "navidrome",
+          "service": "Spotify",
+          "origin": "swap"
+        },
+        {
+          "id": "living-timelapse",
+          "member": "valeria",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-adguardhome",
+          "member": null,
+          "app": "adguardhome",
+          "service": "NextDNS",
+          "origin": "add"
+        },
+        {
+          "id": "living-photoprism",
+          "member": null,
+          "app": "photoprism",
+          "service": "Google Photos",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-pantry",
+          "member": "valeria",
+          "app": "grocy",
+          "service": "AnyList",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-chores",
+          "member": "rafael",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-teampass",
+          "member": null,
+          "app": "teampass",
+          "service": "LastPass",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-jotty",
+          "member": null,
+          "app": "jotty",
+          "service": "Todoist",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-monetr",
+          "member": null,
+          "app": "monetr",
+          "service": "YNAB",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "loft",
+      "title": "Valeria in the studio loft",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the easel in the dressing loft",
+      "beats": [
+        {
+          "id": "loft-lines",
+          "member": "valeria",
+          "app": "inkscape",
+          "service": "Adobe Illustrator",
+          "origin": "now"
+        },
+        {
+          "id": "loft-photos",
+          "member": "valeria",
+          "app": "mazanoke",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "loft-shop",
+          "member": "rafael",
+          "app": "wordpress",
+          "service": "Squarespace",
+          "origin": "now"
+        },
+        {
+          "id": "loft-hazel",
+          "member": "valeria",
+          "app": "ci-openclaw",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "loft-notes",
+          "member": "valeria",
+          "app": "obsidian",
+          "service": "Notion",
+          "origin": "now"
+        },
+        {
+          "id": "loft-sheet",
+          "member": "valeria",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "loft-commission",
+          "member": "valeria",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "loft-calibre-web",
+          "member": null,
+          "app": "calibre-web",
+          "service": "Kindle",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Decks and meadow",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-statement",
+          "member": "rafael",
+          "app": "libreoffice",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "garden-ride",
+          "member": "valeria",
+          "app": "wanderer",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-hermitstash",
+          "member": null,
+          "app": "hermitstash",
+          "service": "WeTransfer",
+          "origin": "add"
+        },
+        {
+          "id": "garden-spliit",
+          "member": null,
+          "app": "spliit",
+          "service": "Splitwise",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-pantry",
+      "line": "The olive oil reaches the list."
+    },
+    {
+      "at": "morning",
+      "beat": "nook-tag",
+      "line": "Rafael ships the invoice script."
+    },
+    {
+      "at": "midday",
+      "beat": "loft-lines",
+      "line": "Valeria redraws a sketch as clean lines."
+    },
+    {
+      "at": "afternoon",
+      "beat": "loft-sheet",
+      "line": "Valeria checks what to reprint."
+    },
+    {
+      "at": "afternoon",
+      "beat": "nook-invoice",
+      "line": "Rafael raises a client's invoice."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-timelapse",
+      "line": "A canvas replays in time-lapse."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-spliit",
+      "line": "The shared costs get settled."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "GitHub",
+      "Zapier",
+      "Adobe Acrobat",
+      "Google Home",
+      "Plex",
+      "AnyList",
+      "Adobe Illustrator",
+      "Squarespace",
+      "Notion",
+      "Microsoft Office"
+    ],
+    "servicesFinal": [
+      "GitHub",
+      "GitHub Copilot",
+      "Zapier",
+      "Adobe Acrobat",
+      "Spotify",
+      "Plex",
+      "AnyList",
+      "Tody",
+      "Adobe Illustrator",
+      "Squarespace",
+      "Notion",
+      "Microsoft Office",
+      "Airtable",
+      "DocuSign",
+      "Cursor",
+      "QuickBooks",
+      "Postman",
+      "LastPass",
+      "NextDNS",
+      "WeTransfer",
+      "Google Photos",
+      "Todoist",
+      "Splitwise",
+      "YNAB",
+      "Kindle"
+    ],
+    "count": 25
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "loft-commission",
+      "nook-model",
+      "garden-hermitstash",
+      "kitchen-teampass",
+      "nook-invoice",
+      "kitchen-chores"
+    ],
+    "mustCarry": {
+      "inkscape": [
+        "Runs as a remote-desktop style session in the browser, not a native window",
+        "Image tag is the Kasm image version, not the Inkscape version"
+      ],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "opencode": [
+        "[cloud-link] The Hub wires it to the Core's local model by default (hub_integration inference). The app can also connect to cloud providers with a key you add inside it; leave that off. A coding agent is private only on ",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. The agent edits files, so the beat shows the person approving the change (agents prepare, people approve).",
+        "[note] The web interface has no sign-in unless a server password is set at install. The older OpenCode Web listing is superseded; name only OpenCode.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "n8n": [
+        "[licence] Fair-code licence, not open source. Say \"source-available\"; do not say \"open source\".",
+        "[note] An n8n MCP entry exists for agents.",
+        "Fair-code licence: say source-available, never open source.",
+        "Public URL setting is for webhooks; leave off the scene.",
+        "Listing says full control over data: connectors to cloud services still pass data to them."
+      ],
+      "stirling-pdf": [
+        "QA screenshot is a sign-in wall that prints default credentials",
+        "already in the persona pool: share cap risk"
+      ],
+      "navidrome": [
+        "Description says \"from anywhere\" and \"works offline-first\": paraphrase, remote access is not claimed",
+        "Already in 11 of 30 stories: one short of the cap of 12; rotate music beats to mStream, Swing Music and Music Assistant"
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "grocy": [
+        "[note] The listing is short. Describe pantry stock, shopping lists, recipes and chores only.",
+        "Short listing: describe pantry stock, shopping lists, recipes, tasks and habits only (catalog)",
+        "Upstream demo screenshot shows a dollar total: prices on screen"
+      ],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "mazanoke": [
+        "The Core serves the page; images are processed and stay in the viewer's browser, not on the Core",
+        "Description says \"images never leave your device\": paraphrase"
+      ],
+      "wordpress": [
+        "[public-access] A public site needs your Core reachable from outside. Open it by its public URL, not the .localhost link.",
+        "A site nobody outside can open is not a site",
+        "Already in 2 families"
+      ],
+      "obsidian": [
+        "[licence] Obsidian is not open source. Do not call it open source.",
+        "[note] An Obsidian MCP entry exists so an agent can read and write the vault.",
+        "not open source (catalog: never say so)",
+        "listing says private and offline: do not repeat",
+        "notes are files on the Core, the app is streamed"
+      ],
+      "libreoffice": [
+        "[note] The listing is generic. Name the suite, not specific features.",
+        "[note] ONLYOFFICE Desktop Editors does the same job: one suite per household."
+      ],
+      "wanderer": [],
+      "grist": [],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "invoice-ninja": [
+        "[cloud-link] Taking card payments needs a payment provider. Say invoicing, not payment processing.",
+        "marketplace: Elastic License 2.0 (source-available)."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "teampass": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Listing claims secrets never leave the appliance (banned word, banned claim)",
+        "Per-person roles sit close to the cap-multi-user rule: phrase it as the app's folders and permissions",
+        "No QA screenshot"
+      ],
+      "adguardhome": [
+        "[note] Overlaps Pi-hole; pick one per story.",
+        "[claims] Same as Pi-hole: no parental-control promise.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Overlaps Pi-hole: one per household",
+        "Listing mentions adult-content parental controls: never repeat it (sec-safety-people)"
+      ],
+      "hermitstash": [
+        "Listing claims post-quantum encryption and that every field is encrypted: do not repeat (sec-absolute)",
+        "Dark-theme UI",
+        "Public Drop page lets visitors upload without an account"
+      ],
+      "photoprism": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "jotty": [
+        "Public share links need outside reach",
+        "Everything is Markdown and JSON files, no database"
+      ],
+      "spliit": [],
+      "monetr": [
+        "[claims] No financial advice.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024.",
+        "marketplace: Licence is the Functional Source License (not open source)."
+      ],
+      "calibre-web": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "marketplace: An upstream default admin sign-in exists (not repeated here); no QA capture."
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "hermitstash",
+      "display": "HermitStash",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "WeTransfer",
+        "Dropbox"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 2",
+      "caveats": [
+        "Listing claims post-quantum encryption and that every field is encrypted: do not repeat (sec-absolute)",
+        "Dark-theme UI",
+        "Public Drop page lets visitors upload without an account"
+      ],
+      "evidence": "CI-Marketplace apps/hermitstash/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "opencode",
+      "beats": [
+        "nook-model"
+      ]
+    },
+    {
+      "app": "code-server",
+      "beats": [
+        "nook-editor"
+      ]
+    },
+    {
+      "app": "teampass",
+      "beats": [
+        "kitchen-teampass"
+      ]
+    },
+    {
+      "app": "adguardhome",
+      "beats": [
+        "living-adguardhome"
+      ]
+    },
+    {
+      "app": "calibre-web",
+      "beats": [
+        "loft-calibre-web"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}
