@@ -27,7 +27,7 @@ import { FILM, filmClock, silentStory, sceneAt, audioPlacements, captionCues, ch
 import { TYPE, FLOOR, DISC_D, caps } from '../assets/story/film/cards.js';
 import { inter, CANVAS_TYPE_MIN } from '../assets/story/place.js';
 import { mixTimeline, floatWav, normaliseChain, encodeArgs, buildAudio, measure, TARGET, CLIP_RATE } from './film/mux.mts';
-import { filmsProblems, sizeGuard, WEB_MAX_BYTES, webFileName, sideName, posterFileName, vttFileName, filmText, loadClaims, namesAgentRuntime, FILM_FILE_RE, loadFamily, hasVoiceLock, inputsShaOf, captionProblems, READ_CPS, type FilmsFile } from './film/lib.mts';
+import { filmsProblems, sizeGuard, WEB_MAX_BYTES, webFileName, sideName, posterFileName, vttFileName, filmText, loadClaims, namesAgentRuntime, FILM_FILE_RE, loadFamily, hasVoiceLock, inputsShaOf, captionProblems, READ_CPS, toolSha, sha256, entryRes, entryIsCurrent, filmDisclosureIds, FILM_DISCLOSURES, FILM_LIGHTINGS, FILM_LIGHTING, isFilmLighting, type FilmsFile, type FilmEntry, type Family } from './film/lib.mts';
 import { gate } from './film/qa.mts';
 import { estimateMs } from '../assets/story/runtime.js';
 import shipFilms from './story/ship/films.mts';
@@ -535,9 +535,10 @@ test('silent: a family with a bake lock and no voice lock loads as a silent film
     assert.equal(hasVoiceLock('brennan'), true);
     const again = await loadFamily('brennan', { silent: true });
     assert.equal(again.voice, null); assert.equal(again.shas.voice, '');
-    assert.equal(inputsShaOf(fam, 1080, 'tool'), inputsShaOf(again, 1080, 'tool'));
-    assert.notEqual(inputsShaOf(fam, 1080, 'tool'), inputsShaOf({ ...fam, silent: false }, 1080, 'tool'), 'silent and voiced are never the same film');
-    assert.notEqual(inputsShaOf(fam, 1080, 'tool'), inputsShaOf(fam, 540, 'tool'));
+    assert.equal(inputsShaOf(fam, 1080, { tool: 'tool' }), inputsShaOf(again, 1080, { tool: 'tool' }));
+    assert.notEqual(inputsShaOf(fam, 1080, { tool: 'tool' }), inputsShaOf({ ...fam, silent: false }, 1080, { tool: 'tool' }), 'silent and voiced are never the same film');
+    assert.notEqual(inputsShaOf(fam, 1080, { tool: 'tool' }), inputsShaOf(fam, 540, { tool: 'tool' }));
+    assert.notEqual(inputsShaOf(fam, 1080, { tool: 'tool' }), inputsShaOf(fam, 1080, { tool: 'tool', lighting: 'golden' }), 'a film lit at another hour is another film');
     await assert.rejects(loadFamily('brennan'), /estimated durations/, 'with a voice lock but an estimated bake a voiced film still refuses');
   } finally {
     if (prev === undefined) delete process.env.CI_STORY_FAMILIES_DIR; else process.env.CI_STORY_FAMILIES_DIR = prev;
@@ -563,7 +564,11 @@ test('silent: the ship step links a silent film like any other, and sees it as s
     const src = path.resolve(import.meta.dirname, '..', 'content', 'families');
     if (fs.existsSync(path.join(src, 'brennan.bake.json')) && JSON.parse(fs.readFileSync(path.join(src, 'brennan.bake.json'), 'utf8')).durations === 'estimated') {
       for (const f of ['brennan.json', 'brennan.bake.json']) fs.copyFileSync(path.join(src, f), path.join(dir, f));
-      const fresh = inputsShaOf(await loadFamily('brennan', { silent: true }), 1080), cur = JSON.parse(fs.readFileSync(path.join(dir, 'films.json'), 'utf8'));
+      // the pin as the renderer writes it, spelled out here and not taken from the function under test: the story, voice and bake hashes, the code and the disclosures this film prints, the hour it is lit at, the size, the silent marker.
+      // (The old ship check hashed the code with no lighting and so could never agree with a film `story:film` had made: "older than its story" for every film once FILM_BASE_URL was set.)
+      const fam = await loadFamily('brennan', { silent: true });
+      const fresh = sha256(JSON.stringify([fam.shas.story, fam.shas.voice, fam.shas.bake, `${toolSha(undefined, filmDisclosureIds(fam.rs, fam.silent))}|lighting=day`, 1080, 'silent'])), cur = JSON.parse(fs.readFileSync(path.join(dir, 'films.json'), 'utf8'));
+      assert.equal(inputsShaOf(fam, 1080), fresh, 'the shared pin is the renderer\'s recipe, to the byte');
       const said: string[] = [], log = console.log; console.log = (...a: any[]) => { said.push(a.join(' ')); };
       const ship = () => shipFilms({ addHashed: (s2, d) => `${d}/${path.basename(s2)}`, register: () => {}, registerFilm: () => {}, problem: () => {}, stories: [{ slug: 'brennan' }] });
       try {
@@ -571,6 +576,11 @@ test('silent: the ship step links a silent film like any other, and sees it as s
         assert.ok(!said.some(m => /cannot check freshness/.test(m)), 'a silent film is loadable by the ship step (no voice lock needed)');
         said.length = 0; cur.families.brennan.inputsSha = fresh; fs.writeFileSync(path.join(dir, 'films.json'), JSON.stringify(cur));
         await ship(); assert.ok(!said.some(m => /older than its story|cannot check/.test(m)), `a film made from these inputs is current: ${said.join(' | ')}`);
+        // a film lit at the other permitted hour is the film of this story as well (the entry does not say which it was lit at); a film of another size or one cut from other inputs is not
+        said.length = 0; cur.families.brennan.inputsSha = inputsShaOf(fam, 1080, { lighting: 'golden' }); fs.writeFileSync(path.join(dir, 'films.json'), JSON.stringify(cur));
+        await ship(); assert.ok(!said.some(m => /older than its story|cannot check/.test(m)), `a golden-lit film is current: ${said.join(' | ')}`);
+        said.length = 0; cur.families.brennan.inputsSha = inputsShaOf(fam, 540); fs.writeFileSync(path.join(dir, 'films.json'), JSON.stringify(cur));
+        await ship(); assert.ok(said.some(m => /older than its story/.test(m)), 'a 540 p film is not the 1080 p entry');
       } finally { console.log = log; }
     }
     // an entry that breaks the silent rules is reported by the ship step, as a voiced one is
@@ -583,6 +593,99 @@ test('silent: the ship step links a silent film like any other, and sees it as s
     if (prevBase === undefined) delete process.env.FILM_BASE_URL; else process.env.FILM_BASE_URL = prevBase;
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// ---- the pin: films.json's inputsSha -------------------------------------------------------------------------------------------------------------------------
+// One definition (inputsShaOf in scripts/film/lib.mts), used by the renderer and by the ship step. The pin hashes the code and the text of the claims.json disclosures the film
+// prints, and nothing else of claims.json: PR 37 edited the lander's `rent-line` entry (source, status, note), which no film shows, and the pins went stale for no new frame.
+const withClaims = (edit: (c: any) => void) => { const c: any = JSON.parse(JSON.stringify(loadClaims())); edit(c); return c; };
+const byId = (o: any, id: string): any => {
+  if (Array.isArray(o)) { for (const x of o) { const hit = byId(x, id); if (hit) return hit; } return null; }
+  if (o && typeof o === 'object') { if (o.id === id) return o; for (const v of Object.values(o)) { const hit = byId(v, id); if (hit) return hit; } }
+  return null;
+};
+const withAgent = (rs: RuntimeStory): RuntimeStory => ({ ...rs, beats: rs.beats.map(b => (b.id === 'b2' ? { ...b, agent: 'mika' } : b)) } as any);
+/** a family as `loadFamily` returns it, without the disk: the pin reads only these fields */
+const pinFamily = (silent: boolean, rs: RuntimeStory): Family => ({ slug: 'test-family', story: {} as any, voice: null, bake: {} as any, rs, silent, shas: { story: 's'.repeat(64), voice: silent ? '' : 'v'.repeat(64), bake: 'b'.repeat(64) } });
+
+test('the pin: toolSha ignores every claim the film does not print, and follows every disclosure it does', () => {
+  const claims: any = loadClaims(), base = toolSha();
+  assert.match(base, /^[0-9a-f]{64}$/); assert.equal(toolSha(), base); assert.equal(toolSha(claims), base);
+  // the claim PR 37 edited: the lander's rent-line, in every field (its source, status and note, and even its words)
+  const rent = withClaims(c => { const r = byId(c, 'rent-line'); assert.ok(r, 'claims.json has the rent-line claim'); r.source = 'Owner approval, 1999-01-01'; r.status = 'hold'; r.note = 'a different note'; r.text = 'Another line.'; });
+  assert.notDeepEqual(rent, claims); assert.equal(toolSha(rent), base, 'a change to rent-line is not a change to a frame');
+  // nothing outside the disclosures counts: not the style sheet (the sign-off and the caption limits are constants in the code), not the apps, the allowed claims, the version
+  for (const key of Object.keys(claims).filter(k => k !== 'disclosures')) assert.equal(toolSha(withClaims(c => { c[key] = JSON.stringify(c[key]) + ' changed'; })), base, `claims.json "${key}" is not printed by a film`);
+  assert.equal(toolSha(withClaims(c => { c.disclosures.reverse(); })), base, 'the pin looks a disclosure up by id, so the order of the file is not part of it');
+  const printed = new Set<string>(Object.values(FILM_DISCLOSURES));
+  assert.equal(printed.size, 6);
+  for (const d of claims.disclosures) {
+    const meta = withClaims(c => { const x = byId(c.disclosures, d.id); x.source = 'changed'; x.status = 'changed'; x.note = 'changed'; x.tag = 'changed'; });
+    assert.equal(toolSha(meta), base, `${d.id}: a disclosure's source, status and note are not printed`);
+    const text = withClaims(c => { byId(c.disclosures, d.id).text += ' (changed)'; });
+    if (printed.has(d.id)) assert.notEqual(toolSha(text), base, `${d.id} is printed by a film: a change to its words makes a film stale`);
+    else assert.equal(toolSha(text), base, `${d.id} is not printed by any film`);
+  }
+  for (const id of printed) assert.ok(claims.disclosures.some((d: any) => d.id === id), `claims.json has the disclosure "${id}" the film prints`);
+  // a disclosure the film prints that claims.json lost is a change too (filmText would throw), not a silent pin
+  assert.notEqual(toolSha(withClaims(c => { c.disclosures = c.disclosures.filter((d: any) => d.id !== 'stylised-art'); })), base);
+});
+
+test('the pin: it hashes exactly the disclosures filmText reads, for a voiced, a silent and an agent-naming film', () => {
+  const claims: any = loadClaims(), sil = silentStory(estimatedFamily());
+  const variants: Array<[string, RuntimeStory, boolean]> = [['voiced', family(), false], ['silent', sil, true], ['voiced, naming an agent', withAgent(family()), false], ['silent, naming an agent', withAgent(sil), true]];
+  for (const [what, rs, silent] of variants) {
+    const text = JSON.stringify(filmText(rs, claims, { silent })), ids = filmDisclosureIds(rs, silent), fam = pinFamily(silent, rs), pin = inputsShaOf(fam, 1080);
+    assert.deepEqual(ids.slice(0, 1), [FILM_DISCLOSURES.fictional]);
+    assert.equal(ids.includes(FILM_DISCLOSURES.voice), !silent, `${what}: the voice line is printed only under a film with sound`);
+    assert.equal(ids.includes(FILM_DISCLOSURES.agents), what.includes('agent'), `${what}: the attribution line is printed only when a beat names Hermes or OpenClaw`);
+    for (const d of claims.disclosures) {
+      const changed = withClaims(c => { byId(c.disclosures, d.id).text += ' (changed)'; });
+      const prints = JSON.stringify(filmText(rs, changed, { silent })) !== text;
+      assert.equal(ids.includes(d.id), prints, `${what}: ${d.id} ${prints ? 'is printed but the pin does not hash it (add it to FILM_DISCLOSURES and filmLineIds)' : 'is hashed by the pin but not printed'}`);
+      assert.equal(inputsShaOf(fam, 1080, { claims: changed }) !== pin, prints, `${what}: ${d.id}: the pin follows what the film prints, no more and no less`);
+    }
+  }
+});
+
+test('the pin: the renderer and the ship step share one definition, and an entry is current for either permitted lighting, at its own size', () => {
+  // the renderer is a command with no exports: hold its source to the shared definition (it writes `inputsShaOf(fam, RES, { lighting })` and keeps no recipe of its own)
+  const src = fs.readFileSync(path.resolve(import.meta.dirname, 'render-family-film.mts'), 'utf8');
+  assert.match(src, /inputsShaOf\(fam, RES, \{ lighting: LIGHTING \}\)/); assert.ok(!/toolSha/.test(src) && !/\|lighting=/.test(src), 'the renderer builds no pin of its own');
+  assert.match(src, /process\.env\.FILM_LIGHTING \|\| FILM_LIGHTING/); assert.match(src, /isFilmLighting\(LIGHTING_ASKED\)/);
+  const ship = fs.readFileSync(path.resolve(import.meta.dirname, 'story', 'ship', 'films.mts'), 'utf8');
+  assert.match(ship, /entryIsCurrent\(fam, e\)/); assert.ok(!/inputsShaOf|toolSha/.test(ship), 'the ship step builds no pin of its own');
+  assert.deepEqual([...FILM_LIGHTINGS], ['day', 'golden']); assert.equal(FILM_LIGHTING, 'day'); assert.ok(isFilmLighting('golden') && !isFilmLighting('dusk') && !isFilmLighting('night'));
+  // the entry's size: the height of the 16:9 film, else the width of the 9:16 film
+  const entry = (aspects: any, inputsSha: string): FilmEntry => ({ sound: false, durationMs: 1000, inputsSha, vtt: 'film/captions.0011223344.vtt', aspects });
+  const a169 = aspect('test-family', '16x9'), a916 = aspect('test-family', '9x16');
+  assert.equal(entryRes(entry({ '16x9': a169, '9x16': a916 }, 'x')), 1080); assert.equal(entryRes(entry({ '9x16': a916 }, 'x')), 1080);
+  assert.equal(entryRes(entry({ '16x9': { ...a169, width: 1280, height: 720 } }, 'x')), 720); assert.equal(entryRes(entry({}, 'x')), 1080);
+  const fam = pinFamily(true, silentStory(estimatedFamily()));
+  const day = inputsShaOf(fam, 1080, { lighting: 'day' }), golden = inputsShaOf(fam, 1080, { lighting: 'golden' });
+  assert.notEqual(day, golden); assert.equal(inputsShaOf(fam, 1080), day, 'day is the default');
+  const both = { '16x9': a169, '9x16': a916 };
+  assert.ok(entryIsCurrent(fam, entry(both, day))); assert.ok(entryIsCurrent(fam, entry(both, golden)));
+  assert.ok(entryIsCurrent(fam, entry({ '9x16': a916 }, day)), 'a portrait-only entry is judged at its own size');
+  assert.ok(!entryIsCurrent(fam, entry(both, inputsShaOf(fam, 540))), 'a pin made at another size is not the entry\'s');
+  assert.ok(!entryIsCurrent(fam, entry(both, 'f'.repeat(64))));
+  assert.ok(!entryIsCurrent({ ...fam, shas: { ...fam.shas, story: 'z'.repeat(64) } }, entry(both, day)), 'a changed story is stale');
+  assert.ok(!entryIsCurrent({ ...fam, shas: { ...fam.shas, bake: 'z'.repeat(64) } }, entry(both, day)), 'a changed bake is stale');
+  // a printed disclosure changes the verdict, one the film does not print (and the lander's rent-line) does not
+  const claimsOf = (id: string) => withClaims(c => { byId(c, id).text += ' (changed)'; });
+  assert.ok(!entryIsCurrent(fam, entry(both, day), claimsOf('beta-short')), 'the beta line is on the end card');
+  assert.ok(entryIsCurrent(fam, entry(both, day), claimsOf('synthetic-voice')), 'a silent film prints no voice line');
+  const voiced = { ...fam, silent: false, shas: { ...fam.shas, voice: 'v'.repeat(64) } }, voicedPin = inputsShaOf(voiced, 1080);
+  assert.ok(entryIsCurrent(voiced, entry(both, voicedPin)));
+  assert.ok(!entryIsCurrent(voiced, entry(both, voicedPin), claimsOf('synthetic-voice')), 'a film with sound does print it');
+  assert.ok(entryIsCurrent(fam, entry(both, day), claimsOf('rent-line')) && entryIsCurrent(fam, entry(both, day), claimsOf('site-practises')));
+});
+
+test('the pin: the ad cuts\' toolSha is code only (their end card\'s claims are in each cut\'s own hash), so it has no claim to narrow', async () => {
+  const ads = await import('./film/ads-lib.mts');
+  assert.ok(!/claims/.test(ads.toolSha.toString()), 'ads-lib toolSha reads no claims.json');
+  assert.match(ads.toolSha(), /^[0-9a-f]{64}$/); assert.equal(ads.toolSha(), ads.toolSha());
+  assert.notEqual(ads.toolSha(), toolSha(), 'two tools, two code lists: the ad cuts\' hash is not the film\'s');
 });
 
 test('the GPU path: --gl is the cut renderer\'s choice, default on Linux, never Vulkan', async () => {
