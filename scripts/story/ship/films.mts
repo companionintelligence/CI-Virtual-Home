@@ -14,7 +14,7 @@
 // Coded against the part of ShipCtx it uses (scripts/story/hooks.ts), structurally, like scripts/story/ship/audio.mts.
 import fs from 'node:fs';
 import path from 'node:path';
-import { familiesDir, readFilms, filmsProblems, loadFamily, inputsShaOf, FILM_BASE_URL_ENV } from '../../film/lib.mts';
+import { familiesDir, readFilms, filmsProblems, loadFamily, entryIsCurrent, FILM_BASE_URL_ENV } from '../../film/lib.mts';
 
 export interface FilmShipCtx {
   addHashed(srcAbs: string, dstDir: string): string;
@@ -52,7 +52,7 @@ export default async function shipFilms(ctx: FilmShipCtx): Promise<void> {
     // is the film still the film of this story? Warn, do not fail: the film is hosted elsewhere and a copy edit should not stop a site build
     try {
       const fam = await loadFamily(slug, { silent: e.sound === false });     // (a silent film is compared with its own inputs: the bake lock, no voice)
-      if (inputsShaOf(fam, a169 ? a169.height : 1080) !== e.inputsSha) console.log(`films: ${slug}: the film is older than its story, voice, bake or the film code (pnpm run story:film -- ${slug})`);
+      if (!entryIsCurrent(fam, e)) console.log(`films: ${slug}: the film is older than its story, voice, bake or the film code (pnpm run story:film -- ${slug})`);
     } catch (err: any) { console.log(`films: ${slug}: cannot check freshness: ${err.message}`); }
     if (a169) ctx.register(slug, 'film.src169', `${base}/${a169.file}`);
     if (e.aspects['9x16']) ctx.register(slug, 'film.src916', `${base}/${e.aspects['9x16']!.file}`);

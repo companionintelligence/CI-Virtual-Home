@@ -150,8 +150,11 @@ Outputs:
 | `content/families/<slug>/film/captions.<hash10>.vtt` | WebVTT, one file for both shapes | yes |
 | `content/families/films.json` | per family: `sound`, duration, `inputsSha`, the vtt, and per aspect the file name, sha256, bytes, size, duration, poster, loudness (none for a silent film) | yes |
 
-`films.json` keeps no timestamps and no absolute paths. `inputsSha` hashes the story, voice lock and bake lock files, the film code and `claims.json`, and the frame size: a changed
-input makes the film stale, and `story:film` renders only the stale ones (`--force` renders anyway). The site build warns when a film is older than its story.
+`films.json` keeps no timestamps and no absolute paths. `inputsSha` (the pin) hashes the story, voice lock and bake lock files, the film code, the text of the `claims.json` disclosures this film prints
+(`filmDisclosureIds`: the fictional line, the end card's lines; the synthetic-voice line only in a film with sound, the attribution line only in a film that names Hermes or OpenClaw), the lighting and the frame size: a changed
+input makes the film stale, and `story:film` renders only the stale ones (`--force` renders anyway). Nothing else of `claims.json` is in it (the lander's `rent-line`, a disclosure's source, status or note, a disclosure only the site prints),
+because none of it can change a frame. The pin has ONE definition, `inputsShaOf` in `scripts/film/lib.mts`: the renderer writes it and the site build's freshness check (`entryIsCurrent`, which accepts either permitted lighting, since an entry
+does not record which it was lit at) reads it, so the build warns "older than its story" only when a film really is. `scripts/test-film.mts` holds both to it, and fails when `filmText` reads a disclosure the pin does not hash.
 
 ## The sound
 
