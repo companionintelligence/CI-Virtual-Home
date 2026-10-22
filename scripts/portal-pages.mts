@@ -130,8 +130,8 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 // the header and footer of the pages in homes/, which sit one level down (../ reaches the site's root)
 const header = (): string => `<header class="site-head">
     <div class="brand">
-      <a class="brand-ci" href="${LINKS.site}" aria-label="${SITE_NAME}"><img src="../assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><span>${SITE_NAME}</span></a>
-      <span class="brand-sep" aria-hidden="true">/</span>
+      <a class="brand-ci" href="${LINKS.site}" aria-label="${SITE_NAME}"><picture><source srcset="../assets/brand/ci-logo-white-banner.svg" media="(prefers-color-scheme: dark)"><img class="brand-logo" src="../assets/brand/ci-logo-black-banner.svg" alt="" width="151" height="48"></picture></a>
+      <span class="brand-sep" aria-hidden="true"></span>
       <a class="brand-title" href="../" data-campaign>Virtual homes</a>
     </div>
     <nav class="site-nav" aria-label="Site">
@@ -289,21 +289,28 @@ export function notFoundPage(site: string, word: string): string {
   <!-- served at any depth, so the script is the site's own absolute address (portal:build adds ?v=<hash>): an ad's tags ride on the links to ci.computer -->
   <script src="${esc(new URL('portal/campaign.js', site).href)}" defer data-cfasync="false"></script>
   <style>
-    :root { color-scheme: light dark; --bg: #f3faf7; --fg: #0a222e; --muted: #3a524b; --primary: #0a6358; --on-primary: #f0fdf4; --line: rgba(10, 34, 46, 0.14); }
-    @media (prefers-color-scheme: dark) { :root { --bg: #041620; --fg: #e8f2f4; --muted: #a3babf; --primary: #c5e8dc; --on-primary: #041620; --line: rgba(232, 242, 244, 0.18); } }
+    /* the site's rules (portal/site.css; the token names are @companionintelligence/tokens'): Manrope, the ring colours for links, a flat 3px primary button, a hairline ghost */
+    @font-face { font-family: "PG Manrope"; src: url("${esc(new URL('assets/fonts/manrope-latin-var.woff2', site).href)}") format("woff2"); font-weight: 200 800; font-display: swap; }
+    :root { color-scheme: light dark; --bg: #f3faf7; --fg: #0a222e; --muted: #3a524b; --mark-deep: #066c80; --mark-light: #72ddd4; --link: var(--mark-deep); --button-primary: var(--mark-deep); --button-primary-foreground: #ffffff; --button-primary-hover: color-mix(in srgb, var(--mark-deep) 84%, white); --hairline: color-mix(in srgb, #0a222e 12%, transparent); --button-ghost-border: color-mix(in srgb, #0a222e 30%, transparent); --button-ghost-hover: color-mix(in srgb, #0a222e 5%, transparent); --radius-control: 3px; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #041620; --fg: #e8f2f4; --muted: #a3babf; --link: var(--mark-light); --hairline: color-mix(in srgb, #e8f2f4 12%, transparent); --button-ghost-border: color-mix(in srgb, #e8f2f4 30%, transparent); --button-ghost-hover: color-mix(in srgb, #e8f2f4 5%, transparent); } }
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; box-sizing: border-box; background: var(--bg); color: var(--fg);
-      font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+      font: 17px/1.6 "PG Manrope", "Manrope", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     main { display: grid; gap: 12px; justify-items: center; max-width: 42em; text-align: center; }
-    h1 { margin: 0; font-size: 28px; }
-    p { margin: 0; color: var(--muted); }
-    a { color: var(--primary); font-weight: 600; text-underline-offset: 3px; }
+    h1 { margin: 0; font-size: clamp(32px, 3.5vw + 10px, 60px); font-weight: 500; letter-spacing: -0.025em; line-height: 1.04; }
+    p { margin: 0; color: var(--muted); font-size: 19px; line-height: 1.5; }
+    a { color: var(--link); font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+    a:hover { color: var(--fg); }
     .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
-    .btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 999px; text-decoration: none; font-weight: 700;
-      background: var(--primary); color: var(--on-primary); }
-    .btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
+    .btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; border: 1px solid transparent; border-radius: var(--radius-control); text-decoration: none; font-weight: 500; font-size: 16px;
+      background: var(--button-primary); color: var(--button-primary-foreground); }
+    .btn:hover { background: var(--button-primary-hover); color: var(--button-primary-foreground); }
+    .btn.ghost { background: transparent; color: var(--fg); border-color: var(--button-ghost-border); }
+    .btn.ghost:hover { background: var(--button-ghost-hover); border-color: var(--fg); color: var(--fg); }
     .more { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin-top: 8px; font-size: 14px; }
-    .fine { margin-top: 12px; font-size: 13px; max-width: 36em; }
-    a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 6px; }
+    .more a { color: var(--muted); text-decoration: none; }
+    .more a:hover { color: var(--fg); text-decoration: underline; }
+    .fine { margin-top: 12px; font-size: 13px; line-height: 1.45; max-width: 36em; }
+    a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: var(--radius-control); }
   </style>
 </head>
 <body>

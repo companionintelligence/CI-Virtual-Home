@@ -88,7 +88,7 @@ External tools the scripts call but this repository does not include: **ffmpeg**
 
 Four sections follow: what the family pages ship, what the voice-over tool builds with, what the films are built with, and
 what was considered and refused. In short: the site loads nothing from a third party at run time; the player adds no dependency; the only
-third-party **material** the site ships is Archivo Black (OFL-1.1), the generated audio and, in the app media below, the apps' own logos and real screenshots of them; Kokoro-82M, espeak-ng and FFmpeg are build-time
+third-party **material** the site ships is the generated audio and, in the app media below, the apps' own logos and real screenshots of them; Kokoro-82M, espeak-ng and FFmpeg are build-time
 tools whose **output** ships. Voice-over is generated locally; no cloud text-to-speech service or API key is used anywhere. Open
 questions for counsel are listed in the voice and film sections.
 
@@ -99,7 +99,7 @@ loaded from a third party at run time: the site makes no third-party request.
 
 | Component | Version | Licence | Where | Licence text |
 |---|---|---|---|---|
-| [Archivo Black](https://github.com/Omnibus-Type/ArchivoBlack) — Latin subset, via CI-Common `styles/fonts/files/archivo-black-latin.woff2` (the canon's display face: a family page's headline, kickers and big numerals only) | as in CI-Common | OFL-1.1 — © 2017 The Archivo Black Project Authors | [`portal/fonts/archivo-black.woff2`](portal/fonts/archivo-black.woff2); shipped as `portal/fonts/archivo-black.<hash10>.woff2` | [`portal/fonts/LICENSE-Archivo-Black.txt`](portal/fonts/LICENSE-Archivo-Black.txt) (shipped as `portal/LICENSE-Archivo-Black.txt`) |
+| [Archivo Black](https://github.com/Omnibus-Type/ArchivoBlack) — Latin subset, via CI-Common `styles/fonts/files/archivo-black-latin.woff2` (the families' link-preview images only, drawn by `scripts/story/build-og.mts`; the pages themselves are set in Manrope since the October 2026 restyle) | as in CI-Common | OFL-1.1 — © 2017 The Archivo Black Project Authors | [`portal/fonts/archivo-black.woff2`](portal/fonts/archivo-black.woff2); not shipped | [`portal/fonts/LICENSE-Archivo-Black.txt`](portal/fonts/LICENSE-Archivo-Black.txt) |
 | Manrope and Lucide icon path data (a few more symbols: menu, sliders, film, search) | as in the table above | OFL-1.1 · ISC | `assets/fonts/`, inlined in `scripts/story/pages.mts` | as above |
 | The first-run drawings and the monogram discs | first-party | — | `scripts/story/pages.mts` (inline SVG) | — |
 
