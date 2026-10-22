@@ -87,11 +87,15 @@ export function errorRules(claims: any): RegExp[] {
 
 // ---------------------------------------------------------------------------------------------------- chrome (the page sits in family/, so ../ is the site's root)
 const rel = '../';
-/** The site's header: the chrome keeps the site's labels on every page (Buy Companion Core, Download Companion); the story's own "See Companion Core" is the hero's and the close's. */
+/** The site's header: the logo lockup (the main site's link), "Virtual homes" (this site's top) and the page links; the chrome keeps the site's labels on every page (Buy Companion Core, Download Companion); the story's own "See Companion Core" is the hero's and the close's. */
 export function header(): string {
   return `<a class="skip" href="#main">Skip to the family</a>
   <header class="site-head">
-    <a class="brand" href="${rel}" aria-label="Virtual homes, ${SITE_NAME}"><img src="${rel}assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><span class="brand-text"><b>Virtual homes</b><span>${SITE_NAME}</span></span></a>
+    <div class="brand">
+      <a class="brand-ci" href="${LINKS.site}" aria-label="${SITE_NAME}"><picture><source srcset="${rel}assets/brand/ci-logo-white-banner.svg" media="(prefers-color-scheme: dark)"><img class="brand-logo" src="${rel}assets/brand/ci-logo-black-banner.svg" alt="" width="151" height="48"></picture></a>
+      <span class="brand-sep" aria-hidden="true"></span>
+      <a class="brand-title" href="${rel}">Virtual homes</a>
+    </div>
     <nav class="site-nav" aria-label="Site" id="site-nav">
       <a href="${rel}#homes">Homes</a>
       <a href="${LINKS.docs}">Docs</a>

@@ -1,12 +1,19 @@
 /* ---------------------------------------------------------------------------------------------------------------
  * The site's shared styles: tokens, base, the header, the fiction bar, buttons, chips, monogram discs and the footer.
- * portal/gallery.css (the landing) and portal/family.css (a family page) sit on top of it.
+ * portal/family.css (a family page) sits on top of it; the front page and the homes' pages have their own copy of
+ * these rules in portal/gallery.css.
  *
- * Colours are the CI design canon's semantic set, mirrored from @companionintelligence/tokens tokens.css (CI-Common
- * styles/tokens/src/) because this site is served standalone with no package to import them from: re-copy them from
- * there, never edit a value here. Light is :root, dark follows the system. Page-local values carry the --pg-* prefix.
- * The page is daylight: primary phthalo (sage on the dark set), flat surfaces, no heat, no glow. The ad rules bind it (CI-Common ADS.md section 9).
- * Type: Manrope 400 to 700 for everything; Archivo Black only for the oversized numerals of the first-run steps (canon).
+ * October 2026 restyle: the site follows the same rules as ci.computer and docs.ci.computer (CI-Public-Website
+ * apps/site/app/theme.css, CI-Docs src/app/globals.css). Manrope for every role on a 60 / 36 / 19 / 17 / 13 scale,
+ * flat buttons on a 3px radius, cards on 5px with a hairline border and their pictures on 3px, text links in the
+ * logo's ring colours, a 12-column grid with 24px gutters and one-column page margins, no glass, blur, gradients
+ * or shadows. Both colourways stay: the grounds, panels and ink below are the CI design canon's semantic set,
+ * mirrored from @companionintelligence/tokens tokens.css (CI-Common styles/tokens/src/) because this site is
+ * served standalone with no package to import them from: re-copy them from there, never edit a value here. Light
+ * is :root, dark follows the system. The restyle's own roles (the mark's ring colours, links, labels, buttons, radii,
+ * the type scale and the grid) are mirrored the same way from the tokens of CI-Common PR #413, under the package's own
+ * names (--mark-deep, --link, --button-primary, --radius-card, --type-display, --grid-margin …). Page-local values carry
+ * the --pg-* prefix.
  * ------------------------------------------------------------------------------------------------------------- */
 
 @font-face {
@@ -15,21 +22,12 @@
   font-weight: 200 800;
   font-display: swap;
 }
-/* build-time: scripts/story/site.mts writes the content-hashed file name over this one */
-@font-face {
-  font-family: "PG Archivo Black";
-  src: url("fonts/archivo-black.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
 
 :root {
   color-scheme: light;
-  --radius: 0.625rem;
-  --font-letter-spacing: 0.2pt;
-  --font-word-spacing: 0.4pt;
+  --font-letter-spacing: 0;
+  --font-word-spacing: 0;
   --font-sans: "PG Manrope", "Manrope", system-ui, sans-serif;
-  --font-display: "PG Archivo Black", "PG Manrope", "Manrope", system-ui, sans-serif;
   /* canon: semantic set, light */
   --background: #f3faf7;
   --foreground: #0a222e;
@@ -41,30 +39,75 @@
   --muted-foreground: #3a524b;
   --accent: #edf6f0;
   --border: #dfece6;
-  --ring: #0a6358;
-  --heat: #ff3f00;
-  --phthalo-hover: #0d7a6e;
+  --ring: #066c80;
   --chart-1: #0a6358;
   --chart-2: #00a9a7;
   --chart-3: #066c80;
   --chart-4: #ffb900;
-  --chart-5: #066c80;                                  /* (canon: heat; a disc never wears the one heat of the page) */
+  --chart-5: #066c80;                                  /* (canon: heat; a disc never wears a heat colour) */
   --disc-fg-1: #f0fdf4; --disc-fg-2: #041620; --disc-fg-3: #f0fdf4; --disc-fg-4: #041620; --disc-fg-5: #f0fdf4;
-  --shadow-sm: 0 1px 2px rgba(4, 22, 32, 0.04), 0 4px 12px -4px rgba(10, 99, 88, 0.05);
-  --shadow-md: 0 1px 3px rgba(4, 22, 32, 0.05), 0 6px 18px -6px rgba(10, 99, 88, 0.07);
-  --shadow-lg: 0 2px 4px rgba(4, 22, 32, 0.05), 0 10px 24px -8px rgba(10, 99, 88, 0.08);
-  --gradient-aurora: radial-gradient(1200px circle at 50% -20%, rgba(232, 242, 236, 0.65), transparent 52%),
-    radial-gradient(900px circle at 80% 0%, rgba(10, 99, 88, 0.04), transparent 45%);
+  /* ---- the October 2026 restyle's roles, mirrored from @companionintelligence/tokens tokens.css (CI-Common PR #413, styles/tokens/src/tokens.json): the names and values are the package's; re-copy them from there, never edit a value here ---- */
+  --font-heading: var(--font-sans);
+  /* Logo mark ring colours, outer to inner (mode-independent) — links, labels and the primary fill */
+  --mark-deep: #066c80;
+  --mark-mid: #00a9a7;
+  --mark-light: #72ddd4;
+  /* Accent call to action (mode-independent) — one per view, weight 600 */
+  --cta: #069b5b;
+  --cta-foreground: #ffffff;
+  --cta-hover: #05824c;
+  /* Primary button (mode-independent): flat fill, no gradient / shadow / transform */
+  --button-primary: var(--mark-deep);
+  --button-primary-foreground: #ffffff;
+  --button-primary-hover: color-mix(in srgb, var(--mark-deep) 84%, white);
+  --radius-control: 3px;
+  --radius-card: 5px;
+  --radius-media: 3px;
+  /* Ground-dependent roles — light: links and labels in mark-deep, hover to the foreground */
+  --link: var(--mark-deep);
+  --link-hover: var(--foreground);
+  --label-ink: var(--mark-deep);
+  --hairline: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --button-ghost-foreground: var(--foreground);
+  --button-ghost-border: color-mix(in srgb, var(--foreground) 30%, transparent);
+  --button-ghost-border-hover: var(--foreground);
+  --button-ghost-hover: color-mix(in srgb, var(--foreground) 5%, transparent);
+  /* Type scale: --type-<role> is the size; weight, tracking, leading and (label) transform follow */
+  --type-display: clamp(2.2rem, 3.5vw + 0.5rem, 3.55rem);
+  --type-display-weight: 500;
+  --type-display-tracking: -0.025em;
+  --type-display-leading: 1.04;
+  --type-title: clamp(1.6rem, 1.9vw + 0.55rem, 2.12rem);
+  --type-title-weight: 500;
+  --type-title-tracking: -0.02em;
+  --type-title-leading: 1.12;
+  --type-lede: clamp(1.05rem, 0.2vw + 0.95rem, 1.12rem);
+  --type-lede-weight: 400;
+  --type-lede-leading: 1.5;
+  --type-body: 17px;
+  --type-body-weight: 400;
+  --type-body-leading: 1.6;
+  --type-label: 13px;
+  --type-label-weight: 600;
+  --type-label-tracking: 0.12em;
+  --type-label-transform: uppercase;
+  --type-stat: clamp(2rem, 1.9vw + 1rem, 2.6rem);
+  --type-stat-weight: 300;
+  --type-stat-tracking: -0.03em;
+  --type-stat-leading: 0.95;
+  /* 12-column grid: --grid-margin is one column plus one gutter, so content sits in columns 2 to 11 */
+  --grid-columns: 12;
+  --grid-gutter: 24px;
+  --grid-margin: calc((100vw - 11 * var(--grid-gutter)) / 12 + var(--grid-gutter));
+  /* page-local (--pg-*): the strong hairline is the ghost button's border, reused on outlined chips and fields */
+  --pg-hairline-strong: var(--button-ghost-border);
   /* page */
   --pg-surface: #ffffff;
   --pg-logo-bg: #ffffff;                               /* a real logo sits on a white tile in both themes, so a dark mark stays visible */
-  --pg-hairline: color-mix(in srgb, var(--foreground) 10%, transparent);
   --pg-thumb-bg: var(--secondary);
-  --pg-ink: #041620;                                   /* canon dark --background: the closing band in both themes */
+  --pg-ink: #041620;                                   /* canon dark --background: the badge on a picture and the dialog's backdrop, in both themes */
   --pg-ink-fg: #e8f2f4;
   --pg-ink-muted: #a3babf;
-  --pg-wide: 1240px;
-  --pg-gutter: clamp(16px, 4vw, 40px);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -79,113 +122,141 @@
     --muted-foreground: #a3babf;
     --accent: #0a2e38;
     --border: #073038;
-    --ring: #c5e8dc;
-    --phthalo-hover: #daf2ea;
+    --ring: #72ddd4;
     --chart-1: #c5e8dc; --chart-2: #409b9b; --chart-3: #079d99; --chart-4: #70a6af; --chart-5: #066c80;
     --disc-fg-1: #041620; --disc-fg-2: #041620; --disc-fg-3: #041620; --disc-fg-4: #041620; --disc-fg-5: #f0fdf4;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 4px 12px -6px rgba(0, 0, 0, 0.28);
-    --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.24), 0 6px 18px -8px rgba(0, 0, 0, 0.32);
-    --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.26), 0 10px 24px -10px rgba(0, 0, 0, 0.36);
-    --gradient-aurora: radial-gradient(1200px circle at 50% -20%, rgba(200, 230, 217, 0.08), transparent 55%),
-      radial-gradient(800px circle at 15% 10%, rgba(4, 22, 32, 0.5), transparent 50%);
+    /* Ground-dependent roles — dark: links and labels in mark-light, hover to the foreground (tokens.css .dark) */
+    --link: var(--mark-light);
+    --link-hover: var(--foreground);
+    --label-ink: var(--mark-light);
+    --hairline: color-mix(in srgb, var(--foreground) 12%, transparent);
+    --button-ghost-foreground: var(--foreground);
+    --button-ghost-border: color-mix(in srgb, var(--foreground) 30%, transparent);
+    --button-ghost-border-hover: var(--foreground);
+    --button-ghost-hover: color-mix(in srgb, var(--foreground) 5%, transparent);
     --pg-surface: #0c323c;
     --pg-thumb-bg: #073038;
   }
 }
+/* below tablet width everything spans the full width with a 16px side gutter (tokens.css) */
+@media (max-width: 900px) {
+  :root { --grid-gutter: 16px; --grid-margin: 16px; }
+}
+}
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { font-size: 17px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 72px; }
+html { --pg-head-h: 64px; font-size: 17px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: calc(var(--pg-head-h) + 16px); }
 body {
   margin: 0; min-height: 100vh;
-  background: var(--background); background-image: var(--gradient-aurora); background-repeat: no-repeat;
-  color: var(--foreground); font-family: var(--font-sans); font-size: 15px; line-height: 1.55;
+  background: var(--background);
+  color: var(--foreground); font-family: var(--font-sans); font-size: var(--type-body); line-height: var(--type-body-leading);
   letter-spacing: var(--font-letter-spacing); word-spacing: var(--font-word-spacing);
   -webkit-font-smoothing: antialiased; overflow-x: hidden;
 }
-a { color: var(--primary); text-underline-offset: 3px; }
+/* text links: the ring colour, the ink on hover, a 1px rule in the current colour */
+a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: color 0.15s ease; }
+a:hover { color: var(--link-hover); }
 img { display: block; max-width: 100%; }
 button, input { font: inherit; letter-spacing: inherit; word-spacing: inherit; color: inherit; }
 h1, h2, h3, h4, p, ul, ol, dl, figure { margin: 0; }
-:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: var(--radius-control); }
 .i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .i-fill { fill: currentColor; stroke: none; }
 .i-out { width: 13px; height: 13px; margin-left: 4px; vertical-align: -1px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.skip { position: absolute; left: 12px; top: -64px; padding: 8px 12px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground); z-index: 30; }
+.skip { position: absolute; left: 12px; top: -64px; padding: 8px 12px; border-radius: var(--radius-control); background: var(--button-primary); color: var(--button-primary-foreground); z-index: 40; }
 .skip:focus { top: 12px; }
 
-/* ---------------- header ---------------- */
+/* ---------------- header ----------------
+   A solid band on the page's ground with a hairline under it. The lockup (a link to the main site) leads, "Virtual
+   homes" is this site's own top, the page links are muted text and Buy is the one flat primary button. */
 .site-head {
-  position: sticky; top: 0; z-index: 20; height: 56px;
+  --pg-head-h: 64px;
+  position: sticky; top: 0; z-index: 20; min-height: var(--pg-head-h);
   display: flex; align-items: center; gap: 12px;
-  padding: 0 max(var(--pg-gutter), calc((100vw - var(--pg-wide)) / 2 + var(--pg-gutter)));   /* the header's edges are the content's */
-  background: color-mix(in srgb, var(--background) 88%, transparent);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--pg-hairline);
+  padding: 8px var(--grid-margin);
+  background: var(--background);
+  border-bottom: 1px solid var(--hairline);
 }
-.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: inherit; text-decoration: none; margin-right: auto; }
-.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-.brand-text b { font-size: 15px; font-weight: 700; }
-.brand-text span { font-size: 12px; color: var(--muted-foreground); font-weight: 500; }
-.site-nav { display: flex; gap: 2px; }
-.site-nav a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 999px; color: var(--muted-foreground); text-decoration: none; font-weight: 600; font-size: 14px; }
-.site-nav a:hover { color: var(--foreground); background: var(--pg-hairline); }
-.site-nav a.nav-buy { color: var(--primary); font-weight: 700; }
-.menu-btn { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; }
-.menu-btn:hover { background: var(--pg-hairline); }
+.brand { display: inline-flex; align-items: center; gap: 14px; min-width: 0; margin-right: auto; }
+.brand a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }
+.brand-ci { line-height: 0; }
+/* the banner file is the lockup plus its clear space, so it runs taller than it looks; it never shrinks for the links beside it */
+.brand-ci { flex: none; }
+.brand-logo { display: block; height: 48px; width: auto; max-width: none; }
+.brand-sep { width: 1px; height: 22px; background: var(--pg-hairline-strong); }
+.brand-title { font-size: var(--type-label); font-weight: var(--type-label-weight); letter-spacing: var(--type-label-tracking); text-transform: var(--type-label-transform); color: var(--muted-foreground); white-space: nowrap; }
+.brand-title:hover { color: var(--foreground); }
+.site-nav { display: flex; gap: 4px; }
+.site-nav a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: var(--radius-control); color: var(--muted-foreground); text-decoration: none; font-weight: 500; font-size: 15px; transition: color 0.15s ease, background-color 0.15s ease; }
+.site-nav a:hover { color: var(--foreground); }
+.site-nav a.nav-buy { margin-left: 8px; padding: 0 14px; background: var(--button-primary); color: var(--button-primary-foreground); font-size: 14px; }
+.site-nav a.nav-buy:hover { background: var(--button-primary-hover); color: var(--button-primary-foreground); }
+.menu-btn { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid transparent; border-radius: var(--radius-control); background: transparent; cursor: pointer; }
+.menu-btn:hover { border-color: var(--pg-hairline-strong); }
 
 /* ---------------- buttons, chips, discs ---------------- */
+/* a button: 3px, Manrope 500, flat; no shadow, no transform */
 .btn {
   display: inline-flex; text-align: center; align-items: center; justify-content: center; gap: 9px;
-  min-height: 46px; padding: 0 20px; border-radius: 999px; border: 0; cursor: pointer;
-  font-weight: 700; font-size: 15px; text-decoration: none;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  min-height: 46px; padding: 0 20px; border: 1px solid transparent; border-radius: var(--radius-control); cursor: pointer;
+  font-weight: 500; font-size: 16px; line-height: 1.2; letter-spacing: 0; text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .btn .i { width: 16px; height: 16px; }
 .btn-sm { min-height: 38px; padding: 0 16px; font-size: 14px; }
-.btn-primary { background: var(--primary); color: var(--primary-foreground); box-shadow: var(--shadow-md); }
-.btn-primary:hover { background: var(--phthalo-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-.btn-ghost { background: transparent; color: var(--foreground); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.btn-ghost:hover { background: var(--pg-hairline); }
+.btn-primary { background: var(--button-primary); color: var(--button-primary-foreground); }
+.btn-primary:hover { background: var(--button-primary-hover); color: var(--button-primary-foreground); }
+/* the one highlighted call to action on a page: the accent green, white text at 600 */
+.btn-buy { background: var(--cta); color: var(--cta-foreground); font-weight: 600; }
+.btn-buy:hover { background: var(--cta-hover); color: var(--cta-foreground); }
+.btn-ghost { background: transparent; border-color: var(--button-ghost-border); color: var(--button-ghost-foreground); }
+.btn-ghost:hover { background: var(--button-ghost-hover); border-color: var(--button-ghost-border-hover); color: var(--button-ghost-foreground); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
-  display: inline-flex; align-items: center; gap: 7px; min-height: 26px; padding: 0 10px; border-radius: 999px;
-  background: var(--secondary); color: var(--foreground); font-size: 12.5px; font-weight: 600; text-decoration: none; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 7px; min-height: 26px; padding: 0 8px; border: 1px solid var(--hairline); border-radius: var(--radius-control);
+  background: transparent; color: var(--foreground); font-size: 12.5px; font-weight: 500; text-decoration: none; white-space: nowrap;
 }
-a.chip:hover { background: var(--pg-hairline); }
-.chip-quiet { background: transparent; color: var(--muted-foreground); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+a.chip:hover { border-color: var(--pg-hairline-strong); color: var(--foreground); }
+.chip-quiet { color: var(--muted-foreground); }
+/* the monogram disc stays round: it is a mark, not a control */
 .avatar {
   display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%;
   background: var(--disc, var(--chart-1)); color: var(--disc-fg, var(--disc-fg-1));
-  font-size: 13px; font-weight: 700; box-shadow: 0 0 0 2px var(--background);
+  font-size: 13px; font-weight: 600;
 }
 .avatar[style*="chart-2"] { --disc-fg: var(--disc-fg-2); }
 .avatar[style*="chart-3"] { --disc-fg: var(--disc-fg-3); }
 .avatar[style*="chart-4"] { --disc-fg: var(--disc-fg-4); }
 .avatar[style*="chart-5"] { --disc-fg: var(--disc-fg-5); }
 
-/* ---------------- footer ---------------- */
-.site-foot { max-width: var(--pg-wide); margin: 0 auto; padding: 32px var(--pg-gutter) 48px; border-top: 1px solid var(--pg-hairline); color: var(--muted-foreground); font-size: 13px; }
-.foot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; }
-.foot-grid p { margin: 0 0 8px; max-width: 46em; }
-.foot-grid b { color: var(--foreground); font-weight: 700; }
+/* ---------------- footer: condensed, 13px, tight rows, a hairline on top ---------------- */
+.site-foot { margin: 0; padding: 24px var(--grid-margin) 32px; border-top: 1px solid var(--hairline); color: var(--muted-foreground); font-size: var(--type-label); line-height: 1.45; }
+.foot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 48px; }
+.foot-grid p { margin: 0 0 6px; max-width: 46em; }
+.foot-grid b { color: var(--foreground); font-weight: 600; }
 .foot-brand { display: flex; align-items: center; gap: 8px; }
-.foot-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.foot-links a { min-height: 32px; display: inline-flex; align-items: center; }
-.legal { margin: 28px 0 0; font-size: 12px; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 2px 18px; }
+.foot-links a { min-height: 26px; display: inline-flex; align-items: center; color: var(--muted-foreground); text-decoration: none; font-weight: 500; }
+.foot-links a:hover { color: var(--foreground); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.legal { margin: 20px 0 0; font-size: 12px; }
 
 @media (max-width: 860px) {
   .menu-btn { display: inline-flex; }
-  .site-nav { display: none; position: absolute; left: 0; right: 0; top: 56px; flex-direction: column; gap: 0; padding: 8px var(--pg-gutter) 14px; background: var(--background); border-bottom: 1px solid var(--pg-hairline); box-shadow: var(--shadow-md); }
-  .site-nav a { min-height: 44px; padding: 0 4px; border-radius: 8px; font-size: 16px; }
+  .site-nav { display: none; position: absolute; left: 0; right: 0; top: 100%; flex-direction: column; gap: 0; padding: 8px var(--grid-margin) 14px; background: var(--background); border-bottom: 1px solid var(--hairline); }
+  .site-nav a { min-height: 44px; padding: 0 4px; font-size: 16px; }
+  .site-nav a.nav-buy { margin: 8px 0 0; padding: 0 14px; justify-content: center; }
   .site-head[data-open] .site-nav { display: flex; }
   .foot-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
-  .brand-text span { display: none; }
-  .brand-text b { font-size: 14px; white-space: nowrap; }
-  .site-head { gap: 6px; }
+  html { --pg-head-h: 56px; }
+  .site-head { min-height: 56px; padding-top: 6px; padding-bottom: 6px; gap: 6px; }
+  .brand { gap: 10px; }
+  .brand-logo { height: 40px; }
+  .site-head { --pg-head-h: 56px; }
+  .brand .brand-title, .brand-sep { display: none; }   /* (.brand a sets display, so the title needs the same specificity) */
 }
 @media (pointer: coarse) { .site-foot a { min-height: 44px; } }
 @media (prefers-reduced-motion: reduce) {
