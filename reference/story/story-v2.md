@@ -102,5 +102,5 @@ only with the owner's say-so, flag `--screenshots`).
 
 ## What did not change
 
-The persona contract (personas.md), the ad rules (label, beta line, no prices, daylight, no per-person accounts, nobody presented as a customer), the
+The persona contract (personas.md), the ad rules (label, no prices, daylight, no per-person accounts, nobody presented as a customer), the
 credit rule (no builder, no game it came from, anywhere), the 40 percent app share, the validator's claims lint, and `__house*` hooks.

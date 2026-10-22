@@ -1,6 +1,6 @@
 # Lawyer: ten more user stories (`lawyer`)
 
-Draft, written 2026-10-20 for the owner. It extends chapter 3.12 of [persona-bible.md](../persona-bible.md) and the `lawyer` row of `content/story/personas.json`. Nobody here is a customer: ages, households, roles and lines are design choices for fictional characters. Companion OS, Companion Memory and Companion Agents are in beta. The law for every word is `content/story/claims.json`.
+Draft, written 2026-10-20 for the owner. It extends chapter 3.12 of [persona-bible.md](../persona-bible.md) and the `lawyer` row of `content/story/personas.json`. Nobody here is a customer: ages, households, roles and lines are design choices for fictional characters. The law for every word is `content/story/claims.json`.
 
 **What this file is for.** The chapter shows one kind of lawyer day: the stack scanned and searchable (Paperless-ngx), the engagement letter signed (Docuseal), folders (Nextcloud), a model draft with the original under the pencil (Open WebUI) and a Word file (LibreOffice). These ten stories leave that ground. They are about other rooms of the house, other moments of the week and the year, and other people at the table, and each is tied to a catalog app and a registry service that the chapter does not use.
 

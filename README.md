@@ -385,7 +385,7 @@ on your own hardware. The contract for the writers, the validator and the film i
   A family page with `t`, `shot`, `tod`, `play`, `beat` or `member` in its address forwards to the tour, and the player's share link points back at the family page.
 <!-- ---- family pages ---- -->
 - **A family's page is the landing page of an ad.** It reads with no JavaScript and no WebGL: the name, the tagline, the home's picture, "Take the tour" and "See Companion Core", one honest line about the
-  3D, the disclosure strip (printed from `content/story/claims.json`), then a section for each person (`family/<slug>#sally`) with their moments, each linking the tour at that beat ("Watch this
+  3D, the label "Fictional family. Real software." (printed from `content/story/claims.json`), then a section for each person (`family/<slug>#sally`) with their moments, each linking the tour at that beat ("Watch this
   moment", `&beat=`), and "Start with Sally" (`&member=sally`: the tour opens at the first beat of her own room, the chapter where most of her beats are). Then what runs on the Core (each app, what it
   replaces, its Companion Hub store page). The tour's start card lists the family the same way; the player keeps a campaign's tags (`utm_*`, `fbclid`, `ttclid`, `gclid`, `msclkid`) in its address
   and `portal/campaign.js` carries them from the page to the tour and on to ci.computer. A family with no voice lock (none has one yet) has a captions-only tour from reading-time durations
@@ -393,7 +393,7 @@ on your own hardware. The contract for the writers, the validator and the film i
 <!-- ---- end family pages ---- -->
 <!-- ---- ad kit ---- -->
 - **The ad kit** makes social ads from the tour: `pnpm run story:ads` plans a silent persona CUT for every member of every family that parses (the hook is the first `film: true` beat of theirs in a room, its
-  title big over the room; then the beat on the tour's camera with its card, chips and karaoke captions; then an end card with "See Companion Core", `ci.computer/core`, the beta line and the other disclosures)
+  title big over the room; then the beat on the tour's camera with its card, chips and karaoke captions; then an end card with "See Companion Core", `ci.computer/core` and the disclosures)
   into `content/story/ads.json`, and renders the ones that have a bake lock to `video/ads/` (gitignored; no voice or voice lock is needed). The label "Fictional family. Real software." is on every frame, the picture is daylight
   (`?lighting=day` on the editor page: the houses' own dusk is never used), the overlay is the canon's light set, and the GPU is the machine's own through ANGLE (`--gl default`, `PERSONA_CUT_GL`). Hook rule, aspects,
   safe areas, disclosures, determinism, hosting and the open items: [`reference/story/ads.md`](reference/story/ads.md).
@@ -438,7 +438,7 @@ on your own hardware. The contract for the writers, the validator and the film i
 <!-- front page -->
 - **The front page** (`index.html`, `portal/gallery.js`, `portal/gallery.css`, `scripts/portal-front.mts`, `scripts/story/lib/lander.mts`, `pairs.mts` and `lander-check.mts`, the plan `content/story/lander.json`, the `lander` blocks of
   `scripts/build-portal.mts`; the contract is [`reference/story/lander.md`](reference/story/lander.md)) is the Companion Core's lander. It says what a Core is in the hero ("Stop renting your intelligence."; a small personal server
-  that runs the household's apps and local AI at home; "Fictional family. Real software." and the full beta line; one action, `Take the tour`, the Brennan family's tour in the player), argues in three steps ("From rented to kept",
+  that runs the household's apps and local AI at home; "Fictional family. Real software."; one action, `Take the tour`, the Brennan family's tour in the player), argues in three steps ("From rented to kept",
   `claims.json`'s own words), shows one pair in full (a beat of the Brennan file, with `Watch this moment` into the tour), offers the Core in one band (the claims, the engine's stylised Core, `Buy Companion Core`, `Download Companion`,
   the docs, what a Core is not), and then lets a visitor choose by the service they rent ("What do you rent today?": a chip for each service with the app that is an alternative to it, a chip for each job, a search, and the kind of
   place when there is more than one), under six featured families and, in a native `<details>`, every other family and home. The Core's offer is about 1.5 screens down on a desktop and 2.4 on a phone (the page it replaced:

@@ -25,7 +25,7 @@ node --experimental-strip-types scripts/story/build-catalog-snapshot.mts --fetch
 - **Where the work happens.** Say what the cloud service would have held and where it sits now. Never "private",
   "secure" or "safe" on their own. The safe verbs are "sits on the Core", "stays on your Core by default", "runs on the
   Core".
-- **Honest edges that ride along (every family).** Companion OS is in beta. Installing apps uses the internet. Crash
+- **Honest edges that ride along (every family).** Installing apps uses the internet. Crash
   reports go to Companion Intelligence from the first-party apps unless switched off (see the first-party row in the
   maker and host table). Remote access is not claimed: set every scene on the home network. A coding or chat agent is
   private only on the Core's local model, so never mention a cloud key.
@@ -122,7 +122,7 @@ only on the Core's local model. Never claim parity with a hosted model and never
 | `gitea` | Gitea | GitHub, GitLab (SaaS), Bitbucket | As Forgejo. Gitea Mirror is a different app: never name it. | shot |
 | `ollama` | Ollama | OpenAI, ChatGPT | CPU unless the host passes a GPU in: say nothing about speed. No chat window of its own. The Hub also has a built-in Ollama service. | none |
 | `open-webui` | Open WebUI | ChatGPT, Claude | Wired to the local model by the Hub. It can connect to cloud models with a key: leave that out of the scene. | shot |
-| `ci-openclaw` | OpenClaw WebCLI | none | Beta. Errands and browser automation, not a coder. Cloud provider keys saved in Hub can reach it: say "the model on your Core" only when none are saved, and never mention a key. Phone use away from home is not claimed. | shot |
+| `ci-openclaw` | OpenClaw WebCLI | none | Errands and browser automation, not a coder. Cloud provider keys saved in Hub can reach it: say "the model on your Core" only when none are saved, and never mention a key. Phone use away from home is not claimed. | shot |
 | `opencode` | OpenCode | GitHub Copilot, Cursor | Wired to the local model; it can add cloud providers with a key inside the app. The person approves the change. No sign-in unless a password is set. Name only OpenCode, never OpenCode Web. | none |
 | `aider` | Aider | GitHub Copilot, Cursor | Wired to the Hub model; a model override can point elsewhere. Every edit is a git commit, which is the approval. Browser interface is experimental upstream. | none |
 | `jupyterlab` | JupyterLab | none | One password. Packages install from the internet. The store names nothing it replaces: no replaces chip. | shot |
@@ -386,7 +386,7 @@ Runs a shop, studio, agency or practice of one to fifteen people: quotes, invoic
 | `libreoffice` | LibreOffice | Microsoft Office, Google Workspace | See the organiser table. | shot |
 | `stirling-pdf` | Stirling-PDF | Adobe Acrobat, Smallpdf | See the organiser table. | shot |
 | `whisper-webui` | Whisper-WebUI | none | Listed and installable, no recorded QA run: the beat needs an owner entry. Model weights are downloaded first; it runs on the CPU unless the host passes a GPU in. Say nothing about speed or accuracy. Subtitles and transcripts only. | none |
-| `ci-memory` | Companion Memory | none | Beta: the first mention reads "Companion Memory (beta)". Imports are opt-in and revocable, nothing connected by default. First-party crash-report caveat below. A chat and agent app: the member in the beat is 16 or older. | shot |
+| `ci-memory` | Companion Memory | none | Imports are opt-in and revocable, nothing connected by default. First-party crash-report caveat below. A chat and agent app: the member in the beat is 16 or older. | shot |
 
 **Invoice Ninja**
 - Say: "Ruth's quotes and invoices go through Invoice Ninja on the Core."
@@ -427,7 +427,7 @@ Runs a shop, studio, agency or practice of one to fifteen people: quotes, invoic
 - Never: "Whisper-WebUI transcribes every word correctly."
 
 **Companion Memory**
-- Say: "Companion Memory (beta) keeps the client file on the Core, so the agent has the context."
+- Say: "Companion Memory keeps the client file on the Core, so the agent has the context."
 - Never: "Companion Memory remembers everything."
 
 Honest edges for this archetype:

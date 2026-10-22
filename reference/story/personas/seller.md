@@ -1,6 +1,6 @@
 # Seller (`seller`)
 
-Deep dive for one proposed persona, written 2026-10-20 as a draft for the owner. Category: Run a business (`run-a-business`). Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: ages, households, crafts, names and lines are design choices for fictional characters. The shape follows the business-owner chapter of [persona-bible.md](../persona-bible.md) and the tables of [persona-apps.md](../persona-apps.md); the contract is [personas.md](../personas.md) and the wording law is `content/story/claims.json`.
+Deep dive for one proposed persona, written 2026-10-20 as a draft for the owner. Category: Run a business (`run-a-business`). Nobody here is a customer: ages, households, crafts, names and lines are design choices for fictional characters. The shape follows the business-owner chapter of [persona-bible.md](../persona-bible.md) and the tables of [persona-apps.md](../persona-apps.md); the contract is [personas.md](../personas.md) and the wording law is `content/story/claims.json`.
 
 **One line.** Sells what they make or find at a stall and by message, and keeps the stock, photos and invoices at home.
 
@@ -112,7 +112,7 @@ The limits, said once and said plainly:
 - No card processing, payroll, point of sale or bank feeds; no tax, accounting or legal advice; never "tax ready".
 - No sales figure, no revenue, no price, no "saves hours". The persona is a person with stock, not a dashboard.
 - HomeBox and Photoview have no recorded QA run and no `claims.json` entry; Baserow, Invio and Activepieces have no `claims.json` entry. They are fit to use only after the owner lists them (section 14).
-- Companion OS, Memory and Agents are beta, and installing an app uses the internet.
+- Installing an app uses the internet.
 
 ## 9. Claims boundary
 
@@ -139,7 +139,7 @@ What must never be said for this persona, with the `claims.json` ids that stop i
 
 **Regulated-domain rule.** Health, legal, finance, children's data and education records are written without any compliance, certification, safety or security-guarantee claim and without advice. For the seller this bites in three places. **Food, cosmetics, candles, toys, electricals and anything worn or swallowed** may be someone's stock: the story names the thing, never the rules around it. **Money** is a record of an invoice, not a statement of what is owed to a tax office. **Children** are not in the pictures of stock or stall and do not appear as sellers; a young relative can be named in a parent-led beat as the one carrying a crate.
 
-The beta line rides beside any software claim, "Fictional family. Real software." sits where a family is, and the Core is always drawn stylised. Every page that carries a seller beat sends a visitor to exactly `https://ci.computer/core` for "See Companion Core".
+"Fictional family. Real software." sits where a family is, and the Core is always drawn stylised. Every page that carries a seller beat sends a visitor to exactly `https://ci.computer/core` for "See Companion Core".
 
 ## 10. Fit: homes, rooms, furniture, casting
 

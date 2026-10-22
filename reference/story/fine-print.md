@@ -16,14 +16,14 @@ changes, the owner changes `claims.json`, the snapshot is rewritten, and every p
 
 | Surface | Carried by | Prints (when) |
 |---|---|---|
-| `family-fold` | `scripts/story/pages.mts` | `fictional-family` as the header chip (printed once), `beta-short` as the strip |
+| `family-fold` | `scripts/story/pages.mts` | `fictional-family` as the header chip (printed once) |
 | `family-start` | `scripts/story/pages.mts`, under "How the Core starts" | `internet-steps` (an agent is named) |
-| `family-footer` | `footer()` in `scripts/story/pages.mts` | `launch-not-offer`, `beta-full`, `scripted-scenes`, `stylised-art`, `synthetic-voice` (the tour has a voice), `attribution-agents` and `not-frontier` (an agent is named), `apps-availability`, `names-owners`, `names-logos-owners` (the page shows an app's logo) |
-| `home-band`, `home-footer` | `scripts/portal-pages.mts` (every `homes/<id>`) | `beta-short` in the Core band; `launch-not-offer` and `beta-full` in the footer |
+| `family-footer` | `footer()` in `scripts/story/pages.mts` | `launch-not-offer`, `scripted-scenes`, `stylised-art`, `synthetic-voice` (the tour has a voice), `attribution-agents` and `not-frontier` (an agent is named), `apps-availability`, `names-owners`, `names-logos-owners` (the page shows an app's logo) |
+| `home-footer` | `scripts/portal-pages.mts` (every `homes/<id>`) | `launch-not-offer` in the footer |
 | `not-found` | `scripts/portal-pages.mts` (`404.html`) | `launch-not-offer` (the page offers Buy Companion Core) |
-| `player-about`, `player-end` | `assets/viewer.ts` | the About panel: `launch-not-offer`, `beta-full`, `not-frontier`, and for a tour `fictional-family`, `scripted-scenes`, `stylised-art`, `attribution-agents`, `names-logos-owners`; the end card: `beta-short`. A family tour also shows `fictional-family` as a chip that stays on screen (`.vh-fiction`) |
-| `tour-start` | `FINE_PRINT` in `assets/story/popup.ts` | `scripted-scenes`, `synthetic-voice` (a voice), `stylised-art`, `beta-short`; `scripts/test-fine-print.mts` holds the list to the table |
-| `lander-hero`, `lander-core`, `lander-footer` | `index.html`, `scripts/portal-front.mts` (markers `<!-- fine-hero: -->`, `<!-- fine-core: -->`, `<!-- fine-foot: -->`; the line `stylised-art` is the caption of the Core's picture) | `fictional-family` and `beta-short`; `beta-short`, `not-frontier` and `stylised-art`; `launch-not-offer`, `beta-full`, `scripted-scenes`, `names-logos-owners` and `third-party-apps` |
+| `player-about` | `assets/viewer.ts` | the About panel: `launch-not-offer`, `not-frontier`, and for a tour `fictional-family`, `scripted-scenes`, `stylised-art`, `attribution-agents`, `names-logos-owners`; the end card prints none. A family tour also shows `fictional-family` as a chip that stays on screen (`.vh-fiction`) |
+| `tour-start` | `FINE_PRINT` in `assets/story/popup.ts` | `scripted-scenes`, `synthetic-voice` (a voice), `stylised-art`; `scripts/test-fine-print.mts` holds the list to the table |
+| `lander-hero`, `lander-core`, `lander-footer` | `index.html`, `scripts/portal-front.mts` (markers `<!-- fine-hero: -->`, `<!-- fine-core: -->`, `<!-- fine-foot: -->`; the line `stylised-art` is the caption of the Core's picture) | `fictional-family`; `not-frontier` and `stylised-art`; `launch-not-offer`, `scripted-scenes`, `names-logos-owners` and `third-party-apps` |
 
 Every printed line carries `data-fine="<disclosure id>"`, so a test, a build step or a screen reader's rotor finds it by id. The Core band's sentence is
 `coreLine()`: "The small computer on your desk is a Companion Core." and then claims.json's `local-by-default`, verbatim. "Your own AI, apps and memory" is

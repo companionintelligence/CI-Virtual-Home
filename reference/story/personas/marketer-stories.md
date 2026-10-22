@@ -1,6 +1,6 @@
 # Marketer (`marketer`): ten more user stories
 
-Draft written 2026-10-20 for the owner. It widens the stories of an archetype that already exists (`marketer`, bible chapter 3.11, `personas.json`, `persona-apps.md`); it changes no source file. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: ages, jobs, rooms and lines are design choices for fictional characters. The wording law is `content/story/claims.json`; the catalog (`catalog-apps.json`) and the service registry (`services.json`) decide what may be named.
+Draft written 2026-10-20 for the owner. It widens the stories of an archetype that already exists (`marketer`, bible chapter 3.11, `personas.json`, `persona-apps.md`); it changes no source file. Nobody here is a customer: ages, jobs, rooms and lines are design choices for fictional characters. The wording law is `content/story/claims.json`; the catalog (`catalog-apps.json`) and the service registry (`services.json`) decide what may be named.
 
 **One line.** A freelance or in-house digital marketer: the client's list, files and briefs sit at home. This file adds the marketer's other hours: the wall of cards on Monday, the pitch the evening before, the quarterly review of what is rented, a project write-up read by a partner, the first coffee with the feeds, a launch tag tested at home, a client leaving, an event kit in a cupboard, a guest list for a breakfast and a day plan in a bedroom corner.
 
@@ -8,7 +8,7 @@ Draft written 2026-10-20 for the owner. It widens the stories of an archetype th
 
 ## 1. What the chapter and the stories already show
 
-**The chapter (3.11).** The seven Hub replacements it ranks: Open WebUI (the brief read back by the model on the Core), Companion Memory (beta), Nextcloud (the client's files), Ghost (the client's list, with the outside mailer caveat), Penpot, Mixpost (a limit card) and Twenty. Its shots are a wall of paper cards used as a content calendar and a hand with a red pen on a printed proof. Its triggers are a vendor shift, a client clause on AI and offboarding a client. Its limits: the platforms, sending reputation, SEO suites, the Canva library, live co-editing with a client and HubSpot automation stay out there.
+**The chapter (3.11).** The seven Hub replacements it ranks: Open WebUI (the brief read back by the model on the Core), Companion Memory, Nextcloud (the client's files), Ghost (the client's list, with the outside mailer caveat), Penpot, Mixpost (a limit card) and Twenty. Its shots are a wall of paper cards used as a content calendar and a hand with a red pen on a printed proof. Its triggers are a vendor shift, a client clause on AI and offboarding a client. Its limits: the platforms, sending reputation, SEO suites, the Canva library, live co-editing with a client and HubSpot automation stay out there.
 
 **The pool** (`personas.json`, 16 apps) and `persona-apps.md` add Listmonk, Plausible Analytics, n8n, Inkscape, FreeCut, Solidtime, Grist, VaultWarden and Whisper-WebUI. Beats that name each pool app in the 30 family files today (a count of beats, not of homes): Nextcloud 13, VaultWarden 12, Open WebUI 8, Twenty 7, n8n 5, Companion Memory 3, Penpot 2, Inkscape 2, Listmonk 1, Grist 1, and none for Ghost, Whisper-WebUI, Plausible, FreeCut, Mixpost and Solidtime.
 

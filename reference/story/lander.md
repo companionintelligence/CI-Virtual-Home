@@ -11,10 +11,10 @@ this file is the contract of the page's parts. Its code is `scripts/portal-front
 | Block | id | Job | Where its words come from |
 |---|---|---|---|
 | Header (sticky) | `site-head` | Buy and Download in reach at every scroll position, on a phone too | authored; the four destinations are `LINKS` |
-| Hero | `hero` | continue the ad's sentence, say what a Core is, one action | the H1 is the claim named by the plan's first message (`rent-line`); the two chips are `finePrint('lander-hero')`; the next two lines are authored, the families word is the data's |
+| Hero | `hero` | continue the ad's sentence, say what a Core is, one action | the H1 is the claim named by the plan's first message (`rent-line`); the chip is `finePrint('lander-hero')`; the next two lines are authored, the families word is the data's |
 | From rented to kept | `argument` | the argument in three steps | `problem`, `plug-pair-walk`, `local-by-default`, `hub-no-api-bill`, verbatim (`<!-- claim:id -->` markers, `data-claim`) |
 | One pair, in full | `proof` | one concrete pair, in the family's own words, with a link into the tour at that moment | the first candidate beat of the plan that may show (`proofOf`); the words are the beat's |
-| Meet the Companion Core | `core` | the offer, and what a Core is not | `core-size`, `core-assembled`, `hub-count`; the beta line and `not-frontier` from `finePrint('lander-core')`; the picture's caption is `stylised-art` |
+| Meet the Companion Core | `core` | the offer, and what a Core is not | `core-size`, `core-assembled`, `hub-count`; `not-frontier` from `finePrint('lander-core')`; the picture's caption is `stylised-art` |
 | What do you rent today? | `swap` | the chooser: a chip for each service, for each job, a search, the kind of place | `stripOf` (the pair index), `categories.json`, the plan's `types` |
 | Meet the families | `homes` | six featured cards, then every family and home in a native `<details>` | `featuredOf`, `cardPairs`, the families |
 | Footer | | the four destinations, the sign-off, the fine print, the apps named, every home's page | `signoff`; `finePrint('lander-footer')`; `appsNamed`; `galleryHomeIndex` |
