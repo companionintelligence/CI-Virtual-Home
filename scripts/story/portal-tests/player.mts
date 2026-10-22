@@ -11,7 +11,8 @@
 //       id and the contrast the canon asks for (the in-repo audit stands in for axe-core, which is MPL-2.0)
 //   T8  audio and the gesture: no AudioContext and no source started before the click; "Start without sound" never makes a context and
 //       costs no audio bytes; "Start with narration" does, and plays; M after a silent start is a gesture too; ?no=story shows none of it
-//   +   the contrast of every piece of text the tour draws at 390, 768 and 1440; reduced motion (opens paused, nothing advances, a step
+//   +   the contrast of every piece of text the tour draws at 390, 768 and 1440 (the cards, the top bar, the dock, the tools sheet and the About dialog: all of it light
+//       frosted glass, audited as its floor colour over pure white and over pure black, the worst the scene could put behind it); reduced motion (opens paused, nothing advances, a step
 //       is a cut, no pulsing ring); a shared ?beat= link; the failure paths (story file 404, audio 404); next family
 //   (T9, the way in at a person, and T10, the captions-only tour, are scripts/story/portal-tests/player-start.mts)
 import type { TestCtx } from '../hooks.ts';
@@ -69,8 +70,10 @@ export default async function player(ctx: TestCtx): Promise<void> {
     const rgba = (c: string): [number, number, number, number] => { cv.clearRect(0, 0, 1, 1); cv.fillStyle = '#000'; cv.fillStyle = c; cv.fillRect(0, 0, 1, 1); const d = cv.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
     const lum = (r: number, g: number, b: number) => { const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
     const over = (top: number[], under: number[]) => { const a = top[3]; return [top[0] * a + under[0] * (1 - a), top[1] * a + under[1] * (1 - a), top[2] * a + under[2] * (1 - a), 1]; };
-    // what is behind a piece of text: the nearest ancestors' backgrounds stacked, over the WORST thing the 3D view could show (white, then black)
-    const stack = (el: Element): number[][] => { const s: number[][] = []; for (let e: Element | null = el; e; e = e.parentElement) { const bg = rgba(getComputedStyle(e).backgroundColor); if (bg[3] > 0) s.push(bg); if (bg[3] >= 1) break; } return s.reverse(); };
+    // what is behind a piece of text: the nearest ancestors' backgrounds stacked, over the WORST thing the 3D view could show (white, then black). The stack ends at an opaque
+    // surface or at the glass (the first ancestor with a backdrop blur): the glass is the light frosted one of portal/viewer.css, translucent over the scene, so what is
+    // composited under its floor colour is pure white and pure black and never the opaque page behind the player (which is near black and would stand in for the black case only)
+    const stack = (el: Element): number[][] => { const s: number[][] = []; for (let e: Element | null = el; e; e = e.parentElement) { const cs = getComputedStyle(e), bg = rgba(cs.backgroundColor); if (bg[3] > 0) s.push(bg); if (bg[3] >= 1) break; if (cs.backdropFilter && cs.backdropFilter !== 'none') break; } return s.reverse(); };
     const visible = (e: Element) => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
     for (const e of Array.from(root.querySelectorAll('a[href],button,input,select,textarea,summary'))) {
       if (!visible(e)) continue;
@@ -363,6 +366,22 @@ export default async function player(ctx: TestCtx): Promise<void> {
     const issues: string[] = await page.evaluate(AUDIT, '.st-card');
     ok(issues.length === 0, `the card (lit karaoke, chips, note, footer) at ${vw}: contrast met everywhere${issues.length ? ': ' + issues.join(' | ') : ''}`);
     await ctx.shot(page, `tour-card-${SLUG}-${vw}`);
+    // the rest of the glass the player draws over the scene, in the same audit (the glass's floor over white and over black): the top bar, the dock, the tools sheet where
+    // the layout is compact (More), and the About dialog
+    for (const sel of ['.vh-top', '.vh-dock']) {
+      const chrome: string[] = await page.evaluate(AUDIT, sel);
+      ok(chrome.length === 0, `${sel} at ${vw}: contrast met on the glass${chrome.length ? ': ' + chrome.join(' | ') : ''}`);
+    }
+    const compact = await page.isVisible('[data-act="more"]');
+    if (compact) {
+      await page.click('[data-act="more"]'); await sleep(300);
+      const tools: string[] = await page.evaluate(AUDIT, '.vh-tools');
+      ok(tools.length === 0, `the tools sheet at ${vw}: contrast met on the glass${tools.length ? ': ' + tools.join(' | ') : ''}`);
+      await page.click('.vh-tools [data-act="help"]');
+    } else await page.click('[data-act="help"]');
+    await sleep(400);
+    const about: string[] = await page.evaluate(AUDIT, '.vh-help');
+    ok(about.length === 0, `the About dialog at ${vw}: contrast met on the glass${about.length ? ': ' + about.join(' | ') : ''}`);
     await close();
   }
 

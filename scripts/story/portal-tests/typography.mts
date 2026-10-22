@@ -14,6 +14,11 @@
 //        The family page, at the same three sizes in the light and the dark set: every name (`.nm`) is uppercase, bold and tracked at least 0.15em, in contrast with its page (4.5:1),
 //        the heading ones at 1.5rem or more and the nav chips and section labels at 0.85rem or more; the screenshot dialog's text is the same size as a card's, and its buttons are 44 px.
 //        The player always takes the dark set (room-creator.html), so its modals are audited once.
+//   T13b the glass pass (the owner's mockup, 2026-10): on the three Brennan tours at the same three sizes, the start card, the first three beat cards, one with "More" open, the end
+//        card, the chapters panel, the tools sheet, the About dialog, the top bar and the dock: every border-radius is 0, 5 px or 3 px, nothing in a card is nowrap or cut with an
+//        ellipsis (the top bar's title and the dock's chips are one-line controls), no text line or box leaves a card's padding box (a row that scrolls sideways by design is judged by
+//        its own box), a card that is not a phone's full-width sheet is trimmed to its widest line (at most 3 px spare, never wider than `data-solved-w`), no card covers more than
+//        2 % of its subject, and an open card's stuck head is opaque.
 //
 // It prints the type table (the tokens in px at each width) so the numbers in reference/story/player.md are the measured ones.
 import type { TestCtx } from '../hooks.ts';
@@ -67,6 +72,48 @@ export default async function typography(ctx: TestCtx): Promise<void> {
     const one = (sel: string) => { const e = document.querySelector(sel); if (!e) return null; const cs = getComputedStyle(e); return { px: parseFloat(cs.fontSize), weight: Number(cs.fontWeight), track: cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing) }; };
     return { min: px('var(--st-min)'), title: px('var(--st-title)'), hook: px('var(--st-hook)'), root: parseFloat(getComputedStyle(document.documentElement).fontSize), body: one('.st-card .st-body, .st-start-p'), titleEl: one('.st-card .st-title'), chip: one('.st-chip'), btn: one('.st-btn'), note: one('.st-note'), more: one('.st-more-btn') };
   };
+  /**
+   * The glass pass's checks on one surface (the owner's mockup, 2026-10), run in the page: its corners (every border-radius of it and of everything in it is 0, 5 px or 3 px: no
+   * 999px pill, no 50 % circle), text that is nowrap or cut with an ellipsis, text lines and boxes that leave its padding box, and how much room is left at the right of its widest line
+   * (text lines, plus the right edges of the chips, buttons, monogram and logo; the "More" toggle and a person's button on the start card sit at the far end of a row and count by
+   * what they need: the kicker's edge + the gap + their own width, content + their padding). Parts that are not on screen (hidden, the screen-reader text) are not judged.
+   */
+  const GLASS = (sel: string) => {
+    const root = document.querySelector(sel) as HTMLElement | null; if (!root) return null;
+    const rr = root.getBoundingClientRect(), cs = getComputedStyle(root);
+    const bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0, pr = parseFloat(cs.paddingRight) || 0;
+    const pb = { l: rr.left + bl, r: rr.left + bl + root.clientWidth };          // the padding box, less a scrollbar
+    const bar = Math.max(0, rr.width - root.clientWidth - bl - br);
+    const skip = (e: Element) => !!e.closest('[hidden], .vh-sr, .st-live-region, svg');
+    // a row that scrolls sideways by design (the dock's chips) clips what is past its edge: its items are judged by that row's box, which is held, and not by the surface's
+    const scrolledAway = (e: Element) => { for (let a = e.parentElement; a && a !== root; a = a.parentElement) { const s = getComputedStyle(a); if ((s.overflowX === 'auto' || s.overflowX === 'scroll') && a.scrollWidth > a.clientWidth + 1) return true; } return false; };
+    const name = (e: Element) => `${e.tagName.toLowerCase()}.${String((e as HTMLElement).className || '').split(' ')[0]}`;
+    const radii: string[] = [], nowrap: string[] = [], escapes: string[] = [];
+    let n = 0, widest = 0;
+    const edge = (el: Element, extra: string): number => { let m = -Infinity; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); for (let t = w.nextNode(); t; t = w.nextNode()) { if (!(t.textContent || '').trim() || skip(t.parentElement!)) continue; const g = document.createRange(); g.selectNodeContents(t); for (const q of Array.from(g.getClientRects())) if (q.width) m = Math.max(m, q.right); } el.querySelectorAll(extra).forEach(x => { const q = x.getBoundingClientRect(); if (q.width && !skip(x)) m = Math.max(m, q.right); }); return m; };
+    for (const el of [root, ...Array.from(root.querySelectorAll<HTMLElement>('*'))]) {
+      if (skip(el)) continue;
+      const s = getComputedStyle(el), b = el.getBoundingClientRect();
+      if (s.display === 'none' || s.display === 'contents' || s.visibility === 'hidden' || (b.width === 0 && b.height === 0)) continue;
+      n++;
+      for (const k of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'] as const) { const v = (s as any)[k] as string; if (!/^(0px|5px|3px)( (0px|5px|3px))?$/.test(v)) { radii.push(`${name(el)} ${k.replace(/^border|Radius$/g, '')} ${v}`); break; } }
+      if (s.whiteSpace === 'nowrap' || s.whiteSpace === 'pre' || s.textOverflow === 'ellipsis') nowrap.push(`${name(el)} (${s.whiteSpace}, ${s.textOverflow})`);
+      if (el !== root && !scrolledAway(el) && (b.right > pb.r + 0.6 || b.left < pb.l - 0.6)) escapes.push(`box ${name(el)} ${Math.round(b.left - pb.l)}..${Math.round(b.right - pb.r)}`);
+      if (el.matches('.st-chip, .st-btn, .st-disc, .st-logo, .vh-help a, .vh-help kbd')) widest = Math.max(widest, b.right - rr.left);
+    }
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let t = w.nextNode(); t; t = w.nextNode()) {
+      const e = t.parentElement; if (!e || !(t.textContent || '').trim() || skip(e) || getComputedStyle(e).display === 'none') continue;
+      const g = document.createRange(); g.selectNodeContents(t);
+      // (a line that sits in a box with its own right padding, such as a phone drawing's panel or the agent's quoted line, needs that room too: the box is what is at the card's edge)
+      let tr = 0; for (let a: Element | null = e; a && a !== root; a = a.parentElement) { const as = getComputedStyle(a); tr += (parseFloat(as.paddingRight) || 0) + (parseFloat(as.borderRightWidth) || 0) + (parseFloat(as.marginRight) || 0); }
+      for (const q of Array.from(g.getClientRects())) { if (!q.width) continue; widest = Math.max(widest, q.right - rr.left + tr); if (!scrolledAway(e) && (q.right > pb.r + 0.6 || q.left < pb.l - 0.6)) escapes.push(`text "${(t.textContent || '').trim().slice(0, 20)}" ${Math.round(q.left - pb.l)}..${Math.round(q.right - pb.r)}`); }
+    }
+    root.querySelectorAll<HTMLElement>('.st-more-btn').forEach(mb => { if (skip(mb)) return; const head = mb.parentElement!, kick = head.querySelector('.st-kicker')!; widest = Math.max(widest, edge(kick, '.st-disc') - rr.left + (parseFloat(getComputedStyle(head).columnGap) || 0) + mb.getBoundingClientRect().width); });
+    root.querySelectorAll<HTMLElement>('.st-member').forEach(m => { if (skip(m)) return; const q = getComputedStyle(m); widest = Math.max(widest, edge(m, '.st-disc') - rr.left + (parseFloat(q.paddingRight) || 0) + (parseFloat(q.borderRightWidth) || 0)); });
+    const padR = pr + br + bar;
+    return { n, w: rr.width, solved: root.dataset.solvedW ? Number(root.dataset.solvedW) : null, widest: Math.ceil(widest), padR, spare: Math.round(rr.width - (widest + padR)), radii: radii.slice(0, 6), nowrap: nowrap.slice(0, 6), escapes: escapes.slice(0, 6) };
+  };
   const PHONE = (vw: number) => vw < 768;
   const near = (a: number, b: number, e = 0.05) => Math.abs(a - b) <= e;
 
@@ -113,7 +160,12 @@ export default async function typography(ctx: TestCtx): Promise<void> {
         ok(real !== real.toUpperCase(), `${tag}: the name is in the page as written ("${real}"), the capitals are CSS`);
       }
       if (PHONE(vw) || vw < 1000 && vh > vw) ok(m.mode === 'sheet' && m.card.h <= vh * PHONE_SHEET_MAX + 1 && m.card.w <= vw, `${tag}: a sheet of at most 55 % of the height (${(m.card.h / vh * 100).toFixed(0)} %)`);
-      else ok(m.mode === 'card' && m.card.w >= 359 && m.card.w <= 561 && m.card.w <= vw * 0.46 + 1 && m.card.x >= -0.5 && m.card.x + m.card.w <= vw + 0.5, `${tag}: a card of ${Math.round(m.card.w)} px (${(m.card.w / vw * 100).toFixed(0)} % of the window: the wanted clamp(420px, 32vw, 560px), or a narrower one)`);
+      else {
+        // the solver's width is the clamp(420px, 32vw, 560px) or a narrower one (360 to 560 px); the card as drawn is trimmed to its widest line plus its padding (glass pass: the
+        // container fits the text), so it is never wider than the width the solver chose, and never narrower than its widest line and padding (the solved width is `m.solvedW`)
+        const g = await page.evaluate(GLASS, '.st-card');
+        ok(m.mode === 'card' && m.solvedW >= 359 && m.solvedW <= 561 && m.card.w <= m.solvedW + 0.5 && g && g.spare >= -0.5 && m.card.w <= vw * 0.46 + 1 && m.card.x >= -0.5 && m.card.x + m.card.w <= vw + 0.5, `${tag}: a card of ${Math.round(m.card.w)} px (${(m.card.w / vw * 100).toFixed(0)} % of the window), the solver's ${m.solvedW} px trimmed to its widest line and padding (${g && Math.round(g.widest + g.padR)} px at least; the wanted clamp(420px, 32vw, 560px), or a narrower one)`);
+      }
       if (i === 0) { const tc = await page.evaluate(PROBE); if (tc.titleEl) ok(near(tc.titleEl.px, t.title, 0.1) && tc.titleEl.weight === 700, `${label}: a card's title is --st-title (${tc.titleEl.px.toFixed(2)} px) in the canon's 700`); }
       if (more && i === more.i) {
         await ctx.shot(page, `type-${label}-beat-closed`);
@@ -173,6 +225,79 @@ export default async function typography(ctx: TestCtx): Promise<void> {
     ok(w.roots === 1 && w.nodes >= 3 && w.bad.length === 0 && btns.length >= 2 && btns.every((h: number) => h >= 43.5), `${label}: the failure card's ${w.nodes} text nodes are all at least ${floor} px (smallest ${w.smallest.toFixed(2)}) and its ${btns.length} buttons are 44 px${w.bad[0] ? ': ' + w.bad.join(' | ') : ''}`);
     await ctx.shot(page, `type-${label}-failure`);
     await close();
+  }
+
+  // ======================================================================== the glass pass (the owner's mockup, 2026-10): corners, words inside their box, a box that fits its words
+  //   On the three Brennan tours at 1440, 1024 and 390, on the start card, the first three beats' cards (and one with "More" open), the end card, the chapters panel, the About
+  //   dialog, the tools sheet and the top bar and dock: every border-radius is 0, 5 px or 3 px (no 999px, no 50 %: the scrubber's thumb is a pseudo-element and the pin an SVG circle,
+  //   neither is a box), nothing in a card is nowrap or cut with an ellipsis, no text line or box leaves its card's padding box, and a card that is not a phone's full-width sheet is
+  //   trimmed to its widest line (at most 3 px spare at the right of it) and never wider than the solver's width (`data-solved-w`), and no card covers its beat's subject.
+  console.log('\nT13b the glass: corners, words inside their box, a box that fits its words');
+  const brennans = ['brennan', 'brennan-hollin', 'brennan-merrow'].filter(s => byFamily[s]?.story);
+  for (const fam of brennans) {
+    for (const [vw, vh, mobile] of [[1440, 900, false], [1024, 768, false], [390, 844, true]] as const) {
+      const label = `${fam} ${vw}x${vh}`, sheet = PHONE(vw) || (vw < 1000 && vh > vw);
+      const { page, errors, close } = await ctx.open({ width: vw, height: vh }, mobile);
+      await page.goto(url(`room-creator?mode=view&house=${byFamily[fam].house}&family=${fam}`)); await wait(page);
+      const bad = (g: any, oneLine = false) => g ? [...g.radii.map((x: string) => 'radius ' + x), ...(oneLine ? [] : g.nowrap).map((x: string) => 'nowrap ' + x), ...g.escapes.map((x: string) => 'escape ' + x)] : ['not on screen'];
+      // (`oneLine`: the top bar's title and the dock's scrolling chips are controls, not reading text: they keep their one line and their ellipsis; their corners and their box are still held)
+      const clean = (g: any, what: string, oneLine = false) => ok(!!g && bad(g, oneLine).length === 0, `${label}: ${what}: only 5 px and 3 px corners, ${oneLine ? 'one-line controls allowed' : 'nothing nowrap or ellipsised'}, nothing past its padding box (${g ? g.n : 0} elements)${bad(g, oneLine)[0] ? ': ' + bad(g, oneLine).slice(0, 3).join(' | ') : ''}`);
+      const fits = (g: any, what: string) => ok(!!g && g.spare >= -0.5 && g.spare <= 3 && (g.solved === null || g.w <= g.solved + 0.5), `${label}: ${what} fits its text: ${g && g.spare} px spare at the right of its widest line (${g && Math.round(g.w)} px of at most ${g && g.solved})`);
+      // the start card, the top bar and the dock
+      clean(await page.evaluate(GLASS, '.st-start-card'), 'the start card');
+      fits(await page.evaluate(GLASS, '.st-start-card'), 'the start card');
+      clean(await page.evaluate(GLASS, '.vh-top'), 'the top bar', true);
+      clean(await page.evaluate(GLASS, '.vh-dock'), 'the dock', true);
+      await page.locator('.st-start .st-actions .st-btn').last().click(); await sleep(500);
+      // the first three beats, then the first with "More" (opened)
+      const beats = await page.evaluate(() => (window as any).__houseStory.rs.beats.map((b: any, i: number) => ({ i, id: b.id, more: !!b.detail })));
+      for (const i of [0, 1, 2]) {
+        const m = await page.evaluate((k: number) => (window as any).__houseStory.measure(k), i); await sleep(450);
+        const g = await page.evaluate(GLASS, '.st-card');
+        clean(g, `beat ${i} (${beats[i].id}) card`);
+        if (sheet) ok(m.mode === 'sheet' && Math.abs(m.card.w - (vw - 16)) <= 1, `${label}: beat ${i}'s sheet is full width (${Math.round(m.card.w)} of ${vw - 16} px)`);
+        else fits(g, `beat ${i}'s card`);
+        ok(m.overlapLive <= 0.02 && m.planned && m.planned.ok !== false, `${label}: beat ${i}'s card covers ${(m.overlapLive * 100).toFixed(2)} % of its subject (at most 2 %)`);
+        if (i === 0) await ctx.shot(page, `glass-${fam}-${vw}-beat-0`);
+      }
+      const more = beats.find((b: any) => b.more);
+      if (more) {
+        await page.evaluate((k: number) => (window as any).__houseStory.measure(k), more.i); await sleep(350);
+        await page.evaluate(() => (window as any).__houseStory.setMore(true)); await sleep(450);
+        const m = await page.evaluate((k: number) => (window as any).__houseStory.measure(k), more.i); await sleep(250);
+        clean(await page.evaluate(GLASS, '.st-card'), `beat ${more.i} (${more.id}) card with More open`);
+        ok(m.overlapLive <= 0.02, `${label}: with More open the card covers ${(m.overlapLive * 100).toFixed(2)} % of its subject (at most 2 %)`);
+        // (a card that scrolls: the head stuck at its top is an opaque light surface, so words that scroll under it are hidden)
+        const head = await page.evaluate(() => { const h = document.querySelector('.st-card.st-open .st-head') as HTMLElement | null; if (!h) return null; const c = getComputedStyle(h).backgroundColor.match(/[\d.]+/g)!.map(Number); return { a: c[3] === undefined ? 1 : c[3], pos: getComputedStyle(h).position }; });
+        ok(!!head && head.a === 1 && head.pos === 'sticky', `${label}: the open card's head is sticky and opaque (alpha ${head && head.a})`);
+        await ctx.shot(page, `glass-${fam}-${vw}-more`);
+        await page.evaluate(() => (window as any).__houseStory.setMore(false)); await sleep(300);
+      }
+      // the end card
+      const e = await page.evaluate(() => (window as any).__houseStory.measureEnd()); await sleep(500);
+      clean(await page.evaluate(GLASS, '.st-end'), 'the end card');
+      if (sheet) ok(Math.abs(e.card.w - (vw - 16)) <= 1, `${label}: the end card's sheet is full width (${Math.round(e.card.w)} of ${vw - 16} px)`);
+      else fits(await page.evaluate(GLASS, '.st-end'), 'the end card');
+      ok(e.overlapCore < 0.05, `${label}: the end card covers ${(e.overlapCore * 100).toFixed(1)} % of the Core`);
+      await ctx.shot(page, `glass-${fam}-${vw}-end`);
+      // the chapters panel (a window wide enough to show a card beside it, and the sheet on a phone: both are the glass)
+      await page.evaluate(() => (window as any).__houseStory.goBeat(1)); await sleep(700);
+      await page.keyboard.press('c'); await sleep(900);
+      clean(await page.evaluate(GLASS, '.st-chapters'), 'the chapters panel');
+      await ctx.shot(page, `glass-${fam}-${vw}-chapters`);
+      await page.keyboard.press('Escape'); await sleep(400);
+      // the tools sheet (the compact layout) and the About dialog
+      if (await page.isVisible('[data-act="more"]')) {
+        await page.click('[data-act="more"]'); await sleep(400);
+        clean(await page.evaluate(GLASS, '.vh-tools'), 'the tools sheet', true);
+        await page.click('.vh-tools [data-act="help"]');
+      } else await page.click('[data-act="help"]');
+      await sleep(500);
+      clean(await page.evaluate(GLASS, '.vh-help'), 'the About dialog');
+      await ctx.shot(page, `glass-${fam}-${vw}-about`);
+      ok(errors.length === 0, `${label}: no console error${errors[0] ? ': ' + errors[0] : ''}`);
+      await close();
+    }
   }
 
   // ======================================================================== the family page, in both sets, and the screenshot dialog
