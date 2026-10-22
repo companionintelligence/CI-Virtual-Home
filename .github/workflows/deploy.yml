@@ -38,10 +38,14 @@
 # ============================================================================
 name: deploy
 
+# >>> ci-local:gated original triggers below, restore with `ci-local restore`
+# on:
+#   workflow_run:
+#     workflows: [ci]
+#     types: [completed]
+#   workflow_dispatch:
+# <<< ci-local:gated
 on:
-  workflow_run:
-    workflows: [ci]
-    types: [completed]
   workflow_dispatch:
 
 permissions:
