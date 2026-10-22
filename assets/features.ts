@@ -265,7 +265,9 @@ export function createFeatures(bctx) {
     let deckY = y;
     if (f.type === 'terrace') { const top = roofTopAt(planRoofModels(spec), R.x + R.w / 2, R.z + R.d / 2); if (top !== null) deckY = Math.max(y, top + 0.03); }
     const deckMat = f.type === 'terrace' ? fresh(hexOf(f.floorColor, 0x8a735c), { roughness: 0.8 }) : am.floor({ kind: 'deck', ...(f.floorColor ? { color: f.floorColor } : {}) });
-    const slabMat = f.type === 'terrace' ? fresh(0xd9d4cb, { roughness: 0.8 }) : am.paint(0xe3ded5, { roughness: 0.8 });
+    // (a terrace's 3 cm slab lies inside the roof it is laid over, with the roof's footprint: its top and its sides are the roof's own planes, and the
+    // white edge along the terrace flickered. A depth bias makes the slab win them; dropping the slab would move boxes of the world digest)
+    const slabMat = f.type === 'terrace' ? fresh(0xd9d4cb, { roughness: 0.8, polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -4 }) : am.paint(0xe3ded5, { roughness: 0.8 });
     // a terrace's boards on the roof; a loggia near grade stands on a plinth to the ground; a balcony's slab
     const T = f.type === 'terrace' ? 0.06 : f.type === 'loggia' && y < 1.2 ? Math.max(0.05, y + 0.01) : y > 0.05 ? 0.2 : Math.max(0.05, y + 0.02);
     const deck = put(() => {

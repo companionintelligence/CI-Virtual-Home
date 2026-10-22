@@ -194,6 +194,19 @@ export function createSiteBuild(bctx) {
   // a slab, a deck or the lawn cut round water stands 1.5 cm clear of the pool's wall: a hole face on the wall's own
   // plane z-fights it (tan deck boards showing through the tile)
   const JOINT = 0.015;
+  // Every patio has one top (0.08) and every driveway another (0.06), so two of a kind that overlap, a patio laid on a patio, on a roof, or round a
+  // stoop shared a plane and flickered. The site list's order breaks the tie: each ground slab gets a private copy of its material with a depth bias,
+  // one step stronger than the slab before it, so the later slab wins. A bias is a draw state: lifting the slab by its index (0.6 mm) pushed
+  // patios over 0.08 into the world digest as walkable boxes (plan.json shots.world and the bake locks' worldSha are mm-rounded boxes).
+  const biasSlab = (o: any, rank: number) => o.traverse((m: any) => {
+    if (!m.isMesh || !m.material || Array.isArray(m.material)) return;
+    const src = m.material, c = src.clone();
+    if (src.onBeforeCompile) c.onBeforeCompile = src.onBeforeCompile;
+    if (Object.prototype.hasOwnProperty.call(src, 'customProgramCacheKey')) c.customProgramCacheKey = src.customProgramCacheKey;
+    c.polygonOffset = true; c.polygonOffsetFactor = 0; c.polygonOffsetUnits = -4 - 3 * rank;
+    m.material = c;
+  });
+  const isGroundSlab = (q: any) => q && (q.type === 'patio' || q.type === 'driveway');
   const overlaps = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.z < b.z + b.d && a.z + a.d > b.z;
   function slabWithHoles(rect, holes, color, h, y = 0, polys = []) {
     const g = group('Slab');
@@ -460,12 +473,13 @@ export function createSiteBuild(bctx) {
         const b = solidBox((prop.height || 0) > 1.1 ? 'structure' : 'furniture', o); if (b) solids.push(b);
         return;
       }
-      if ((s.type === 'patio' || s.type === 'driveway') && (s.poly !== undefined || s.surface !== undefined || s.color !== undefined || s.smooth !== undefined)) { buildSlab(s, si, { put, water, groundAt }); return; }
+      if ((s.type === 'patio' || s.type === 'driveway') && (s.poly !== undefined || s.surface !== undefined || s.color !== undefined || s.smooth !== undefined)) { buildSlab(s, si, { put, water, groundAt, rank: site.slice(0, si).filter(isGroundSlab).length }); return; }
       if (s.type === 'deck' && newDeck(s, water)) { buildDeck(s, si, { put, water, solids, groundAt }); return; }
       if (s.type === 'steps' && newSteps(s, terraced, groundAt)) { buildSteps(s, si, { put, solids, groundAt }); return; }
       const fn = SITE[s.type];
       if (!fn) { (anchors.siteDropped ||= []).push({ site: si, type: s.type }); return; }   // never silently: the scene QA reports it
       const o = put(() => fn(s, water), s.at[0], s.at[1], s.y ?? groundAt(s.at[0], s.at[1]), null, 'site');
+      if (isGroundSlab(s)) biasSlab(o, site.slice(0, si).filter(isGroundSlab).length);
       o.rotation.y = (s.rot || 0) * DEG;
       if (s.type === 'cypress' || s.type === 'palm') siteKit.vary(o, s, si);   // seeded scale / lean / spin
       if (s.type !== 'car' && s.color === undefined) kit.mute(o);   // restrained palette: no orange porch decks, no cyan basins
@@ -488,7 +502,7 @@ export function createSiteBuild(bctx) {
   }
 
   // ---- patios and driveways (S4): any outline (`poly`, curved when `smooth`), a surface and a colour, cut round water -
-  function buildSlab(s, si, { put, water, groundAt }) {
+  function buildSlab(s, si, { put, water, groundAt, rank = 0 }) {
     const t = tensionOf(s.smooth), raw: P2[] = Array.isArray(s.poly) && s.poly.length >= 3 ? s.poly : rectPoly(s.at, s.w || 4, s.d || 3, s.rot || 0);
     const outline = t === null ? raw : ctxFor0(s);
     const h = s.type === 'patio' ? 0.08 : 0.06, c = centroid(outline), y = s.y ?? groundAt(c[0], c[1]);
@@ -506,6 +520,7 @@ export function createSiteBuild(bctx) {
     const geo = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false, curveSegments: 4 }); geo.rotateX(Math.PI / 2);
     const m = new THREE.Mesh(geo, mat); m.position.y = y + h; m.receiveShadow = true; g.add(m);
     const o = put(() => g, 0, 0, 0, null, 'site'); o.userData.category = 'Site'; o.userData.siteType = s.type;
+    biasSlab(o, rank);
     const b = bboxG(outline);
     (anchors0.siteInstances ||= []).push({ site: si, type: s.type, part: 'slab', shape: 'poly', poly: outline.map(p => [r3(p[0]), r3(p[1])]), color: '#' + (m.material.color ? m.material.color.getHexString() : 'cccccc'), box: [b.x0, y, b.z0, b.x1, y + h, b.z1].map(r3) });
   }

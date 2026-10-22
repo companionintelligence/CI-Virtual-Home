@@ -28,6 +28,7 @@ registerDress({
   // A tall mirror leaning on the wall behind it: a wooden frame and a mirror panel, its top resting 0.16 m back.
   'leaner-mirror': dressType({
     name: 'leaner-mirror', footprint: [0.57, 0.2], height: 1.58, rolls: 1, tags: ['hall', 'bedroom'], surface: false,
+    bias: { mirror: 2 },   // the mirror's back and the frame's back are one plane (z 0): two steps of depth bias make the mirror win it, and move no box
     build(k) {
       k.with({ rx: -0.1 }, () => {
         k.add('wood', box(0.56, 1.58, 0.04), { z: 0.02 });                    // pivot at the bottom of the BACK face, so nothing dips under the floor

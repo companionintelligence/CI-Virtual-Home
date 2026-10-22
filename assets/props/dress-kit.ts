@@ -330,7 +330,7 @@ export class Kit {
     return b;
   }
   /** One mesh per role, in the order the roles were first used. `paint` overrides a role's colour (an item's own `color`). */
-  build(ctx: any, name: string, paint: Record<string, number> = {}): any {
+  build(ctx: any, name: string, paint: Record<string, number> = {}, bias: Record<string, number> = {}): any {
     const { THREE, group, std, colors } = ctx;
     const g = group(name);
     for (const [role, a] of this.roles) {
@@ -344,6 +344,7 @@ export class Kit {
       const col = paint[role] !== undefined ? paint[role] : spec.fixed !== undefined ? spec.fixed : (colors[spec.from!] ?? colors[spec.fallback || 'linen']);
       const mat = std(col, { roughness: spec.rough, metalness: spec.metal || 0, ...(a.shaded ? { vertexColors: true } : {}) });
       if (spec.fixed !== undefined && paint[role] === undefined) mat.userData.muted = true;
+      if (bias[role]) { mat.polygonOffset = true; mat.polygonOffsetFactor = 0; mat.polygonOffsetUnits = -bias[role]; }
       const m = new THREE.Mesh(geo, mat); m.name = role; m.castShadow = true; m.receiveShadow = true; g.add(m);
     }
     g.userData.dress = { thinnest: r5(this.thinnest), thinnestFree: this.thinnestFree === Infinity ? null : r5(this.thinnestFree), segWide: this.minSegWide === Infinity ? null : this.minSegWide };   // the invariants test-dress-kit.mts reads (group data only: material userData is the batcher's)
@@ -388,16 +389,19 @@ export interface DressSpec {
   rolls?: number;
   /** the role the item's own `color` paints, when it takes one */
   paint?: string;
+  /** roles that win a plane they share with another role of the object (a mirror's back and its frame's): the units of depth bias each role's
+   *  material carries. A bias is a draw state; moving the part a millimetre would move a box of the world digest (see README, Geometry detectors). */
+  bias?: Record<string, number>;
   /** build the object into the kit; `u` are the item's rolls in [0, 1), `ctx` the prop context (for colours the build wants to read) */
   build(k: Kit, it: any, u: number[], ctx: any): void;
   [k: string]: any;
 }
 /** Turn a spec into a registry definition: create() draws its rolls, builds a Kit, and returns the merged group (one mesh per role). */
 export function dressType(spec: DressSpec): DressDef {
-  const { name, rolls: nRolls, paint, build, params, ...def } = spec;
+  const { name, rolls: nRolls, paint, build, params, bias, ...def } = spec;
   const title = name.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
   return {
     ...def, params: params || (paint ? ['color', 'variant'] : ['variant']),
-    create(it: any, ctx: any) { const u = rolls(ctx.rng, nRolls ?? 6), k = new Kit(); build(k, it, u, ctx); return k.build(ctx, title, paint ? paintOf(it, ctx, paint) : {}); },
+    create(it: any, ctx: any) { const u = rolls(ctx.rng, nRolls ?? 6), k = new Kit(); build(k, it, u, ctx); return k.build(ctx, title, paint ? paintOf(it, ctx, paint) : {}, bias || {}); },
   } as DressDef;
 }
