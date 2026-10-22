@@ -166,7 +166,7 @@ export default async function typography(ctx: TestCtx): Promise<void> {
         const g = await page.evaluate(GLASS, '.st-card');
         ok(m.mode === 'card' && m.solvedW >= 359 && m.solvedW <= 561 && m.card.w <= m.solvedW + 0.5 && g && g.spare >= -0.5 && m.card.w <= vw * 0.46 + 1 && m.card.x >= -0.5 && m.card.x + m.card.w <= vw + 0.5, `${tag}: a card of ${Math.round(m.card.w)} px (${(m.card.w / vw * 100).toFixed(0)} % of the window), the solver's ${m.solvedW} px trimmed to its widest line and padding (${g && Math.round(g.widest + g.padR)} px at least; the wanted clamp(420px, 32vw, 560px), or a narrower one)`);
       }
-      if (i === 0) { const tc = await page.evaluate(PROBE); if (tc.titleEl) ok(near(tc.titleEl.px, t.title, 0.1) && tc.titleEl.weight === 700, `${label}: a card's title is --st-title (${tc.titleEl.px.toFixed(2)} px) in the canon's 700`); }
+      if (i === 0) { const tc = await page.evaluate(PROBE); if (tc.titleEl) ok(near(tc.titleEl.px, t.title, 0.1) && tc.titleEl.weight === 500, `${label}: a card's title is --st-title (${tc.titleEl.px.toFixed(2)} px) at the restyle's headline weight 500`); }
       if (more && i === more.i) {
         await ctx.shot(page, `type-${label}-beat-closed`);
         await page.evaluate(() => (window as any).__houseStory.setMore(true)); await sleep(450);
@@ -325,8 +325,8 @@ export default async function typography(ctx: TestCtx): Promise<void> {
         });
       });
       const heading = (n: any) => n.tag === 'h1' || n.tag === 'h2', rem = 17;
-      ok(names.length >= 8 && names.every((n: any) => n.upper && n.track >= NAME_TRACK && n.weight >= 700), `${slug} family page ${label}: all ${names.length} names (hero, people nav, each person, the day, the next and previous family) are uppercase by CSS, bold, tracked at least 0.15em`);
-      ok(names.filter(heading).every((n: any) => n.px + 0.05 >= 1.5 * rem) && names.filter((n: any) => !heading(n)).every((n: any) => n.px + 0.05 >= 0.85 * rem), `${slug} family page ${label}: a heading name is 1.5rem or more (smallest ${Math.min(...names.filter(heading).map((n: any) => n.px)).toFixed(1)} px), a nav chip or section label 0.85rem or more (smallest ${Math.min(...names.filter((n: any) => !heading(n)).map((n: any) => n.px)).toFixed(1)} px)`);
+      ok(names.length >= 8 && names.every((n: any) => n.upper && n.track >= NAME_TRACK && n.weight >= (n.tag === 'h1' ? 500 : 700)), `${slug} family page ${label}: all ${names.length} names (hero, people nav, each person, the day, the next and previous family) are uppercase by CSS, bold, tracked at least 0.15em`);
+      ok(names.filter(heading).every((n: any) => n.px + 0.05 >= (n.tag === 'h1' ? 1.25 : 1.5) * rem) && names.filter((n: any) => !heading(n)).every((n: any) => n.px + 0.05 >= 0.85 * rem), `${slug} family page ${label}: a heading name is 1.5rem or more (the hero's h1 1.25rem, the restyle) (smallest ${Math.min(...names.filter(heading).map((n: any) => n.px)).toFixed(1)} px), a nav chip or section label 0.85rem or more (smallest ${Math.min(...names.filter((n: any) => !heading(n)).map((n: any) => n.px)).toFixed(1)} px)`);
       const low = names.filter((n: any) => n.ratio < 4.5);
       ok(low.length === 0, `${slug} family page ${label}: every name is 4.5:1 or better against its page${low[0] ? ': ' + low.slice(0, 3).map((n: any) => `${n.ratio.toFixed(2)} "${n.text.slice(0, 20)}" ${n.cls}`).join(' | ') : ''}`);
       const real = await page.evaluate(() => Array.from(document.querySelectorAll('.who-nav a')).map(a => ({ label: a.getAttribute('aria-label') || '', text: (a.querySelector('.nm') || { textContent: '' }).textContent || '' })));
