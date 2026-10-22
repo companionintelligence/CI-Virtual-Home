@@ -5,7 +5,14 @@
 // tokens --st-min (1.5rem of the canon's 17 px root = 25.5 px at 768 px and wider, clamp(20px, 5.4vw, 25.5px) on a phone), --st-title (2.25rem) and --st-hook (2.6rem),
 // defined in portal/viewer.css and used by portal/story.css. Nothing here sets a size; a card that is taller than its room scrolls inside (and keeps the word being
 // spoken in view), it never shrinks its type. A person's name is kept as the person wrote it in the DOM and in every aria-label; the kicker look (all caps, 0.2em
-// tracking, bold, the sage accent) is CSS on `.st-name`.
+// tracking, bold, the accent) is CSS on `.st-name`.
+//
+// The container fits the text (the owner's glass mockup, 2026-10, rule 3). Once the solver has placed a card at the width it chose, `fitWidth` trims the box to its
+// widest wrapped line plus the right padding: Range.getClientRects over every text node (one rect a line) and the right edges of the chips, buttons, the monogram and a
+// logo. Never wider than the solved width (a narrower card can only cover less of the subject), never on a phone's sheet (full width by contract); the left edge and the
+// height stay. Two boxes sit pinned to the far end of a row and are measured by what they need, not where they are: the "More" toggle (the kicker's right edge, the gap and
+// its own width) and a person's button on the start card (its content and padding). A trim that would make the content taller (a re-wrap) is undone. `data-solved-w` keeps the
+// solver's width for the tests, and `box` is the card as drawn, which the leader starts from (the solved rect would start it in the air beside a trimmed card).
 //
 // One surface for the words. The card shows the kicker (who, with which companion), the title, the beat's text lit word by word as it is
 // spoken (captions.ts), the apps as chips (the chip that names an app wears its real logo, 1.3 times the type: story v2, `rs.media`), a "More" toggle when
@@ -44,6 +51,97 @@ export const SYNTHETIC_VOICE_LINE = FINE_PRINT[1];
 const BETA_SHORT = FINE_PRINT[3];
 /** Where the end card sends a visitor besides the story's own call to action (the same address as assets/viewer.ts's DOWNLOAD_URL and the site's LINKS.download). */
 export const DOWNLOAD_URL = 'https://ci.computer/download';
+
+/** the boxes a reader sees as content besides the text: their right edges count toward a card's widest line */
+export const FIT_BOXES = '.st-chip, .st-btn, .st-more-btn, .st-disc, .st-logo, .st-member';
+/** boxes that sit pinned to the far end of a row: measured by what they need (see widestLine), not by where they are */
+const PINNED = '.st-more-btn, .st-member';
+/** Run `fn` with a surface laid out: a hidden one (the first beat's card, the end card before it shows) is shown invisibly for the call, as `measure` does. */
+export function whileLaidOut<T>(c: HTMLElement, fn: () => T): T {
+  const was = c.hidden, vis = c.style.visibility;
+  c.hidden = false; c.style.visibility = 'hidden';
+  try { return fn(); } finally { c.hidden = was; c.style.visibility = vis; }
+}
+/** the room a line of text needs to its right inside `root`: the padding, border and margin at the right of every box it sits in (a phone drawing's panel, the agent's quoted line ...) */
+function trail(e: Element, root: Element): number {
+  let t = 0;
+  for (let a: Element | null = e; a && a !== root; a = a.parentElement) {
+    const cs = getComputedStyle(a);
+    t += (parseFloat(cs.paddingRight) || 0) + (parseFloat(cs.borderRightWidth) || 0) + (parseFloat(cs.marginRight) || 0);
+  }
+  return t;
+}
+/**
+ * the rightmost edge (client px) of the text lines under `root`, each with the room its boxes need to its right (a trim must not narrow a panel that holds the line below
+ * the line's own width), and of the boxes `boxes` names (hidden parts skipped); -Infinity when there is none
+ */
+function rightEdge(root: Element, boxes: string): number {
+  let w = -Infinity;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (!(n.textContent || '').trim()) continue;
+    const e = n.parentElement; if (!e || e.closest('[hidden]')) continue;
+    const range = document.createRange(); range.selectNodeContents(n);
+    const extra = trail(e, root);
+    for (const r of Array.from(range.getClientRects())) if (r.width > 0) w = Math.max(w, r.right + extra);
+  }
+  for (const b of Array.from(root.querySelectorAll<HTMLElement>(boxes))) {
+    if (b.closest('[hidden]')) continue;
+    const r = b.getBoundingClientRect(); if (r.width > 0) w = Math.max(w, r.right);
+  }
+  return w;
+}
+/**
+ * The widest wrapped line of a laid-out surface, px from its border-box left edge: every text node's line rects and the right edges of FIT_BOXES. The two boxes that sit
+ * at the far end of a row are measured by what they need: the "More" toggle is the kicker's right edge + the head's gap + its own width, a person's button on the start
+ * card its content's right edge + its own padding (a button as wide as its column would otherwise hold the card at the width it already has).
+ */
+export function widestLine(card: HTMLElement): number {
+  const left = card.getBoundingClientRect().left;
+  const plain = FIT_BOXES.split(', ').filter(s => !PINNED.split(', ').includes(s)).join(', ');
+  let w = rightEdge(card, plain) - left;
+  if (!Number.isFinite(w)) w = 0;
+  for (const b of Array.from(card.querySelectorAll<HTMLElement>('.st-more-btn'))) {
+    const head = b.parentElement; if (!head || b.closest('[hidden]')) continue;
+    const kick = head.querySelector('.st-kicker'), gap = parseFloat(getComputedStyle(head).columnGap) || 0;
+    const k = kick ? rightEdge(kick, '.st-disc') : -Infinity;
+    w = Math.max(w, (Number.isFinite(k) ? k - left + gap : 0) + b.getBoundingClientRect().width);
+  }
+  for (const b of Array.from(card.querySelectorAll<HTMLElement>('.st-member'))) {
+    if (b.closest('[hidden]')) continue;
+    const cs = getComputedStyle(b), c = rightEdge(b, '.st-disc');
+    if (Number.isFinite(c)) w = Math.max(w, c - left + (parseFloat(cs.paddingRight) || 0) + (parseFloat(cs.borderRightWidth) || 0));
+  }
+  return w;
+}
+/**
+ * Trim a placed surface to its widest line plus its right padding (and the room a scrollbar takes), never wider than `solved`; returns the width set. The left edge is
+ * the caller's and stays; the height is not touched. `+1`: a line measured at a fraction of a pixel must still fit at the trimmed width. A trim that makes the content
+ * taller (a column or a line that re-wraps at the narrower width) is undone: the container fits the text, but never at the cost of the card's height. It trims again while
+ * the text lays itself out shorter at the new width (`text-wrap: balance`), so what is left at the right of the widest line is the +1 and nothing more.
+ */
+export function fitWidth(card: HTMLElement, solved: number): number {
+  const cs = getComputedStyle(card);
+  const bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0;
+  const padR = (parseFloat(cs.paddingRight) || 0) + br;
+  const full = Math.max(0, Math.round(solved));
+  card.style.width = `${full}px`;
+  card.dataset.solvedW = String(full);
+  // (a balanced title or a paragraph that is set to fill its lines lays itself out again at the narrower width, and its widest line may then be shorter still: trim again until
+  // the width stops moving, up to four times)
+  let cur = full;
+  for (let pass = 0; pass < 4; pass++) {
+    const bar = Math.max(0, card.offsetWidth - card.clientWidth - bl - br);     // a vertical scrollbar, when the card scrolls
+    const want = Math.ceil(widestLine(card) + padR + bar) + 1;
+    const w = Math.max(0, Math.min(cur, want));
+    if (w >= cur - 1) break;
+    const h = card.scrollHeight;
+    card.style.width = `${w}px`;
+    if (card.scrollHeight > h + 1) { card.style.width = `${cur}px`; break; }
+    cur = w;
+  }
+  return cur;
+}
 
 // ---- the beat card ----------------------------------------------------------------------------------------------------------------------
 export class BeatCard {
@@ -210,9 +308,19 @@ export class BeatCard {
     const c = this.el;
     c.dataset.mode = mode;
     c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = '';
-    // a card whose content is taller than its box scrolls inside it, so it takes the pointer (one that fits leaves the picture to the pointer)
-    c.dataset.scroll = c.scrollHeight > Math.round(r.h) + 1 ? '1' : '0';
+    c.dataset.solvedW = String(Math.round(r.w));
+    let w = Math.round(r.w);
+    whileLaidOut(c, () => {
+      // the container fits the text: a wide window's card is trimmed to its widest line (a phone's sheet is full width by contract); the left edge and the height stay
+      if (mode === 'card') w = fitWidth(c, r.w);
+      // a card whose content is taller than its box scrolls inside it, so it takes the pointer (one that fits leaves the picture to the pointer)
+      c.dataset.scroll = c.scrollHeight > Math.round(r.h) + 1 ? '1' : '0';
+    });
+    this.rect = { x: Math.round(r.x), y: Math.round(r.y), w, h: Math.round(r.h) };
   }
+  private rect: Rect = { x: 0, y: 0, w: 0, h: 0 };
+  /** the card's box as drawn (px, in the tour's layer): the trimmed width, not the solved one. The leader starts from this edge. */
+  get box(): Rect { return this.rect; }
   show(on: boolean): void {
     const c = this.el;
     if (on === !c.hidden && c.classList.contains('st-in') === on) return;
@@ -301,8 +409,11 @@ export type StartChoice = 'sound' | 'silent';
 export type StartMember = { id: string; name: string; archetype: string; colour: string; beat: number };
 export class StartCard {
   readonly el: HTMLElement;
+  /** the dialog inside the scrim */
+  readonly card: HTMLElement;
   private primary: HTMLButtonElement;
   private secondary: HTMLButtonElement;
+  private gone = false;
   constructor(host: HTMLElement, rs: RuntimeStory, opts: {
     shared: RuntimeBeat | null; audio: boolean;
     /** the person ?member= asked to start with, when it named one of the family */
@@ -313,14 +424,14 @@ export class StartCard {
   }) {
     // the outer element is the scrim, the inner one the dialog. Two columns on a wide screen (the copy and the buttons; the family and the fine print), one below.
     const wrap = (this.el = el('div', 'st-start'));
-    const c = el('div', 'st-start-card');
+    const c = (this.card = el('div', 'st-start-card'));
     c.setAttribute('role', 'dialog'); c.setAttribute('aria-labelledby', 'st-start-h'); c.setAttribute('aria-describedby', 'st-start-p');
     wrap.append(c);
     const copy = el('div', 'st-start-copy'), more = el('div', 'st-start-more');
     c.append(copy, more);
     const shared = opts.shared;
     const mins = Math.max(1, Math.round(rs.duration / 60));
-    // (the kicker line is all caps with wide tracking in the sage accent, and "Starting with John" is a person's name: the string stays as written, CSS makes the capitals)
+    // (the kicker line is all caps with wide tracking in the accent, and "Starting with John" is a person's name: the string stays as written, CSS makes the capitals)
     copy.append(el('p', 'st-start-kick', shared ? 'A shared moment' : opts.member ? `Starting with ${opts.member.name}` : 'Interactive tour'));
     const h = el('h2', '', shared ? shared.popup.title : `The ${rs.family.surname} family home`);
     h.id = 'st-start-h';
@@ -361,10 +472,30 @@ export class StartCard {
     for (const t of FINE_PRINT) if (opts.audio || t !== SYNTHETIC_VOICE_LINE) fine.append(el('li', '', t));
     more.append(fine);
     host.append(wrap);
+    this.fit();
+    // (the web font arriving re-wraps the lines: fit again when it has)
+    try { void document.fonts.ready.then(() => { if (!this.gone) this.fit(); }); } catch { /* no font API */ }
+  }
+  /**
+   * The dialog is as wide as its content up to its max (CSS: fit-content, then 1000 px or the window), then trimmed to its widest line. Two columns re-wrap as the width
+   * goes, so it is measured again (up to three times) until the slack is under a pixel; a trim that makes it taller is undone (fitWidth). Called on mount, when the fonts
+   * arrive, and by the director on a resize.
+   */
+  fit(): void {
+    const c = this.card; c.style.width = '';
+    whileLaidOut(this.el, () => {
+      const max = Math.round(c.getBoundingClientRect().width);
+      if (max < 1) return;                       // not laid out (the player is not showing yet): the director fits it again when it is
+      for (let pass = 0; pass < 3; pass++) {
+        const now = c.getBoundingClientRect().width;
+        if (now - fitWidth(c, now) < 1) break;
+      }
+      c.dataset.solvedW = String(max);
+    });
   }
   focus(): void { this.primary.focus({ preventScroll: true }); }
   contains(n: Node | null): boolean { return !!n && this.el.contains(n); }
-  destroy(): void { this.el.remove(); }
+  destroy(): void { this.gone = true; this.el.remove(); }
 }
 
 // ---- the end card -------------------------------------------------------------------------------------------------------------------------
@@ -395,7 +526,14 @@ export class EndCard {
   setNarration(ms: number | null): void { this.karaoke.set(ms); }
   /** the card with its padding and gaps tighter (the type is never touched): for a window too short for the card at its full padding */
   setTight(on: boolean): void { this.el.classList.toggle('st-tight', on); }
-  put(r: Rect): void { const c = this.el; c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = ''; }
+  /** place the card; a wide window's panel is then trimmed to its widest line (a phone's sheet is full width by contract) */
+  put(r: Rect, mode: 'card' | 'sheet' = 'card'): void {
+    const c = this.el;
+    c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = '';
+    c.dataset.solvedW = String(Math.round(r.w));
+    c.dataset.mode = mode;
+    if (mode === 'card') whileLaidOut(c, () => fitWidth(c, r.w));
+  }
   /** the card's size at this width: `full` is the height its content needs, `h` that or `maxH` (a taller one scrolls inside) */
   measure(width: number, maxH = Infinity): { w: number; h: number; full: number; type: number } {
     const c = this.el, was = c.hidden, vis = c.style.visibility;
