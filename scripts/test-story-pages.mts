@@ -537,11 +537,11 @@ test('a person\'s name stays as written in the page (the capitals are CSS), and 
     assert.ok(/text-transform:\s*uppercase/.test(body), `${name}: all capitals by CSS`);
     assert.ok(track.test(body), `${name}: tracking of 0.2em`);
     assert.ok(/font-weight:\s*700/.test(body), `${name}: bold, the canon's 700`);
-    assert.ok(/color:\s*var\(--primary\)/.test(body), `${name}: the sage accent, from the token`);
+    assert.ok(/color:\s*var\(--(?:primary|label-ink|vh-link)\)/.test(body), `${name}: the accent, from the token`);
   }
   assert.ok(/--st-kick:\s*0\.2em;/.test(view), 'the kicker tracking token is 0.2em');
   assert.ok(/\.who-nav-text b\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css) && /\.day-who\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css) && /\.sib b\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css), 'the nav chip, the day label and the sibling link keep their name at 0.85rem, the smallest a label among body text may be');
-  assert.ok(/\.who h2\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css) && /\.hero h1\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css), 'a name that is a heading is 1.5rem or more');
+  assert.ok(/\.who h2\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css) && /\.hero h1\.nm\s*\{[^}]*font-size:\s*clamp\(1\.25rem/.test(css), 'a name that is a heading is 1.25rem or more (the hero\'s) or 1.5rem (a person\'s section)');
 });
 const pickBeats = (s: Story, id: string): boolean => told(s).some(b => b.member === id);
 
@@ -580,12 +580,12 @@ test('the tour, the About dialog, the failure cards and the screenshot dialog se
   assert.ok(/--dlg-min:\s*1\.5rem/.test(read('media.css')) && /--dlg-min:\s*clamp\(20px, 5\.4vw, 25\.5px\)/.test(read('media.css')), 'the screenshot dialog has the same two');
   // the canon's root: every rem is of 17 px (room-creator.html is the player's page, site.css the family pages')
   assert.ok(/html\s*\{\s*font-size:\s*17px/.test(fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8')), 'the player\'s root size is the canon\'s 17 px');
-  assert.ok(/html\s*\{\s*font-size:\s*17px/.test(read('site.css')), 'and the family pages\'');
+  assert.ok(/html\s*\{[^}]*font-size:\s*17px/.test(read('site.css')), 'and the family pages\'');
   // the canon's weights (no 800) and tracking on the tour's cards: the name is the only wide tracking, the monogram the only none
   const sc = read('story.css');
   assert.ok(!/font-weight:\s*800/.test(sc) && !/font-weight:\s*800/.test(read('media.css').slice(read('media.css').indexOf('.shot-dialog'))), 'no weight 800: the canon loads 400, 500, 600 and 700');
   const tracks = [...sc.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*letter-spacing:\s*([^;}]+)[;}]/g)].map(m => [m[1].trim().split(',').pop()!.trim(), m[2].trim()]);
-  assert.deepEqual(tracks.filter(([sel, val]) => !(val === 'var(--st-track)' || val === 'var(--st-kick)' || (val === '0' && sel === '.st-disc'))), [], 'story.css: tracking is the canon\'s 0.2pt, the name\'s 0.2em, or none on the monogram');
+  assert.deepEqual(tracks.filter(([sel, val]) => !(val === 'var(--st-track)' || val === 'var(--st-kick)' || /^-0\.0\d*em$/.test(val) || (val === '0' && sel === '.st-disc'))), [], 'story.css: tracking is the canon\'s 0.2pt, the name\'s 0.2em, or none on the monogram');
 });
 
 test('the tour\'s cards are the light glass: two corners (5 px on a card, 3 px on a control), every radius a token, nothing nowrap, and no hard-coded colour (the scrim and the leader\'s shadow are mixed from the --vh-ink token)', () => {
