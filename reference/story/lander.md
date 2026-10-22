@@ -19,8 +19,8 @@ this file is the contract of the page's parts. Its code is `scripts/portal-front
 | Meet the families | `homes` | six featured cards, then every family and home in a native `<details>` | `featuredOf`, `cardPairs`, the families |
 | Footer | | the four destinations, the sign-off, the fine print, the apps named, every home's page | `signoff`; `finePrint('lander-footer')`; `appsNamed`; `galleryHomeIndex` |
 
-The Core's offer is 1.5 screens down on a desktop and 2.4 on a phone (it was 9.6 and 23.5); the page is at most 5 and 7.5 screens. The test holds both
-(`portal-tests/lander.mts`). Buy, Download and the docs are offered three times (header, band, footer), the main site twice; the build refuses one inside the
+The Core's offer is 1.5 screens down on a desktop and 2.35 on a 390 x 844 phone (it was 9.6 and 23.5); the page is at most 5 and 7.5 screens. The test holds both
+(`portal-tests/lander.mts`: at most 3 and 2.5 down). Buy, Download and the docs are offered three times (header, band, footer), the main site twice; the build refuses one inside the
 argument, the proof, the chooser or the families.
 
 ## Words, and where they may come from
@@ -83,6 +83,11 @@ with no script has no dead controls; everything that argues, proves and offers r
 - `pnpm run test:node`: `test-pairs`, `test-lander` (the plan, the gate, the featured choice, the proof), `test-lander-page` (the page checks, a negative control for each), `test-gallery-count`.
 - `pnpm run portal:test -- --only gallery,campaign` and `-- --only hooks --hook lander`: the fold, depth, the sticky header, the chooser with an ad's tags, deep links, no JavaScript, the list refused, heading levels,
   touch targets, the tags on every way in.
+- The phone rules (`portal-tests/mobile-site.mts`, at 390 x 844, 360 x 640, 320 x 568 and 844 x 390 on its side): nothing scrolls sideways and every box is border-box; the header is one slim bar (56 px, 52 on its
+  side) with Download and Buy in it on every page and no menu hiding them; every control is a 44 px target; type is 13 px for a label, 14 px for small print and 16 px for reading text (a text field 16 px);
+  every image has its size, the far ones are lazy and the hero is the 640 px picture; the Core's offer is at most 2.5 screens down; safe-area insets, a visible focus ring, reduced motion, contrast in both colour
+  sets, the screenshot dialog's fit, and the Slow 4G budget (the largest picture in 2.5 s, a shift under 0.05, under 1 MB before a first touch). `scripts/test-site-css.mts` (quick, in `test:node`) holds
+  the stylesheets' braces and the header's markup without a browser.
 
 ## Not built, on purpose
 

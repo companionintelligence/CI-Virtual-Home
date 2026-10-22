@@ -257,3 +257,59 @@
 /* the tagline under it carries the sentence: the display role, Manrope 500 on the 60px scale, capped where the copy column holds it */
 .hero .tagline { font-size: clamp(30px, 2.6vw + 8px, 48px); font-weight: 500; line-height: 1.08; letter-spacing: -0.025em; color: var(--foreground); max-width: 22em; text-wrap: balance; }
 .who-nav a { gap: 12px; }
+
+/* ===================================================== phones: type floors, targets, a shorter page, a screen on its side =====================================================
+   Reading text is 16 px, the small print (captions, notes, the strip, the footer) 14 px, a label or a chip 13 px, on a phone upright (up to 700 px wide) and on its side (a short
+   screen that cannot hover). The desktop sizes above are unchanged. A control is 44 px tall or more. The people's bar and the tour bar stick, so on a phone they are as slim as a
+   44 px target allows and they let go on a short screen. portal-tests/mobile-site.mts holds all of it. */
+@media (max-width: 700px), (max-height: 500px) and (hover: none) {
+  .who-work, .who-bio, .moment-body, .moment .say, .agent, .more-body, .day-line, .spot p, .swap-list li, .steps-compact p { font-size: 16px; }
+  .spot h3, .shots h3 { font-size: 16px; }
+  .moment .note, .agent .limits, .more-cap, .shot figcaption, .swap-cap, .instead, .note, .block p.note, .strip ul, .hero-note, .home-facts li, .plan-cap, .plan-hint, .home-note, .foot-notes p, .film-note, .film-note p { font-size: 14px; }
+  .address { font-size: 15px; }
+  .day-link, .play-from, .more summary { font-size: 15px; }
+  .chip, .tag-scripted, .sib small, .who-nav-text small { font-size: 13px; }
+  .site-foot { font-size: 14px; }
+  .foot-brand, .foot-grid b { font-size: 14px; }
+  .legal { font-size: 13px; }
+  .tourbar .btn { min-height: 44px; }
+  .strip ul li { line-height: 1.5; }
+  .more-body { gap: 14px; }
+  .who-nav a { min-height: 44px; padding-top: 4px; padding-bottom: 4px; }
+  .who-nav { padding-top: 6px; padding-bottom: 6px; }
+  .tourbar:not([hidden]) { padding-left: max(var(--grid-margin), env(safe-area-inset-left, 0px)); padding-right: max(var(--grid-margin), env(safe-area-inset-right, 0px)); padding-top: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 700px) {
+  .day-list { padding-left: 20px; }
+  .day-item { padding: 12px 12px 6px 12px; }
+  .day-item::before { left: -27px; }
+  .block { padding-top: clamp(28px, 6vw, 40px); }
+  .closing { padding: 28px 18px; }
+}
+/* the apps: two to a row when the phone is wide enough to hold a logo and a name in half of it, one to a row below that */
+@media (max-width: 520px) and (min-width: 350px) {
+  .apps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .app { padding: 10px 12px; }
+  .app-name { align-items: flex-start; gap: 8px; line-height: 1.25; padding-top: 2px; }
+  .app-name .logo { width: 28px; height: 28px; }
+  .app-name .i-out { display: none; }
+}
+/* a phone on its side: the picture beside the name, the bars let go (a 390 px screen cannot spare 120 px of it for two bars) */
+@media (min-width: 700px) and (max-width: 1100px) and (max-height: 500px) {
+  .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "copy poster" "actions poster"; align-content: center; padding-top: 16px; gap: 14px 28px; }
+  .hero-copy { align-self: end; }
+  .hero-actions { align-self: start; }
+  .hero .poster { align-self: center; }
+  .hero h1.nm { font-size: 1.1rem; }
+  .hero .tagline { font-size: clamp(24px, 3.4vw, 32px); }
+}
+@media (max-height: 500px) {
+  .who-nav { position: static; }
+  .who, .moment { scroll-margin-top: 16px; }
+  .tourbar:not([hidden]) { display: none; }
+}
+/* print: the page as a plain document */
+@media print {
+  .who-nav { position: static; }
+  .tourbar { display: none !important; }
+}

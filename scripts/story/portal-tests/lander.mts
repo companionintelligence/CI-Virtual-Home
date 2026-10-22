@@ -3,7 +3,7 @@
 //
 // What the page promises (reference/story/lander.md), held where a person meets it:
 //   the fold      at 1440 × 900 and 390 × 844 the message, the label, the beta line, what a Core is, "Take the tour" and Buy (and Download) are inside the first screen
-//   depth         the Core's offer is at most 3 screens down on a desktop and 4 on a phone, the whole page at most 5 and 7.5 (it was 9.6 and 23.5 down); the sticky header keeps
+//   depth         the Core's offer is at most 3 screens down on a desktop and 2.5 on a phone, the whole page at most 5 and 7.5 (it was 9.6 and 23.5 down); the sticky header keeps
 //                 Buy and Download in reach after two screens of scroll; nothing scrolls sideways at 320, 390, 768 and 1440
 //   the chooser   a chip narrows the families and puts service= in the address with every other parameter (an ad's tags) kept byte for byte; the cards shown are the chip's
 //                 count; a second press lets go; a job chip narrows the chips; "Clear filters" resets; the search finds the same families as the chip; ?service= from an ad lights
@@ -50,7 +50,7 @@ export default async function lander(ctx: TestCtx): Promise<void> {
     const present = BLOCKS.filter((_, i) => depth.tops[i] >= 0);
     ok(present.map(b => depth.tops[BLOCKS.indexOf(b)]).every((t, i, a) => i === 0 || t > a[i - 1]) && present.includes('core') && present.includes('swap') && present.includes('homes'), `${tag}: the blocks are in order: ${present.join(', ')}`);
     const coreAt = depth.tops[BLOCKS.indexOf('core')] / depth.vh, pageAt = depth.height / depth.vh;
-    ok(coreAt <= (mobile ? 4.0 : 3.0), `${tag}: the Core's offer is ${coreAt.toFixed(2)} screens down (at most ${mobile ? 4 : 3}; the page it replaces was ${mobile ? 23.5 : 9.6})`);
+    ok(coreAt <= (mobile ? 2.5 : 3.0), `${tag}: the Core's offer is ${coreAt.toFixed(2)} screens down (at most ${mobile ? 2.5 : 3}; the page it replaces was ${mobile ? 23.5 : 9.6})`);
     ok(pageAt <= (mobile ? 7.5 : 5.0), `${tag}: the whole page is ${pageAt.toFixed(2)} screens (at most ${mobile ? 7.5 : 5})`);
     // (before any scroll: what the first load asks for, which is what a phone pays for) no media image from the app or Companion folders, no Core frame until it nears the screen
     const early = requests.map((u: string) => u.replace(ctx.base, ''));
@@ -73,8 +73,8 @@ export default async function lander(ctx: TestCtx): Promise<void> {
     for (let i = 0; i < 6; i++) { await page.keyboard.press('Tab'); order.push(await page.evaluate(() => { const a = document.activeElement as HTMLAnchorElement; return a?.dataset?.cta || a?.className?.split(' ')[0] || a?.tagName || ''; })); }
     ok(order[0] === 'skip' && order[1] === 'brand-ci' && order.indexOf('download') > 1 && order.indexOf('buy') > order.indexOf('download'), `${tag}: the header's tab order is the skip link, the brand, then Docs, Download and Buy (${order.join(', ')})`);
     if (mobile) {
-      const small = await page.evaluate(() => ['.pair', '.tag.persona', '.btn', '.hero-pointer', '.site-nav a', '.proof-actions a', '#clear'].flatMap(sel => Array.from(document.querySelectorAll(sel)).filter(e => (e as HTMLElement).offsetParent !== null).map(e => ({ sel, h: Math.round(e.getBoundingClientRect().height) }))).filter(x => x.h > 0 && x.h < 36));
-      ok(small.length === 0, `390: the controls are not smaller than 36 px${small.length ? ` (${small.slice(0, 3).map(x => `${x.sel} ${x.h}`).join(', ')})` : ''}`);
+      const small = await page.evaluate(() => ['.pair', '.tag.persona', '.btn', '.hero-pointer', '.site-nav a', '.proof-actions a', '#clear', '#q', '#types button', '.foot-homes a', '.foot-links a', '.siblings a', '.foot-apps summary', '.all-homes summary'].flatMap(sel => Array.from(document.querySelectorAll(sel)).filter(e => (e as HTMLElement).offsetParent !== null).map(e => { const r = e.getBoundingClientRect(); return { sel, h: Math.round(r.height), w: Math.round(r.width) }; })).filter(x => x.h > 0 && (x.h < 43.5 || x.w < 43.5)));
+      ok(small.length === 0, `390: every control is a 44 px target${small.length ? ` (${small.slice(0, 3).map(x => `${x.sel} ${x.w}x${x.h}`).join(', ')})` : ''}`);
     }
     ok(errors.length === 0, `${tag}: no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
     ok(thirdParty.length === 0, `${tag}: no third party is asked for anything${thirdParty.length ? ': ' + thirdParty.join(' | ') : ''}`);

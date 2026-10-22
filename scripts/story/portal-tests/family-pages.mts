@@ -134,8 +134,8 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
     await page.goto(ctx.url(`family/${slug}`));
     await sleep(500);
     ok((await page.$$eval('h1', (e: Element[]) => e.length)) === 1 && (await page.isVisible('.poster img')) && (await page.isVisible('.hero-actions .btn-primary')) && (await page.isVisible('.hero-actions a[href="https://ci.computer/core"]')), `${slug} at ${label}: the page shows its heading, its picture, the tour button and See Companion Core`);
-    // (a phone's header keeps the menu and tucks the links in it: the closing band is where the Core is offered then)
-    ok(await page.isVisible(mobile ? '.menu-btn' : '.site-nav .nav-buy') && await page.isVisible('.closing a[href="https://ci.computer/core"]') && await page.isVisible('.home-note a'), 'it offers the Companion Core and its fine print links the home');
+    // (a phone's header is the same bar as a laptop's, with the short forms "Download" and "Buy Core": both stay in reach, and the closing band offers the Core again)
+    ok(await page.isVisible('.site-nav .nav-buy') && await page.isVisible('.site-nav .nav-download') && await page.isVisible('.closing a[href="https://ci.computer/core"]') && await page.isVisible('.home-note a'), 'it offers the Companion Core and its fine print links the home');
     const fold = await page.evaluate((vh: number) => {
       const b = (sel: string) => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, w: r.width, h: r.height }; };
       return { h1: b('.hero h1'), tag: b('.hero .tagline'), poster: b('.hero .poster'), tour: b('.hero-actions .btn-primary'), core: b('.hero-actions a[href="https://ci.computer/core"]'), label: b('.hero .disclosure strong'), note: b('.hero-note'), scrollX: document.documentElement.scrollWidth - innerWidth, vh };
@@ -149,7 +149,7 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
     ok(fold.scrollX <= 1, `no sideways scroll (${Math.round(fold.scrollX)} px over)`);
     if (mobile) {
       // the touch targets of the whole page: the people's links, "Start with", "Watch this moment", the store links, the neighbours
-      const small = await page.evaluate(() => Array.from(document.querySelectorAll('main a[href], .site-nav a, .menu-btn')).filter(e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden' && !e.closest('[hidden]') && r.height < 43.5 && !(e as HTMLElement).closest('.site-nav'); }).map(e => `${(e.textContent || '').trim().slice(0, 24)} ${Math.round(e.getBoundingClientRect().height)}`));
+      const small = await page.evaluate(() => Array.from(document.querySelectorAll('main a[href], .site-nav a')).filter(e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden' && !e.closest('[hidden]') && r.height < 43.5 && !(e as HTMLElement).closest('.site-nav'); }).map(e => `${(e.textContent || '').trim().slice(0, 24)} ${Math.round(e.getBoundingClientRect().height)}`));
       ok(small.length === 0, `every link and button of the page is a 44 px target on a phone${small.length ? ': ' + small.slice(0, 4).join(', ') : ''}`);
     }
     await ctx.shot(page, `family-${label}`);

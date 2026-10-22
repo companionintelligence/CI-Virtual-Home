@@ -211,7 +211,7 @@ export function cardPairs(data: LanderData, slugs: readonly string[], featured: 
   return out;
 }
 
-export interface CardOpts { data: LanderData; lines: Line[]; featured: boolean; /** the picture is in the first screens: not lazy */ eager: boolean; /** the hero family's card names the other homes of the same people */ siblings?: FrontFamily[] }
+export interface CardOpts { data: LanderData; lines: Line[]; featured: boolean; /** the picture is not lazy. No card passes true: the families come after the hero, the argument and the Core, 4 screens down on a phone, and a browser fetches a lazy picture within a screen or two of the viewport on a laptop anyway; an eager one only competed with the hero's picture for a phone's bandwidth */ eager: boolean; /** the hero family's card names the other homes of the same people */ siblings?: FrontFamily[] }
 /**
  * A family's card: the home's picture, the family and its home, who lives there (a monogram disc and the job each does), up to two of its pairs in text,
  * and the way in. The link is the family's name (the card is clickable through it, a stretched link), so the text stays a heading and two lists; its page
@@ -248,7 +248,7 @@ export function frontCards(houses: House[], families: FrontFamily[], data: Lande
   const pairs = cardPairs(data, fams.map(f => f.slug), data.featured.slugs);
   const hero = fams.find(f => f.slug === data.plan.hero.slug);
   const make = (f: FrontFamily, featured: boolean, i: number): string => familyCard(f, by.get(f.house)!, {
-    data, lines: pairs.get(f.slug) ?? [], featured, eager: featured && i < 2,
+    data, lines: pairs.get(f.slug) ?? [], featured, eager: false,
     siblings: featured && hero && f.slug === hero.slug ? fams.filter(x => x.surname === hero.surname && x.slug !== hero.slug) : undefined,
   });
   const featured = data.featured.slugs.map(s => fams.find(f => f.slug === s)).filter((f): f is FrontFamily => !!f).map((f, i) => make(f, true, i));
@@ -336,7 +336,9 @@ export function swapBlock(data: LanderData, front: FrontFamily[]): string {
       </ul>
       <div class="jobs" id="personas" role="group" aria-label="What you do">
         <span class="jobs-label" aria-hidden="true">Or choose by what you do</span>
-        ${jobs}
+        <div class="jobs-row">
+          ${jobs}
+        </div>
       </div>
       ${types}
       <p class="swap-note" id="swap-note" hidden>Showing the families that moved this one home.</p>

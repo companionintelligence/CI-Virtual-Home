@@ -112,7 +112,7 @@ room-creator.html          the editor + renderer page; loads assets/*.js and con
                            ?mode=view is the portal's player (assets/viewer.ts, portal/viewer.css); &family=<slug> adds the tour
 index.html                 the portal's front page: the families and their homes (portal/gallery.css, portal/gallery.js, portal/campaign.js)
 portal/                    the portal's styles and scripts, thumbs/<id>.webp and hero.webp, and the link-preview
-                           JPEGs previews/<id>.jpg and hero.jpg (derived, committed); site.css, family.css and site.js (a family's
+                           JPEGs previews/<id>.jpg and hero.jpg (derived, committed); site.css, media.css, family.css, family.js and shots.js (a family's
                            page), story.css (the tour), fonts/ (Archivo Black, for og/ only), og/ (the families' link previews, derived, committed)
 content/families/          the authored stories, <slug>.json (the writers' files; the voice and bake locks sit beside them)
 content/story/             cast-plan.json (who lives where; casting.json, slug <-> house, is derived from it), personas.json, claims.json,
