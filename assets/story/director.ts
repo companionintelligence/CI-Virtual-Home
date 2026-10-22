@@ -154,8 +154,10 @@ export class Director {
       helpOpen: () => { const h = env.root.querySelector<HTMLElement>('.vh-help'); return !!h && !h.hidden; },
       flying: () => this.flying, leaveFreeLook: () => this.leaveFreeLook(),
     });
-    this.resizeObs = new ResizeObserver(() => { clearTimeout(this.resizeTimer); this.resizeTimer = window.setTimeout(() => { this.placedFor = ''; this.replace(); }, 120); });
+    this.resizeObs = new ResizeObserver(() => { clearTimeout(this.resizeTimer); this.resizeTimer = window.setTimeout(() => { this.placedFor = ''; this.replace(); this.start?.fit(); }, 120); });
     this.resizeObs.observe(root);
+    // (the display face arriving after a card was placed re-wraps its lines: the trimmed width was the old lines'. Place it again once the fonts are in.)
+    try { void document.fonts.ready.then(() => { if (this.destroyed) return; this.placedFor = ''; this.replace(); this.start?.fit(); }); } catch { /* no font API */ }
     this.raf = requestAnimationFrame(this.tick);
   }
 
@@ -627,12 +629,12 @@ export class Director {
     this.end.setNarration(n && n.running && this.soundOn && n.current === 'closing' && pos !== null ? pos * 1000 : null);
   }
 
-  /** keep the leader on the thing the card is about */
+  /** keep the leader on the thing the card is about (it starts from the card's LIVE box, which popup.ts may have trimmed narrower than the solved rect) */
   private aimLeader(): void {
     const p = this.place_; if (!p || !this.card.visible) return;
     const live = this.liveSubject();
     if (!live) { this.card.aim(null, null, p.mode); return; }
-    if (p.mode === 'card') this.card.aim(leaderTo(p.rect, live), null, 'card');
+    if (p.mode === 'card') this.card.aim(leaderTo(this.card.box, live), null, 'card');
     else this.card.aim(null, [live.x + live.w / 2, live.y + live.h / 2], 'sheet');
   }
 
@@ -641,7 +643,8 @@ export class Director {
     const fr = trackFrameAt(this.rs.track, this.T, o.w / o.h);
     const core = this.rs.track.core ? focusRect(fr.eye, fr.target, fr.fov, this.rs.track.core, o.w, o.h) : null;
     let r: Rect;
-    if (sheetLayout(o.w, o.h)) {
+    const sheet = sheetLayout(o.w, o.h);
+    if (sheet) {
       // a phone: a sheet above the dock, up to 55 % of the height, scrolling inside beyond that, in the room the Core leaves (as a beat's sheet takes the room under or over its subject:
       // the end frame's camera composes the Core for a smaller sheet, so a taller one goes under the Core or over it, never on it; tighter padding before a scroll)
       const width = o.w - 16, cap = o.h * SHEET_MAX_FRAC;
@@ -659,7 +662,7 @@ export class Director {
       this.end.setTight(specs[placed.variant].tight);
       r = placed.rect;
     }
-    this.end.put(r);
+    this.end.put(r, sheet ? 'sheet' : 'card');
     this.end.show(true);
     this.closingDone = false;
     this.card.show(false);
@@ -685,7 +688,8 @@ export class Director {
         const inter = (a: Rect, b: Rect) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
         const c: Rect = { x: card.left - o.x, y: card.top - o.y, w: card.width, h: card.height };
         const bars = self.barRects().map(r => inter(c, r));
-        return { beat: self.beat, expanded: self.card.expanded, hasMore: self.card.hasMore, mode: self.place_?.mode, card: c, live, vw: o.w, vh: o.h, visible: self.card.visible, hidden: self.card.el.hidden, overlapLive: live ? inter(c, live) / Math.max(1, live.w * live.h) : 0, overlapBars: bars.reduce((a, b) => a + b, 0), planned: self.place_ ? { ok: self.place_.ok, overlapFocus: self.place_.overlapFocus, slot: self.place_.slot, variant: self.place_.variant, scrolls: self.place_.scrolls, type: self.place_.type, refused: self.place_.refused } : null };
+        // (`card` is the box as drawn, trimmed to its widest line; `solvedW` the width the solver chose, which the trim never exceeds)
+        return { beat: self.beat, expanded: self.card.expanded, hasMore: self.card.hasMore, mode: self.place_?.mode, card: c, solvedW: Number(self.card.el.dataset.solvedW) || null, live, vw: o.w, vh: o.h, visible: self.card.visible, hidden: self.card.el.hidden, overlapLive: live ? inter(c, live) / Math.max(1, live.w * live.h) : 0, overlapBars: bars.reduce((a, b) => a + b, 0), planned: self.place_ ? { ok: self.place_.ok, overlapFocus: self.place_.overlapFocus, slot: self.place_.slot, variant: self.place_.variant, scrolls: self.place_.scrolls, type: self.place_.type, refused: self.place_.refused } : null };
       },
       /** Go to the end card (paused), and report where it sits and how much of the Core, as the camera sees it now, it covers. */
       async measureEnd() {
@@ -695,7 +699,7 @@ export class Director {
         const core = self.liveSubject({ box: self.rs.track.core as any, focus: null });
         const c: Rect = { x: card.left - o.x, y: card.top - o.y, w: card.width, h: card.height };
         const x = Math.max(0, Math.min(c.x + c.w, core ? core.x + core.w : 0) - Math.max(c.x, core ? core.x : 0)), y = Math.max(0, Math.min(c.y + c.h, core ? core.y + core.h : 0) - Math.max(c.y, core ? core.y : 0));
-        return { visible: self.end.visible, card: c, core, vw: o.w, vh: o.h, overlapCore: core ? (x * y) / Math.max(1, core.w * core.h) : 0, bars: self.barRects().reduce((a, r) => a + Math.max(0, Math.min(c.x + c.w, r.x + r.w) - Math.max(c.x, r.x)) * Math.max(0, Math.min(c.y + c.h, r.y + r.h) - Math.max(c.y, r.y)), 0) };
+        return { visible: self.end.visible, card: c, solvedW: Number(self.end.el.dataset.solvedW) || null, core, vw: o.w, vh: o.h, overlapCore: core ? (x * y) / Math.max(1, core.w * core.h) : 0, bars: self.barRects().reduce((a, r) => a + Math.max(0, Math.min(c.x + c.w, r.x + r.w) - Math.max(c.x, r.x)) * Math.max(0, Math.min(c.y + c.h, r.y + r.h) - Math.max(c.y, r.y)), 0) };
       },
       goBeat: (i: number) => self.goBeat(i),
       /** story v2: open or close the card's "More" and wait for the card to be placed again; false when the beat has none */

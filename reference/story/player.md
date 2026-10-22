@@ -85,23 +85,60 @@ under 360 px), each with and without the tight padding; it picks the first that 
 the result says `reason: 'type-floor'` and is not `ok`. The end card is solved the same way, and a phone's sheet tries the phone drawing, no drawing, and tight padding before it scrolls.
 
 **Size.** A card is `clamp(420px, 32vw, 560px)` wide (`cardWidth`: 461 px at 1440, 420 at 1024, 560 from 1750 px up; 28 to 34 % of a window from 1235 to 2000 px), as tall as its content needs up to the room between the top bar and
-the dock, on the side the subject leaves free (docked at the edge when it is a quarter of the window or more, else beside the subject). The start card is a dialog of up to 1000 px (one column of 760 px under 1100 px; a window
+the dock, on the side the subject leaves free (docked at the edge when it is a quarter of the window or more, else beside the subject); that is the width the solver chooses, and the card as drawn is then trimmed to its widest wrapped line ("The glass", rule 3). The start card is a dialog of up to 1000 px (one column of 760 px under 1100 px; a window
 shorter than it scrolls the scrim). The About dialog is 40rem wide, the failure card 34rem, the family page's screenshot dialog 48rem (a picture and its caption); all scroll in a short window. A phone's sheet is full width, up to 55 % of the height.
 
-**What was copied from the website and the canon.** The root and the rem scale; Manrope's four weights and 0.2pt tracking; the radius scale (`--radius` 0.625rem: a card is its 2xl, `calc(0.625rem + 10px)`, a control its xl,
-`+ 4px`, a phone's sheet `+ 6px`, chips stay pills as the canon's `rounded-full`); a hairline ring instead of a heavy border (the site's panels and the Hub's Dialog use a 1 px line); the shadow set's `shadow-lg` look (the
-glass keeps `--vh-shadow`); controls at least 44 px (the site's `--store-tap`); padding that grows with the surface (the site's `clamp(20px, 3vw, 36px)` panel: 1.25 to 1.5rem on a card, 2 to 2.25rem on the start card); the
-proportion of title to text (the site's panel title 1.75rem over 1.0625rem text, the Hub's `text-lg` over `text-sm`: here 2.25rem over 1.5rem); a primary button in the accent and the others quiet; the About and failure
-cards' width in the Dialog's `max-w-lg` to `2xl` range (32 to 42rem; the screenshot dialog, which holds a 960 px picture, is 48rem). What was not: the site's square corners and uppercase display headings (the portal keeps its own rounded glass), and the Hub's black 80 % overlay (the start
-card's scrim lets the home show through).
+**What was copied from the website and the canon.** The root and the rem scale; Manrope's four weights and 0.2pt tracking; a hairline ring instead of a heavy border (the site's panels and the Hub's Dialog use a 1 px line);
+the shadow set's `shadow-lg` look (the glass keeps `--vh-shadow`); controls at least 44 px (the site's `--store-tap`); padding that grows with the surface (the site's `clamp(20px, 3vw, 36px)` panel: 1.25 to 1.5rem on a card,
+2 to 2.25rem on the start card); the proportion of title to text (the site's panel title 1.75rem over 1.0625rem text, the Hub's `text-lg` over `text-sm`: here 2.25rem over 1.5rem); a primary button in the accent and the
+others quiet; the About and failure cards' width in the Dialog's `max-w-lg` to `2xl` range (32 to 42rem; the screenshot dialog, which holds a 960 px picture, is 48rem). What was not: the site's square corners and uppercase
+display headings, and the Hub's black 80 % overlay (the start card's scrim lets the home show through). The canon's radius scale (`--radius` 0.625rem: a card its 2xl, a control its xl, chips `rounded-full`) was the first
+pass and is gone: the owner's glass mockup set two corners instead, below ("The glass").
 
 **The name is a kicker.** A person's name wherever it labels a card, a dialog or a section (the card's kicker slot `.st-who`, the start card's "Starting with" line and its person buttons `.st-name`, the family page's `.nm`:
 hero, people nav, each person's heading, the day's entries, the previous and next family; "THE BRENNAN FAMILY" the same) is all capitals by CSS (`text-transform`, never in the string: the text and every aria-label keep the name as
-written), 700, `letter-spacing: 0.2em` (`--st-kick`), in the accent (`--primary`: sage on the player's dark set, phthalo on the family pages' light one), at the card's reading size; on the family page's nav chips, day labels and
+written), 700, `letter-spacing: 0.2em` (`--st-kick`), in the accent (`--primary`: the canon's light-set phthalo `#0a6358` on the glass, the same on the family pages' light set), at the card's reading size; on the family page's nav chips, day labels and
 sibling links it is 0.85rem (14.45 px) and no smaller, and its headings are 1.5rem or more. The monogram disc stays.
 
 **Not changed.** The chapters drawer and the Transcript (a navigation list, not a card or a dialog: 13 to 15 px as before) and the player's own bars. While the chapters panel is open, a window of 1100 px and wider keeps the card beside the drawer (the drawer is something the card keeps off, not the top of its room: `roomFor` counts only the top bar's own items), and from 768 to 1099 px, where the panel is a wide sheet, the sheet takes the card's and the end card's place (one panel at a time, as on a phone); `typography.mts` checks both. A film or ad canvas is a picture shown scaled down, so its type stays at 36 design px
 (`CANVAS_TYPE_MIN`) with the same kicker and card geometry (`assets/story/film/`).
+
+## The glass (the owner's mockup, 2026-10)
+
+The owner approved a mockup of the tour in light frosted glass and asked for it in the live player: cards, the start and end cards, dialogs and controls, behind the existing tests. The type scale above does not move: the
+mockup's 16 px text was never the proposal for the type. Four rules, each with its check.
+
+1. **Glass.** Every surface the player draws over the home (the beat card and its sheet, the start, end and failure cards, the chapters panel, the About dialog, the loader card, the toast, the top bar's buttons and title, the dock, the
+   tools sheet, the free-camera bar and the chips and buttons in them) is one glass, tokens in `portal/viewer.css`: `--st-glass` white at 82 % as the floor, `--st-glass-sheen` (white 44 % to 0 at 135deg) over it, so the surface runs from about
+   90 % at its top left to 82 % at its bottom right, `blur(16px) saturate(1.5)` (`--st-glass-blur`), a 1 px edge of white at 62 %, an inset 1 px highlight and the soft `--vh-shadow`. The text on it is the canon's LIGHT semantic set, copied from
+   the light token block of `room-creator.html` (the player's page always takes the dark set, so the view page does not expose it): `--st-ink` `#0a222e` (foreground), `--st-ink-2` `#3a524b` (muted-foreground), `--st-accent` `#0a6358` (primary),
+   `--st-accent-fg` (primary-foreground, the text of a primary action), `--st-paper` `#f3faf7` (background: the one opaque surface, under a card's stuck head so scrolled words hide) and `--st-c1` to `--st-c4`; `viewer.css` re-scopes the
+   semantic names (`--foreground`, `--primary` ...) to them on `.vh` and `.vh-fail`, so a rule keeps saying `var(--foreground)`. `test-story-pages.mts` holds each token equal to the canon's.
+   **Contrast is measured, not assumed.** The mockup's 80 to 64 % white was tuned up, never the type down, until the text holds over the worst thing the scene could put behind the glass. The audit in `player.mts` composites the glass's floor
+   colour over pure white and over pure black (it stops at the glass: the near-black page behind the player used to stand in for the backdrop, which is the black case only, and never showed white). At the 82 % floor over black the ink is
+   10.7:1 (body text asks 7:1), the muted ink 5.5:1 and the accent 4.7:1 (small and muted text ask 4.5:1); over white 16.4, 8.4 and 7.2. The sheen only lightens, so the floor is the worst case. A control's tint (the quiet buttons, the
+   person buttons) takes a little off: the large bold accent name on a person button is 4.2:1 over black (it needs 3:1 as large text). Raise `--st-glass` first if more is wanted, then the sheen; never the type. `player.mts` audits
+   the cards, the top bar, the dock, the tools sheet and the About dialog at 390, 768 and 1440.
+2. **Corners.** Two radii and nothing else: **5 px** (`--st-r-card`, `--st-r-sheet`, `--vh-radius`, the last one in the compact layout too) on a card, a sheet, a dialog, a panel, the dock, the top bar's panels and the toast; **3 px**
+   (`--st-r-ctl`) on a chip, button, monogram disc, logo tile, kbd, tick, control and the lit word of the karaoke. No pill and no circle: the scrubber's round thumb is a pseudo-element and the leader's pin an SVG circle, drawing marks and not
+   containers. A chip's 44 px touch target is a margin and an `::after`, not a transparent border: a face clipped to the padding box has the outer radius less the border, which is square at 3 px. `test-story-pages.mts` fails on a literal
+   radius in `story.css` or `viewer.css` (the thumb excepted); `typography.mts` walks the elements on screen and fails on any radius that is not 0, 5 px or 3 px.
+3. **Words stay in their box and the box fits the words.** The tour's layer sets `overflow-wrap: anywhere` and `min-width: 0` on a card's children, and nothing in a card or dialog is `nowrap` or cut with an ellipsis (the top bar's one-line
+   title and the dock's scrolling chips are controls and keep theirs). After the solver has placed a beat card at the width it chose, `fitWidth` (`popup.ts`) trims the DOM card to its widest wrapped line plus its right padding: the line rects
+   of every text node (`Range.getClientRects`) and the right edges of chips, buttons, the monogram and the logo. The left edge and the height stay and the card is never widened (a narrower card can only cover less of the subject);
+   a phone's sheet is full width by contract and is not trimmed; a trim that would make the content taller (a re-wrap) is undone. The "More" toggle and a person's button on the start card sit at the far end of a row, so they count by
+   what they need (the kicker's edge, the gap and the toggle's width; the button's content and padding), not by where they are. The end card and the start card are trimmed the same way (the start card is `fit-content` up to its max first).
+   The solver's width is kept on the element as `data-solved-w`, and the director returns it from `measure`/`measureEnd`; the leader starts from the card as drawn (`BeatCard.box`), not the solved rect. The About dialog stays 40rem
+   wide (its links are rows of their own); it is checked for corners and overflow, not trimmed. `place.ts`, which the film's pin hashes, is not touched.
+   **When every variant covers the subject** the solver does not collapse the card: it picks the slot and variant with the best score (it prefers the card at its own width, then the same with tighter padding, then narrower and taller, each in each
+   slot, and charges a lot for covering the subject or the Core and more for covering a bar), reports `ok: false`, and the card stands where it covers the least; "More" stays closed and the body stays shown (a card taller than its room scrolls
+   inside). None of the three Brennan tours has such a beat at 1440, 1024 or 390 (`measure` says `planned.ok` for all 27 of each). The mockup's body-behind-More idea is not built: `BeatCard.measure(..., collapsed)` has the hook for it and
+   nothing calls it.
+4. **The text does not cover the subject.** Unchanged: `MAX_OVERLAP` 2 % of the focus rect, which `player.mts` (every beat of one family at 1440 and 390) and `typography.mts` (the first three beats of each Brennan tour, with More open on one,
+   at 1440, 1024 and 390) hold. The trim cannot break it: it only makes a card narrower, from the left edge the solver chose.
+
+`typography.mts` (T13b) also holds, for the start, three beat, More, end, chapters, About, tools and chrome surfaces of the three Brennan tours at those three widths, that no text line or box leaves its card's padding box and that a
+card that is not a full-width sheet has at most 3 px spare at the right of its widest line.
 
 ## Rules worth knowing
 
@@ -133,11 +170,11 @@ sibling links it is 0.85rem (14.45 px) and no smaller, and its headings are 1.5r
 T6 placement for every beat of two families (the exemplar and one whose house has no TV) at 1440 and 390 (a phone's sheet at most 55 % of the height), chapters list length, live text,
 end card; T7 keys, focus, live region, captions on screen while a clip sounds, the start card, end card and chapters panel audited at 1440 and 390
 (axe-core is MPL-2.0 and the repo does not take it, so an in-page audit stands in: names, labelled dialog, ids, contrast against the worst
-background, 44 px targets on touch); T8 the gesture rule and `?no=story`; contrast of the lit card at 390, 768 and 1440; the address bar; reduced
+background, 44 px targets on touch); T8 the gesture rule and `?no=story`; contrast of the lit card, the top bar, the dock, the tools sheet and the About dialog at 390, 768 and 1440 (the glass over pure white and pure black); the address bar; reduced
 motion; the failure paths; next family.
 
 `scripts/test-story-place.mts` (Node, no browser) holds the solver: the type floor (25.5 px, the phone clamp, the film's 36), the card width, the variants (a type under the floor is refused, padding may shrink), the panel's sweep over random subjects, the phone's sheet at 55 %, the end card.
-`scripts/story/portal-tests/typography.mts` (T13): at 1440, 1024 and 390, every text node of the start card, three beat cards (the first, a film beat, one with "More" open), the end card, the About dialog and the failure card is at least 25 px (20 px on a phone); every person's name in them and on the family page (light and dark) is uppercase by CSS, bold and tracked at least 0.15em, at the reading size, with the real name in the text and the aria-label; the family page's names are 4.5:1 against their page; the screenshot dialog's text and buttons; cards 360 to 560 px wide, a sheet at most 55 %.
+`scripts/story/portal-tests/typography.mts` (T13): at 1440, 1024 and 390, every text node of the start card, three beat cards (the first, a film beat, one with "More" open), the end card, the About dialog and the failure card is at least 25 px (20 px on a phone); every person's name in them and on the family page (light and dark) is uppercase by CSS, bold and tracked at least 0.15em, at the reading size, with the real name in the text and the aria-label; the family page's names are 4.5:1 against their page; the screenshot dialog's text and buttons; a card is the solver's 360 to 560 px trimmed to its widest line (never wider than `data-solved-w`), a sheet at most 55 %. T13b (the glass pass): on the three Brennan tours at 1440, 1024 and 390, the start card, the first three beat cards, one with More open, the end card, the chapters panel, the tools sheet, the About dialog, the top bar and the dock: only 5 px and 3 px corners, no nowrap or ellipsis in a card, no text line or box past a card's padding box, at most 3 px spare at the right of a card's widest line (a phone's sheet is full width), under 2 % of the subject covered, a stuck head that is opaque.
 
 `scripts/story/portal-tests/player-start.mts`: T9 the way in at a person, the campaign's tags in the address, daylight, the end card and Next family; T10 the captions-only tour (the audio checks of T7 and T8 in `player.mts` run for a family that has a voice and say so when none does).
 

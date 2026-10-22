@@ -260,6 +260,11 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   **A person's name is a kicker** on every card, dialog and family-page label: all capitals by CSS (the text and aria-labels stay as written), 700, 0.2em of tracking, in the accent; "THE BRENNAN FAMILY" the same. Film and ad
   canvases keep 36 design px (a canvas is shown scaled down). Details and the table: `reference/story/player.md`, "Type and size". Tests: `scripts/test-story-place.mts`, `scripts/test-story-pages.mts`, `typography.mts`
   (`pnpm run portal:test -- --only hooks`).
+  **The glass** (the owner's mockup, 2026-10; `player.md`, "The glass"): every surface the player draws over the home is one light frosted glass (white 82 % with a sheen to about 90 %, `blur(16px) saturate(1.5)`, a 62 % white edge),
+  its text the canon's LIGHT set (ink `#0a222e`, muted `#3a524b`, primary `#0a6358`: the `--st-*` tokens of `viewer.css`, held equal to room-creator.html's light block by `test-story-pages.mts`), contrast held over pure black and pure
+  white behind it (`player.mts`: tune the white up, never the type down). Two corners only: 5 px on a card, sheet, dialog, panel, dock or toast (`--st-r-card`, `--st-r-sheet`, `--vh-radius`) and 3 px on a chip, button, disc, kbd,
+  tick or control (`--st-r-ctl`); no pill and no circle but the scrubber's thumb and the pin (drawing marks). Words never leave their box (`overflow-wrap: anywhere`, nothing nowrap or ellipsised in a card), and a beat, start or end
+  card is trimmed to its widest wrapped line once placed (`fitWidth` in `popup.ts`: never wider than `data-solved-w`, never a phone's sheet; the leader starts from the card as drawn). `place.ts` and the film files are untouched by it.
 <!-- ---- end type scale (live pass 3) ---- -->
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
   import map (and `?v=` on the `<script>`/`<link>` tags), and `portal/_headers` asks every file to revalidate. Never give an

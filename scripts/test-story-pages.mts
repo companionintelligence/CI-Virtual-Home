@@ -537,11 +537,11 @@ test('a person\'s name stays as written in the page (the capitals are CSS), and 
     assert.ok(/text-transform:\s*uppercase/.test(body), `${name}: all capitals by CSS`);
     assert.ok(track.test(body), `${name}: tracking of 0.2em`);
     assert.ok(/font-weight:\s*700/.test(body), `${name}: bold, the canon's 700`);
-    assert.ok(/color:\s*var\(--primary\)/.test(body), `${name}: the sage accent, from the token`);
+    assert.ok(/color:\s*var\(--(?:primary|label-ink|vh-link)\)/.test(body), `${name}: the accent, from the token`);
   }
   assert.ok(/--st-kick:\s*0\.2em;/.test(view), 'the kicker tracking token is 0.2em');
   assert.ok(/\.who-nav-text b\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css) && /\.day-who\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css) && /\.sib b\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css), 'the nav chip, the day label and the sibling link keep their name at 0.85rem, the smallest a label among body text may be');
-  assert.ok(/\.who h2\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css) && /\.hero h1\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css), 'a name that is a heading is 1.5rem or more');
+  assert.ok(/\.who h2\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css) && /\.hero h1\.nm\s*\{[^}]*font-size:\s*clamp\(1\.25rem/.test(css), 'a name that is a heading is 1.25rem or more (the hero\'s) or 1.5rem (a person\'s section)');
 });
 const pickBeats = (s: Story, id: string): boolean => told(s).some(b => b.member === id);
 
@@ -580,18 +580,36 @@ test('the tour, the About dialog, the failure cards and the screenshot dialog se
   assert.ok(/--dlg-min:\s*1\.5rem/.test(read('media.css')) && /--dlg-min:\s*clamp\(20px, 5\.4vw, 25\.5px\)/.test(read('media.css')), 'the screenshot dialog has the same two');
   // the canon's root: every rem is of 17 px (room-creator.html is the player's page, site.css the family pages')
   assert.ok(/html\s*\{\s*font-size:\s*17px/.test(fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8')), 'the player\'s root size is the canon\'s 17 px');
-  assert.ok(/html\s*\{\s*font-size:\s*17px/.test(read('site.css')), 'and the family pages\'');
+  assert.ok(/html\s*\{[^}]*font-size:\s*17px/.test(read('site.css')), 'and the family pages\'');
   // the canon's weights (no 800) and tracking on the tour's cards: the name is the only wide tracking, the monogram the only none
   const sc = read('story.css');
   assert.ok(!/font-weight:\s*800/.test(sc) && !/font-weight:\s*800/.test(read('media.css').slice(read('media.css').indexOf('.shot-dialog'))), 'no weight 800: the canon loads 400, 500, 600 and 700');
   const tracks = [...sc.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*letter-spacing:\s*([^;}]+)[;}]/g)].map(m => [m[1].trim().split(',').pop()!.trim(), m[2].trim()]);
-  assert.deepEqual(tracks.filter(([sel, val]) => !(val === 'var(--st-track)' || val === 'var(--st-kick)' || (val === '0' && sel === '.st-disc'))), [], 'story.css: tracking is the canon\'s 0.2pt, the name\'s 0.2em, or none on the monogram');
+  assert.deepEqual(tracks.filter(([sel, val]) => !(val === 'var(--st-track)' || val === 'var(--st-kick)' || /^-0\.0\d*em$/.test(val) || (val === '0' && sel === '.st-disc'))), [], 'story.css: tracking is the canon\'s 0.2pt, the name\'s 0.2em, or none on the monogram');
 });
 
-test('the tour\'s cards are the canon\'s surface: the radius scale, a hairline, and no hard-coded colour (the scrim and the leader\'s shadow are mixed from the --vh-ink token)', () => {
+test('the tour\'s cards are the light glass: two corners (5 px on a card, 3 px on a control), every radius a token, nothing nowrap, and no hard-coded colour (the scrim and the leader\'s shadow are mixed from the --vh-ink token)', () => {
   const sc = fs.readFileSync(path.join(ROOT, 'portal', 'story.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-  assert.ok(/\.st-card \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc) && /\.st-end \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc) && /\.st-start-card \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc), 'a card, the end card and the start card take the 2xl radius');
+  assert.ok(/\.st-card \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc) && /\.st-end \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc) && /\.st-start-card \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc), 'a card, the end card and the start card take the card radius');
   const view = fs.readFileSync(path.join(ROOT, 'portal', 'viewer.css'), 'utf8');
-  assert.ok(/--st-r-card:\s*calc\(0\.625rem \+ 10px\)/.test(view) && /--st-r-ctl:\s*calc\(0\.625rem \+ 4px\)/.test(view), 'the radius tokens are the canon\'s --radius (0.625rem) plus 10 px and 4 px');
+  // the owner's glass mockup (2026-10): 5 px on a card, sheet, dialog, panel, dock or toast; 3 px on a chip, button, disc, kbd, tick or control; no pill, no circle
+  assert.ok(/--st-r-card:\s*5px;/.test(view) && /--st-r-sheet:\s*5px;/.test(view) && /--st-r-ctl:\s*3px;/.test(view) && /--vh-radius:\s*5px;/.test(view), 'the radius tokens are the mockup\'s 5 px (card, sheet, panel) and 3 px (control)');
+  const vhRadius = [...view.matchAll(/--vh-radius:\s*([^;]+);/g)].map(m => m[1].trim());
+  assert.ok(vhRadius.length >= 2 && vhRadius.every(v => v === '5px'), `--vh-radius is 5 px where it is set, the compact layout's override included (${vhRadius.join(', ')})`);
+  // every radius in the tour is one of the tokens (the pin is an SVG circle, which has no border-radius); in viewer.css's view-mode rules only the scrubber's thumb keeps its 50 %
+  const literal = (src: string) => [...src.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*?border-radius:\s*([^;}]+)[;}]/g)].map(m => [m[1].trim().split(',').pop()!.trim(), m[2].trim()] as const).filter(([, v]) => !/^var\(--(st-r-(card|sheet|ctl)|vh-radius)\)$/.test(v));
+  assert.deepEqual(literal(sc), [], 'story.css: every border-radius is --st-r-card, --st-r-sheet or --st-r-ctl');
+  assert.deepEqual(literal(view).filter(([sel]) => !/slider-thumb|range-thumb/.test(sel)), [], 'viewer.css: every border-radius but the scrubber\'s thumb is a token');
+  assert.ok(!/white-space:\s*nowrap|text-overflow:\s*ellipsis/.test(sc.replace(/\.st-live-region[^}]*\}/, '')), 'story.css: no reading text is nowrap or cut with an ellipsis (the live region is off screen)');
+  assert.ok(/\.st \{[^}]*overflow-wrap:\s*anywhere/.test(sc), 'the tour\'s layer wraps any word');
   assert.deepEqual([...sc.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/g)].map(m => m[0]), [], 'story.css has no hex or rgb colour: tokens only');
+  // the glass and its text are tokens of viewer.css, in the canon's light set (room-creator.html's light token block)
+  const rc = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8'), light = rc.slice(rc.indexOf('canon — light semantic set'));
+  const tok = (name: string) => (light.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`)) || [])[1];
+  for (const [st, canon] of [['st-ink', 'foreground'], ['st-ink-2', 'muted-foreground'], ['st-accent', 'primary'], ['st-accent-fg', 'primary-foreground'], ['st-paper', 'background'], ['st-c1', 'chart-1'], ['st-c2', 'chart-2'], ['st-c3', 'chart-3'], ['st-c4', 'chart-4']] as const) {
+    const want = tok(canon), got = (view.match(new RegExp(`--${st}:\\s*(#[0-9a-fA-F]{6});`)) || [])[1];
+    assert.ok(want && got && got.toLowerCase() === want.toLowerCase(), `--${st} is the light set's --${canon} (${want}), got ${got}`);
+  }
+  assert.ok(/--st-glass:\s*rgb\(255 255 255 \/ 0\.8[2-9]\)/.test(view) && /--st-glass-blur:\s*blur\(16px\) saturate\(1\.5\)/.test(view) && /--st-glass-edge:\s*rgb\(255 255 255 \/ 0\.62\)/.test(view), 'the glass is white at 82 % or more (the floor the contrast holds at), blur(16px) saturate(1.5), a 62 % white edge');
+  assert.ok(/\.st-card\.st-open \.st-head \{[^}]*background:\s*var\(--st-paper\)/.test(sc), 'a stuck card head is the opaque paper, so scrolled words hide under it');
 });
