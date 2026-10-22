@@ -485,17 +485,17 @@ html[data-mode="view"] .vh-scrub input {
 /* (the thumb below keeps its 50 %: it is a drawing mark on the track, not a container) */
 .vh-scrub input::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 14px; height: 14px; margin-top: -5px;
-  border-radius: 50%;
+  width: 8px; height: 16px; margin-top: -6px;
+  border-radius: var(--st-r-ctl);
   background: var(--foreground);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--vh-link) 28%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vh-link) 28%, transparent);
   transition: transform 0.12s ease;
 }
 .vh-scrub input:hover::-webkit-slider-thumb, .vh-scrub input:active::-webkit-slider-thumb { transform: scale(1.18); }
 .vh-scrub input::-moz-range-thumb {
-  width: 14px; height: 14px; border: 0; border-radius: 50%;
+  width: 8px; height: 16px; border: 0; border-radius: var(--st-r-ctl);
   background: var(--foreground);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--vh-link) 28%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vh-link) 28%, transparent);
 }
 .vh-scrub input:focus-visible { outline: none; }
 .vh-scrub input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--ring); }

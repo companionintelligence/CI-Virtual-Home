@@ -596,10 +596,10 @@ test('the tour\'s cards are the light glass: two corners (5 px on a card, 3 px o
   assert.ok(/--st-r-card:\s*5px;/.test(view) && /--st-r-sheet:\s*5px;/.test(view) && /--st-r-ctl:\s*3px;/.test(view) && /--vh-radius:\s*5px;/.test(view), 'the radius tokens are the mockup\'s 5 px (card, sheet, panel) and 3 px (control)');
   const vhRadius = [...view.matchAll(/--vh-radius:\s*([^;]+);/g)].map(m => m[1].trim());
   assert.ok(vhRadius.length >= 2 && vhRadius.every(v => v === '5px'), `--vh-radius is 5 px where it is set, the compact layout's override included (${vhRadius.join(', ')})`);
-  // every radius in the tour is one of the tokens (the pin is an SVG circle, which has no border-radius); in viewer.css's view-mode rules only the scrubber's thumb keeps its 50 %
+  // every radius in the tour is one of the tokens (the pin is an SVG circle, which has no border-radius); no exemption: the scrubber's thumb is a 3 px bar, not a disc
   const literal = (src: string) => [...src.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*?border-radius:\s*([^;}]+)[;}]/g)].map(m => [m[1].trim().split(',').pop()!.trim(), m[2].trim()] as const).filter(([, v]) => !/^var\(--(st-r-(card|sheet|ctl)|vh-radius)\)$/.test(v));
   assert.deepEqual(literal(sc), [], 'story.css: every border-radius is --st-r-card, --st-r-sheet or --st-r-ctl');
-  assert.deepEqual(literal(view).filter(([sel]) => !/slider-thumb|range-thumb/.test(sel)), [], 'viewer.css: every border-radius but the scrubber\'s thumb is a token');
+  assert.deepEqual(literal(view), [], 'viewer.css: every border-radius is a token, the scrubber\'s thumb included (no circle)');
   assert.ok(!/white-space:\s*nowrap|text-overflow:\s*ellipsis/.test(sc.replace(/\.st-live-region[^}]*\}/, '')), 'story.css: no reading text is nowrap or cut with an ellipsis (the live region is off screen)');
   assert.ok(/\.st \{[^}]*overflow-wrap:\s*anywhere/.test(sc), 'the tour\'s layer wraps any word');
   assert.deepEqual([...sc.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/g)].map(m => m[0]), [], 'story.css has no hex or rgb colour: tokens only');
