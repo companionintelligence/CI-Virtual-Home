@@ -193,7 +193,6 @@ html[data-story] .vh-help { z-index: 7; }
 /* (a phone's sheet is full width and is not trimmed: there the buttons fill their rows, as they always did) */
 .st-end[data-mode="sheet"] .st-actions .st-btn { flex: 1 1 auto; }
 .st-end-body { margin: 0; }
-.st-end .st-note { margin-top: 0.9rem; }
 /* the end card with its padding and gaps tighter, before it scrolls (the type is never touched) */
 .st-end.st-tight { padding: 0.8rem 1.1rem 0.7rem; line-height: 1.3; }
 .st-end.st-tight h2 { line-height: 1.05; }

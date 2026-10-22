@@ -105,11 +105,11 @@ export type FilmText = {
  * code), so what makes a film stale and what the film shows cannot drift apart. A new disclosure on a card goes in here, or `test-film.mts` fails.
  */
 export const FILM_DISCLOSURES = {
-  fictional: 'fictional-family', beta: 'beta-short', scripted: 'scripted-scenes', stylised: 'stylised-art', voice: 'synthetic-voice', agents: 'attribution-agents',
+  fictional: 'fictional-family', scripted: 'scripted-scenes', stylised: 'stylised-art', voice: 'synthetic-voice', agents: 'attribution-agents',
 } as const;
 /** The ids of the lines under the end card, in the order they are printed. A silent film has no voice, so it does not print the synthetic-voice line (claims.json places it on the end card of a film with narration; saying a voice was generated under a silent film would be false). */
 export function filmLineIds(rs: RuntimeStory, silent: boolean): string[] {
-  const ids: string[] = [FILM_DISCLOSURES.beta, FILM_DISCLOSURES.scripted, FILM_DISCLOSURES.stylised];
+  const ids: string[] = [FILM_DISCLOSURES.scripted, FILM_DISCLOSURES.stylised];
   if (!silent) ids.push(FILM_DISCLOSURES.voice);
   if (namesAgentRuntime(rs, rs.film.parts.map(p => p.id))) ids.push(FILM_DISCLOSURES.agents);
   return ids;

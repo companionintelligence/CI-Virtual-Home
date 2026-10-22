@@ -158,8 +158,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "Mika plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Mika plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network."
       }
     },
     {
@@ -208,13 +207,13 @@
       "popup": {
         "kind": "phone",
         "title": "Pick your first agents and apps",
-        "body": "In Companion Hub, Mika picks Hermes, Elias picks OpenClaw, and they add Immich and Nextcloud. Companion Memory (beta) comes along. Then they walk away.",
+        "body": "In Companion Hub, Mika picks Hermes, Elias picks OpenClaw, and they add Immich and Nextcloud. Companion Memory comes along. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
-            "Companion Memory (beta)",
+            "Companion Memory",
             "Apps: Immich, Nextcloud"
           ]
         }
@@ -463,7 +462,7 @@
       },
       "popup": {
         "title": "A draft, never sent alone",
-        "body": "A client asks a tricky question. Mika texts Odette, and Odette drafts a reply using the context Mika connected to Companion Memory (beta). Mika reads it and sends it herself."
+        "body": "A client asks a tricky question. Mika texts Odette, and Odette drafts a reply using the context Mika connected to Companion Memory. Mika reads it and sends it herself."
       },
       "say": {
         "speaker": "mika",

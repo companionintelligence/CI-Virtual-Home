@@ -116,15 +116,8 @@ export const CASES: BadCase[] = [
   // ---- rules the TypeScript port added
   { name: 'bad-11-anchor', expect: ['anchor'], mutate: (s) => { beat(s, 'living-lights').anchor = { role: 'fireplace' }; } },
   { name: 'bad-12-not-in-store', expect: ['app-not-in-store'], mutate: (s) => { beat(s, 'kitchen-wallos').popup.body = 'Mika opens Actual Budget at the counter. It lists every subscription the household still pays for.'; } },
-  { name: 'bad-13-disclosure', expect: ['disclosure'], mutate: (s) => { delete beat(s, 'ftue-plug-in').popup.note; } },
+  { name: 'bad-13-disclosure', expect: ['disclosure'], mutate: (s) => { delete beat(s, 'ftue-pick').popup.note; } },
   { name: 'bad-14-voices', expect: ['voices'], mutate: (s) => { s.members[1].companion!.voice = s.family.narrator; } },
-  { name: 'bad-15-memory-beta', expect: ['disclosure'], mutate: (s) => {
-    // the first mention is in ftue-pick (its body and its phone rows); take the tag off wherever it stands
-    for (const b of s.beats) {
-      b.popup.body = b.popup.body.replace('Companion Memory (beta)', 'Companion Memory');
-      if (b.popup.phone) b.popup.phone.rows = b.popup.phone.rows.map((r) => r.replace('Companion Memory (beta)', 'Companion Memory'));
-    }
-  } },
   { name: 'bad-16-film', expect: ['film'], mutate: (s) => { for (const b of s.beats) if (b.film && b.chapter !== 'ftue') delete b.film; } },
   { name: 'bad-17-agent-app', expect: ['agent-app'], mutate: (s) => { const b = beat(s, 'office-paper'); b.agent = 'mika'; b.approval = 'mika'; } },
   { name: 'bad-18-no-screenshot', expect: ['app-qa-screenshot'], mutate: (s) => { const b = beat(s, 'kitchen-recipe'); b.app = { id: 'mealie', replaces: [] }; b.popup.chips = ['Mealie']; b.popup.title = 'Grandma\'s soup, kept'; b.popup.body = 'Elias types his grandmother\'s soup recipe into Mealie once. Now it sits in the family recipe book, beside the meal planner.'; b.capability = 'import recipes and plan meals'; } },

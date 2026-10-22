@@ -23,7 +23,7 @@ import { EXTRA_BANS, withExtraBans } from './story/lib/extra-bans.mts';
 import { loadContext, ROOT } from './story/lib/context.mts';
 import { validateStory } from './story/lib/validate.mts';
 import type { Story } from '../assets/story/types.ts';
-import { FICTIONAL_LINE, BETA_LINE } from '../assets/story/types.ts';
+import { FICTIONAL_LINE } from '../assets/story/types.ts';
 
 const claims = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'claims.json'), 'utf8'));
 const say = (id: string): string => claims.disclosures.find((d: { id: string }) => d.id === id).text;
@@ -40,11 +40,11 @@ function makeSite(opts: { v3?: boolean; chips?: string[]; homeName?: string; ban
   if (opts.v3) beat.service = 'google-photos';
   write('story/okafor.bbbb.json', JSON.stringify({ v: 1, slug: 'okafor', family: { surname: 'Okafor', tagline: 'Four people, one quiet computer.', story: 'A family.', address: { line: '4 Elm Lane', place: 'Ashby' } }, members: [{ id: 'ada', name: 'Ada', work: 'Nurse' }], chapters: [{ id: 'kitchen', title: 'The kitchen' }], beats: [beat], closing: { body: 'That is the day.', cta: { label: 'Start again' } }, media: {} }));
   write('story/manifest.json', JSON.stringify({ v: 1, families: 'story/families.aaaa.json', byFamily: { okafor: { house: 'newcrest', story: 'story/okafor.bbbb.json', audio: {}, narration: false } } }));
-  const foot = `<footer>Product names belong to their owners. ${say('launch-not-offer')} ${say('beta-full')} © 2026</footer>`;
-  write('index.html', `<!doctype html><html><head><title>Thirty homes</title><meta name="description" content="A home for every family."></head><body><main><h1>Thirty homes. ${FICTIONAL_LINE}</h1><p>${BETA_LINE}</p><p>${say('beta-short')}</p><ul><li>${homeName} · 2 storeys</li></ul></main><section class="cta-band"><p>${opts.bandText ?? 'A Companion Core is a small personal server.'}</p></section>${['scripted-scenes', 'stylised-art', 'not-frontier', 'names-logos-owners', 'third-party-apps'].map((id) => `<p>${say(id)}</p>`).join('')}${foot}</body></html>`);
+  const foot = `<footer>Product names belong to their owners. ${say('launch-not-offer')} © 2026</footer>`;
+  write('index.html', `<!doctype html><html><head><title>Thirty homes</title><meta name="description" content="A home for every family."></head><body><main><h1>Thirty homes. ${FICTIONAL_LINE}</h1><ul><li>${homeName} · 2 storeys</li></ul></main><section class="cta-band"><p>${opts.bandText ?? 'A Companion Core is a small personal server.'}</p></section>${['scripted-scenes', 'stylised-art', 'not-frontier', 'names-logos-owners', 'third-party-apps'].map((id) => `<p>${say(id)}</p>`).join('')}${foot}</body></html>`);
   write('404.html', `<!doctype html><html><head><title>Not found</title></head><body><main><h1>That page is not here</h1></main>${foot}</body></html>`);
-  write('homes/newcrest.html', `<!doctype html><html><head><title>${homeName}</title></head><body><main><h1>${homeName}</h1><p>${FICTIONAL_LINE}</p><p>${say('beta-short')}</p><section class="family-block"><a href="../family/okafor">Meet the family</a></section></main>${foot}</body></html>`);
-  const strip = [FICTIONAL_LINE, BETA_LINE, say('beta-short'), say('scripted-scenes'), say('stylised-art'), say('names-owners')].map((t) => `<p>${t}</p>`).join('');
+  write('homes/newcrest.html', `<!doctype html><html><head><title>${homeName}</title></head><body><main><h1>${homeName}</h1><p>${FICTIONAL_LINE}</p><section class="family-block"><a href="../family/okafor">Meet the family</a></section></main>${foot}</body></html>`);
+  const strip = [FICTIONAL_LINE, say('scripted-scenes'), say('stylised-art'), say('names-owners')].map((t) => `<p>${t}</p>`).join('');
   write('family/okafor.html', `<!doctype html><html><head><title>The Okafor family</title></head><body><header></header><main><h1>The Okafor family</h1>${strip}${opts.familyExtra ?? ''}<p class="home-note">The home is <a href="../homes/newcrest">${homeName}</a>.</p></main>${foot}</body></html>`);
   write('room-creator.html', `<!doctype html><html><head><title>Companion virtual home</title><script>var t = 'We could not open this home. Check the link, or pick a home from the gallery.'; throw new Error('this is not copy for a visitor, it is a message');</script></head><body><noscript><p>The virtual homes need JavaScript. Turn it on to fly through a home in 3D.</p></noscript><div id="app">Frame rate 30 fps</div></body></html>`);
   return { dir, write, read: (rel) => fs.readFileSync(path.join(dir, rel), 'utf8') };

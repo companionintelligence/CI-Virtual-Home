@@ -39,16 +39,13 @@ const svg = <K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string,
   return e;
 };
 
-/** the disclosures the start card carries (claims.json: scripted-scenes, synthetic-voice, stylised-art, beta-short), word for word. The voice line is only said of a tour that has a voice. */
+/** the disclosures the start card carries (claims.json: scripted-scenes, synthetic-voice, stylised-art), word for word. The voice line is only said of a tour that has a voice. */
 export const FINE_PRINT = [
   'Scenes are written for this site. They show what the listed apps do. They are not recordings of a real session.',
   'Narration is generated locally with an open text-to-speech model. It is not a recording of a person.',
   'The Companion Core is drawn as a stylised illustration, not a photograph.',
-  'Companion OS, Companion Memory and Companion Agents are in beta.',
 ];
 export const SYNTHETIC_VOICE_LINE = FINE_PRINT[1];
-/** the beta line the end card closes on (the last of the start card's lines: claims.json beta-short, which scripts/test-fine-print.mts holds FINE_PRINT to) */
-const BETA_SHORT = FINE_PRINT[3];
 /** Where the end card sends a visitor besides the story's own call to action (the same address as assets/viewer.ts's DOWNLOAD_URL and the site's LINKS.download). */
 export const DOWNLOAD_URL = 'https://ci.computer/download';
 
@@ -520,7 +517,7 @@ export class EndCard {
     acts.append(cta, link('Download Companion', DOWNLOAD_URL, 'st-btn'), mk('Replay', opts.onReplay));
     if (opts.hasNext) acts.append(mk('Next family', opts.onNext));
     acts.append(mk('Share this family', opts.onShare));
-    c.append(acts, this.body, el('p', 'st-note', BETA_SHORT));
+    c.append(acts, this.body);
     host.append(c);
   }
   setNarration(ms: number | null): void { this.karaoke.set(ms); }

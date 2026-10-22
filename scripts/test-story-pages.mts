@@ -6,10 +6,10 @@
 // assets/home-names.js).
 //
 // The page is the landing page of an ad: above the fold the name, the tagline, the picture, "Take the tour" and "See Companion Core" and the
-// one honest line about the 3D; a disclosure strip printed from claims.json; a section for each person (id = the member's id, so
+// one honest line about the 3D; the label printed from claims.json; a section for each person (id = the member's id, so
 // family/<slug>#sally is a link) with their moments, each linking the tour at that beat, and "Start with <name>"; what runs on the Core. It
-// reads with no JavaScript (this test reads the HTML, which has none of it). The ad rules bind it: no UI mockup, no price, nobody a customer, the beta
-// line, the chrome's labels kept and the story's own call to action "See Companion Core"; a third-party logo only beside the name it identifies, and a
+// reads with no JavaScript (this test reads the HTML, which has none of it). The ad rules bind it: no UI mockup, no price, nobody a customer, the
+// chrome's labels kept and the story's own call to action "See Companion Core"; a third-party logo only beside the name it identifies, and a
 // screenshot only real, whole and labelled (story v2: the test families have no media, so the page is held to "none" there, and the Brennan page, which has
 // the real files, is held to the rules for the real ones: the sticky nav, the card "Rented before, on the Core now", the logos, "More about this moment",
 // the screenshot strip, a day in the house, the home and its floor plan, how it runs; plus the floor plan's own tests, scripts/story/lib/plan-map.mts).
@@ -26,7 +26,7 @@ import { LINKS, TITLE_MAX, galleryCards } from './portal-pages.mts';
 import { memberBeat, memberChapter } from '../assets/story/url.ts';
 import { displayName } from '../assets/home-names.js';
 import { builderHandles, guardTerms, scanText } from './portal-redact.mts';
-import { FICTIONAL_LINE, BETA_LINE } from '../assets/story/types.ts';
+import { FICTIONAL_LINE } from '../assets/story/types.ts';
 import type { Story } from '../assets/story/types.ts';
 import { readMedia, appCaption, appMedia, checkPageImages, MANIFEST } from './story/lib/media.mts';
 import type { MediaManifest } from './story/lib/media.mts';
@@ -94,13 +94,13 @@ for (const s of L.stories) {
   test(`${s.slug}: the words are the voice's: no dash, the disclosures, no home and no builder`, () => {
     const t = pageOf(s), words = text(t);
     assert.ok(!/[—–]/.test(words), `a dash in: ${(words.match(/.{30}[—–].{30}/) || [''])[0]}`);
-    assert.ok(words.includes(FICTIONAL_LINE) && words.includes(BETA_LINE));
+    assert.ok(words.includes(FICTIONAL_LINE));
     assert.deepEqual(storyCopyLeaks(s, needles(ROOT)), []);
   });
 }
 
 for (const s of L.stories) {
-  test(`${s.slug}: above the fold, the strip, a section for each person and what runs on the Core`, () => {
+  test(`${s.slug}: above the fold, a section for each person and what runs on the Core`, () => {
     const t = pageOf(s), words = text(t), q = (u: string): string => decode(u);
     // above the fold: the name, the tagline, the home's picture, the two buttons, the one honest line
     const hero = (t.match(/<section class="hero"[\s\S]*?<\/section>/) || [''])[0];
@@ -112,12 +112,12 @@ for (const s of L.stories) {
     assert.equal((hero.match(/btn-primary/g) || []).length, 1, 'one primary button above the fold');
     assert.ok(hero.includes(`<p class="hero-note">${pg.TOUR_NOTE}</p>`) && pg.TOUR_NOTE === 'The tour draws the home in 3D in your browser.', 'the one honest line');
     assert.ok(!/streamed/i.test(words), 'it does not say anything is streamed');
-    // the label is the header's chip, once; the strip is the claims file's beta line; the rest of the fine print is the footer's (claims.json `where`; scripts/test-fine-print.mts holds every surface)
+    // the label is the header's chip, once; the rest of the fine print is the footer's (claims.json `where`; scripts/test-fine-print.mts holds every surface)
     const claim = (id: string): string => (L.claims.disclosures as { id: string; text: string }[]).find(x => x.id === id)!.text;
     assert.ok(hero.includes(`<p class="disclosure" data-fine="fictional-family"><strong>${claim('fictional-family')}</strong></p>`), 'the label, in the header');
-    const strip = (t.match(/<section class="strip"[\s\S]*?<\/section>/) || [''])[0], foot = (t.match(/<footer[\s\S]*<\/footer>/) || [''])[0];
-    assert.ok(q(strip).includes(claim('beta-short')) && !q(strip).includes(claim('fictional-family')), 'the strip has the beta line, word for word, and does not say the label again');
-    for (const id of ['scripted-scenes', 'stylised-art', 'launch-not-offer', 'beta-full']) assert.ok(q(foot).includes(claim(id)) && !q(strip).includes(claim(id)), `the footer has the ${id} disclosure, word for word, and the strip does not`);
+    const foot = (t.match(/<footer[\s\S]*<\/footer>/) || [''])[0];
+    assert.ok(!t.includes('class="strip"'), 'no strip under the fold: the label is the one line of fine print there');
+    for (const id of ['scripted-scenes', 'stylised-art', 'launch-not-offer']) assert.ok(q(foot).includes(claim(id)), `the footer has the ${id} disclosure, word for word`);
     // a person's section, whose id is theirs; their moments each link the tour at that beat; "Start with <name>"
     const secs = sections(t);
     for (const m of s.members) {
@@ -407,7 +407,7 @@ test('the Brennan page: a day in the house, the home and its floor plan, how it 
   assert.ok(!/(?:href|src)="\/(?!\/)/.test(t) && !/href="[^"]*\.html/.test(t));
   const words = text(t);
   assert.ok(!/[—–]/.test(words) && !/!/.test(words.replace(/!important/g, '')), 'no dash and no exclamation mark');
-  assert.ok(words.includes(FICTIONAL_LINE) && words.includes(BETA_LINE));
+  assert.ok(words.includes(FICTIONAL_LINE));
   assert.ok(scanText('family/brennan.html', t, terms).length === 0, 'no builder credit and no build named');
   assert.ok(!/\bSims\b|Base Game|\bBG\b/.test(words));
 });

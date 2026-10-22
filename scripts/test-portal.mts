@@ -341,7 +341,7 @@ async function pages() {
   const h1s = [...gallery.text.matchAll(/<h1[^>]*>([^<]*)<\/h1>/g)].map(m => m[1]);
   // ---- story v2 ---- (the owner asked for real logos and screenshots: the front page now carries those of content/story/app-media.json, each beside the name it identifies, with alt
   // text, its size and lazy loading: the family pages' hooks hold them to that. What is still never there: a logo or picture fetched from anywhere else.)
-  ok(h1s.length === 1 && h1s[0] === claimText('rent-line') && gallery.text.includes('Fictional family. Real software.') && gallery.text.includes('Companion OS, Companion Memory and Companion Agents are in beta.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
+  ok(h1s.length === 1 && h1s[0] === claimText('rent-line') && gallery.text.includes('Fictional family. Real software.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
   // ---- end story v2 ----
   // every word of the front page, the Core band and the footer included, goes through claims.json's rules (scripts/story/lib/site-copy.mts: banned phrases at their
   // severity, headings in sentence case, the disclosures the page owes). This block used to stop at the band ("main's wording, which says your own AI, apps and memory"),

@@ -77,7 +77,7 @@ test('each rule has teeth: breaking one thing makes exactly that complaint', () 
   assert.match(broke((g) => g.replace(esc(say('problem')), 'You rent intelligence.')), /data-claim="problem" says "You rent intelligence\."/);
   assert.match(broke((g) => g.replace(/<p data-fine="launch-not-offer">[\s\S]*?<\/p>/, '')), /lander-footer: the launch-not-offer line is missing/);
   assert.match(broke((g) => g.replace(/<p data-fine="not-frontier">[\s\S]*?<\/p>/, '')), /lander-core: the not-frontier line is missing/);
-  assert.match(broke((g) => g.replace(/<p data-fine="beta-short">[\s\S]*?<\/p>/, '')), /lander-hero: the beta-short line is missing/);
+  assert.match(broke((g) => g.replace(/<p data-fine="fictional-family">[\s\S]*?<\/p>/, '')), /lander-hero: the fictional-family line is missing/);
   assert.match(broke((g) => g.replace('<section class="swap"', `<section class="swap"><a href="${LINKS.core}">Buy</a></section><section class="swap"`)), /the swap block links https:\/\/ci\.computer\/core/);
   assert.match(broke((g) => g.replace('<div class="hero-cta">', `<div class="hero-cta"><a class="btn" href="${LINKS.core}">Buy now</a>`)), /the hero has 2 buttons|the hero block links/);
   assert.match(broke((g) => g.replace('<footer>', '<footer><img src="./portal/apps/immich/logo.webp" alt="">')), /an image from portal\/apps or portal\/ci/);
