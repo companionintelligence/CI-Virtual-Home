@@ -168,7 +168,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `story:voice -- <slug> --stale`, `story:bake -- <slug>`, `portal:og`, then `portal:build` and `portal:test`. The `.voice.json`,
   `.bake.json`, audio and link-preview images are generated and committed; never hand-edit them. Every app a story names must be in
   `content/story/catalog-apps.json` (the Companion Hub's catalog); do not invent an app or a capability, and take product claims only from
-  `content/story/claims.json`. No page, film or ad is required to carry a beta line or label, and no copy says beta. The families are fictional and say so wherever a family is
+  `content/story/claims.json`. No page, film or ad is required to carry a beta line or label, and no copy says beta (`story:copy` fails the word in anything a visitor reads: rule `release-status-beta` in `scripts/story/lib/extra-bans.mts`). The families are fictional and say so wherever a family is
   ("Fictional family. Real software."); the Companion Core is always drawn stylised. No UI mockup or invented app screen, no household with
   separate platform accounts, no person presented as a customer, daylight and warm light only (CI-Common `ADS.md`: the lander and the
   videos are held to it). A family file tells exactly the people `casting.json` lists for its home (id, name, age, role, archetype, companion's

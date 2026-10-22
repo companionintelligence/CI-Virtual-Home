@@ -9,6 +9,7 @@
 //   * a disclosure a kind of page owes: the one printed today is an error when missing, the one nobody prints yet is pending until --strict
 //   * the string finder reads copy and not code (templates, tags, attributes; not an error message, a selector or a class list)
 //   * the extra rules (cloud gaming, "sorts the photos") are warnings in the story validator's report and in the lint
+//   * the word beta is an error in the lint (CLAUDE.md: no copy says beta; no page, film or ad is required to carry a beta line)
 // @check-house node-test
 // @check-house quick
 import { test } from 'node:test';
@@ -190,7 +191,7 @@ test('the string finder reads copy, markup text and attributes, and leaves code,
 });
 
 test('the extra rules: a cloud gaming service and "sorts the photos" are warnings in the lint, the held no-account claim is an error, and a rule claims.json carries wins', () => {
-  assert.deepEqual(EXTRA_BANS.filter((b) => b.severity !== 'warn').map((b) => b.id), ['held-no-account'], 'only the held claim is an error; the caveats are warnings');
+  assert.deepEqual(EXTRA_BANS.filter((b) => b.severity !== 'warn').map((b) => b.id).sort(), ['held-no-account', 'release-status-beta'], 'only the held claim and the word beta are errors; the caveats are warnings');
   assert.ok(new RegExp(EXTRA_BANS.find((b) => b.id === 'held-no-account')!.pattern, 'i').test('Set up without an account and no activation needed.') && !/\bno (?:vendor )?account (?:needed|required)/i.test('no accounting advice'));
   assert.deepEqual(withExtraBans([{ id: 'cap-cloud-gaming' }], (e) => ({ id: e.id })).map((r) => r.id).sort(), ['cap-cloud-gaming', ...EXTRA_BANS.map((b) => b.id).filter((i) => i !== 'cap-cloud-gaming')].sort());
   const s = makeSite({ tourBody: 'Steve cancelled his cloud gaming plan, and Immich sorts your photos.' });
@@ -201,6 +202,33 @@ test('the extra rules: a cloud gaming service and "sorts the photos" are warning
   } finally { done(s); }
   const held = makeSite({ tourBody: 'Ada sets it up without an account.' });
   try { assert.ok(lint(held).errors.some((e) => e.includes('held-no-account'))); } finally { done(held); }
+});
+
+test('the word beta is an error wherever a visitor reads it: a page, a tour, the player\'s HTML and the card data (no copy says beta, CLAUDE.md)', () => {
+  const rule = EXTRA_BANS.find((b) => b.id === 'release-status-beta')!;
+  assert.equal(rule.severity, 'error');
+  const re = new RegExp(rule.pattern, rule.flags);
+  for (const yes of ['Companion Memory (beta)', 'Companion OS is in beta.', 'Join the Beta program', 'a beta-tester', 'BETA']) assert.ok(re.test(yes), `${yes} is caught`);
+  for (const no of ['alphabet soup', 'the Betamax tape', 'metadata', 'Bethany']) assert.ok(!re.test(no), `${no} is not`);
+  const where: [string, (s: Site) => void][] = [
+    ['index.html', (s) => s.write('index.html', s.read('index.html').replace('A Companion Core is', 'In beta, a Companion Core is'))],
+    ['homes/newcrest.html', (s) => s.write('homes/newcrest.html', s.read('homes/newcrest.html').replace('Meet the family', 'Meet the family (beta)'))],
+    ['family/okafor.html', (s) => s.write('family/okafor.html', s.read('family/okafor.html').replace('<header></header>', '<header><p>Companion Memory is in beta.</p></header>'))],
+    ['404.html', (s) => s.write('404.html', s.read('404.html').replace('That page is not here', 'The beta page is not here'))],
+    ['room-creator.html', (s) => s.write('room-creator.html', s.read('room-creator.html').replace('Turn it on', 'Beta: turn it on'))],
+  ];
+  for (const [page, edit] of where) {
+    const s = makeSite({ bandText: 'A Companion Core is a small personal server.' });
+    try {
+      edit(s);
+      const r = lint(s);
+      assert.ok(r.errors.some((e) => e.startsWith(page) && e.includes('release-status-beta')), `${page}: ${r.errors.join('\n') || 'no error'}`);
+    } finally { done(s); }
+  }
+  const tour = makeSite({ tourBody: 'Ada looks for last summer in Immich. Companion Memory (beta) comes along.' });
+  try { assert.ok(lint(tour).errors.some((e) => e.includes('story/okafor') && e.includes('release-status-beta'))); } finally { done(tour); }
+  const clean = makeSite({ tourBody: 'Ada looks for last summer in Immich. Companion Memory comes along.' });
+  try { assert.deepEqual(lint(clean).errors, []); } finally { done(clean); }
 });
 
 test('copyReport runs the lint and the app check over a site and a folder of families, and reports in three lists', () => {
