@@ -268,8 +268,7 @@
       },
       "popup": {
         "title": "Plugged in beside the whiteboard",
-        "body": "Sally plugs the cable in by the whiteboard. The Core wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Sally plugs the cable in by the whiteboard. The Core wakes and opens its own Wi-Fi network."
       },
       "film": true
     },
@@ -321,13 +320,13 @@
       "popup": {
         "kind": "phone",
         "title": "Sally and John choose their agents",
-        "body": "In the Companion Hub store, Sally picks Hermes and John picks OpenClaw. Companion Memory (beta) comes along, with Yuvomi, Joplin Server and Gitea. Then they walk away.",
+        "body": "In the Companion Hub store, Sally picks Hermes and John picks OpenClaw. Companion Memory comes along, with Yuvomi, Joplin Server and Gitea. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
-            "Companion Memory (beta)",
+            "Companion Memory",
             "Apps: Yuvomi, Joplin Server, Gitea"
           ]
         }
@@ -894,11 +893,11 @@
       },
       "popup": {
         "title": "Juniper drafts the renewal, Sally checks",
-        "body": "Juniper drafts a renewal reply from last spring's thread, which Sally connected to Companion Memory (beta). Sally checks the figures, then sends it herself.",
+        "body": "Juniper drafts a renewal reply from last spring's thread, which Sally connected to Companion Memory. Sally checks the figures, then sends it herself.",
         "chips": [
           "Companion Memory"
         ],
-        "note": "Messages pass through the chat service you choose. Companion Agents are in beta."
+        "note": "Messages pass through the chat service you choose."
       },
       "film": true,
       "detail": {
