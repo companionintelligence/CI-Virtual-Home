@@ -143,7 +143,7 @@ export default async function playerStart(ctx: TestCtx): Promise<void> {
       await page.goto(link(cap)); await wait(page);
       const info = await page.evaluate(() => ({ actions: Array.from(document.querySelectorAll('.st-start .st-actions .st-btn')).map(b => b.textContent), fine: Array.from(document.querySelectorAll('.st-fine li')).map(l => l.textContent), sound: !!document.querySelector('.st-btn-sound:not([hidden])'), mode: (window as any).__houseStory.rs.durations, audio: Object.keys((window as any).__houseStory.rs.audio).length, dur: (window as any).__houseStory.rs.duration }));
       ok(info.actions.length === 1 && info.actions[0] === 'Start the tour', `the start card has one button, "${info.actions.join(' | ')}": no sound to choose`);
-      ok(!info.fine.some((l: string) => /Narration is generated/.test(l)) && info.fine.length === 3, 'and its fine print says nothing of a voice (three lines)');
+      ok(!info.fine.some((l: string) => /Narration is generated/.test(l)) && info.fine.length === 2, 'and its fine print says nothing of a voice (two lines)');
       ok(info.mode === 'estimated' && info.audio === 0 && info.dur > 60, `the tour runs from reading-time durations (${info.mode}, ${Math.round(info.dur)} s, ${info.audio} clips)`);
       ok(!info.sound, 'there is no sound button');
       await page.click('.st-start .st-primary');
