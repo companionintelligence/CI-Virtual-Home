@@ -158,7 +158,13 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     o.updateMatrixWorld(true);
     try {
       if (role === 'wall') {
-        meshes(ud.fullGroup || o, m => { if (posable.size && inLeaf(m)) return; meshBoxes(m, b => push(b, isGlass(m) ? K.glass : K.wall, o.name || 'wall', colorOf(m))); });
+        meshes(ud.fullGroup || o, m => {
+          if (posable.size && inLeaf(m)) return;
+          // an arched doorway's spandrel (features.ts `archRise`): its solid is above the crown, but the axis-aligned box of the corner piece reaches down to
+          // the springline across the whole opening, at the eye. Start the box at the crown so the digest has the doorway open, as it is built.
+          const rise = m.userData && typeof m.userData.archRise === 'number' ? m.userData.archRise : 0;
+          meshBoxes(m, b => { if (rise > 0) b.min.y += rise; push(b, isGlass(m) ? K.glass : K.wall, o.name || 'wall', colorOf(m)); });
+        });
       } else if (role === 'structure') {
         if (ud.stair) meshes(o, m => { pushObb(m, K.stair, o.name || 'stairs'); });
         else meshes(o, m => meshBoxes(m, b => { if (b.max.y - b.min.y > 0.1) push(b, isGlass(m) ? K.glass : K.rail, o.name || 'structure', colorOf(m)); }));

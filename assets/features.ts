@@ -98,7 +98,9 @@ export function createFeatures(bctx) {
             const r = w / 2 - 0.05;
             const left = new THREE.Shape(); left.moveTo(-w / 2, spring); left.lineTo(-w / 2, spring + hh); left.lineTo(0, spring + hh); left.lineTo(0, spring + r); left.absarc(0, spring, r, Math.PI / 2, Math.PI, false); left.lineTo(-w / 2, spring);
             const right = new THREE.Shape(); right.moveTo(w / 2, spring); right.lineTo(w / 2 - 0.05, spring); right.absarc(0, spring, r, 0, Math.PI / 2, false); right.lineTo(0, spring + hh); right.lineTo(w / 2, spring + hh); right.lineTo(w / 2, spring);
-            for (const sh of [left, right]) { const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.16, bevelEnabled: false, curveSegments: 16 }), paint); m.position.set(d.offset, 0, -0.08); m.castShadow = true; m.receiveShadow = true; g.userData.fullGroup.add(m); }
+            // `archRise`: the digest (shot-world.ts) boxes a mesh by its axis-aligned box, and a spandrel's spans the whole doorway from the springline up; the
+            // solid is above the crown, `r` over the springline, so the digest's box starts that much higher and the doorway reads as open at the eye
+            for (const sh of [left, right]) { const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.16, bevelEnabled: false, curveSegments: 16 }), paint); m.position.set(d.offset, 0, -0.08); m.castShadow = true; m.receiveShadow = true; m.userData.archRise = r; g.userData.fullGroup.add(m); }
           }
         }
         return g;

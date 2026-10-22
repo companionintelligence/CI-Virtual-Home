@@ -26,8 +26,13 @@ Exit 1 when a beat loses its anchor (none of its role, its `nth` and its fallbac
 The planner's navigation grid (`assets/shot-nav.ts`) reads the digest's boxes at eye height (1.2 to 1.8 m over the floor) and treats a wall box as a wall. The digest is boxes, not meshes, and
 four things in the shipped homes are drawn as boxes that close a way a person walks through. Six homes (kovacs, adeniran, nguyen, dekker, tesfaye, quintero) were "not connected for the camera"
 for these reasons (`story:spline`: `cuts`, `no walkable leg on l1`). `routeBetween` therefore tries the planner's grid first, and only a walk it refuses (no leg, a leg over 24 m, an entry it
-will not take) goes up the ladder; the first rung that gives a walk within 24 m wins and `Route.rescued` says which. A walk the planner's grid makes is never touched, so a tour that had no cut
-because of this keeps its bytes (the 24 families that passed are byte-identical).
+will not take) goes up the ladder; the first rung that gives a walk within 24 m wins and `Route.rescued` says which. A walk the planner's grid makes is kept unless it goes more than 2 cm into a wall or a hard piece (`crossesSolid`, below), so a tour that had no cut and no such crossing keeps its bytes.
+
+Two things have changed since that first pass, both from the digest (`assets/features.ts` `archRise`, `assets/shot-world.ts`): the spandrels of a partition's arch are boxed from their crown, not
+from the springline (2.15 to 2.49 m over the floor, above the eye band), so the planner's grid walks those doorways itself and the rung 1 row below for an arch is for a digest made before that, an arched
+head in a facade wall and any other header; and **a walk the planner's grid makes that goes more than 2 cm into a wall or a hard piece of furniture is asked again on the ladder** (`crossesSolid`, `route.ts`:
+the planner's own hard bands, 1.1 to 2.0 m for furniture, 1.2 to 1.8 m for walls; the stretch to a snapped end is the one it does not check) and stands only if the ladder has nothing. In the 30
+families that moves one lock, kovacs' tv-steam walk, whose last hop went through the bird of paradise beside the TV room's arch once the planner could reach that arch.
 
 | Rung | What it reads differently | The cause it answers |
 |---|---|---|

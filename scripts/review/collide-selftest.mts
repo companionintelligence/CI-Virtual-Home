@@ -5,6 +5,7 @@
 //      and must report exactly those two, at the right depth
 //   B. the real plan (aurora): a box put through a ground-floor wall is found against that wall, and the findings are the same as before once
 //      it is taken out again
+//   C. a cord built in world coordinates under a group at the origin (the hero's, on the second storey): its level is the storey it is on
 import { startGeoSession } from './geom-page.mts';
 import { extractDump, loadCatalog } from './collide-io.mts';
 import { findCollisions } from './collide-lib.mts';
@@ -69,6 +70,16 @@ export async function selftest(sess: Awaited<ReturnType<typeof startGeoSession>>
     await pg.evaluate(() => (window as any).__geo.removePlanted());
     const gone = await (async () => { const { dump } = await extractDump(h); return findCollisions(dump, cat, { minDepth: 0.01 }); })();
     check('real plan, box removed: the findings are the ones before', gone.findings.length === before.findings.length && JSON.stringify(gone.findings.map(f => f.depth_cm)) === JSON.stringify(before.findings.map(f => f.depth_cm)), `${before.findings.length} -> ${gone.findings.length}`);
+    // C. the level of world-space geometry (the hero's power cord: a group at the origin whose vertices are in world coordinates). aurora's second storey
+    //    is y 3 to 6: a cord from 3.02 to 3.77 is on level 1 and clear of its ceiling (5.98); read from its origin it was level 0 and 79 cm through the
+    //    first storey's ceiling (2.98), as it was on 13 hero cords of 10 homes
+    await pg.evaluate(() => { const g = (window as any).__geo; g.sandboxOn(); g.sandboxAddWorldSpace({ size: [0.02, 0.75, 0.02], pos: [-7.5, 3.395, -5.5], name: 'Hero Power Cord', userData: { role: 'item' } }); g.rebuildRegistry(); });
+    const cordDump = (await extractDump(h)).dump;
+    const cordEnt = cordDump.entities.find(e => e.name === 'Hero Power Cord');
+    const cordRes = findCollisions(cordDump, cat, { minDepth: 0.01 });
+    await pg.evaluate(() => (window as any).__geo.sandboxOff());
+    check('world-space cord on the second storey: read as level 1, not as the origin\'s level 0', !!cordEnt && cordEnt.level === 1, cordEnt ? `level ${cordEnt.level}, at ${JSON.stringify(cordEnt.at)}` : 'not in the dump');
+    check('world-space cord on the second storey: no ceiling finding', !cordRes.findings.some(f => f.kind === 'ceiling'), cordRes.findings.map(f => `${f.kind} ${f.depth_cm} cm`).join('; '));
   } finally { await h.close(); }
   console.log(ok ? 'collide self-test: PASS' : 'collide self-test: FAIL');
   return ok;

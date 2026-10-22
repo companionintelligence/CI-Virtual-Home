@@ -9,7 +9,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createPoseCtx } from '../assets/story/poses.js';
-import { routeBetween, smoothRoute, walkGrid, failed, MAX_ROUTE_M, ENTRY_STEP_M, PASS_OVER_M, type Standing, type Route } from '../assets/story/route.js';
+import { routeBetween, smoothRoute, walkGrid, crossesSolid, failed, MAX_ROUTE_M, ENTRY_STEP_M, PASS_OVER_M, type Standing, type Route } from '../assets/story/route.js';
 import { K, type ShotWorld, type WLevel } from '../assets/shot-world.js';
 import type { V3 } from '../assets/shot-probe.js';
 
@@ -178,4 +178,46 @@ test('a walk over the cut length stays a cut with its length for a reason; the a
   // a sealed room says what is still in the way on the best grid
   const sealed = routeBetween(ctxOf(twoRooms(true, false)), a, b);
   assert.ok(failed(sealed) && /no walkable leg/.test(sealed.reason));
+});
+
+// ---- the planner's last hop -----------------------------------------------------------------------------------------------------------------------------------
+// The planner's leg routes to the nearest passable cell when an end is not passable (a pose over a sofa: the first three tiers call the sofa blocked) and then walks to the true end in a straight
+// line it never checked. Two rooms with an OPEN arched doorway (the digest starts the spandrels at the crown, 2.15 m: nothing at the eye) on x = -1.6, a sofa (top 1.0 m: soft) beyond it, and a
+// plant (1.87 m: hard) in the way of the straight line from the doorway to the pose over the sofa. Kovacs' tv-steam, in small.
+const hopWorld = () => world({
+  levels: [{ id: 'l1', y: 0, rects: [{ x: -8, z: 0, w: 16, d: 10 }], parts: [{ a: [-1.6, 0], b: [-1.6, 10], door: 5.6, doorW: 1.4, h: 2.74 }] }],
+  boxes: [[K.wall, [-1.68, 0, 0, -1.52, 2.74, 4.9]], [K.wall, [-1.68, 0, 6.3, -1.52, 2.74, 10]], [K.wall, [-1.68, 2.15, 4.9, -1.52, 2.74, 6.3]], [K.item, [-5.2, 0, 3.5, -2.4, 1.0, 5.2]], [K.item, [-2.44, 0, 4.04, -1.29, 1.87, 5.2]]],
+});
+const asRoute = (pts: Array<[number, number]>, level: string | null = 'l1', mode: 'walk' | 'stair' = 'walk'): Route => ({ ok: true, pts: pts.map(p => [p[0], 1.55, p[1]] as V3), length: 0, mode: pts.map(() => mode), levels: pts.map(() => level), tier: 0 });
+
+test('a planner walk whose last hop goes through a hard piece of furniture is rescued, and reaches the pose over the sofa without touching the plant', () => {
+  const w = hopWorld(), ctx = ctxOf(w), a = at(1, 1.55, 5.6, 'l1'), b = at(-3.6, 1.55, 4.6, 'l1');
+  // the case is real: the pose is over the sofa (not passable at the comfortable tiers), and the planner's own leg is the straight line through the plant
+  const g = ctx.nav.grid(ctx.nav.levelOf('l1'));
+  assert.ok(!ctx.nav.passableAt(g, -3.6, 4.6, 0) && ctx.nav.passableAt(g, -3.6, 4.6, 3), 'fixture: the pose is over soft furniture');
+  const own = ctx.nav.leg(g, [1, 5.6], [-3.6, 4.6], { snap: 1 });
+  assert.ok(own && crossesSolid(ctx, asRoute(own.pts)), 'fixture: the planner\'s own leg runs through the plant');
+  const r = routeBetween(ctx, a, b);
+  assert.ok(!failed(r), `a walk: ${failed(r) ? r.reason : ''}`);
+  if (failed(r)) return;
+  assert.equal(r.rescued, 1, 'the ladder made it');
+  assert.ok(!crossesSolid(ctx, r), 'and it touches nothing hard');
+  assert.deepEqual([r.pts[r.pts.length - 1][0], r.pts[r.pts.length - 1][2]], [-3.6, 4.6], 'it ends on the pose');
+  const along: Array<[number, number]> = []; for (let i = 1; i < r.pts.length; i++) for (let k = 0; k <= 20; k++) along.push([r.pts[i - 1][0] + (r.pts[i][0] - r.pts[i - 1][0]) * k / 20, r.pts[i - 1][2] + (r.pts[i][2] - r.pts[i - 1][2]) * k / 20]);
+  assert.ok(along.some(p => Math.abs(p[0] + 1.6) < 0.1 && p[1] > 4.9 && p[1] < 6.3), 'through the doorway');
+});
+
+test('a walk that touches nothing hard is the planner\'s, vertex for vertex; crossesSolid ignores grazes, flights and the lot', () => {
+  // a pose beside the sofa on the other side of the room: the hop is clear
+  const w = hopWorld(), ctx = ctxOf(w), a = at(1, 1.55, 7.5, 'l1'), b = at(-3.6, 1.55, 8, 'l1');
+  const r = routeBetween(ctx, a, b), own = ctx.nav.leg(ctx.nav.grid(ctx.nav.levelOf('l1')), [1, 7.5], [-3.6, 8], { snap: 1 });
+  assert.ok(!failed(r) && own && r.rescued === undefined, 'not rescued');
+  if (!failed(r) && own) assert.deepEqual(r.pts.map(p => [p[0], p[2]]), own.pts, 'the planner\'s polyline');
+  // 1 cm into the plant is a graze (the planner's own legs keep 0.2 m or more; this is for the straight hop), 5 cm is not
+  assert.ok(!crossesSolid(ctx, asRoute([[-2.0, 5.211], [-1.0, 5.211]])), 'a 1 cm graze of the plant\'s edge is not a crossing');
+  assert.ok(crossesSolid(ctx, asRoute([[-2.0, 5.15], [-1.0, 5.15]])), '5 cm in is');
+  assert.ok(!crossesSolid(ctx, asRoute([[-2.0, 5.15], [-1.0, 5.15]], 'l1', 'stair')), 'a flight is not a walk');
+  assert.ok(!crossesSolid(ctx, asRoute([[-2.0, 5.15], [-1.0, 5.15]], null)), 'nor is a walk on the lot (its own grid)');
+  assert.ok(crossesSolid(ctx, asRoute([[-3, 2], [0, 2]])), 'a wall is hard too (x = -1.6, z 2: the south jamb)');
+  assert.ok(!crossesSolid(ctx, asRoute([[-3, 5.6], [0, 5.6]])), 'the doorway is not (the spandrel starts at 2.15 m)');
 });
