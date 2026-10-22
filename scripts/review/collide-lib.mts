@@ -303,8 +303,9 @@ function structural(dump: SceneDump, parts: Part[], o: typeof DEFAULTS): Finding
       out.push({ kind: 'floor', depth_cm: Math.round((floorTop - lo) * 1000) / 10, volume_cm3: 0, at: r3([ent.at[0], lo, ent.at[2]]), a: refOf(ent), b: null, parts: null, rule: `its lowest point is ${Math.round((floorTop - lo) * 1000) / 10} cm under the floor of its room (${floorTop.toFixed(3)})` });
     }
     // no ceiling over an outdoor room (a porch, a terrace, a portal under its own roof is not the storey's slab), and a column is the structure that
-    // carries the storeys above: it is meant to be taller than its own storey
-    const ceilingless = (room && room.program === 'outdoor') || ent.itemType === 'column';
+    // carries the storeys above: it is meant to be taller than its own storey. A hanging plant is hung FROM the roof or beam over its room, so it is still held to the
+    // storey's top outdoors (bgfamily's porch plant hangs 57 cm over the porch beam: a real defect that the outdoor skip had lost)
+    const ceilingless = (room && room.program === 'outdoor' && ent.itemType !== 'hanging-plant') || ent.itemType === 'column';
     if (lv && ent.role === 'item' && !ent.mounted && !ceilingless) {
       const top = Math.max(...ps.map(p => p.hull.max[1])), ceil = lv.y + lv.height - 0.02;
       if (top > ceil + 0.03) out.push({ kind: 'ceiling', depth_cm: Math.round((top - ceil) * 1000) / 10, volume_cm3: 0, at: r3([ent.at[0], top, ent.at[2]]), a: refOf(ent), b: null, parts: null, rule: `its top is ${Math.round((top - ceil) * 1000) / 10} cm above the ceiling of its storey (${ceil.toFixed(3)})` });

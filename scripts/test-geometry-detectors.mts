@@ -185,6 +185,7 @@ const kinds = (d: SceneDump) => findCollisions(d, CAT);
   };
   check(ceilings(mk('column', 6.1, 'living')).length === 0, 'a 6.1 m column in a living room: no ceiling finding (it carries the storeys above)');
   check(ceilings(mk('sofa', 3.2, 'outdoor')).length === 0, 'a 3.2 m item in a room whose program is outdoor: no ceiling finding');
+  check(ceilings(mk('hanging-plant', 3.2, 'outdoor')).length === 1, 'a hanging plant through a porch roof (an outdoor room) is still found: it hangs from that roof (bgfamily, 57 cm)');
   check(ceilings(mk('sofa', 3.2, 'living')).length === 1, 'the same item in a living room still goes through the ceiling (the check is only skipped, not removed)', JSON.stringify(ceilings(mk('sofa', 3.2, 'living')).map(f => f.depth_cm)));
   check(ceilings(mk('column', 6.1, 'outdoor')).length === 0 && ceilings(mk('hanging-plant', 3.2, 'sunroom')).length === 1, 'a hanging plant through a sunroom ceiling is still found; the skip is not "any room that opens to the outside"');
 }
