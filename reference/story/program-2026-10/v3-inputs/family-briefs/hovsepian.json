@@ -1,0 +1,1407 @@
+{
+  "v": 3,
+  "slug": "hovsepian",
+  "house": "bghouse-olcia",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/hovsepian.json",
+    "sha1": "8c9f16990dd1f9a9e50af5d51302e58edd70d88c",
+    "beatsNow": 22,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "grandparents",
+  "business": true,
+  "narrator": "v-storyteller-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "kimai",
+        "joplin",
+        "forgejo",
+        "booklore",
+        "frigate",
+        "mealie"
+      ],
+      "beatApps": {
+        "home": "paperless"
+      },
+      "reviewNeeded": [
+        "mealie"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "kimai",
+          "joplin",
+          "forgejo",
+          "jellyfin",
+          "booklore",
+          "frigate"
+        ],
+        "beatApps": {
+          "food": "yuvomi"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "beatApps.food yuvomi dropped",
+        "beatApps.home paperless added",
+        "jellyfin dropped to make room",
+        "mealie added: carries food"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 14,
+    "swaps": 4,
+    "householdBeats": 6,
+    "householdBeatsMax": 6,
+    "persona": {
+      "araxi": {
+        "now": 7,
+        "add": 2,
+        "target": 9
+      },
+      "hagop": {
+        "now": 4,
+        "add": 5,
+        "target": 9
+      },
+      "nare": {
+        "now": 5,
+        "add": 1,
+        "target": 6
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "araxi",
+      "name": "Araxi",
+      "age": 67,
+      "role": "grandparent",
+      "archetype": "organiser",
+      "work": "retired teacher, runs the parish newsletter",
+      "companion": {
+        "name": "Saffron",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "elder-day",
+        "club-volunteer",
+        "writer"
+      ],
+      "thread": "A retired teacher who runs the parish newsletter, from the Study."
+    },
+    {
+      "id": "hagop",
+      "name": "Hagop",
+      "age": 70,
+      "role": "grandparent",
+      "archetype": "builder",
+      "work": "retired developer, two consulting clients",
+      "companion": {
+        "name": "Walnut",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "business-office",
+        "elder-day"
+      ],
+      "thread": "A retired developer with two consulting clients, working from the Family Room sofa."
+    },
+    {
+      "id": "nare",
+      "name": "Nare",
+      "age": 11,
+      "role": "child",
+      "archetype": "learner",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker",
+        "reader-collector"
+      ],
+      "thread": "An eleven-year-old who reads, writes and looks things up."
+    }
+  ],
+  "character": {
+    "lede": "A raised periwinkle house of lap siding stands over a dark-brick garage storey, reached by a long brick stair with white balusters. Stepped board-and-batten gables, a dormer and a red-brick chimney crown the street front.",
+    "spots": [
+      {
+        "room": "Study",
+        "line": "A tuxedo sofa, a slipper chair and nesting tables make the study."
+      },
+      {
+        "room": "Family Room",
+        "line": "A media credenza, a wall screen and a loveseat fill the family room downstairs."
+      },
+      {
+        "room": "Garage",
+        "line": "A workbench and a bicycle share the garage under the house."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 225,
+      "ground": "lawn",
+      "style": "Raised periwinkle lap-siding house over a dark-brick garage storey: a front-gabled wing under a shingled pent skirt on white pilasters, the pale glazed front door in the recess up a long brick stair with white balusters, stepped board-and-batten cross gables, a dormer and a red-brick chimney, Italian cypress, arborvitae and birch",
+      "rooms": [
+        "Garage",
+        "Mud Room",
+        "Lower Hall",
+        "Primary Bedroom",
+        "Primary Bath",
+        "Laundry",
+        "Family Room",
+        "Lower Bath",
+        "Guest Bedroom",
+        "Living & Dining",
+        "Kitchen",
+        "Stair Hall",
+        "Entry Hall",
+        "Study"
+      ],
+      "flags": [
+        "desk: core-desk-only"
+      ]
+    },
+    "truths": "The Core sits on a desk in the Study upstairs. The living room and the family room downstairs each have a television. The kitchen has an island. The front door is up a long brick stair.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "listmonk",
+      "name": "Listmonk",
+      "member": "araxi",
+      "room": "Study",
+      "service": "Mailchimp",
+      "serviceId": "mailchimp",
+      "status": "add",
+      "beat": "office-mail",
+      "seed": "Araxi keeps the parish newsletter list in Listmonk on the Core, and the mail leaves through the sender she set.",
+      "line": "Listmonk keeps the club mailing list on the Core, and the mail leaves through the sender the household sets."
+    },
+    {
+      "app": "invoice-ninja",
+      "name": "Invoice Ninja",
+      "member": "hagop",
+      "room": "Family Room",
+      "service": "FreshBooks",
+      "serviceId": "freshbooks",
+      "status": "add",
+      "beat": "living-quote",
+      "seed": "Hagop raises the quote and the invoice for a client in Invoice Ninja from the family room sofa.",
+      "line": "Invoice Ninja raises the quote and the invoice for a job from the desk in the workshop."
+    },
+    {
+      "app": "kokoro",
+      "name": "Kokoro",
+      "member": "nare",
+      "room": "Guest Bedroom",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "nare-aloud",
+      "seed": "Nare types her lighthouse report, and Kokoro reads it back in a synthetic voice made on the Core.",
+      "line": "Kokoro reads a story aloud in a synthetic voice made on the Core."
+    },
+    {
+      "app": "adventurelog",
+      "name": "AdventureLog",
+      "member": null,
+      "room": "Family Room",
+      "service": "Polarsteps",
+      "serviceId": "polarsteps",
+      "status": "add",
+      "beat": "living-adventurelog",
+      "seed": "AdventureLog keeps the parish outings as a map and a journal, one entry for each place.",
+      "line": "AdventureLog keeps the family's trips as a map and a journal."
+    },
+    {
+      "app": "inkscape",
+      "name": "Inkscape",
+      "member": "araxi",
+      "room": "Study",
+      "service": "Adobe Illustrator",
+      "serviceId": "adobe-illustrator",
+      "status": "add",
+      "beat": "office-poster",
+      "seed": "Araxi draws the poster for the church fair in Inkscape, in a browser session the Core serves.",
+      "line": "Inkscape draws the lettering for the van door, running in a browser session served from the Core."
+    },
+    {
+      "app": "espocrm",
+      "name": "EspoCRM",
+      "member": null,
+      "room": "Entry Hall",
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "status": "add",
+      "beat": "entry-espocrm",
+      "seed": "The practice logs a new enquiry from a consulting client in EspoCRM and sets the follow-up date.",
+      "line": "EspoCRM keeps a freelancer's enquiries and follow-ups in one list."
+    },
+    {
+      "app": "project-nomad",
+      "name": "Project N.O.M.A.D.",
+      "member": "nare",
+      "room": "Nare’s room",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "nare-lookup",
+      "seed": "Nare follows a Project N.O.M.A.D. lesson on lighthouse lenses, with the maps and the encyclopaedia fetched once at setup and served from the Core.",
+      "line": "Project N.O.M.A.D. gives the kids' desk lessons, maps and an encyclopaedia served from the Core."
+    },
+    {
+      "app": "open-webui",
+      "name": "Open WebUI",
+      "member": "araxi",
+      "room": "Nare’s room",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "status": "swap",
+      "beat": "nare-fractions",
+      "seed": "Araxi reads the answer the model on the Core gave to Nare's fraction question in Open WebUI, and checks it against the book.",
+      "line": "Open WebUI is the chat window for the model on the Core, in the browser."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "nare-lookup",
+      "member": "nare",
+      "chapter": "nare",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "project-nomad",
+      "toName": "Project N.O.M.A.D.",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Nare follows a Project N.O.M.A.D. lesson on lighthouse lenses, with the maps and the encyclopaedia fetched once at setup and served from the Core.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "nare-fractions",
+      "member": "araxi",
+      "chapter": "nare",
+      "from": "open-webui",
+      "fromName": "Open WebUI",
+      "to": "open-webui",
+      "toName": "Open WebUI",
+      "service": "ChatGPT",
+      "serviceId": "chatgpt",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Araxi reads the answer the model on the Core gave to Nare's fraction question in Open WebUI, and checks it against the book.",
+      "filmBeat": false,
+      "dropWith": [
+        "obsidian"
+      ],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-pudding",
+      "member": "nare",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Nare picks a pudding from the recipes in Mealie, and the shopping list sends Hagop to the shop for the cream.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-dinners",
+      "member": "araxi",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Dinners fit around Hagop's calls: Araxi plans the week in Mealie and the shopping list follows.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "yuvomi",
+      "name": "Yuvomi",
+      "beats": [
+        "kitchen-dinners",
+        "kitchen-pudding"
+      ],
+      "retoldAs": [
+        "kitchen-pudding -> Mealie",
+        "kitchen-dinners -> Mealie"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "nare-lookup"
+      ],
+      "retoldAs": [
+        "nare-lookup -> Project N.O.M.A.D."
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "obsidian",
+      "name": "Obsidian",
+      "beats": [
+        "nare-fractions"
+      ],
+      "retoldAs": [],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "joplin",
+      "forgejo"
+    ],
+    "was": [
+      "joplin",
+      "forgejo"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "office-mail",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "araxi",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "listmonk",
+      "appName": "Listmonk",
+      "with": [],
+      "service": "Mailchimp",
+      "serviceId": "mailchimp",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Araxi keeps the parish newsletter list in Listmonk on the Core, and the mail leaves through the sender she set."
+    },
+    {
+      "id": "office-poster",
+      "chapter": "office",
+      "newChapter": null,
+      "member": "araxi",
+      "also": [],
+      "room": "Study",
+      "roomRole": "office",
+      "anchor": {
+        "role": "couch",
+        "room": "office"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "inkscape",
+      "appName": "Inkscape",
+      "with": [],
+      "service": "Adobe Illustrator",
+      "serviceId": "adobe-illustrator",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Araxi draws the poster for the church fair in Inkscape, in a browser session the Core serves."
+    },
+    {
+      "id": "living-quote",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "hagop",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "invoice-ninja",
+      "appName": "Invoice Ninja",
+      "with": [],
+      "service": "FreshBooks",
+      "serviceId": "freshbooks",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hagop raises the quote and the invoice for a client in Invoice Ninja from the family room sofa."
+    },
+    {
+      "id": "living-sign",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "hagop",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hagop sets the consulting agreement out in Docuseal, and his client signs it at the table."
+    },
+    {
+      "id": "living-editor",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "hagop",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "code-server",
+      "appName": "Code Server",
+      "with": [],
+      "service": "Cursor",
+      "serviceId": "cursor",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hagop opens his editor in the laptop browser from Code Server, and the editor runs on the Core."
+    },
+    {
+      "id": "living-sync",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "hagop",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "syncthing",
+      "appName": "Syncthing",
+      "with": [],
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hagop keeps a client's folder in step between his laptop and the Core with Syncthing."
+    },
+    {
+      "id": "living-api",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "hagop",
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "productivity",
+      "segment": "small-business",
+      "app": "hoppscotch",
+      "appName": "Hoppscotch",
+      "with": [],
+      "service": "Postman",
+      "serviceId": "postman",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Hagop tests a client's endpoint from a Hoppscotch tab, and the collection stays in that browser."
+    },
+    {
+      "id": "nare-aloud",
+      "chapter": "nare",
+      "newChapter": null,
+      "member": "nare",
+      "also": [],
+      "room": "Guest Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "kokoro",
+      "appName": "Kokoro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Nare types her lighthouse report, and Kokoro reads it back in a synthetic voice made on the Core."
+    },
+    {
+      "id": "living-adventurelog",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "tv",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "adventurelog",
+      "appName": "AdventureLog",
+      "with": [],
+      "service": "Polarsteps",
+      "serviceId": "polarsteps",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "AdventureLog keeps the parish outings as a map and a journal, one entry for each place."
+    },
+    {
+      "id": "kitchen-baserow",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "baserow",
+      "appName": "Baserow",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice keeps the clients' tickets as a table in Baserow, with a view for what is late."
+    },
+    {
+      "id": "garage-enclosed",
+      "chapter": "garage",
+      "newChapter": "garage",
+      "member": null,
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "enclosed",
+      "appName": "Enclosed",
+      "with": [],
+      "service": "PrivNote",
+      "serviceId": "privnote",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "At the table, an Enclosed note holds the project-folder password for a consulting client, read on the home Wi-Fi, and closes after a day."
+    },
+    {
+      "id": "entry-espocrm",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Entry Hall",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "espocrm",
+      "appName": "EspoCRM",
+      "with": [],
+      "service": "Salesforce",
+      "serviceId": "salesforce",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice logs a new enquiry from a consulting client in EspoCRM and sets the follow-up date."
+    },
+    {
+      "id": "kitchen-super-productivity",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "small-business",
+      "segment": "small-business",
+      "app": "super-productivity",
+      "appName": "Super Productivity",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "loose",
+      "qualifier": "with Nextcloud WebDAV sync, else the tasks sit in the browser",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The practice plans the clients' tickets in blocks in Super Productivity, with a timer beside each task."
+    },
+    {
+      "id": "living-linkwarden",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Family Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "linkwarden",
+      "appName": "Linkwarden",
+      "with": [],
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The family save the pages for the parish outing into Linkwarden, which keeps a screenshot and a PDF of each one."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "garage",
+        "kind": "room",
+        "room": "garage",
+        "title": "Under the house",
+        "place": "after:living"
+      },
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "The entry hall",
+        "place": "after:office"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "office",
+        "room": "office",
+        "title": "Araxi in the study",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "The entry hall",
+        "new": true
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "Beside the bread bin",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "Hagop in the family room",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "Under the house",
+        "new": true
+      },
+      {
+        "id": "nare",
+        "room": "bedroom",
+        "title": "Nare’s room",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out by the drive",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "office",
+      "title": "Araxi in the study",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the desk and the tuxedo sofa in the upstairs Study",
+      "beats": [
+        {
+          "id": "office-notes",
+          "member": "araxi",
+          "app": "joplin",
+          "service": "Evernote",
+          "origin": "now"
+        },
+        {
+          "id": "office-newsletter",
+          "member": "araxi",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "office-contract",
+          "member": "araxi",
+          "app": "paperless",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "office-invoice",
+          "member": "araxi",
+          "app": "libreoffice",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "office-mail",
+          "member": "araxi",
+          "app": "listmonk",
+          "service": "Mailchimp",
+          "origin": "add"
+        },
+        {
+          "id": "office-poster",
+          "member": "araxi",
+          "app": "inkscape",
+          "service": "Adobe Illustrator",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "The entry hall",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-espocrm",
+          "member": null,
+          "app": "espocrm",
+          "service": "Salesforce",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "Beside the bread bin",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-dinners",
+          "member": "araxi",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-pudding",
+          "member": "nare",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-baserow",
+          "member": null,
+          "app": "baserow",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-super-productivity",
+          "member": null,
+          "app": "super-productivity",
+          "service": "Todoist",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "Hagop in the family room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the family room sofa Hagop works from",
+      "beats": [
+        {
+          "id": "living-repo",
+          "member": "hagop",
+          "app": "forgejo",
+          "service": "GitHub",
+          "origin": "now"
+        },
+        {
+          "id": "living-hours",
+          "member": "hagop",
+          "app": "kimai",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "nare-reads",
+          "member": "nare",
+          "app": "booklore",
+          "service": "Kindle",
+          "origin": "now"
+        },
+        {
+          "id": "living-walnut",
+          "member": "hagop",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-tapes",
+          "member": "nare",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-quote",
+          "member": "hagop",
+          "app": "invoice-ninja",
+          "service": "FreshBooks",
+          "origin": "add"
+        },
+        {
+          "id": "living-sign",
+          "member": "hagop",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "living-editor",
+          "member": "hagop",
+          "app": "code-server",
+          "service": "Cursor",
+          "origin": "add"
+        },
+        {
+          "id": "living-sync",
+          "member": "hagop",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "add"
+        },
+        {
+          "id": "living-api",
+          "member": "hagop",
+          "app": "hoppscotch",
+          "service": "Postman",
+          "origin": "add"
+        },
+        {
+          "id": "living-adventurelog",
+          "member": null,
+          "app": "adventurelog",
+          "service": "Polarsteps",
+          "origin": "add"
+        },
+        {
+          "id": "living-linkwarden",
+          "member": null,
+          "app": "linkwarden",
+          "service": "Raindrop.io",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "Under the house",
+      "roomRole": "garage",
+      "isNew": true,
+      "subject": "the workbench under the house",
+      "beats": [
+        {
+          "id": "garage-enclosed",
+          "member": null,
+          "app": "enclosed",
+          "service": "PrivNote",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "nare",
+      "title": "Nare’s room",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "nare-lookup",
+          "member": "nare",
+          "app": "project-nomad",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "nare-fractions",
+          "member": "araxi",
+          "app": "open-webui",
+          "service": "ChatGPT",
+          "origin": "swap"
+        },
+        {
+          "id": "nare-letter",
+          "member": "nare",
+          "app": "libretranslate",
+          "service": "Google Translate",
+          "origin": "now"
+        },
+        {
+          "id": "nare-aloud",
+          "member": "nare",
+          "app": "kokoro",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out by the drive",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-drive",
+          "member": "hagop",
+          "app": "frigate",
+          "service": "Ring",
+          "origin": "now"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-dinners",
+      "line": "Araxi plans dinners around Hagop's calls."
+    },
+    {
+      "at": "morning",
+      "beat": "office-newsletter",
+      "line": "Araxi reads the newsletter draft first."
+    },
+    {
+      "at": "midday",
+      "beat": "living-quote",
+      "line": "Hagop raises a quote before lunch."
+    },
+    {
+      "at": "afternoon",
+      "beat": "living-sign",
+      "line": "A client signs the agreement at the table."
+    },
+    {
+      "at": "after-school",
+      "beat": "nare-aloud",
+      "line": "Nare hears her lighthouse report read back."
+    },
+    {
+      "at": "after-school",
+      "beat": "nare-reads",
+      "line": "Nare reads beside Hagop."
+    },
+    {
+      "at": "weekend",
+      "beat": "office-poster",
+      "line": "The church fair poster gets its draft."
+    },
+    {
+      "at": "weekend",
+      "beat": "living-linkwarden",
+      "line": "The saved pages keep a screenshot and a PDF."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Evernote",
+      "Google Drive",
+      "Microsoft Office",
+      "GitHub",
+      "Kindle",
+      "Plex",
+      "Google Search",
+      "ChatGPT",
+      "Google Translate",
+      "Ring"
+    ],
+    "servicesFinal": [
+      "Evernote",
+      "Google Drive",
+      "Microsoft Office",
+      "Paprika",
+      "GitHub",
+      "Kindle",
+      "Plex",
+      "ChatGPT",
+      "Google Translate",
+      "Ring",
+      "Mailchimp",
+      "Adobe Illustrator",
+      "FreshBooks",
+      "DocuSign",
+      "Cursor",
+      "Dropbox",
+      "Postman",
+      "Polarsteps",
+      "Airtable",
+      "PrivNote",
+      "Salesforce",
+      "Todoist",
+      "Raindrop.io"
+    ],
+    "count": 23
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "office-mail",
+      "living-quote",
+      "nare-aloud",
+      "living-adventurelog",
+      "office-poster",
+      "entry-espocrm",
+      "nare-lookup",
+      "nare-fractions"
+    ],
+    "mustCarry": {
+      "joplin": [
+        "[note] Joplin Server only; the Joplin apps are separate.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "marketplace: Joplin Server carries its own Personal Use License: not open source and limited for business use."
+      ],
+      "forgejo": [
+        "[note] Gitea does the same job. Name one Git host per household, not both.",
+        "[note] The listing mentions Forgejo Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing says \"fully self-hosted and private\": over-claim, do not repeat.",
+        "Listing mentions Forgejo Actions CI, but no runner ships: never show a CI run."
+      ],
+      "paperless": [
+        "[note] AI features are off by default. If you turn them on they can use a local model.",
+        "[note] Office document conversion is not wired up in this build; OCR and archiving of PDFs and scans works."
+      ],
+      "libreoffice": [
+        "[note] The listing is generic. Name the suite, not specific features.",
+        "[note] ONLYOFFICE Desktop Editors does the same job: one suite per household."
+      ],
+      "kimai": [
+        "Do not call it a billing or tax tool"
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "booklore": [
+        "[cloud-link] Fetches metadata and covers from outside."
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "project-nomad": [
+        "[public-access] Ships without authentication. For trusted home networks only. Never describe it as exposed.",
+        "[note] amd64 only (fine on the Core). Internet is needed once for setup and downloads.",
+        "[claims] Educational content comes from third-party sources. Do not promise grades.",
+        "Ships without authentication: home network only, never described as exposed.",
+        "Needs the internet once for setup and downloads; never \"fully offline\" or \"anywhere\"."
+      ],
+      "open-webui": [
+        "[note] The Hub onboarding wizard offers Open WebUI as a featured app.",
+        "[cloud-link] It can also connect to cloud models with an API key. Leave that off.",
+        "[note] Wired to the Core's local model by the Hub (hub_integration inference). Say \"a model on the Core\"; never claim it matches a hosted model and never give a speed figure.",
+        "Can connect to cloud models with an API key (field in the install form): leave out of any scene.",
+        "Hub wires it to the local model."
+      ],
+      "libretranslate": [
+        "[note] Works offline once language models are downloaded.",
+        "Listing says \"works fully offline\": banned wording (sec-offline)",
+        "Say nothing about quality",
+        "Likely already heavy in the existing stories"
+      ],
+      "frigate": [
+        "[hardware] Needs IP cameras that stream over RTSP. Cameras are not part of the Core.",
+        "[public-access] Watching cameras from away from home is remote access, which the sheet leaves unfinished.",
+        "[claims] No detection-speed or accuracy numbers. Do not say it prevents anything.",
+        "QA screenshot shows \"No frames have been received, check error logs\": reject. The store listing image shows a real backyard photo that is not a Hub capture.",
+        "Watching away from home is remote access: not claimed."
+      ],
+      "listmonk": [
+        "[cloud-link] Sending at volume needs an SMTP provider or mail server. Do not promise delivery.",
+        "Do not promise delivery",
+        "Overlaps Keila",
+        "short_desc is the description"
+      ],
+      "inkscape": [
+        "Runs as a remote-desktop style session in the browser, not a native window",
+        "Image tag is the Kasm image version, not the Inkscape version"
+      ],
+      "invoice-ninja": [
+        "[cloud-link] Taking card payments needs a payment provider. Say invoicing, not payment processing.",
+        "marketplace: Elastic License 2.0 (source-available)."
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "code-server": [
+        "[cloud-link] The editor and the files are on the Core and it asks for no cloud key. Installing an extension fetches it from an outside extension registry (the upstream default is Open VSX), and a coding agent extension c",
+        "[claims] The listing says \"access it from anywhere\"; do not write that (the sheet leaves remote access unfinished). Say the editor opens in the laptop's browser on the home network. Never claim it matches a hosted coding",
+        "[note] One password set at install (plus an optional sudo password). It is one household tool, not a separate account per person.",
+        "[note] Persona decision 2026-10-15 (Liam Broza): re-admitted from the old cloud-or-developer exclusion for the builder archetype. The manifest has no API key field.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "hoppscotch": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "kokoro": [
+        "[note] OpenAI-compatible speech API. No GPU requirement in the listing.",
+        "OpenAI-compatible speech API; web player included.",
+        "No GPU requirement in the listing; no speed claim.",
+        "Capture is real (FastKoko player) on a dark purple background."
+      ],
+      "adventurelog": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "baserow": [
+        "[note] Overlaps NocoDB, Grist and Teable."
+      ],
+      "enclosed": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "espocrm": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "super-productivity": [
+        "by default tasks live in the browser local storage, not on the Core",
+        "no sync means no custody on the Core"
+      ],
+      "linkwarden": [
+        "Sharing links publicly needs inbound reach: keep the story to saving, not sharing",
+        "The Pocket name in replaces is stale"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "hoppscotch",
+      "display": "Hoppscotch",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Postman"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [
+        "Without sign-in, collections stay in the browser, not on the Core",
+        "Heavy for a client tool: three containers"
+      ],
+      "evidence": "CI-Marketplace apps/hoppscotch/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m1)"
+    },
+    {
+      "app": "enclosed",
+      "display": "Enclosed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "PrivNote"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Listing and the app's own header say \"private and secure notes\" and \"server never sees plaintext\": do not repeat",
+        "Overlaps Cryptgeon and PrivateBin: one per household",
+        "Notes can carry an optional note password and an expiry"
+      ],
+      "evidence": "CI-Marketplace apps/enclosed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-dinners",
+        "kitchen-pudding"
+      ]
+    },
+    {
+      "app": "code-server",
+      "beats": [
+        "living-editor"
+      ]
+    },
+    {
+      "app": "syncthing",
+      "beats": [
+        "living-sync"
+      ]
+    },
+    {
+      "app": "adventurelog",
+      "beats": [
+        "living-adventurelog"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

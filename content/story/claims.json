@@ -671,10 +671,10 @@
     {
       "id": "rent-line",
       "text": "Stop renting your intelligence.",
-      "source": "lander spec decision D1 B (proposed); the exact line is not in CAMPAIGN.md or COPY.md",
+      "source": "Owner approval, 2026-10-20 (lander spec decision D1 B); the exact line is not in CAMPAIGN.md or COPY.md",
       "tag": "E",
-      "status": "hold",
-      "note": "The lander's H1 and the ad kit's last line (content/story/lander.json messages). The owner delegated D1 to the audit, which recommended this line. It stays on hold until the owner sets status to ok-verbatim and names its source; the lander builds with a warning meanwhile, and a strict (push to main) build fails while it is on hold."
+      "status": "ok-verbatim",
+      "note": "The lander's H1 and the ad kit's last line (content/story/lander.json messages). Approved by the owner for use verbatim on 2026-10-20 (answered in the lander build session). It is the owner's wording, not a line of the campaign decks, so a change to it is the owner's to make here."
     },
     {
       "id": "signoff",

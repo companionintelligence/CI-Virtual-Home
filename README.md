@@ -113,7 +113,7 @@ room-creator.html          the editor + renderer page; loads assets/*.js and con
 index.html                 the portal's front page: the families and their homes (portal/gallery.css, portal/gallery.js, portal/campaign.js)
 portal/                    the portal's styles and scripts, thumbs/<id>.webp and hero.webp, and the link-preview
                            JPEGs previews/<id>.jpg and hero.jpg (derived, committed); site.css, family.css and site.js (a family's
-                           page), story.css (the tour), fonts/ (Archivo Black), og/ (the families' link previews, derived, committed)
+                           page), story.css (the tour), fonts/ (Archivo Black, for og/ only), og/ (the families' link previews, derived, committed)
 content/families/          the authored stories, <slug>.json (the writers' files; the voice and bake locks sit beside them)
 content/story/             cast-plan.json (who lives where; casting.json, slug <-> house, is derived from it), personas.json, claims.json,
                            catalog-apps.json, services.json (the replaced services), the schema: the story system's inputs
@@ -156,7 +156,9 @@ test/review/baselines/     the rig's frozen BEFORE and the stability baselines (
                            prop-boxes.json, build-neutrality.json, compose-fixtures.json)
 reference/                 HOUSE-SPEC.md (the schema), APARTMENTS.md (a unit in a block: the recipe, the six, what adding a home changes),
                            PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
-                           HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
+                           HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review), geometry/ (the detectors' baseline),
+                           office/ (the parked /office design, not shipped), story/program-2026-10/ (records of the October 2026
+                           marketing program); reference/README.md indexes it all
 test/goldens/macos-metal/  150 committed baseline frames of the first 30 homes (Git LFS; the apartments' come with `goldens:update --house`) + PROFILE.json (the renderer that made them)
 test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the frames it moves and why, and
                            <stream>/<profile>/ what each golden moved to (see How verification works)
@@ -445,7 +447,7 @@ on your own hardware. The contract for the writers, the validator and the film i
   appear nowhere on the page. Featured families pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day), so only a few of the thirty can be featured today. Counts are words ("Thirty fictional
   families in thirty-six homes."), written from the data. The filters live in the address (`?service=<id>&persona=<category>&type=<kind>&q=`), keep every parameter that is not theirs, and let an ad link to the exact pair
   (`/?service=google-photos`). The Core's picture is `pnpm run portal:thumbs -- --stage`. A home's page (`homes/<id>`) has "Meet the family" when a current family lives there. The hero tours the plan's `hero` (the Brennans at
-  Seraphine); when that family is not current the hero plays the home. The headline's claim, `rent-line`, is on hold in `claims.json` until the owner signs it off, so a push to main fails until then.
+  Seraphine); when that family is not current the hero plays the home. The headline's claim, `rent-line`, is the owner's own wording (approved 2026-10-20, `ok-verbatim`). A claim the plan names that is on `hold` in `claims.json` builds with a warning and fails a push to main, so an unsanctioned line cannot go live.
 - **Campaign passthrough** (`portal/campaign.js`, `scripts/test-campaign.mts`, `pnpm run test:campaign`; the `campaign` leg of `portal:test`). An ad's
   `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `fbclid`, `ttclid`, `gclid` and `msclkid` are read from the address, kept in
   `sessionStorage` under `ci-campaign` and put, **in the browser only** (the built hrefs stay exactly `https://ci.computer`, `/core` and `/download`: step 7

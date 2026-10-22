@@ -1,0 +1,1559 @@
+{
+  "v": 3,
+  "slug": "quintero",
+  "house": "cocoon",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/quintero.json",
+    "sha1": "27ba433e2f0a8ae36a8ec55ee4c3fb67d8cbe15a",
+    "beatsNow": 24,
+    "chaptersNow": 9,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "young-family",
+  "business": false,
+  "narrator": "v-warm-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "yuvomi",
+        "blockbench",
+        "librephotos",
+        "gitea",
+        "libretranslate",
+        "adguardhome"
+      ],
+      "beatApps": {},
+      "reviewNeeded": [
+        "adguardhome"
+      ],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "yuvomi",
+          "uptime-kuma",
+          "pi-hole",
+          "kiwix",
+          "blockbench",
+          "librephotos"
+        ],
+        "beatApps": {},
+        "reviewNeeded": []
+      },
+      "notes": [
+        "uptime-kuma dropped: no beat tells it any more",
+        "pi-hole dropped: no beat tells it any more",
+        "kiwix dropped: no beat tells it any more",
+        "gitea added: the builder pool for andres",
+        "libretranslate added: the learner pool for camila",
+        "adguardhome added: carries iot"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 38,
+    "add": 14,
+    "swaps": 7,
+    "householdBeats": 5,
+    "householdBeatsMax": 6,
+    "persona": {
+      "marisol": {
+        "now": 6,
+        "add": 1,
+        "target": 7
+      },
+      "andres": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      },
+      "camila": {
+        "now": 4,
+        "add": 3,
+        "target": 7
+      },
+      "mateo": {
+        "now": 3,
+        "add": 3,
+        "target": 6
+      }
+    },
+    "pairShare": 0.806,
+    "pairShareMin": 0.8,
+    "chapters": 10
+  },
+  "members": [
+    {
+      "id": "marisol",
+      "name": "Marisol",
+      "age": 38,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "clinic office manager",
+      "companion": {
+        "name": "Willow",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "household-manager"
+      ],
+      "thread": "The family's plan, the clinic office rota and the sitter's guide."
+    },
+    {
+      "id": "andres",
+      "name": "Andres",
+      "age": 40,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "devops engineer",
+      "companion": {
+        "name": "Thimble",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "builder-pro",
+        "tinkerer"
+      ],
+      "thread": "Devops work in the Den, and the house scripts."
+    },
+    {
+      "id": "camila",
+      "name": "Camila",
+      "age": 10,
+      "role": "child",
+      "archetype": "learner",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker",
+        "reader-collector"
+      ],
+      "thread": "A ten-year-old with a bee project, a story and a chore game."
+    },
+    {
+      "id": "mateo",
+      "name": "Mateo",
+      "age": 7,
+      "role": "child",
+      "archetype": "maker",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker"
+      ],
+      "thread": "A seven-year-old who draws, builds and makes stickers."
+    }
+  ],
+  "character": {
+    "lede": "A teal lap-siding colonial with black shutters and flower boxes has taupe-brick gables over the garage and entry. A walled stone terrace holds the pool, a swing set and a sandbox.",
+    "spots": [
+      {
+        "room": "Den",
+        "line": "A media credenza, a wall screen and a sofa fill the den."
+      },
+      {
+        "room": "Kids Bedroom",
+        "line": "A house bed, a toy box and an easel fill Mateo's room."
+      },
+      {
+        "room": "Living Room",
+        "line": "A fireplace and a chesterfield sofa warm the living room."
+      }
+    ],
+    "facts": {
+      "storeys": 2,
+      "areaSqm": 263,
+      "ground": "lawn",
+      "style": "Two-storey teal lap-siding colonial with taupe-brick garage and entry gables, a hipped roof with a big front cross gable and a nested bay gable, black louvred shutters and flower boxes, a low hipped east wing; warm taupe-and-cherry fireside interior; walled stone pool terrace",
+      "rooms": [
+        "Living Room",
+        "Kitchen",
+        "Dining Room",
+        "Den",
+        "Foyer",
+        "Stair Hall",
+        "Powder Room",
+        "Garage",
+        "Mudroom & Laundry",
+        "Family Room",
+        "Primary Bedroom",
+        "Ensuite",
+        "Walk-in Closet",
+        "Gallery Landing",
+        "Hall Bath",
+        "Kids Bedroom",
+        "Kids Room"
+      ],
+      "flags": []
+    },
+    "truths": "The Core sits on a shelf in the Living Room. Television in the Den and the Family Room. The kitchen has a breakfast bar. Pool, swing set, sandbox and garden beds on a walled stone terrace.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "bookstack",
+      "name": "BookStack",
+      "member": "marisol",
+      "room": "Dining Room",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "status": "add",
+      "beat": "dining-guide",
+      "seed": "Marisol writes the sitter's guide in BookStack: mealtimes, allergies, the number to ring and where the torch lives.",
+      "line": "BookStack holds the house manual in books, chapters and pages: the stopcock, the boiler, the sitter's guide."
+    },
+    {
+      "app": "lunalytics",
+      "name": "Lunalytics",
+      "member": "andres",
+      "room": "Andres in the den",
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "status": "swap",
+      "beat": "den-watch",
+      "seed": "Andres sets Lunalytics to check that the house's apps answer, and the checks sit on one page.",
+      "line": "Lunalytics checks that the shop site and the label printer answer."
+    },
+    {
+      "app": "project-nomad",
+      "name": "Project N.O.M.A.D.",
+      "member": "camila",
+      "room": "Camila’s room",
+      "service": null,
+      "serviceId": null,
+      "status": "swap",
+      "beat": "camila-kiwix",
+      "seed": "Camila follows a Project N.O.M.A.D. lesson on bees, with the encyclopaedia and the map fetched once at setup and served from the Core.",
+      "line": "Project N.O.M.A.D. gives the kids' desk lessons, maps and an encyclopaedia served from the Core."
+    },
+    {
+      "app": "rembg",
+      "name": "Rembg",
+      "member": "mateo",
+      "room": "Kids Bedroom",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "mateo-sticker",
+      "seed": "Rembg cuts the paper from Mateo's dragon drawing so it becomes a sticker that sits clean on the page.",
+      "line": "Rembg cuts the background from a product photo, so the candle sits clean on the page."
+    },
+    {
+      "app": "adventurelog",
+      "name": "AdventureLog",
+      "member": null,
+      "room": "Dining Room",
+      "service": "Polarsteps",
+      "serviceId": "polarsteps",
+      "status": "add",
+      "beat": "dining-adventurelog",
+      "seed": "AdventureLog keeps the swim-meet trips as a map and a journal, one entry for each place.",
+      "line": "AdventureLog keeps the family's trips as a map and a journal."
+    },
+    {
+      "app": "adguardhome",
+      "name": "AdGuard Home",
+      "member": "andres",
+      "room": "Andres in the den",
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "status": "swap",
+      "beat": "den-dns",
+      "seed": "Andres points the Den's router setting at AdGuard Home and gives the television its own rules.",
+      "line": "AdGuard Home does the same job as a DNS filter, with its own rules for each device."
+    },
+    {
+      "app": "privatebin",
+      "name": "PrivateBin",
+      "member": null,
+      "room": "Garage",
+      "service": "Pastebin",
+      "serviceId": "pastebin",
+      "status": "add",
+      "beat": "garage-privatebin",
+      "seed": "A PrivateBin note holds the house notes for the grandparents who are visiting, read on the home Wi-Fi, and is set to expire.",
+      "line": "PrivateBin shares a code snippet with the next room as a paste that expires."
+    },
+    {
+      "app": "n8n",
+      "name": "n8n",
+      "member": "andres",
+      "room": "Den",
+      "service": "Zapier",
+      "serviceId": "zapier",
+      "status": "add",
+      "beat": "den-flow",
+      "seed": "Andres links the front-door sensor to a workflow in n8n that runs on the Core and posts to the family's phones.",
+      "line": "n8n links one app to another with a workflow that runs on the Core, so the form lands in the sheet."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "den-repo",
+      "member": "andres",
+      "chapter": "den",
+      "from": "forgejo",
+      "fromName": "Forgejo",
+      "to": "gitea",
+      "toName": "Gitea",
+      "service": "GitHub",
+      "serviceId": "github",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Andres gives the house scripts a repository of their own, and Gitea keeps it, with its issues, on the Core.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "camila-kiwix",
+      "member": "camila",
+      "chapter": "camila",
+      "from": "kiwix",
+      "fromName": "Kiwix",
+      "to": "project-nomad",
+      "toName": "Project N.O.M.A.D.",
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "seed": "Camila follows a Project N.O.M.A.D. lesson on bees, with the encyclopaedia and the map fetched once at setup and served from the Core.",
+      "filmBeat": true,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "camila-moon",
+      "member": "camila",
+      "chapter": "camila",
+      "from": "obsidian",
+      "fromName": "Obsidian",
+      "to": "excalidraw",
+      "toName": "Excalidraw",
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Camila draws the moon's phases as one picture on Excalidraw and labels each one.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-fridge",
+      "member": "marisol",
+      "chapter": "kitchen",
+      "from": "yuvomi",
+      "fromName": "Yuvomi",
+      "to": "donetick",
+      "toName": "Donetick",
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "The swim fee and the bin rota move off the fridge door onto Donetick tags that the whole house taps.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-plan",
+      "member": "marisol",
+      "chapter": "living",
+      "from": "ci-planning",
+      "fromName": "Companion Planning",
+      "to": "baikal",
+      "toName": "Baikal",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Marisol blocks out her clinic shifts on the calendar that Baikal serves from the Core to every phone in the house.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "den-watch",
+      "member": "andres",
+      "chapter": "den",
+      "from": "uptime-kuma",
+      "fromName": "Uptime Kuma",
+      "to": "lunalytics",
+      "toName": "Lunalytics",
+      "service": "UptimeRobot",
+      "serviceId": "uptimerobot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Andres sets Lunalytics to check that the house's apps answer, and the checks sit on one page.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "den-dns",
+      "member": "andres",
+      "chapter": "den",
+      "from": "pi-hole",
+      "fromName": "Pi-hole",
+      "to": "adguardhome",
+      "toName": "AdGuard Home",
+      "service": "NextDNS",
+      "serviceId": "nextdns",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Andres points the Den's router setting at AdGuard Home and gives the television its own rules.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "kiwix",
+      "name": "Kiwix",
+      "beats": [
+        "ftue-pick",
+        "camila-kiwix"
+      ],
+      "retoldAs": [
+        "camila-kiwix -> Project N.O.M.A.D."
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "ci-planning",
+      "name": "Companion Planning",
+      "beats": [
+        "living-plan"
+      ],
+      "retoldAs": [
+        "living-plan -> Baikal"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "obsidian",
+      "name": "Obsidian",
+      "beats": [
+        "camila-moon"
+      ],
+      "retoldAs": [
+        "camila-moon -> Excalidraw"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "forgejo",
+      "name": "Forgejo",
+      "beats": [
+        "den-repo"
+      ],
+      "retoldAs": [
+        "den-repo -> Gitea"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "uptime-kuma",
+      "name": "Uptime Kuma",
+      "beats": [
+        "den-watch"
+      ],
+      "retoldAs": [
+        "den-watch -> Lunalytics"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "pi-hole",
+      "name": "Pi-hole",
+      "beats": [
+        "den-dns"
+      ],
+      "retoldAs": [
+        "den-dns -> AdGuard Home"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "yuvomi",
+      "paperless"
+    ],
+    "was": [
+      "yuvomi",
+      "kiwix"
+    ],
+    "changed": [
+      {
+        "from": "kiwix",
+        "to": "paperless"
+      }
+    ],
+    "note": "ftue-pick names apps in `with` that the plan retells away; set `with` to this list and name each one in the popup body (the first-install list), so the fleet counts are the ones in fleet-simulation.md"
+  },
+  "adds": [
+    {
+      "id": "dining-adventurelog",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Room",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "adventurelog",
+      "appName": "AdventureLog",
+      "with": [],
+      "service": "Polarsteps",
+      "serviceId": "polarsteps",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "AdventureLog keeps the swim-meet trips as a map and a journal, one entry for each place."
+    },
+    {
+      "id": "dining-guide",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": "marisol",
+      "also": [],
+      "room": "Dining Room",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "bookstack",
+      "appName": "BookStack",
+      "with": [],
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Marisol writes the sitter's guide in BookStack: mealtimes, allergies, the number to ring and where the torch lives."
+    },
+    {
+      "id": "den-flow",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "andres",
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "n8n",
+      "appName": "n8n",
+      "with": [],
+      "service": "Zapier",
+      "serviceId": "zapier",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Andres links the front-door sensor to a workflow in n8n that runs on the Core and posts to the family's phones."
+    },
+    {
+      "id": "den-assist",
+      "chapter": "den",
+      "newChapter": null,
+      "member": "andres",
+      "also": [],
+      "room": "Den",
+      "roomRole": "office",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "opencode",
+      "appName": "OpenCode",
+      "with": [],
+      "service": "GitHub Copilot",
+      "serviceId": "github-copilot",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "OpenCode reads Andres's house scripts and proposes a change with the model on the Core, and he reads the diff first."
+    },
+    {
+      "id": "camila-pad",
+      "chapter": "camila",
+      "newChapter": null,
+      "member": "camila",
+      "also": [],
+      "room": "Kids Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "etherpad",
+      "appName": "Etherpad",
+      "with": [],
+      "service": "Google Docs",
+      "serviceId": "google-docs",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Camila and a friend write the bee report together in Etherpad on the home Wi-Fi, each in her own colour."
+    },
+    {
+      "id": "camila-audio",
+      "chapter": "camila",
+      "newChapter": null,
+      "member": "camila",
+      "also": [],
+      "room": "Kids Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "audiobookshelf",
+      "appName": "Audiobookshelf",
+      "with": [],
+      "service": "Audible",
+      "serviceId": "audible",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Camila's story chapter resumes where she stopped, played by Audiobookshelf from files the family owns."
+    },
+    {
+      "id": "camila-quest",
+      "chapter": "camila",
+      "newChapter": null,
+      "member": "camila",
+      "also": [],
+      "room": "Kids Room",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "desk",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "habitica",
+      "appName": "Habitica",
+      "with": [],
+      "service": "Habitify",
+      "serviceId": "habitify",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Camila and Mateo score the week's chores as a Habitica party, with streaks and rewards."
+    },
+    {
+      "id": "mateo-sticker",
+      "chapter": "mateo",
+      "newChapter": null,
+      "member": "mateo",
+      "also": [],
+      "room": "Kids Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "easel",
+        "room": "kids"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "rembg",
+      "appName": "Rembg",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Rembg cuts the paper from Mateo's dragon drawing so it becomes a sticker that sits clean on the page."
+    },
+    {
+      "id": "mateo-send",
+      "chapter": "mateo",
+      "newChapter": null,
+      "member": "mateo",
+      "also": [],
+      "room": "Kids Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "easel",
+        "room": "kids"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pairdrop",
+      "appName": "PairDrop",
+      "with": [],
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Mateo sends his dragon photo from the family phone to the screen in the Den with PairDrop."
+    },
+    {
+      "id": "mateo-draw",
+      "chapter": "mateo",
+      "newChapter": null,
+      "member": "mateo",
+      "also": [],
+      "room": "Kids Bedroom",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "toys",
+        "room": "kids"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "tldraw",
+      "appName": "tldraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Mateo draws a dragon on tldraw as big as the screen, and Camila adds the fire."
+    },
+    {
+      "id": "living-librespeed",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "librespeed",
+      "appName": "LibreSpeed",
+      "with": [],
+      "service": "Speedtest by Ookla",
+      "serviceId": "speedtest-by-ookla",
+      "pairQuality": "loose",
+      "qualifier": "measures the link to the Core, not the broadband line",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone walks to the Living Room with a phone and tests the Wi-Fi to the Core with LibreSpeed after the router moves."
+    },
+    {
+      "id": "kitchen-blinko",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "blinko",
+      "appName": "Blinko",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Anyone at the breakfast bar catches a half-formed idea in Blinko before it is lost."
+    },
+    {
+      "id": "dining-spliit",
+      "chapter": "dining",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining Room",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "spliit",
+      "appName": "Spliit",
+      "with": [],
+      "service": "Splitwise",
+      "serviceId": "splitwise",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "After the swim meet the family settle who paid for what in Spliit, a group that lives on the Core."
+    },
+    {
+      "id": "garage-privatebin",
+      "chapter": "garage",
+      "newChapter": "garage",
+      "member": null,
+      "also": [],
+      "room": "Garage",
+      "roomRole": "garage",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "privatebin",
+      "appName": "PrivateBin",
+      "with": [],
+      "service": "Pastebin",
+      "serviceId": "pastebin",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A PrivateBin note holds the house notes for the grandparents who are visiting, read on the home Wi-Fi, and is set to expire."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "garage",
+        "kind": "room",
+        "room": "garage",
+        "title": "The garage",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "Living and family rooms",
+        "new": false
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "garage",
+        "room": "garage",
+        "title": "The garage",
+        "new": true
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "At the dining table",
+        "new": false
+      },
+      {
+        "id": "camila",
+        "room": "kids",
+        "title": "Camila’s room",
+        "new": false
+      },
+      {
+        "id": "mateo",
+        "room": "kids",
+        "title": "Mateo’s room",
+        "new": false
+      },
+      {
+        "id": "den",
+        "room": "office",
+        "title": "Andres in the den",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "living",
+      "title": "Living and family rooms",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-plan",
+          "member": "marisol",
+          "app": "baikal",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "living-film",
+          "member": "mateo",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-librespeed",
+          "member": null,
+          "app": "librespeed",
+          "service": "Speedtest by Ookla",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "kitchen-bar",
+          "member": "andres",
+          "app": "yuvomi",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-fridge",
+          "member": "marisol",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-blinko",
+          "member": null,
+          "app": "blinko",
+          "service": "Google Keep",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garage",
+      "title": "The garage",
+      "roomRole": "garage",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garage-privatebin",
+          "member": null,
+          "app": "privatebin",
+          "service": "Pastebin",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "At the dining table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-forms",
+          "member": "marisol",
+          "app": "paperless",
+          "service": "Evernote",
+          "origin": "now"
+        },
+        {
+          "id": "dining-thimble",
+          "member": "andres",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "dining-vault",
+          "member": "marisol",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "dining-willow",
+          "member": "marisol",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "dining-adventurelog",
+          "member": null,
+          "app": "adventurelog",
+          "service": "Polarsteps",
+          "origin": "add"
+        },
+        {
+          "id": "dining-guide",
+          "member": "marisol",
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "add"
+        },
+        {
+          "id": "dining-spliit",
+          "member": null,
+          "app": "spliit",
+          "service": "Splitwise",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "camila",
+      "title": "Camila’s room",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the small desk",
+      "beats": [
+        {
+          "id": "camila-kiwix",
+          "member": "camila",
+          "app": "project-nomad",
+          "service": null,
+          "origin": "swap"
+        },
+        {
+          "id": "camila-card",
+          "member": "camila",
+          "app": "libretranslate",
+          "service": "Google Translate",
+          "origin": "now"
+        },
+        {
+          "id": "camila-moon",
+          "member": "camila",
+          "app": "excalidraw",
+          "service": "Miro",
+          "origin": "swap"
+        },
+        {
+          "id": "camila-pad",
+          "member": "camila",
+          "app": "etherpad",
+          "service": "Google Docs",
+          "origin": "add"
+        },
+        {
+          "id": "camila-audio",
+          "member": "camila",
+          "app": "audiobookshelf",
+          "service": "Audible",
+          "origin": "add"
+        },
+        {
+          "id": "camila-quest",
+          "member": "camila",
+          "app": "habitica",
+          "service": "Habitify",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "mateo",
+      "title": "Mateo’s room",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the easel and the toy box",
+      "beats": [
+        {
+          "id": "mateo-paint",
+          "member": "mateo",
+          "app": "librephotos",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "mateo-blocks",
+          "member": "mateo",
+          "app": "blockbench",
+          "service": "MagicaVoxel",
+          "origin": "now"
+        },
+        {
+          "id": "mateo-sticker",
+          "member": "mateo",
+          "app": "rembg",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "mateo-send",
+          "member": "mateo",
+          "app": "pairdrop",
+          "service": "AirDrop",
+          "origin": "add"
+        },
+        {
+          "id": "mateo-draw",
+          "member": "mateo",
+          "app": "tldraw",
+          "service": "Miro",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "den",
+      "title": "Andres in the den",
+      "roomRole": "office",
+      "isNew": false,
+      "subject": "the media credenza and wall screen",
+      "beats": [
+        {
+          "id": "den-repo",
+          "member": "andres",
+          "app": "gitea",
+          "service": "GitHub",
+          "origin": "swap"
+        },
+        {
+          "id": "den-watch",
+          "member": "andres",
+          "app": "lunalytics",
+          "service": "UptimeRobot",
+          "origin": "swap"
+        },
+        {
+          "id": "den-dns",
+          "member": "andres",
+          "app": "adguardhome",
+          "service": "NextDNS",
+          "origin": "swap"
+        },
+        {
+          "id": "den-flow",
+          "member": "andres",
+          "app": "n8n",
+          "service": "Zapier",
+          "origin": "add"
+        },
+        {
+          "id": "den-assist",
+          "member": "andres",
+          "app": "opencode",
+          "service": "GitHub Copilot",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-beans",
+          "member": "camila",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-fridge",
+      "line": "The swim fee gets its Donetick tag."
+    },
+    {
+      "at": "midday",
+      "beat": "dining-adventurelog",
+      "line": "The trip joins the map and the journal."
+    },
+    {
+      "at": "afternoon",
+      "beat": "den-flow",
+      "line": "Andres tests the door sensor workflow."
+    },
+    {
+      "at": "after-school",
+      "beat": "camila-kiwix",
+      "line": "Camila follows her bee lesson."
+    },
+    {
+      "at": "after-school",
+      "beat": "mateo-sticker",
+      "line": "Mateo turns a drawing into a sticker."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-beans",
+      "line": "The family asks whose row of beans is winning."
+    },
+    {
+      "at": "weekend",
+      "beat": "camila-quest",
+      "line": "Saturday's chore party scores itself."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Plex",
+      "Evernote",
+      "LastPass",
+      "Google Search",
+      "Google Translate",
+      "Notion",
+      "Google Photos",
+      "MagicaVoxel",
+      "GitHub",
+      "Datadog",
+      "NextDNS"
+    ],
+    "servicesFinal": [
+      "Google Calendar",
+      "Plex",
+      "Tody",
+      "Evernote",
+      "LastPass",
+      "Google Translate",
+      "Miro",
+      "Google Photos",
+      "MagicaVoxel",
+      "GitHub",
+      "UptimeRobot",
+      "NextDNS",
+      "Polarsteps",
+      "Confluence",
+      "Zapier",
+      "GitHub Copilot",
+      "Google Docs",
+      "Audible",
+      "Habitify",
+      "AirDrop",
+      "Speedtest by Ookla",
+      "Google Keep",
+      "Splitwise",
+      "Pastebin"
+    ],
+    "count": 24
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "dining-guide",
+      "den-watch",
+      "camila-kiwix",
+      "mateo-sticker",
+      "dining-adventurelog",
+      "den-dns",
+      "garage-privatebin",
+      "den-flow"
+    ],
+    "mustCarry": {
+      "yuvomi": [
+        "[note] Stored in SQLite on your Core. CalDAV and CardDAV sync are optional.",
+        "one household planner, not an account per person",
+        "already in the persona pool: share cap risk"
+      ],
+      "paperless": [
+        "[note] AI features are off by default. If you turn them on they can use a local model.",
+        "[note] Office document conversion is not wired up in this build; OCR and archiving of PDFs and scans works."
+      ],
+      "baikal": [
+        "[note] Overlaps Radicale.",
+        "Server only, no web calendar",
+        "Whoever opens the app first runs the install wizard and sets the admin password",
+        "Overlaps Radicale and Nextcloud calendars: one calendar server per household"
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "project-nomad": [
+        "[public-access] Ships without authentication. For trusted home networks only. Never describe it as exposed.",
+        "[note] amd64 only (fine on the Core). Internet is needed once for setup and downloads.",
+        "[claims] Educational content comes from third-party sources. Do not promise grades.",
+        "Ships without authentication: home network only, never described as exposed.",
+        "Needs the internet once for setup and downloads; never \"fully offline\" or \"anywhere\"."
+      ],
+      "libretranslate": [
+        "[note] Works offline once language models are downloaded.",
+        "Listing says \"works fully offline\": banned wording (sec-offline)",
+        "Say nothing about quality",
+        "Likely already heavy in the existing stories"
+      ],
+      "excalidraw": [
+        "[note] amd64 only. An Excalidraw MCP entry exists for agents.",
+        "marketplace: Manifest source points to ozencb/excalidraw-persist, a 105-star wrapper, not excalidraw/excalidraw."
+      ],
+      "librephotos": [
+        "[note] First setup takes 5 to 10 minutes while models and migrations start.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "Face recognition is sensitive: say what it does, never that it \"knows\" people",
+        "Overlaps Immich; use it to relieve Immich's share"
+      ],
+      "blockbench": [
+        "Projects live in the browser (IndexedDB) or in files the person saves: the Core serves the app, it does not hold the models",
+        "The listing names Minecraft models; say \"game models\" or \"block models\" in copy",
+        "Free-text store claim \"never sees your models\" is accurate for the container"
+      ],
+      "gitea": [
+        "[note] Gitea Mirror is a different listing (it copies GitHub repositories into Gitea). Name only Gitea. Forgejo does the same job; name one Git host per household.",
+        "[note] The listing mentions Actions CI. The package ships the forge and its database only, no runner, so do not show a CI run.",
+        "[claims] Say where the repositories are (on the Core). Do not say it syncs with, or is compatible with, GitHub.",
+        "Listing mentions Actions CI; no runner ships: never show a CI run.",
+        "Gitea Mirror is a different app."
+      ],
+      "lunalytics": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "adguardhome": [
+        "[note] Overlaps Pi-hole; pick one per story.",
+        "[claims] Same as Pi-hole: no parental-control promise.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "Overlaps Pi-hole: one per household",
+        "Listing mentions adult-content parental controls: never repeat it (sec-safety-people)"
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "adventurelog": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "bookstack": [],
+      "n8n": [
+        "[licence] Fair-code licence, not open source. Say \"source-available\"; do not say \"open source\".",
+        "[note] An n8n MCP entry exists for agents.",
+        "Fair-code licence: say source-available, never open source.",
+        "Public URL setting is for webhooks; leave off the scene.",
+        "Listing says full control over data: connectors to cloud services still pass data to them."
+      ],
+      "opencode": [
+        "[cloud-link] The Hub wires it to the Core's local model by default (hub_integration inference). The app can also connect to cloud providers with a key you add inside it; leave that off. A coding agent is private only on ",
+        "[claims] Never claim parity with a hosted coding model and never a speed figure. The agent edits files, so the beat shows the person approving the change (agents prepare, people approve).",
+        "[note] The web interface has no sign-in unless a server password is set at install. The older OpenCode Web listing is superseded; name only OpenCode.",
+        "[note] Added 2026-10-15 for the builder archetype: the old cloud-or-developer exclusion lumped it with apps that need cloud keys; this one is wired to the local model.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "etherpad": [],
+      "audiobookshelf": [],
+      "habitica": [
+        "The sign-up page in the capture carries a cookie-consent banner: check the self-hosted build for analytics scripts before saying it sends nothing out",
+        "Game, not a health or behaviour tool: no outcomes"
+      ],
+      "rembg": [
+        "[note] amd64 only (fine on the Core). REST API available.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "amd64 only; CPU inference; models are cached after the first download (internet).",
+        "No built-in authentication (home network only).",
+        "No QA screenshot and no gallery image at all: needs a capture."
+      ],
+      "pairdrop": [
+        "none from the catalog"
+      ],
+      "tldraw": [
+        "[note] Overlaps Excalidraw.",
+        "not open source (tldraw licence; a production watermark shows)",
+        "overlaps Excalidraw"
+      ],
+      "librespeed": [
+        "Say \"the link to the Core\" or \"the Wi-Fi in this room\"; never \"internet speed\"",
+        "No speed figures in copy (num rules): show the act, not a number",
+        "Listing says \"privacy-focused\" and \"no tracking\": do not repeat"
+      ],
+      "blinko": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI search and chat need a model provider added in the app (OpenAI, Ollama, LiteLLM...): not wired by the Hub.",
+        "No QA run; gallery frame is upstream marketing with a \"#Password\" tagged note and a gmail file name: reject.",
+        "Companion desktop and mobile clients are separate downloads."
+      ],
+      "spliit": [],
+      "privatebin": [
+        "Footer of the screen says the server has \"zero knowledge\": do not repeat",
+        "Overlaps Cryptgeon and Enclosed: one per household",
+        "No sign-in unless added"
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "lunalytics",
+      "display": "Lunalytics",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "UptimeRobot",
+        "Statuspage"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 3",
+      "caveats": [
+        "Setup wizard asks for email and username on first visit",
+        "Do not claim a public status page",
+        "Overlaps Uptime Kuma (another slice): one uptime monitor per household"
+      ],
+      "evidence": "CI-Marketplace apps/lunalytics/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    },
+    {
+      "app": "etherpad",
+      "display": "Etherpad",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Google Docs"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "maybe 3",
+      "caveats": [],
+      "evidence": "CI-Marketplace apps/etherpad/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m3)"
+    },
+    {
+      "app": "librespeed",
+      "display": "LibreSpeed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Speedtest by Ookla"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Say \"the link to the Core\" or \"the Wi-Fi in this room\"; never \"internet speed\"",
+        "No speed figures in copy (num rules): show the act, not a number",
+        "Listing says \"privacy-focused\" and \"no tracking\": do not repeat"
+      ],
+      "evidence": "CI-Marketplace apps/librespeed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "adguardhome",
+      "beats": [
+        "den-dns"
+      ]
+    },
+    {
+      "app": "adventurelog",
+      "beats": [
+        "dining-adventurelog"
+      ]
+    },
+    {
+      "app": "opencode",
+      "beats": [
+        "den-assist"
+      ]
+    },
+    {
+      "app": "rembg",
+      "beats": [
+        "mateo-sticker"
+      ]
+    },
+    {
+      "app": "blinko",
+      "beats": [
+        "kitchen-blinko"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

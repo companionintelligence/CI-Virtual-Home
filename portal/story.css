@@ -3,7 +3,9 @@
  *
  * Loaded by assets/story/mount.js with its own <link>, only for ?family=<slug> (never the landing, never the editor), after
  * portal/viewer.css, whose tokens it uses (--vh-glass-strong, --vh-ring, --vh-shadow, --vh-font, --foreground, --primary ...).
- * Colour is the canon's dark semantic set; text on the glass is at least 7:1, the dimmed karaoke words 4.5:1 or better.
+ * Colour is the canon's dark semantic set; text on the panels is at least 7:1, the dimmed karaoke words 4.5:1 or better.
+ * October 2026 restyle (portal/viewer.css, top): solid panels on the 5px radius with a hairline and no blur or shadow, 3px controls, the primary
+ * button a flat fill in the mark's deep ring (--vh-fill), links, names and the live marks in its light ring (--vh-link).
  * ------------------------------------------------------------------------------------------------------------- */
 
 /* ---- the player's own chrome, put away while a tour runs: the shot and time-of-day chips (the chapters replace them), the speed
@@ -23,8 +25,8 @@ html[data-story] .vh-end { display: none !important; }
 /* the About dialog (the shortcuts panel the tour rewrites) is a dialog: it stands over the tour's cards, not under them (on a phone a bottom sheet would hide half of it) */
 html[data-story] .vh-help { z-index: 7; }
 
-.st-btn-sound[aria-pressed="true"] { color: var(--primary); }
-.st-btn-chapters[aria-expanded="true"] { background-color: var(--vh-on); color: var(--primary); }
+.st-btn-sound[aria-pressed="true"] { color: var(--vh-link); }
+.st-btn-chapters[aria-expanded="true"] { background-color: var(--vh-on); color: var(--vh-link); }
 .st-tick { position: absolute; top: 50%; width: 2px; height: 10px; margin: -5px 0 0 -1px; border-radius: 2px; background: var(--foreground); opacity: 0.5; pointer-events: none; }
 
 /* ---- the picture fading (a step, a chapter jump, a cut across the house, reduced motion) */
@@ -37,13 +39,13 @@ html[data-story] .vh-help { z-index: 7; }
    solver, assets/story/place.ts, chooses another slot, a narrower and so taller card or tighter padding; it never shrinks the type). Weights are the canon's: 400 body, 500
    controls, 600 chips, 700 titles and the name. Tracking is the canon's 0.2pt (--st-track, inherited from the layer) on everything but the name. ---- */
 /* ---- a person's name, anywhere on a card or a dialog of the tour: the kicker look. All capitals by CSS (the string in the page and in every aria-label is the
-   name as written), 0.2em of tracking, bold, in the sage accent (--primary on the dark set), at the card's reading size. `.st-who` is the card's kicker slot (the person,
-   or the chapter when no one is speaking), `.st-name` a name wherever else it labels something. ---- */
+   name as written), 0.2em of tracking, bold, in the ring colour, at the card's reading size. `.st-who` is the card's kicker slot (the person,
+   or the chapter when no one is speaking), `.st-name` a name wherever else it labels something. The colour is the mark's light ring (--vh-link). ---- */
 .st { letter-spacing: var(--st-track); word-spacing: var(--st-word); }
-.st-who, .st-name, .st-start-kick { text-transform: uppercase; letter-spacing: var(--st-kick); font-weight: 700; color: var(--primary); }
+.st-who, .st-name, .st-start-kick { text-transform: uppercase; letter-spacing: var(--st-kick); font-weight: 700; color: var(--vh-link); }
 
 /* ---- the beat card: a card or side panel of clamp(420px, 32vw, 560px) (as tall as its content needs, up to the room above the dock, scrolling inside beyond it), or a full-width sheet on a phone.
-   The surface is the canon's: a hairline ring, the radius scale's 2xl, an elevation from the shadow set. */
+   The surface is the ink with a hairline ring on the card radius, flat. */
 .st-card {
   --st-pt: 1.25rem; --st-px: 1.5rem;
   position: absolute; z-index: 2;
@@ -51,8 +53,8 @@ html[data-story] .vh-help { z-index: 7; }
   border-radius: var(--st-r-card);
   font-size: var(--st-min); line-height: 1.38; font-weight: 400;
   background: var(--vh-glass-strong);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
-  box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring);
+ 
+  box-shadow: inset 0 0 0 1px var(--vh-ring);
   overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--foreground) 40%, transparent) transparent;
   opacity: 0; transform: translateY(6px);
   transition: opacity 0.22s ease, transform 0.22s ease;
@@ -76,20 +78,20 @@ html[data-story] .vh-help { z-index: 7; }
 .st-disc[data-colour="chart-3"] { background: var(--chart-3); }
 .st-disc[data-colour="chart-4"] { background: var(--chart-4); }
 .st-disc[data-colour="chart-5"] { background: var(--chart-5); color: var(--foreground); }
-.st-title { margin: 0.7rem 0 0.5rem; font-size: var(--st-title); line-height: 1.15; font-weight: 700; text-wrap: balance; }
+.st-title { margin: 0.7rem 0 0.5rem; font-size: var(--st-title); line-height: 1.12; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance; }
 .st-body { margin: 0; color: var(--foreground); }
-.st-w { transition: color 0.12s ease, background-color 0.12s ease; border-radius: 6px; }
+.st-w { transition: color 0.12s ease, background-color 0.12s ease; border-radius: 3px; }
 .st-live .st-w { color: var(--muted-foreground); }
 .st-live .st-w.st-done { color: var(--foreground); }
-.st-live .st-w.st-now { color: var(--foreground); background-color: color-mix(in srgb, var(--primary) 26%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 26%, transparent); }
+.st-live .st-w.st-now { color: var(--foreground); background-color: color-mix(in srgb, var(--vh-link) 26%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--vh-link) 26%, transparent); }
 .st-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0 0; padding: 0; list-style: none; }
-.st-chip { max-width: 100%; padding: 0.3rem 0.9rem; border-radius: 999px; font-size: var(--st-min); line-height: 1.2; font-weight: 600; background: color-mix(in srgb, var(--foreground) 12%, transparent); }
+.st-chip { max-width: 100%; padding: 0.3rem 0.9rem; border-radius: var(--st-r-ctl); font-size: var(--st-min); line-height: 1.2; font-weight: 500; background: color-mix(in srgb, var(--foreground) 12%, transparent); }
 .st-chip-replaces { background: none; box-shadow: inset 0 0 0 1px var(--vh-ring); color: var(--muted-foreground); font-weight: 500; }
-.st-say { margin-top: 0.8rem; padding: 0.6rem 0.9rem; border-radius: var(--st-r-ctl); background: color-mix(in srgb, var(--primary) 12%, transparent); opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s; }
+.st-say { margin-top: 0.8rem; padding: 0.6rem 0.9rem; border-radius: var(--st-r-ctl); background: color-mix(in srgb, var(--vh-link) 12%, transparent); opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s; }
 .st-say.st-on { opacity: 1; visibility: visible; transform: none; transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s; }
-.st-say-who { display: block; font-size: var(--st-min); line-height: 1.2; font-weight: 700; color: var(--primary); }
+.st-say-who { display: block; font-size: var(--st-min); line-height: 1.2; font-weight: 700; color: var(--vh-link); }
 .st-say-text { margin: 0.2rem 0 0; }
-.st-note { margin: 0.8rem 0 0; padding-left: 0.8rem; border-left: 3px solid var(--primary); font-size: var(--st-min); line-height: 1.34; color: var(--muted-foreground); }
+.st-note { margin: 0.8rem 0 0; padding-left: 0.8rem; border-left: 2px solid var(--vh-link); font-size: var(--st-min); line-height: 1.34; color: var(--muted-foreground); }
 .st-foot { margin: 0.8rem 0 0; font-size: var(--st-min); line-height: 1.3; color: var(--muted-foreground); }
 
 /* story v2: the real logo of the app a chip names (on a light tile so a dark mark stays visible, 1.3 times the type), the "More" toggle and what it opens. The head holds
@@ -100,7 +102,7 @@ html[data-story] .vh-help { z-index: 7; }
 .st-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.7rem; margin-top: 0.8rem; }
 .st-row .st-chips { margin: 0; }
 .st-chip-app { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.9rem 0.3rem 0.4rem; }
-.st-logo { flex: none; width: calc(var(--st-min) * 1.3); height: calc(var(--st-min) * 1.3); padding: 4px; border-radius: 8px; object-fit: contain; background: var(--foreground); }
+.st-logo { flex: none; width: calc(var(--st-min) * 1.3); height: calc(var(--st-min) * 1.3); padding: 4px; border-radius: 3px; object-fit: contain; background: var(--foreground); }
 /* "More": a button at the right of the kicker, its label in the card's type (a control: the canon's 500) */
 .st-more-btn { position: relative; flex: none; display: inline-flex; align-items: center; gap: 0.5rem; min-height: max(44px, calc(var(--st-min) * 1.5)); margin-block: calc((var(--st-min) * 1.5 - max(44px, var(--st-min) * 1.5)) / 2); padding: 0 0.8rem 0 1rem; border: 0; border-radius: var(--st-r-ctl); background: var(--vh-hover); font: inherit; font-size: var(--st-min); font-weight: 500; line-height: 1.2; letter-spacing: var(--st-track); color: var(--foreground); cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: background-color 0.15s ease; }
 .st-more-btn:hover { background: color-mix(in srgb, var(--foreground) 16%, transparent); }
@@ -108,11 +110,11 @@ html[data-story] .vh-help { z-index: 7; }
 .st-more-btn[aria-expanded="true"] .st-more-i { transform: rotate(180deg); }
 /* a card that scrolls (an open "More", or a long beat on a small window) keeps its top line, the kicker and the toggle, in view, so the way to close it is never scrolled away.
    The head is the card's first child: it keeps the card's own top and side padding (--st-pt, --st-px, set for each mode above) as its own, so nothing moves when it is stuck
-   (a sticky offset is measured from the padding's inner edge, hence the negative `top`) and the words that scroll under it are hidden by its solid ink (the card's glass is 94 % opaque). */
+   (a sticky offset is measured from the padding's inner edge, hence the negative `top`) and the words that scroll under it are hidden by its solid ink (the card is the ink, solid). */
 .st-card.st-open .st-head { position: sticky; top: calc(-1 * var(--st-pt)); z-index: 1; margin: calc(-1 * var(--st-pt)) calc(-1 * var(--st-px)) 0; padding: var(--st-pt) var(--st-px) 0.4rem; background: var(--vh-ink); }
 .st-more { display: grid; gap: 0.6rem; margin-top: 0.6rem; padding-top: 0.8rem; border-top: 1px solid var(--vh-ring); }
 .st-more-row { margin: 0; font-size: var(--st-min); line-height: 1.34; color: var(--foreground); }
-.st-more-row b { color: var(--primary); font-weight: 700; }
+.st-more-row b { color: var(--vh-link); font-weight: 700; }
 .st-card[data-mode="sheet"] .st-row { margin-top: 0.5rem; }
 .st-card[data-mode="sheet"] .st-more { gap: 0.4rem; padding-top: 0.5rem; }
 
@@ -126,26 +128,26 @@ html[data-story] .vh-help { z-index: 7; }
 
 /* a stylised phone screen (a drawing, never a screenshot), in the card's type like everything else */
 .st-phone { margin: 0.8rem 0 0; padding: 0.6rem 0.8rem 0.8rem; border-radius: var(--st-r-ctl); background: color-mix(in srgb, var(--foreground) 8%, transparent); box-shadow: inset 0 0 0 1px var(--vh-ring); }
-.st-phone-head { font-size: var(--st-min); line-height: 1.2; font-weight: 700; color: var(--primary); padding-bottom: 0.4rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--vh-ring); }
+.st-phone-head { font-size: var(--st-min); line-height: 1.2; font-weight: 700; color: var(--vh-link); padding-bottom: 0.4rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--vh-ring); }
 .st-phone-rows { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; }
 .st-phone-rows li { display: flex; align-items: center; gap: 0.7rem; font-size: var(--st-min); line-height: 1.2; }
-.st-phone-rows li::before { content: ""; flex: none; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--primary); opacity: 0.85; }
+.st-phone-rows li::before { content: ""; flex: none; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--vh-link); opacity: 0.85; }
 
 .st-compact .st-phone { display: none; }
 
 /* ---- the leader and the pin */
 .st-leader { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
-.st-leader-line { stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; opacity: 0.95; filter: drop-shadow(0 0 2px color-mix(in srgb, var(--vh-ink) 80%, transparent)); }
-.st-pin-dot { fill: var(--primary); stroke: var(--vh-ink); stroke-width: 2; }
-.st-pin-ring { fill: none; stroke: var(--primary); stroke-width: 2; opacity: 0.7; transform-box: fill-box; transform-origin: center; animation: st-pulse 1.9s ease-out infinite; }
+.st-leader-line { stroke: var(--vh-link); stroke-width: 2.5; stroke-linecap: round; opacity: 0.95; }
+.st-pin-dot { fill: var(--vh-link); stroke: var(--vh-ink); stroke-width: 2; }
+.st-pin-ring { fill: none; stroke: var(--vh-link); stroke-width: 2; opacity: 0.7; transform-box: fill-box; transform-origin: center; animation: st-pulse 1.9s ease-out infinite; }
 @keyframes st-pulse { from { transform: scale(0.55); opacity: 0.9; } to { transform: scale(1.7); opacity: 0; } }
 
 /* ---- the start card: a dialog in two columns on a wide screen (the copy and the buttons; the family and the fine print), one column below 1100 px. A card taller than the window scrolls the scrim. */
-.st-start { position: absolute; inset: 0; z-index: 8; display: flex; padding: 1rem; pointer-events: auto; background: linear-gradient(180deg, color-mix(in srgb, var(--vh-ink) 28%, transparent), color-mix(in srgb, var(--vh-ink) 55%, transparent)); overflow: auto; }
-.st-start-card { margin: auto; width: min(1000px, 100%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); column-gap: 2.6rem; align-items: start; padding: 2rem 2.25rem; border-radius: var(--st-r-card); font-size: var(--st-min); line-height: 1.38; background: var(--vh-glass-strong); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring); }
+.st-start { position: absolute; inset: 0; z-index: 8; display: flex; padding: 1rem; pointer-events: auto; background: color-mix(in srgb, var(--vh-ink) 45%, transparent); overflow: auto; }
+.st-start-card { margin: auto; width: min(1000px, 100%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); column-gap: 2.6rem; align-items: start; padding: 2rem 2.25rem; border-radius: var(--st-r-card); font-size: var(--st-min); line-height: 1.38; background: var(--vh-glass-strong); box-shadow: inset 0 0 0 1px var(--vh-ring); }
 .st-start-copy, .st-start-more { min-width: 0; }
 .st-start-kick { margin: 0 0 0.6rem; font-size: var(--st-min); line-height: 1.2; }
-.st-start-card h2 { margin: 0 0 0.8rem; font-size: var(--st-hook); line-height: 1.1; font-weight: 700; text-wrap: balance; }
+.st-start-card h2 { margin: 0 0 0.8rem; font-size: var(--st-hook); line-height: 1.08; font-weight: 500; letter-spacing: -0.025em; text-wrap: balance; }
 .st-start-p { margin: 0 0 0.8rem; font-size: var(--st-min); line-height: 1.38; color: var(--foreground); }
 .st-start-home { margin: 1rem 0 0; font-size: var(--st-min); line-height: 1.38; color: var(--muted-foreground); }
 .st-start-meta { margin: 0 0 1.1rem; font-size: var(--st-min); line-height: 1.34; color: var(--muted-foreground); }
@@ -162,18 +164,18 @@ html[data-story] .vh-help { z-index: 7; }
 .st-members + .st-fine { margin-top: 1.4rem; }
 .st-start-more > .st-fine:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 
-/* ---- buttons (a finger and a pointer: at least 44 px, and as tall as the type needs). A control is the canon's 500; the primary action 600. */
+/* ---- buttons (a finger and a pointer: at least 44 px, and as tall as the type needs). Manrope 500, flat. */
 .st-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .st-btn { display: inline-flex; align-items: center; justify-content: center; min-height: max(44px, calc(var(--st-min) * 2)); padding: 0.4rem 1.4rem; border: 0; border-radius: var(--st-r-ctl); font: inherit; font-size: var(--st-min); font-weight: 500; line-height: 1.15; letter-spacing: var(--st-track); text-align: center; text-decoration: none; cursor: pointer; color: var(--foreground); background: var(--vh-hover); pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: background-color 0.15s ease; }
 .st-btn:hover { background: color-mix(in srgb, var(--foreground) 16%, transparent); }
-.st-primary { background: var(--primary); color: var(--primary-foreground); font-weight: 600; }
-.st-primary:hover { background: color-mix(in srgb, var(--primary) 88%, var(--foreground)); }
+.st-primary { background: var(--vh-fill); color: var(--vh-fill-ink); font-weight: 500; }
+.st-primary:hover { background: var(--vh-fill-hover); }
 
 /* ---- the end card: a side panel like the beat card's (placeEndCard keeps it off the Core), scrolling inside when the window is short */
-.st-end { position: absolute; z-index: 4; padding: 1.4rem 1.5rem 1.3rem; border-radius: var(--st-r-card); font-size: var(--st-min); line-height: 1.38; pointer-events: auto; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--foreground) 40%, transparent) transparent; background: var(--vh-glass-strong); -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25); box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring); opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.st-end { position: absolute; z-index: 4; padding: 1.4rem 1.5rem 1.3rem; border-radius: var(--st-r-card); font-size: var(--st-min); line-height: 1.38; pointer-events: auto; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--foreground) 40%, transparent) transparent; background: var(--vh-glass-strong); box-shadow: inset 0 0 0 1px var(--vh-ring); opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
 .st-end.st-in { opacity: 1; transform: none; }
-.st-end h2 { margin: 0; font-size: var(--st-hook); line-height: 1.1; font-weight: 700; text-wrap: balance; }
-.st-end-lead { margin: 0.6rem 0 0.7rem; font-size: var(--st-min); line-height: 1.3; font-weight: 600; color: var(--primary); }
+.st-end h2 { margin: 0; font-size: var(--st-hook); line-height: 1.08; font-weight: 500; letter-spacing: -0.025em; text-wrap: balance; }
+.st-end-lead { margin: 0.6rem 0 0.7rem; font-size: var(--st-min); line-height: 1.3; font-weight: 600; color: var(--vh-link); }
 .st-end .st-actions { margin: 0.9rem 0 1rem; }
 .st-end .st-actions .st-btn { flex: 1 1 auto; }
 .st-end-body { margin: 0; }
@@ -187,28 +189,28 @@ html[data-story] .vh-help { z-index: 7; }
 .st-end.st-tight .st-note { margin-top: 0.5rem; }
 
 /* ---- the chapters panel: a drawer on a wide screen, a sheet above the dock below that */
-.st-chapters { position: absolute; z-index: 5; pointer-events: auto; display: flex; flex-direction: column; overflow: hidden; background: var(--vh-glass-strong); -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25); box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring); border-radius: var(--vh-radius, 16px);
+.st-chapters { position: absolute; z-index: 5; pointer-events: auto; display: flex; flex-direction: column; overflow: hidden; background: var(--vh-glass-strong); box-shadow: inset 0 0 0 1px var(--vh-ring); border-radius: var(--vh-radius, 5px);
   right: calc(var(--vh-gap, 12px) + env(safe-area-inset-right, 0px)); top: calc(var(--vh-gap, 12px) + var(--vh-top-h, 50px) + 12px + env(safe-area-inset-top, 0px)); bottom: 104px; width: 340px; animation: st-slide 0.22s ease both; }
 @keyframes st-slide { from { opacity: 0; transform: translateX(10px); } }
 .st-ch-head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 6px 6px 6px 16px; border-bottom: 1px solid var(--vh-ring); }
-.st-ch-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
-.st-x { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 12px; background: none; color: var(--foreground); cursor: pointer; }
+.st-ch-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.st-x { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 3px; background: none; color: var(--foreground); cursor: pointer; }
 .st-x:hover { background: var(--vh-hover); }
 .st-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .st-ch-nav { flex: 1 1 auto; overflow-y: auto; padding: 6px; }
 .st-ch-list, .st-beats { margin: 0; padding: 0; list-style: none; }
-.st-ch { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: 10px; background: none; color: var(--foreground); font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; }
+.st-ch { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: 3px; background: none; color: var(--foreground); font: inherit; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; }
 .st-ch:hover { background: var(--vh-hover); }
-.st-ch[aria-current] { background: var(--vh-on); color: var(--primary); }
+.st-ch[aria-current] { background: var(--vh-on); color: var(--vh-link); }
 .st-ch small { font-size: 12px; font-weight: 500; color: var(--muted-foreground); }
 .st-n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700; background: color-mix(in srgb, var(--foreground) 14%, transparent); }
 .st-beats { margin: 2px 0 6px 34px; }
-.st-bt { width: 100%; min-height: 36px; padding: 6px 10px; border: 0; border-radius: 8px; background: none; color: var(--muted-foreground); font: inherit; font-size: 13.5px; text-align: left; cursor: pointer; }
+.st-bt { width: 100%; min-height: 36px; padding: 6px 10px; border: 0; border-radius: 3px; background: none; color: var(--muted-foreground); font: inherit; font-size: 13.5px; text-align: left; cursor: pointer; }
 .st-bt:hover { background: var(--vh-hover); color: var(--foreground); }
-.st-bt[aria-current] { color: var(--foreground); font-weight: 700; box-shadow: inset 2px 0 0 var(--primary); border-radius: 0 8px 8px 0; }
+.st-bt[aria-current] { color: var(--foreground); font-weight: 600; box-shadow: inset 2px 0 0 var(--vh-link); border-radius: 0 3px 3px 0; }
 .st-transcript { flex: none; max-height: 40%; overflow-y: auto; padding: 0 16px 8px; border-top: 1px solid var(--vh-ring); }
-.st-transcript summary { display: flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 700; cursor: pointer; }
-.st-tr-body h3 { margin: 12px 0 4px; font-size: 13px; font-weight: 700; color: var(--primary); }
+.st-transcript summary { display: flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.st-tr-body h3 { margin: 12px 0 4px; font-size: 13px; font-weight: 600; color: var(--vh-link); }
 .st-tr-body p { margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
 .st-tr-phone { margin: 0 0 8px; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
 .st-tr-body strong { color: var(--foreground); }

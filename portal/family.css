@@ -9,9 +9,11 @@
  * Real logos sit on a white tile (--pg-logo-bg) in both themes, so a dark mark stays visible. Hover and reveal effects are CSS only and the site's
  * prefers-reduced-motion rule (site.css) turns every transition off.
  * Daylight only: the page takes the canon's light set and, when the system asks for it, its dark set (the tokens switch in site.css).
+ * October 2026 restyle (site.css, top): cards on the 5px radius with a hairline border, pictures on 3px, flat 3px controls, the ring colour for
+ * links and labels (--link), Manrope 500 titles on the 60 / 36 scale, no glass, blur, gradients or shadows.
  * ------------------------------------------------------------------------------------------------------------- */
 
-.page-family main { max-width: var(--pg-wide); margin: 0 auto; padding: 0 var(--pg-gutter) 56px; }
+.page-family main { margin: 0; padding: 0 var(--grid-margin) 56px; }
 
 /* ---------------- the hero ---------------- */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "poster" "actions"; gap: 18px 40px; padding: 22px 0 4px; }
@@ -19,9 +21,9 @@
 .hero .poster { grid-area: poster; }
 .hero-actions { grid-area: actions; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .disclosure { margin: 0 0 12px; }
-.disclosure strong { display: inline-flex; align-items: center; min-height: 28px; padding: 2px 12px; border-radius: 999px; background: var(--secondary); color: var(--primary); font-size: 13.5px; font-weight: 700; }
-.hero h1 { font-weight: 700; font-size: clamp(34px, 5.4vw, 56px); line-height: 1.04; letter-spacing: -0.02em; text-wrap: balance; }
-.tagline { margin-top: 12px; font-size: 18px; line-height: 1.45; color: var(--muted-foreground); max-width: 28em; text-wrap: pretty; }
+.disclosure strong { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border: 1px solid var(--pg-hairline-strong); border-radius: var(--radius-control); color: var(--link); font-size: var(--type-label); font-weight: 600; letter-spacing: 0.02em; }
+.hero h1 { font-weight: var(--type-display-weight); font-size: var(--type-display); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); text-wrap: balance; }
+.tagline { margin-top: 12px; font-size: var(--type-lede); line-height: 1.5; color: var(--muted-foreground); max-width: 28em; text-wrap: pretty; }
 .address { margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--muted-foreground); }
 .hero-note { flex: 1 1 100%; margin: 2px 0 0; font-size: 13.5px; color: var(--muted-foreground); }
 @media (min-width: 900px) {
@@ -31,107 +33,108 @@
   .hero .poster { align-self: center; }
 }
 
-.poster { position: relative; display: block; border-radius: 20px; overflow: hidden; aspect-ratio: 1200 / 630; background: var(--pg-thumb-bg); box-shadow: var(--shadow-lg); isolation: isolate; }
-.poster img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.poster:hover img { transform: scale(1.02); }
-.poster-badge { position: absolute; left: 14px; top: 14px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--pg-ink-fg); background: color-mix(in srgb, var(--pg-ink) 62%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.poster { position: relative; display: block; border: 1px solid var(--hairline); border-radius: var(--radius-media); overflow: hidden; aspect-ratio: 1200 / 630; background: var(--pg-thumb-bg); isolation: isolate; }
+.poster img { width: 100%; height: 100%; object-fit: cover; }
+.poster-badge { position: absolute; left: 12px; top: 12px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 28px; padding: 0 10px; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: 600; letter-spacing: 0.02em; color: var(--pg-ink-fg); background: var(--pg-ink); }
 .poster-badge .i { width: 14px; height: 14px; }
-.poster-play { position: absolute; left: 50%; top: 50%; z-index: 1; width: 68px; height: 68px; margin: -34px 0 0 -34px; display: grid; place-items: center; border-radius: 50%; color: var(--pg-ink); background: color-mix(in srgb, var(--pg-ink-fg) 92%, transparent); box-shadow: var(--shadow-lg); transition: transform 0.25s ease; }
+.poster-play { position: absolute; left: 50%; top: 50%; z-index: 1; width: 64px; height: 64px; margin: -32px 0 0 -32px; display: grid; place-items: center; border-radius: var(--radius-control); color: var(--button-primary-foreground); background: var(--button-primary); transition: background-color 0.2s ease; }
 .poster-play .i { width: 24px; height: 24px; margin-left: 4px; }
-.poster:hover .poster-play { transform: scale(1.06); }
+.poster:hover .poster-play { background: var(--button-primary-hover); }
 .film { grid-column: 1 / -1; margin-top: 8px; }
-.film video { display: block; width: 100%; border-radius: 14px; background: var(--pg-ink); aspect-ratio: 16 / 9; }
+.film video { display: block; width: 100%; border-radius: var(--radius-media); background: var(--pg-ink); aspect-ratio: 16 / 9; }
 .film-note { margin-top: 8px; font-size: 13px; color: var(--muted-foreground); }
 
 /* ---------------- the disclosure strip: the beta line, one compact row under the first screen (the label is the header's chip; scripted scenes, the stylised Core and the rest are the footer's) ---------------- */
-.strip { margin-top: 20px; padding: 9px 14px; border-radius: 12px; background: var(--secondary); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+.strip { margin-top: 20px; padding: 9px 14px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--secondary); }
 .strip ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 24px; font-size: 13px; line-height: 1.45; color: var(--muted-foreground); }
 
 /* ---------------- sections ---------------- */
 .block { padding-top: clamp(34px, 5vw, 56px); }
-.block h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.15; }
-.block .lead { margin-top: 10px; max-width: 40em; font-size: 16.5px; color: var(--muted-foreground); text-wrap: pretty; }
+.block h2 { font-size: var(--type-title); font-weight: var(--type-title-weight); letter-spacing: var(--type-title-tracking); line-height: var(--type-title-leading); }
+.block .lead { margin-top: 10px; max-width: 40em; font-size: var(--type-lede); line-height: 1.5; color: var(--muted-foreground); text-wrap: pretty; }
 .block p.note { margin-top: 14px; font-size: 13.5px; color: var(--muted-foreground); max-width: 46em; }
 
 /* the people, as links to their sections (and so to family/<slug>#sally). The nav sticks under the site header while the people are read, and lets go at
    the end of them (it lives in .people, which ends with the last person); portal/family.js marks the one on screen with aria-current. A chip changes
    colour only, never size, so nothing shifts as it follows the scroll. Without the script it is the same row of plain links. */
 .people { margin-top: 26px; }
-.who-nav { position: sticky; top: 56px; z-index: 12; margin: 0 calc(-1 * var(--pg-gutter)); padding: 8px var(--pg-gutter); background: color-mix(in srgb, var(--background) 92%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--pg-hairline); }
+.who-nav { position: sticky; top: var(--pg-head-h, 64px); z-index: 12; margin: 0 calc(-1 * var(--grid-margin)); padding: 8px var(--grid-margin); background: var(--background); border-bottom: 1px solid var(--hairline); }
 .who-nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
 .who-nav ul::-webkit-scrollbar { display: none; }
 .who-nav li { flex: none; }
-.who-nav a { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 18px 6px 8px; border-radius: 999px; color: inherit; text-decoration: none; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); transition: background-color 0.15s ease, box-shadow 0.15s ease; }
-.who-nav a:hover { background: var(--secondary); }
-.who-nav a[aria-current] { background: color-mix(in srgb, var(--primary) 13%, var(--card)); box-shadow: inset 0 0 0 2px var(--primary); }
+.who-nav a { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 18px 6px 8px; border: 1px solid var(--hairline); border-radius: var(--radius-control); color: inherit; text-decoration: none; background: var(--card); transition: background-color 0.15s ease, border-color 0.15s ease; }
+.who-nav a:hover { border-color: var(--pg-hairline-strong); }
+.who-nav a[aria-current] { border-color: var(--link); outline: 1px solid var(--link); }
 .who-nav-text { display: flex; flex-direction: column; line-height: 1.2; }
-.who-nav-text b { font-size: 15px; font-weight: 700; }
+.who-nav-text b { font-size: 15px; font-weight: 600; }
 .who-nav-text small { font-size: 12.5px; font-weight: 500; color: var(--muted-foreground); }
 
 /* one person */
-.who { margin-top: clamp(30px, 4.5vw, 52px); padding-top: 28px; border-top: 1px solid var(--pg-hairline); scroll-margin-top: 64px; }
+.who { margin-top: clamp(30px, 4.5vw, 52px); padding-top: 28px; border-top: 1px solid var(--hairline); scroll-margin-top: 64px; }
 .people > .who:first-of-type { margin-top: 22px; border-top: 0; padding-top: 12px; }
 .who-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .who-head .avatar { width: 48px; height: 48px; font-size: 19px; box-shadow: none; }
 .who-id { flex: 1 1 220px; min-width: 0; }
-.who h2 { font-size: clamp(26px, 3.2vw, 34px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; }
+.who h2 { font-size: var(--type-title); font-weight: var(--type-title-weight); letter-spacing: var(--type-title-tracking); line-height: var(--type-title-leading); }
 .who-facts { display: flex; flex-wrap: wrap; margin-top: 4px; font-size: 14px; font-weight: 600; color: var(--muted-foreground); }
 .who-facts span + span::before { content: "\00b7"; margin: 0 9px; opacity: 0.6; }
 .who-start .i { width: 15px; height: 15px; }
 .who-work, .who-bio { margin-top: 14px; max-width: 42em; font-size: 16px; text-wrap: pretty; }
 .agent { margin-top: 8px; max-width: 42em; font-size: 14.5px; color: var(--muted-foreground); }
-.agent b { color: var(--foreground); font-weight: 700; }
+.agent b { color: var(--foreground); font-weight: 600; }
 .agent .limits { display: block; margin-top: 2px; font-size: 13.5px; }
 
 .moments { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.moment { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 20px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); scroll-margin-top: 72px; }
-.moment:target { box-shadow: inset 0 0 0 2px var(--primary); }
-.moment-room { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--muted-foreground); }
-.moment h3 { font-size: 17.5px; font-weight: 700; line-height: 1.3; }
+.moment { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 20px 12px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--card); scroll-margin-top: 80px; }
+.moment:target { border-color: var(--link); outline: 1px solid var(--link); }
+.moment-room { margin: 0; font-size: var(--type-label); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.3; color: var(--label-ink); }
+.moment h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
 .moment-body { max-width: 42em; font-size: 15px; text-wrap: pretty; }
 .moment .chips { margin-top: 2px; }
 .moment .say { font-size: 14px; color: var(--muted-foreground); }
-.moment .note { font-size: 13px; color: var(--muted-foreground); padding-left: 10px; border-left: 2px solid var(--primary); }
-.tag-scripted { display: inline-block; padding: 0 8px; margin-right: 4px; border-radius: 999px; background: var(--secondary); color: var(--primary); font-size: 12px; font-weight: 700; }
-.play-from { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-top: auto; padding: 0 2px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.moment .note { font-size: 13px; color: var(--muted-foreground); padding-left: 10px; border-left: 1px solid var(--link); }
+.tag-scripted { display: inline-block; padding: 0 6px; margin-right: 4px; border: 1px solid var(--pg-hairline-strong); border-radius: var(--radius-control); color: var(--link); font-size: 12px; font-weight: 600; }
+.play-from { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-top: auto; padding: 0 2px; font-size: 14px; font-weight: 500; text-decoration: none; }
 .play-from:hover { text-decoration: underline; }
 .play-from .i { width: 12px; height: 12px; }
 
 /* ---------------- the apps ---------------- */
 .apps { list-style: none; padding: 0; margin: 20px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
-.app { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.app-name { font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; min-height: 36px; }
+.app { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--card); }
+.app-name { font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; min-height: 36px; }
 @media (pointer: coarse) { .app-name, .sib, .who-nav a { min-height: 44px; } }
-.app-name:hover { text-decoration: underline; }
+.app-name:hover { text-decoration: underline; text-decoration-thickness: 1px; }
 .instead { font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
 
 /* ---------------- how the Core starts ---------------- */
 .steps-compact { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.steps-compact .step { padding: 14px 16px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.steps-compact .step-n { font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--primary); }
-.steps-compact h3 { margin-top: 6px; font-size: 16px; font-weight: 700; }
-.steps-compact p { margin-top: 4px; font-size: 13.5px; color: var(--muted-foreground); }
+/* three stat tiles: a top hairline rule, a light numeral, a tracked label */
+.steps-compact .step { padding: 16px 0 0; border-top: 1px solid var(--hairline); }
+.steps-compact .step-n { font-size: var(--type-stat); font-weight: var(--type-stat-weight); line-height: var(--type-stat-leading); letter-spacing: var(--type-stat-tracking); font-variant-numeric: tabular-nums; color: var(--foreground); }
+.steps-compact h3 { margin-top: 10px; font-size: var(--type-label); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.3; color: var(--label-ink); }
+.steps-compact p { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--muted-foreground); }
 
 /* ---------------- the next family and the close ---------------- */
 .siblings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: clamp(34px, 5vw, 56px); }
-.sib { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px; border-radius: 14px; color: inherit; text-decoration: none; box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.sib:hover { background: var(--secondary); }
+.sib { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px; border: 1px solid var(--hairline); border-radius: var(--radius-card); color: inherit; text-decoration: none; transition: border-color 0.15s ease; }
+.sib:hover { border-color: var(--pg-hairline-strong); color: inherit; }
 .sib span { display: flex; flex-direction: column; min-width: 0; }
 .sib small { font-size: 12px; font-weight: 600; color: var(--muted-foreground); }
-.sib b { font-size: 15.5px; font-weight: 700; }
+.sib b { font-size: 15.5px; font-weight: 600; }
 .sib-next { justify-content: space-between; text-align: right; }
 
-.closing { margin-top: clamp(34px, 5vw, 56px); padding: clamp(32px, 5vw, 56px) clamp(20px, 4vw, 48px); border-radius: 22px; background: var(--secondary); box-shadow: inset 0 0 0 1px var(--pg-hairline); text-align: center; }
-.closing h2 { font-weight: 700; font-size: clamp(28px, 4.2vw, 44px); line-height: 1.08; letter-spacing: -0.02em; }
-.closing p { max-width: 34em; margin: 14px auto 0; color: var(--muted-foreground); font-size: 17px; }
+.closing { margin-top: clamp(34px, 5vw, 56px); padding: clamp(32px, 5vw, 56px) clamp(20px, 4vw, 48px); border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--secondary); text-align: center; }
+.closing h2 { font-weight: 500; font-size: clamp(32px, 3vw + 8px, 52px); line-height: 1.04; letter-spacing: -0.025em; }
+.closing p { max-width: 34em; margin: 14px auto 0; color: var(--muted-foreground); font-size: var(--type-lede); line-height: 1.5; }
 .closing p:last-child { margin-top: 24px; }
 
 .site-foot .foot-links { margin-top: 12px; }
 /* the fine print (scripts/story/lib/fine-print.mts, 'family-footer'): every disclosure claims.json puts in the footer, small, one paragraph each */
 .foot-notes p { margin: 0 0 7px; font-size: 12.5px; line-height: 1.45; }
-.foot-notes p b { font-weight: 700; }
+.foot-notes p b { font-weight: 600; }
 .home-note { margin: 22px 0 0; max-width: 62em; font-size: 12.5px; color: var(--muted-foreground); }
-.home-note a { color: inherit; font-weight: 700; }
+.home-note a { color: inherit; font-weight: 500; }
+.home-note a:hover { color: var(--foreground); }
 
 /* the tour button that stays in reach on a phone, once the first screen has gone by (the page's own script shows it; it is hidden otherwise) */
 .tourbar { display: none; }
@@ -144,10 +147,10 @@
   .steps-compact { grid-template-columns: 1fr; }
   .siblings { grid-template-columns: 1fr; }
   /* a phone: the picture runs to the edges and the buttons share the width */
-  .hero .poster { margin: 0 calc(-1 * var(--pg-gutter)); border-radius: 0; }
+  .hero .poster { margin: 0 calc(-1 * var(--grid-margin)); border-left: 0; border-right: 0; border-radius: 0; }
   .hero-actions .btn { flex: 1 1 auto; padding: 0 14px; white-space: nowrap; }
   .who-start { flex: 1 1 100%; min-height: 44px; }
-  .tourbar:not([hidden]) { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; padding: 10px var(--pg-gutter) calc(10px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--background) 92%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--pg-hairline); }
+  .tourbar:not([hidden]) { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; padding: 10px var(--grid-margin) calc(10px + env(safe-area-inset-bottom)); background: var(--background); border-top: 1px solid var(--hairline); }
   .tourbar .btn { flex: 1 1 auto; }
   .page-family:has(.tourbar:not([hidden])) { padding-bottom: 72px; }
   .film-on .tourbar { display: none !important; }
@@ -155,74 +158,74 @@
 @media (max-width: 520px) {
   .apps { grid-template-columns: 1fr; }
 }
-@media (hover: none) { .poster:hover img { transform: none; } }
 
 /* ===================================================== story v2: the card, the details, the screenshots, a day, the home, how it runs ===================================================== */
 
 /* a real logo in a chip or beside an app's name (the tile and the size are portal/media.css's) */
 .chip-app { padding-left: 3px; }
-.chip-app .logo { width: 24px; height: 24px; padding: 2px; border-radius: 6px; }
+.chip-app .logo { width: 24px; height: 24px; padding: 2px; border-radius: var(--radius-media); }
 .app-name .logo { width: 32px; height: 32px; }
 
 /* "More about this moment": a native disclosure under a moment */
-.more { align-self: stretch; margin-top: 4px; border-top: 1px solid var(--pg-hairline); }
-.more summary { display: flex; align-items: center; gap: 9px; min-height: 44px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 700; color: var(--primary); }
+.more { align-self: stretch; margin-top: 4px; border-top: 1px solid var(--hairline); }
+.more summary { display: flex; align-items: center; gap: 9px; min-height: 44px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 500; color: var(--link); }
+.more summary:hover { color: var(--link-hover); }
 .more summary::-webkit-details-marker { display: none; }
-.more summary::before { content: ""; flex: none; width: 7px; height: 7px; margin: 0 4px 3px 2px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s ease; }
+.more summary::before { content: ""; flex: none; width: 7px; height: 7px; margin: 0 4px 3px 2px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s ease; }
 .more[open] summary::before { transform: rotate(45deg); margin-bottom: 5px; }
 .more summary:hover span { text-decoration: underline; text-underline-offset: 3px; }
 .more-body { display: grid; gap: 12px; padding: 2px 0 12px; font-size: 14.5px; }
 .more-ba { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
-.more-ba > div { padding: 10px 12px; border-radius: 12px; background: var(--secondary); }
-.more-ba dt { margin-bottom: 3px; font-size: 12.5px; font-weight: 700; color: var(--muted-foreground); }
+.more-ba > div { padding: 10px 12px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--secondary); }
+.more-ba dt { margin-bottom: 3px; font-size: var(--type-label); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--label-ink); }
 .more-ba dd { margin: 0; text-wrap: pretty; }
-.more-cap { margin: 0 0 -4px; font-size: 12.5px; font-weight: 700; color: var(--muted-foreground); }
+.more-cap { margin: 0 0 -4px; font-size: 12.5px; font-weight: 600; color: var(--muted-foreground); }
 .more-steps { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
-.more-steps li::marker { color: var(--primary); font-weight: 700; }
-.more-fact { margin: 0; padding-left: 10px; border-left: 2px solid var(--primary); color: var(--muted-foreground); text-wrap: pretty; }
-.more-fact b { color: var(--foreground); font-weight: 700; }
+.more-steps li::marker { color: var(--link); font-weight: 500; }
+.more-fact { margin: 0; padding-left: 10px; border-left: 1px solid var(--link); color: var(--muted-foreground); text-wrap: pretty; }
+.more-fact b { color: var(--foreground); font-weight: 600; }
 
 /* a day in the house: a rail with the parts of the day on it, and an entry for each moment */
 .day { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 26px; }
 .day-part { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 0 18px; }
-.day-at { padding-top: 14px; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primary); }
-.day-list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 10px; border-left: 2px solid var(--pg-hairline); }
-.day-item { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px 6px 14px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.day-item::before { content: ""; position: absolute; left: -33px; top: 22px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px var(--background); }
-.day-item .avatar { margin-top: 2px; box-shadow: none; }
+.day-at { padding-top: 14px; font-size: var(--type-label); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.3; color: var(--label-ink); }
+.day-list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 10px; border-left: 1px solid var(--hairline); }
+.day-item { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px 6px 14px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--card); }
+.day-item::before { content: ""; position: absolute; left: -33px; top: 22px; width: 11px; height: 11px; border: 1px solid var(--background); border-radius: 50%; background: var(--link); }
+.day-item .avatar { margin-top: 2px; }
 .day-text { min-width: 0; }
-.day-who { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--muted-foreground); }
+.day-who { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--muted-foreground); }
 .day-line { margin: 1px 0 0; font-size: 15.5px; text-wrap: pretty; }
-.day-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.day-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 500; text-decoration: none; }
 .day-link:hover span { text-decoration: underline; text-underline-offset: 3px; }
 .day-link .i { width: 14px; height: 14px; }
 
 /* the home: the lede, the facts, a block for each spot, and the floor plan */
 .home-facts { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.home-facts li { display: inline-flex; align-items: center; min-height: 32px; padding: 0 14px; border-radius: 999px; background: var(--secondary); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.home-facts li { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border: 1px solid var(--hairline); border-radius: var(--radius-control); font-size: 13.5px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .spots { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-.spot { padding: 14px 16px 16px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.spot h3 { font-size: 15px; font-weight: 700; }
+.spot { padding: 14px 16px 16px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--card); }
+.spot h3 { font-size: 15px; font-weight: 600; }
 .spot p { margin-top: 4px; font-size: 14.5px; color: var(--muted-foreground); text-wrap: pretty; }
 .plan-block { margin-top: 28px; }
 .plan-floors ul { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.plan-floors a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; color: inherit; font-size: 14px; font-weight: 700; text-decoration: none; box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.plan-floors a:hover { background: var(--secondary); }
+.plan-floors a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--pg-hairline-strong); border-radius: var(--radius-control); color: inherit; font-size: 14px; font-weight: 500; text-decoration: none; transition: border-color 0.15s ease, background-color 0.15s ease; }
+.plan-floors a:hover { background: var(--button-ghost-hover); border-color: var(--foreground); color: inherit; }
 .plan-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 18px; }
-.plan { padding: 14px 14px 12px; border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); scroll-margin-top: 4px; }
+.plan { padding: 14px 14px 12px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--card); scroll-margin-top: 4px; }
 .plan-cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 13.5px; color: var(--muted-foreground); }
 .plan-cap b { font-size: 15px; color: var(--foreground); }
 .plan-hint { display: none; margin: 4px 0 0; font-size: 12.5px; color: var(--muted-foreground); }
-.plan-scroll { margin-top: 10px; overflow-x: auto; border-radius: 12px; }
+.plan-scroll { margin-top: 10px; overflow-x: auto; border-radius: var(--radius-media); }
 .plan-box { position: relative; min-width: 520px; width: 100%; }
 .plan-svg { display: block; width: 100%; height: 100%; }
 .plan-foot { fill: var(--secondary); stroke: var(--muted-foreground); stroke-opacity: 0.35; stroke-width: 1; }
 .plan-room { fill: var(--background); stroke: var(--muted-foreground); stroke-opacity: 0.6; stroke-width: 0.8; }
 .plan-name { fill: var(--foreground); font-family: var(--font-sans); font-weight: 600; letter-spacing: 0; word-spacing: 0; }
-.plan-core rect { fill: var(--primary); }
-.plan-core circle { fill: var(--primary-foreground); }
+.plan-core rect { fill: var(--mark-deep); }
+.plan-core circle { fill: #ffffff; }
 .pin { position: absolute; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; text-decoration: none; }
-.pin .avatar { width: 30px; height: 30px; box-shadow: 0 0 0 3px var(--background), var(--shadow-md); transition: transform 0.15s ease; }
+.pin .avatar { width: 30px; height: 30px; border: 2px solid var(--background); transition: transform 0.15s ease; }
 .pin:focus-visible { outline-offset: -4px; }
 @media (prefers-reduced-motion: no-preference) { .pin:hover .avatar, .pin:focus-visible .avatar { transform: scale(1.14); } }
 
@@ -240,16 +243,17 @@
 /* ===================================================== a name, as a kicker (live pass 3) =====================================================
    The owner's words: "Use all caps on the name and loosely space the name text like a kicker." A person's name wherever it labels something on a family page, and the family's name
    ("THE BRENNAN FAMILY") the same way: all capitals by CSS (the text in the page, and every aria-label, is the name as written), bold (the canon's 700), tracking of 0.2em, in the
-   sage accent (--primary: phthalo on the light set, sage on the dark one). The monogram discs stay. At the card's reading size (1.5rem, 25.5 px) where the name stands alone as a
+   ring colour (--link: the mark's deep ring on the light set, its light ring on the dark one; the October 2026 restyle moved it from --primary). The monogram discs stay. At the card's reading size (1.5rem, 25.5 px) where the name stands alone as a
    heading; in the people nav, in the day's entries and on the previous and next family links the name is a label among body text, so it is 0.85rem (14.45 px) and no smaller.
    Tokens only. */
-.nm, .who h2.nm, .who-nav-text b.nm, .day-who.nm, .sib b.nm { text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: var(--primary); }
+.nm, .who h2.nm, .who-nav-text b.nm, .day-who.nm, .sib b.nm { text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: var(--label-ink); }
 .who-nav-text b.nm { font-size: 0.85rem; line-height: 1.25; }
 .day-who.nm { font-size: 0.85rem; line-height: 1.3; }
 .who h2.nm { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; }
 .who-start .nm { color: inherit; letter-spacing: 0.2em; font-size: 0.85rem; }
 .sib b.nm { font-size: 0.85rem; line-height: 1.3; letter-spacing: 0.2em; }
 /* the hero's family name is the page's one heading: the kicker look at a size that wraps in the copy column; the tagline under it carries the sentence */
-.hero h1.nm { font-size: clamp(1.5rem, 3.4vw, 2.6rem); line-height: 1.18; letter-spacing: 0.2em; text-wrap: balance; }
-.hero .tagline { font-size: clamp(20px, 2.2vw, 28px); font-weight: 600; color: var(--foreground); max-width: 22em; }
+.hero h1.nm { font-size: clamp(1.25rem, 2.4vw, 1.9rem); line-height: 1.18; letter-spacing: 0.2em; text-wrap: balance; }
+/* the tagline under it carries the sentence: the display role, Manrope 500 on the 60px scale, capped where the copy column holds it */
+.hero .tagline { font-size: clamp(30px, 2.6vw + 8px, 48px); font-weight: 500; line-height: 1.08; letter-spacing: -0.025em; color: var(--foreground); max-width: 22em; text-wrap: balance; }
 .who-nav a { gap: 12px; }

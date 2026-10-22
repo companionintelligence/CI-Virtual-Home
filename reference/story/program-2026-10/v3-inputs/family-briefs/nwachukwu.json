@@ -1,0 +1,1304 @@
+{
+  "v": 3,
+  "slug": "nwachukwu",
+  "house": "cutestarter",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/nwachukwu.json",
+    "sha1": "3865f51717e021d5f46029db34fcae0fddbacf92",
+    "beatsNow": 22,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "grandparents",
+  "business": false,
+  "narrator": "v-storyteller-m",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "papra",
+        "firefly-iii",
+        "kitchenowl",
+        "hortusfox",
+        "jellyfin",
+        "audiobookshelf"
+      ],
+      "beatApps": {
+        "iot": "frigate",
+        "privacy": "searxng"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "papra",
+          "firefly-iii",
+          "kitchenowl",
+          "hortusfox",
+          "jellyfin",
+          "audiobookshelf"
+        ],
+        "beatApps": {
+          "iot": "frigate",
+          "privacy": "duplicati"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "beatApps.privacy duplicati dropped",
+        "beatApps.privacy searxng added"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 14,
+    "swaps": 3,
+    "householdBeats": 5,
+    "householdBeatsMax": 6,
+    "persona": {
+      "ngozi": {
+        "now": 6,
+        "add": 3,
+        "target": 9
+      },
+      "emeka": {
+        "now": 5,
+        "add": 4,
+        "target": 9
+      },
+      "chidi": {
+        "now": 5,
+        "add": 2,
+        "target": 7
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 8
+  },
+  "members": [
+    {
+      "id": "ngozi",
+      "name": "Ngozi",
+      "age": 67,
+      "role": "grandparent",
+      "archetype": "organiser",
+      "work": "retired church treasurer",
+      "companion": {
+        "name": "Gingersnap",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "elder-day",
+        "club-volunteer"
+      ],
+      "thread": "A retired church treasurer: the papers, the budgets and the hall handbook."
+    },
+    {
+      "id": "emeka",
+      "name": "Emeka",
+      "age": 70,
+      "role": "grandparent",
+      "archetype": "host",
+      "work": "retired bus driver, cooks and grows tomatoes",
+      "companion": {
+        "name": "Crumpet",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "elder-day",
+        "host-cook",
+        "grower"
+      ],
+      "thread": "A retired bus driver who cooks, grows tomatoes and keeps the family's music."
+    },
+    {
+      "id": "chidi",
+      "name": "Chidi",
+      "age": 8,
+      "role": "child",
+      "archetype": "learner",
+      "work": "primary school",
+      "companion": null,
+      "lens": [
+        "kid-maker",
+        "reader-collector"
+      ],
+      "thread": "An eight-year-old who reads, draws and counts tomatoes."
+    }
+  ],
+  "character": {
+    "lede": "A slate-blue Cape Cod cottage has a steep fish-scale roof, two dormers and a red-brick entry bay with an arched door. Railed porches on either side look onto beds of flowers.",
+    "spots": [
+      {
+        "room": "Kids Corner",
+        "line": "A single bed, a toy box and a low bookshelf make Chidi's corner."
+      },
+      {
+        "room": "Kitchen",
+        "line": "A kettle, a fruit bowl and café curtains brighten the small kitchen."
+      },
+      {
+        "room": "Living Room",
+        "line": "A loveseat, a slipper chair and a rug make the front room."
+      }
+    ],
+    "facts": {
+      "storeys": 1,
+      "areaSqm": 78,
+      "ground": "lawn",
+      "style": "Slate-blue clapboard Cape Cod cottage: steep brown fish-scale side gable, two dormers, a red-brick gabled entry bay with an arched blue door, railed brick-floored porches either side, an end chimney and a lower bath wing",
+      "rooms": [
+        "Kitchen",
+        "Dining",
+        "Living Room",
+        "Kids Corner",
+        "Bedroom",
+        "Hall",
+        "Bath",
+        "Entry"
+      ],
+      "flags": [
+        "tv: bedroom-only",
+        "kitchen-island: none",
+        "desk: core-shelf-only"
+      ]
+    },
+    "truths": "The Core sits on a shelf in the Living Room, in sight of the door. The only television is in the bedroom: never place a TV scene elsewhere. The kitchen has no island. A small cottage with porches and flower beds.",
+    "mustNot": [
+      "no television in any room but the bedroom",
+      "no kitchen island"
+    ]
+  },
+  "signatureStack": [
+    {
+      "app": "bookstack",
+      "name": "BookStack",
+      "member": "ngozi",
+      "room": "Dining",
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "status": "add",
+      "beat": "table-handbook",
+      "seed": "Ngozi writes the hall handbook in BookStack, with a page for the keys, the heating and the chairs.",
+      "line": "BookStack holds the house manual in books, chapters and pages: the stopcock, the boiler, the sitter's guide."
+    },
+    {
+      "app": "freshrss",
+      "name": "FreshRSS",
+      "member": "emeka",
+      "room": "Kitchen",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "kitchen-news",
+      "seed": "Emeka reads his favourite news sites on one calm page in FreshRSS while the kettle boils.",
+      "line": "FreshRSS gathers a grandparent's favourite news sites into one calm page."
+    },
+    {
+      "app": "photoprism",
+      "name": "PhotoPrism",
+      "member": "chidi",
+      "room": "The living room",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "status": "swap",
+      "beat": "living-photos",
+      "seed": "Chidi watches PhotoPrism sort a shoebox of scanned prints into albums, and his grandmother turns up in the first one.",
+      "line": "PhotoPrism sorts a shoebox of scanned prints into albums the family browses on a phone or a laptop."
+    },
+    {
+      "app": "tandoor",
+      "name": "Tandoor Recipes",
+      "member": "emeka",
+      "room": "Kitchen",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "status": "add",
+      "beat": "kitchen-card",
+      "seed": "Emeka types his plantain stew into Tandoor Recipes once, and it scales for Sunday's table.",
+      "line": "Tandoor Recipes scales a recipe to the number at the table and adds the missing items to the list."
+    },
+    {
+      "app": "karakeep",
+      "name": "Karakeep",
+      "member": null,
+      "room": "Dining",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "status": "add",
+      "beat": "table-karakeep",
+      "seed": "The three of them gather clippings for the next project in Karakeep, tagged by hand.",
+      "line": "Karakeep gathers the clippings for a project in one place, tagged by hand."
+    },
+    {
+      "app": "searxng",
+      "name": "SearXNG",
+      "member": null,
+      "room": "Kitchen",
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "status": "add",
+      "beat": "kitchen-searxng",
+      "seed": "Someone asks how to stake tomatoes on the tablet by the kettle, and SearXNG asks several search engines at once and returns one plain list.",
+      "line": "SearXNG asks several search engines at once and shows one list."
+    },
+    {
+      "app": "radicale",
+      "name": "Radicale",
+      "member": "emeka",
+      "room": "The living room",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "status": "swap",
+      "beat": "living-week",
+      "seed": "The school run follows sports day on the calendar that Radicale serves from the Core to both phones.",
+      "line": "Radicale serves the family calendar and address book from the Core to the phones on the home Wi-Fi."
+    },
+    {
+      "app": "memos",
+      "name": "Memos",
+      "member": "ngozi",
+      "room": "Dining",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "status": "add",
+      "beat": "table-notes",
+      "seed": "Ngozi jots the week's small reminders in Memos, one line each, and the notes run as one timeline.",
+      "line": "Memos catches a quick note by the kitchen door and keeps it in a timeline on the Core."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "living-backup",
+      "member": "ngozi",
+      "chapter": "living",
+      "from": "duplicati",
+      "fromName": "Duplicati",
+      "to": "syncthing",
+      "toName": "Syncthing",
+      "service": "Dropbox",
+      "serviceId": "dropbox",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "On the first Saturday, Ngozi pairs the family laptop with the Core in Syncthing, and the family's folder keeps a second copy in the house.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": "Duplicati cannot back up the family's other apps as installed (market review): the beat promised a backup the Hub does not wire"
+    },
+    {
+      "beat": "living-photos",
+      "member": "chidi",
+      "chapter": "living",
+      "from": "immich",
+      "fromName": "Immich",
+      "to": "photoprism",
+      "toName": "PhotoPrism",
+      "service": "Google Photos",
+      "serviceId": "google-photos",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Chidi watches PhotoPrism sort a shoebox of scanned prints into albums, and his grandmother turns up in the first one.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "living-week",
+      "member": "emeka",
+      "chapter": "living",
+      "from": "ci-planning",
+      "fromName": "Companion Planning",
+      "to": "radicale",
+      "toName": "Radicale",
+      "service": "Google Calendar",
+      "serviceId": "google-calendar",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "The school run follows sports day on the calendar that Radicale serves from the Core to both phones.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "duplicati",
+      "name": "Duplicati",
+      "beats": [
+        "living-backup"
+      ],
+      "retoldAs": [
+        "living-backup -> Syncthing"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "immich",
+      "name": "Immich",
+      "beats": [
+        "living-photos"
+      ],
+      "retoldAs": [
+        "living-photos -> PhotoPrism"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    },
+    {
+      "app": "ci-planning",
+      "name": "Companion Planning",
+      "beats": [
+        "living-week"
+      ],
+      "retoldAs": [
+        "living-week -> Radicale"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "papra",
+      "kitchenowl",
+      "audiobookshelf"
+    ],
+    "was": [
+      "papra",
+      "kitchenowl",
+      "audiobookshelf"
+    ],
+    "changed": [],
+    "note": "unchanged"
+  },
+  "adds": [
+    {
+      "id": "table-sheet",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "ngozi",
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ngozi keeps the church hall's bookings as a table in Grist, with a column that flags a clash."
+    },
+    {
+      "id": "table-handbook",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "ngozi",
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "bookstack",
+      "appName": "BookStack",
+      "with": [],
+      "service": "Confluence",
+      "serviceId": "confluence",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ngozi writes the hall handbook in BookStack, with a page for the keys, the heating and the chairs."
+    },
+    {
+      "id": "table-notes",
+      "chapter": "table",
+      "newChapter": null,
+      "member": "ngozi",
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "memos",
+      "appName": "Memos",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Ngozi jots the week's small reminders in Memos, one line each, and the notes run as one timeline."
+    },
+    {
+      "id": "kitchen-card",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "emeka",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen"
+      },
+      "category": "food",
+      "segment": "consumer",
+      "app": "tandoor",
+      "appName": "Tandoor Recipes",
+      "with": [],
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emeka types his plantain stew into Tandoor Recipes once, and it scales for Sunday's table."
+    },
+    {
+      "id": "kitchen-listen",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "emeka",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "audiobookshelf",
+      "appName": "Audiobookshelf",
+      "with": [],
+      "service": "Audible",
+      "serviceId": "audible",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emeka listens to the next chapter while the stew simmers, played by Audiobookshelf from the family's own files."
+    },
+    {
+      "id": "kitchen-news",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "emeka",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "freshrss",
+      "appName": "FreshRSS",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emeka reads his favourite news sites on one calm page in FreshRSS while the kettle boils."
+    },
+    {
+      "id": "garden-send",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": "emeka",
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pairdrop",
+      "appName": "PairDrop",
+      "with": [],
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Emeka sends the tomato pictures from his phone to Chidi's tablet with PairDrop across the room."
+    },
+    {
+      "id": "corner-sketch",
+      "chapter": "corner",
+      "newChapter": null,
+      "member": "chidi",
+      "also": [],
+      "room": "Kids Corner",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "excalidraw",
+      "appName": "Excalidraw",
+      "with": [],
+      "service": "Miro",
+      "serviceId": "miro",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Chidi and his grandmother draw the tomato bed as one picture on Excalidraw, and each adds a plant."
+    },
+    {
+      "id": "corner-streak",
+      "chapter": "corner",
+      "newChapter": null,
+      "member": "chidi",
+      "also": [],
+      "room": "Kids Corner",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "habitica",
+      "appName": "Habitica",
+      "with": [],
+      "service": "Habitify",
+      "serviceId": "habitify",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Chidi keeps a reading streak in Habitica, and the household chore game cheers him on."
+    },
+    {
+      "id": "kitchen-searxng",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "searxng",
+      "appName": "SearXNG",
+      "with": [],
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "pairQuality": "loose",
+      "qualifier": "the search engines it asks still see the question",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone asks how to stake tomatoes on the tablet by the kettle, and SearXNG asks several search engines at once and returns one plain list."
+    },
+    {
+      "id": "living-endurain",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "endurain",
+      "appName": "Endurain",
+      "with": [],
+      "service": "Strava",
+      "serviceId": "strava",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three of them log a weekend walk in Endurain from a track file, with the distance and the time beside the last one."
+    },
+    {
+      "id": "entry-jotty",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Entry",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "jotty",
+      "appName": "Jotty",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three of them keep room checklists as plain Markdown files in Jotty, one list for each part of the house."
+    },
+    {
+      "id": "table-karakeep",
+      "chapter": "table",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "karakeep",
+      "appName": "Karakeep",
+      "with": [],
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three of them gather clippings for the next project in Karakeep, tagged by hand."
+    },
+    {
+      "id": "table-mstream",
+      "chapter": "table",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "mstream",
+      "appName": "mStream",
+      "with": [],
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "A Sunday playlist plays from the family's own music folder through the speaker in the Living Room with mStream."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "At the front door",
+        "place": "after:living"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "corner",
+        "room": "kids",
+        "title": "Chidi’s corner",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "At the front door",
+        "new": true
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "Emeka’s kitchen",
+        "new": false
+      },
+      {
+        "id": "table",
+        "room": "dining",
+        "title": "Papers at the table",
+        "new": false
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out the back door",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "corner",
+      "title": "Chidi’s corner",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the single bed and the low bookshelf",
+      "beats": [
+        {
+          "id": "kids-lookup",
+          "member": "chidi",
+          "app": "kiwix",
+          "service": "Google Search",
+          "origin": "now"
+        },
+        {
+          "id": "kids-reader",
+          "member": "chidi",
+          "app": "koodo-reader",
+          "service": "Amazon Kindle",
+          "origin": "now"
+        },
+        {
+          "id": "kids-stories",
+          "member": "chidi",
+          "app": "audiobookshelf",
+          "service": "Audible",
+          "origin": "now"
+        },
+        {
+          "id": "corner-sketch",
+          "member": "chidi",
+          "app": "excalidraw",
+          "service": "Miro",
+          "origin": "add"
+        },
+        {
+          "id": "corner-streak",
+          "member": "chidi",
+          "app": "habitica",
+          "service": "Habitify",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": "the loveseat and the shelf where the Core sits",
+      "beats": [
+        {
+          "id": "living-backup",
+          "member": "ngozi",
+          "app": "syncthing",
+          "service": "Dropbox",
+          "origin": "swap"
+        },
+        {
+          "id": "living-draft",
+          "member": "ngozi",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "living-photos",
+          "member": "chidi",
+          "app": "photoprism",
+          "service": "Google Photos",
+          "origin": "swap"
+        },
+        {
+          "id": "living-week",
+          "member": "emeka",
+          "app": "radicale",
+          "service": "Google Calendar",
+          "origin": "swap"
+        },
+        {
+          "id": "living-endurain",
+          "member": null,
+          "app": "endurain",
+          "service": "Strava",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "At the front door",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-jotty",
+          "member": null,
+          "app": "jotty",
+          "service": "Todoist",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "Emeka’s kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": "the range and the fruit bowl",
+      "beats": [
+        {
+          "id": "kitchen-list",
+          "member": "emeka",
+          "app": "kitchenowl",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-reply",
+          "member": "emeka",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-music",
+          "member": "emeka",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-card",
+          "member": "emeka",
+          "app": "tandoor",
+          "service": "Paprika",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-listen",
+          "member": "emeka",
+          "app": "audiobookshelf",
+          "service": "Audible",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-news",
+          "member": "emeka",
+          "app": "freshrss",
+          "service": null,
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-searxng",
+          "member": null,
+          "app": "searxng",
+          "service": "Google Search",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "table",
+      "title": "Papers at the table",
+      "roomRole": "dining",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "table-papers",
+          "member": "ngozi",
+          "app": "papra",
+          "service": "Google Drive",
+          "origin": "now"
+        },
+        {
+          "id": "table-budget",
+          "member": "ngozi",
+          "app": "firefly-iii",
+          "service": "YNAB",
+          "origin": "now"
+        },
+        {
+          "id": "table-agenda",
+          "member": "ngozi",
+          "app": "libreoffice",
+          "service": "Microsoft Office",
+          "origin": "now"
+        },
+        {
+          "id": "table-sheet",
+          "member": "ngozi",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "table-handbook",
+          "member": "ngozi",
+          "app": "bookstack",
+          "service": "Confluence",
+          "origin": "add"
+        },
+        {
+          "id": "table-notes",
+          "member": "ngozi",
+          "app": "memos",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "table-karakeep",
+          "member": null,
+          "app": "karakeep",
+          "service": "Raindrop.io",
+          "origin": "add"
+        },
+        {
+          "id": "table-mstream",
+          "member": null,
+          "app": "mstream",
+          "service": "Spotify",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out the back door",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-journal",
+          "member": "chidi",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-camera",
+          "member": "emeka",
+          "app": "frigate",
+          "service": "Ring",
+          "origin": "now"
+        },
+        {
+          "id": "garden-send",
+          "member": "emeka",
+          "app": "pairdrop",
+          "service": "AirDrop",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-news",
+      "line": "Emeka reads his news while the kettle boils."
+    },
+    {
+      "at": "morning",
+      "beat": "table-papers",
+      "line": "Ngozi finds the warranty card in time."
+    },
+    {
+      "at": "midday",
+      "beat": "table-sheet",
+      "line": "Ngozi checks the hall bookings for a clash."
+    },
+    {
+      "at": "afternoon",
+      "beat": "kitchen-card",
+      "line": "Emeka scales the plantain stew for Sunday."
+    },
+    {
+      "at": "after-school",
+      "beat": "corner-streak",
+      "line": "Chidi ticks off today's reading."
+    },
+    {
+      "at": "after-school",
+      "beat": "kids-lookup",
+      "line": "Chidi asks how a biscuit rides on a whale."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-camera",
+      "line": "Emeka solves the tomato mystery."
+    },
+    {
+      "at": "weekend",
+      "beat": "table-mstream",
+      "line": "The family music plays through the speaker."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Google Search",
+      "Amazon Kindle",
+      "Audible",
+      "Backblaze",
+      "Google Photos",
+      "Plex",
+      "Google Drive",
+      "YNAB",
+      "Microsoft Office",
+      "Ring"
+    ],
+    "servicesFinal": [
+      "Google Search",
+      "Amazon Kindle",
+      "Audible",
+      "Dropbox",
+      "Google Photos",
+      "Google Calendar",
+      "Plex",
+      "Google Drive",
+      "YNAB",
+      "Microsoft Office",
+      "Ring",
+      "Airtable",
+      "Confluence",
+      "Google Keep",
+      "Paprika",
+      "AirDrop",
+      "Miro",
+      "Habitify",
+      "Strava",
+      "Todoist",
+      "Raindrop.io",
+      "Spotify"
+    ],
+    "count": 22
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "table-handbook",
+      "kitchen-news",
+      "living-photos",
+      "kitchen-card",
+      "table-karakeep",
+      "kitchen-searxng",
+      "living-week",
+      "table-notes"
+    ],
+    "mustCarry": {
+      "papra": [],
+      "kitchenowl": [
+        "[note] Learns from your list habits per its manifest."
+      ],
+      "audiobookshelf": [],
+      "kiwix": [
+        "[note] Needs content files (ZIM) downloaded once.",
+        "marketplace: Ships with an empty library: the compose runs kiwix-serve on /data/library.xml with no content and no way in the Hub to add or register ZIM files; the QA capture shows \"No result\"."
+      ],
+      "koodo-reader": [
+        "marketplace: Listing text says nothing is sent to a cloud service; the reader has outside-calling features (translation, lookup, speech)."
+      ],
+      "syncthing": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run."
+      ],
+      "photoprism": [
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "radicale": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot (the app has a bare web page)",
+        "sync away from home is not claimed",
+        "listing says secure"
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "firefly-iii": [
+        "[cloud-link] Bank import through GoCardless or Spectre is an outside service. CSV import stays local.",
+        "[claims] Bookkeeping tool. No financial advice and no savings promises.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024."
+      ],
+      "libreoffice": [
+        "[note] The listing is generic. Name the suite, not specific features.",
+        "[note] ONLYOFFICE Desktop Editors does the same job: one suite per household."
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "frigate": [
+        "[hardware] Needs IP cameras that stream over RTSP. Cameras are not part of the Core.",
+        "[public-access] Watching cameras from away from home is remote access, which the sheet leaves unfinished.",
+        "[claims] No detection-speed or accuracy numbers. Do not say it prevents anything.",
+        "QA screenshot shows \"No frames have been received, check error logs\": reject. The store listing image shows a real backyard photo that is not a Hub capture.",
+        "Watching away from home is remote access: not claimed."
+      ],
+      "grist": [],
+      "bookstack": [],
+      "memos": [],
+      "tandoor": [
+        "[note] Overlaps Mealie; pick one per story.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes.",
+        "no QA screenshot",
+        "overlaps Mealie (pick one per story)"
+      ],
+      "freshrss": [
+        "Pulls feeds from the sites over the internet by nature",
+        "Fever and Google Reader APIs let phone readers connect (the phone app is the reader's own)"
+      ],
+      "pairdrop": [
+        "none from the catalog"
+      ],
+      "excalidraw": [
+        "[note] amd64 only. An Excalidraw MCP entry exists for agents.",
+        "marketplace: Manifest source points to ozencb/excalidraw-persist, a 105-star wrapper, not excalidraw/excalidraw."
+      ],
+      "habitica": [
+        "The sign-up page in the capture carries a cookie-consent banner: check the self-hosted build for analytics scripts before saying it sends nothing out",
+        "Game, not a health or behaviour tool: no outcomes"
+      ],
+      "searxng": [
+        "[cloud-link] It queries outside search engines for you. Say \"private search\", not \"offline search\".",
+        "cloud-link: the engines still see the query from the Core",
+        "listing says users are not tracked: do not repeat"
+      ],
+      "endurain": [
+        "[cloud-link] Optional sync with Strava and Garmin Connect. Bulk GPX and FIT upload is local.",
+        "[claims] Logging only. No health outcomes.",
+        "Strava and Garmin sync are outside links: say bulk upload is the local path",
+        "GPS history is location data: story must not map a home address",
+        "Logging only: no health outcomes"
+      ],
+      "jotty": [
+        "Public share links need outside reach",
+        "Everything is Markdown and JSON files, no database"
+      ],
+      "karakeep": [
+        "[cloud-link] The install form asks for an OpenAI key. Automatic tagging can use a local model instead; do not imply the key is needed.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI tagging is optional: never imply the key is needed (catalog)",
+        "No QA screenshot",
+        "Listing names OpenAI or a self-hosted Ollama; only the OpenAI route is in the form"
+      ],
+      "mstream": [
+        "[note] Overlaps Navidrome.",
+        "Description says \"from anywhere\", \"completely private\" and \"no data collection\": absolute and remote claims, paraphrase",
+        "Overlaps Navidrome"
+      ]
+    }
+  },
+  "needsCatalogEntry": [],
+  "needsReviewedEntry": [
+    {
+      "app": "syncthing",
+      "beats": [
+        "living-backup"
+      ]
+    },
+    {
+      "app": "radicale",
+      "beats": [
+        "living-week"
+      ]
+    },
+    {
+      "app": "tandoor",
+      "beats": [
+        "kitchen-card"
+      ]
+    },
+    {
+      "app": "karakeep",
+      "beats": [
+        "table-karakeep"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

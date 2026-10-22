@@ -1,0 +1,1310 @@
+{
+  "v": 3,
+  "slug": "cardoso",
+  "house": "starter18k",
+  "generated": "2026-10-18",
+  "basedOn": {
+    "file": "content/families/cardoso.json",
+    "sha1": "8864657fa4a0d6042bd6ea2e613e1e1c24288520",
+    "beatsNow": 22,
+    "chaptersNow": 7,
+    "note": "read the family file fresh before editing; if its sha1 differs, re-diff the swaps and day entries by beat id"
+  },
+  "household": "young-family",
+  "business": false,
+  "narrator": "v-bright-f",
+  "cast": {
+    "changes": "none: the people, ages, roles, archetypes and companion names stay as cast-plan.json says",
+    "castPlan": {
+      "signatureApps": [
+        "ci-hermes",
+        "yuvomi",
+        "wallos",
+        "audiobookshelf",
+        "immich",
+        "bentopdf"
+      ],
+      "beatApps": {
+        "iot": "pi-hole",
+        "privacy": "vaultwarden"
+      },
+      "reviewNeeded": [],
+      "was": {
+        "signatureApps": [
+          "ci-hermes",
+          "yuvomi",
+          "wallos",
+          "kitchenowl",
+          "audiobookshelf",
+          "immich",
+          "bentopdf"
+        ],
+        "beatApps": {
+          "iot": "pi-hole",
+          "privacy": "vaultwarden"
+        },
+        "reviewNeeded": []
+      },
+      "notes": [
+        "kitchenowl dropped: no beat tells it any more"
+      ]
+    },
+    "note": "the castPlan below is applied to content/story/cast-plan.json (with each member's lens) by one serial step before any home agent starts (w7/cast-plan.v3.json, then pnpm run story:cast and story:cast-lint); a home agent never edits cast-plan.json, casting.json or cast.md. The signature stack of this brief is a separate list (6 to 9 apps) and is NOT the cast plan."
+  },
+  "targets": {
+    "beats": 36,
+    "add": 14,
+    "swaps": 2,
+    "householdBeats": 6,
+    "householdBeatsMax": 6,
+    "persona": {
+      "beatriz": {
+        "now": 5,
+        "add": 4,
+        "target": 9
+      },
+      "tiago": {
+        "now": 5,
+        "add": 3,
+        "target": 8
+      },
+      "leo": {
+        "now": 6,
+        "add": 1,
+        "target": 7
+      }
+    },
+    "pairShare": 0.828,
+    "pairShareMin": 0.8,
+    "chapters": 9
+  },
+  "members": [
+    {
+      "id": "beatriz",
+      "name": "Beatriz",
+      "age": 33,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "charity coordinator",
+      "companion": {
+        "name": "Tuppence",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "club-volunteer",
+        "household-manager"
+      ],
+      "thread": "A local charity's rota, mailing list and forms, from the desk in the family bedroom."
+    },
+    {
+      "id": "tiago",
+      "name": "Tiago",
+      "age": 35,
+      "role": "parent",
+      "archetype": "host",
+      "work": "at home with Leo",
+      "companion": {
+        "name": "Dumpling",
+        "runtime": "Hermes",
+        "memory": false
+      },
+      "lens": [
+        "host-cook",
+        "household-manager"
+      ],
+      "thread": "At home with Leo: the kitchen, the playlist and the notes."
+    },
+    {
+      "id": "leo",
+      "name": "Leo",
+      "age": 6,
+      "role": "child",
+      "archetype": "learner",
+      "work": "infant school",
+      "companion": null,
+      "lens": [
+        "kid-maker"
+      ],
+      "thread": "A six-year-old who asks questions, waters ferns and picks the supper job."
+    }
+  ],
+  "character": {
+    "lede": "A single-storey cottage on a raised floor has a steep brown side gable with two brick dormers and a grey brick chimney. An open walnut living, dining and kitchen room leads to one long whitewashed family bedroom.",
+    "spots": [
+      {
+        "room": "Kitchen",
+        "line": "A breakfast bar and a coffee maker sit in the open kitchen."
+      },
+      {
+        "room": "Family Bedroom",
+        "line": "A family bed and a loft bed share the long bedroom."
+      },
+      {
+        "room": "Kids Zone",
+        "line": "A play tent, a kids' table and building blocks fill the kids' zone."
+      }
+    ],
+    "facts": {
+      "storeys": 1,
+      "areaSqm": 115,
+      "ground": "lawn",
+      "style": "Single-storey cottage on a raised floor: a steep brown side gable with two brick dormers and a grey brick chimney, twin front-gabled glass wings (grey and red-brown brick) flanking a painted recessed entry in a black frame with a glazed French pair, open walnut living-dining-kitchen, one long whitewashed family bedroom with a kids' zone, a spindle-railed back porch and a privacy-fenced garden",
+      "rooms": [
+        "Living Room",
+        "Kitchen",
+        "Dining",
+        "Entry Vestibule",
+        "Bathroom",
+        "Family Bedroom",
+        "Kids Zone"
+      ],
+      "flags": [
+        "desk: core-desk-only"
+      ]
+    },
+    "truths": "The Core sits on a desk in the Family Bedroom, in sight of the door. There is a television in the Living Room. A small single-storey cottage: the kitchen, dining and living room are one open space. Picnic table and loungers outside.",
+    "mustNot": []
+  },
+  "signatureStack": [
+    {
+      "app": "listmonk",
+      "name": "Listmonk",
+      "member": "beatriz",
+      "room": "Family Bedroom",
+      "service": "Mailchimp",
+      "serviceId": "mailchimp",
+      "status": "add",
+      "beat": "bedroom-mail",
+      "seed": "Beatriz keeps the charity's mailing list in Listmonk on the Core, and the mail leaves through the sender she set.",
+      "line": "Listmonk keeps the club mailing list on the Core, and the mail leaves through the sender the household sets."
+    },
+    {
+      "app": "blinko",
+      "name": "Blinko",
+      "member": "tiago",
+      "room": "Kitchen",
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "status": "add",
+      "beat": "kitchen-ideas",
+      "seed": "Tiago catches the day's small firsts in Blinko on the kitchen counter before they are forgotten.",
+      "line": "Blinko catches a half-formed idea on the kitchen counter before it is lost."
+    },
+    {
+      "app": "kokoro",
+      "name": "Kokoro",
+      "member": "leo",
+      "room": "Kids Zone",
+      "service": null,
+      "serviceId": null,
+      "status": "add",
+      "beat": "kids-aloud",
+      "seed": "Leo types his name and his favourite word, and Kokoro reads them back in a synthetic voice made on the Core.",
+      "line": "Kokoro reads a story aloud in a synthetic voice made on the Core."
+    },
+    {
+      "app": "librespeed",
+      "name": "LibreSpeed",
+      "member": null,
+      "room": "Living Room",
+      "service": "Speedtest by Ookla",
+      "serviceId": "speedtest-by-ookla",
+      "status": "add",
+      "beat": "living-librespeed",
+      "seed": "Someone walks to the Living Room with a phone and tests the Wi-Fi to the Core with LibreSpeed after the router moves.",
+      "line": "LibreSpeed tests the Wi-Fi from this room to the Core after the router moves."
+    },
+    {
+      "app": "linkwarden",
+      "name": "Linkwarden",
+      "member": null,
+      "room": "Dining",
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "status": "add",
+      "beat": "dining-linkwarden",
+      "seed": "The three of them save the pages for the school trip into Linkwarden, which keeps a screenshot and a PDF of each one.",
+      "line": "Linkwarden keeps a screenshot and a PDF of every page cited in an essay, so a dead link cannot hurt it."
+    },
+    {
+      "app": "mstream",
+      "name": "mStream",
+      "member": "tiago",
+      "room": "Kitchen",
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "status": "add",
+      "beat": "kitchen-songs",
+      "seed": "Tiago cooks to a playlist from the family's own music folder, played through the kitchen speaker by mStream.",
+      "line": "mStream plays a record collection, digitised years ago, through the living-room speaker."
+    },
+    {
+      "app": "pairdrop",
+      "name": "PairDrop",
+      "member": "tiago",
+      "room": "Living Room",
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "status": "add",
+      "beat": "living-send",
+      "seed": "Tiago sends the park pictures from his phone to the laptop on the couch with PairDrop, no cable needed.",
+      "line": "PairDrop sends a photo or a file to the screen in the next room across the home Wi-Fi."
+    },
+    {
+      "app": "donetick",
+      "name": "Donetick",
+      "member": "leo",
+      "room": "The kitchen",
+      "service": "Tody",
+      "serviceId": "tody",
+      "status": "swap",
+      "beat": "kitchen-recipe",
+      "seed": "Leo chooses the supper job, setting the table, and taps the Donetick tag on the fridge when it is done.",
+      "line": "Donetick turns the chore rota into a tap of a phone on a tag stuck to the fridge or the laundry door."
+    }
+  ],
+  "chipFixes": [],
+  "swaps": [
+    {
+      "beat": "kitchen-list",
+      "member": "tiago",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "mealie",
+      "toName": "Mealie",
+      "service": "Paprika",
+      "serviceId": "paprika",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Tiago puts milk on the shared list in Mealie, which holds the family recipes too, and Beatriz sees it from the bedroom desk.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    },
+    {
+      "beat": "kitchen-recipe",
+      "member": "leo",
+      "chapter": "kitchen",
+      "from": "kitchenowl",
+      "fromName": "KitchenOwl",
+      "to": "donetick",
+      "toName": "Donetick",
+      "service": "Tody",
+      "serviceId": "tody",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "seed": "Leo chooses the supper job, setting the table, and taps the Donetick tag on the fridge when it is done.",
+      "filmBeat": false,
+      "dropWith": [],
+      "addWith": [],
+      "why": null
+    }
+  ],
+  "drops": [
+    {
+      "app": "kitchenowl",
+      "name": "KitchenOwl",
+      "beats": [
+        "ftue-pick",
+        "kitchen-list",
+        "kitchen-recipe"
+      ],
+      "retoldAs": [
+        "kitchen-list -> Mealie",
+        "kitchen-recipe -> Donetick"
+      ],
+      "why": "share cap and variety: the beat is retold with another app of the same job"
+    }
+  ],
+  "ftuePick": {
+    "with": [
+      "yuvomi",
+      "immich"
+    ],
+    "was": [
+      "yuvomi",
+      "kitchenowl"
+    ],
+    "changed": [
+      {
+        "from": "kitchenowl",
+        "to": "immich"
+      }
+    ],
+    "note": "ftue-pick names apps in `with` that the plan retells away; set `with` to this list and name each one in the popup body (the first-install list), so the fleet counts are the ones in fleet-simulation.md"
+  },
+  "adds": [
+    {
+      "id": "bedroom-sheet",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "beatriz",
+      "also": [],
+      "room": "Family Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "grist",
+      "appName": "Grist",
+      "with": [],
+      "service": "Airtable",
+      "serviceId": "airtable",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Beatriz keeps the charity's volunteer rota as a table in Grist, with a column that flags the empty shifts."
+    },
+    {
+      "id": "bedroom-mail",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "beatriz",
+      "also": [],
+      "room": "Family Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "listmonk",
+      "appName": "Listmonk",
+      "with": [],
+      "service": "Mailchimp",
+      "serviceId": "mailchimp",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Beatriz keeps the charity's mailing list in Listmonk on the Core, and the mail leaves through the sender she set."
+    },
+    {
+      "id": "bedroom-consent",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "beatriz",
+      "also": [],
+      "room": "Family Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "docuseal",
+      "appName": "Docuseal",
+      "with": [],
+      "service": "DocuSign",
+      "serviceId": "docusign",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Beatriz turns the volunteer consent form into a Docuseal page that each new helper fills in and signs."
+    },
+    {
+      "id": "bedroom-tasks",
+      "chapter": "bedroom",
+      "newChapter": null,
+      "member": "beatriz",
+      "also": [],
+      "room": "Family Bedroom",
+      "roomRole": "bedroom",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "vikunja",
+      "appName": "Vikunja",
+      "with": [],
+      "service": "Todoist",
+      "serviceId": "todoist",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Beatriz lays out the week's charity jobs as task lists in Vikunja, and the calendar app on her phone shows them."
+    },
+    {
+      "id": "kitchen-ideas",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "tiago",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "blinko",
+      "appName": "Blinko",
+      "with": [],
+      "service": "Google Keep",
+      "serviceId": "google-keep",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tiago catches the day's small firsts in Blinko on the kitchen counter before they are forgotten."
+    },
+    {
+      "id": "kitchen-songs",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": "tiago",
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "mstream",
+      "appName": "mStream",
+      "with": [],
+      "service": "Spotify",
+      "serviceId": "spotify",
+      "pairQuality": "loose",
+      "qualifier": "for the music you own",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tiago cooks to a playlist from the family's own music folder, played through the kitchen speaker by mStream."
+    },
+    {
+      "id": "living-send",
+      "chapter": "living",
+      "newChapter": null,
+      "member": "tiago",
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "media",
+      "segment": "consumer",
+      "app": "pairdrop",
+      "appName": "PairDrop",
+      "with": [],
+      "service": "AirDrop",
+      "serviceId": "airdrop",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Tiago sends the park pictures from his phone to the laptop on the couch with PairDrop, no cable needed."
+    },
+    {
+      "id": "kids-aloud",
+      "chapter": "kids",
+      "newChapter": null,
+      "member": "leo",
+      "also": [],
+      "room": "Kids Zone",
+      "roomRole": "kids",
+      "anchor": {
+        "role": "toys",
+        "room": "kids"
+      },
+      "category": "kids",
+      "segment": "consumer",
+      "app": "kokoro",
+      "appName": "Kokoro",
+      "with": [],
+      "service": null,
+      "serviceId": null,
+      "pairQuality": "none",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Leo types his name and his favourite word, and Kokoro reads them back in a synthetic voice made on the Core."
+    },
+    {
+      "id": "living-librespeed",
+      "chapter": "living",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Living Room",
+      "roomRole": "living",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "category": "iot",
+      "segment": "consumer",
+      "app": "librespeed",
+      "appName": "LibreSpeed",
+      "with": [],
+      "service": "Speedtest by Ookla",
+      "serviceId": "speedtest-by-ookla",
+      "pairQuality": "loose",
+      "qualifier": "measures the link to the Core, not the broadband line",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone walks to the Living Room with a phone and tests the Wi-Fi to the Core with LibreSpeed after the router moves."
+    },
+    {
+      "id": "kitchen-searxng",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen"
+      },
+      "category": "productivity",
+      "segment": "consumer",
+      "app": "searxng",
+      "appName": "SearXNG",
+      "with": [],
+      "service": "Google Search",
+      "serviceId": "google-search",
+      "pairQuality": "loose",
+      "qualifier": "the search engines it asks still see the question",
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "Someone asks how a Portuguese stew is slow-cooked on the tablet at the breakfast bar, and SearXNG asks several search engines at once and returns one plain list."
+    },
+    {
+      "id": "entry-endurain",
+      "chapter": "entry",
+      "newChapter": "entry",
+      "member": null,
+      "also": [],
+      "room": "Entry Vestibule",
+      "roomRole": "entry",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "endurain",
+      "appName": "Endurain",
+      "with": [],
+      "service": "Strava",
+      "serviceId": "strava",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three of them log a park walk in Endurain from a track file, with the distance and the time beside the last one."
+    },
+    {
+      "id": "dining-linkwarden",
+      "chapter": "dining",
+      "newChapter": "dining",
+      "member": null,
+      "also": [],
+      "room": "Dining",
+      "roomRole": "dining",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining"
+      },
+      "category": "home",
+      "segment": "consumer",
+      "app": "linkwarden",
+      "appName": "Linkwarden",
+      "with": [],
+      "service": "Raindrop.io",
+      "serviceId": "raindrop-io",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three of them save the pages for the school trip into Linkwarden, which keeps a screenshot and a PDF of each one."
+    },
+    {
+      "id": "garden-drawio",
+      "chapter": "garden",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Garden",
+      "roomRole": "garden",
+      "anchor": {
+        "role": "deck",
+        "room": "garden"
+      },
+      "category": "creative",
+      "segment": "consumer",
+      "app": "drawio",
+      "appName": "draw.io",
+      "with": [],
+      "service": "Lucidchart",
+      "serviceId": "lucidchart",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "The three of them draw the garden plan in draw.io and save the diagram as a file on a laptop."
+    },
+    {
+      "id": "kitchen-firefly-iii",
+      "chapter": "kitchen",
+      "newChapter": null,
+      "member": null,
+      "also": [],
+      "room": "Kitchen",
+      "roomRole": "kitchen",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen"
+      },
+      "category": "money",
+      "segment": "consumer",
+      "app": "firefly-iii",
+      "appName": "Firefly III",
+      "with": [],
+      "service": "YNAB",
+      "serviceId": "ynab",
+      "pairQuality": "holds",
+      "qualifier": null,
+      "agent": false,
+      "film": false,
+      "when": null,
+      "seed": "At the end of the week the three of them import the bank export into Firefly III, and its rules sort the spending into categories."
+    }
+  ],
+  "chapters": {
+    "add": [
+      {
+        "id": "entry",
+        "kind": "room",
+        "room": "entry",
+        "title": "The entry vestibule",
+        "place": "after:living"
+      },
+      {
+        "id": "dining",
+        "kind": "room",
+        "room": "dining",
+        "title": "The dining table",
+        "place": "after:kitchen"
+      }
+    ],
+    "finalOrder": [
+      {
+        "id": "ftue",
+        "room": null,
+        "title": "First run",
+        "new": false
+      },
+      {
+        "id": "bedroom",
+        "room": "bedroom",
+        "title": "The family bedroom",
+        "new": false
+      },
+      {
+        "id": "kids",
+        "room": "kids",
+        "title": "Leo’s play zone",
+        "new": false
+      },
+      {
+        "id": "living",
+        "room": "living",
+        "title": "The living room",
+        "new": false
+      },
+      {
+        "id": "entry",
+        "room": "entry",
+        "title": "The entry vestibule",
+        "new": true
+      },
+      {
+        "id": "kitchen",
+        "room": "kitchen",
+        "title": "The kitchen",
+        "new": false
+      },
+      {
+        "id": "dining",
+        "room": "dining",
+        "title": "The dining table",
+        "new": true
+      },
+      {
+        "id": "garden",
+        "room": "garden",
+        "title": "Out in the garden",
+        "new": false
+      },
+      {
+        "id": "outro",
+        "room": null,
+        "title": "Your turn",
+        "new": false
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "chapter": "bedroom",
+      "title": "The family bedroom",
+      "roomRole": "bedroom",
+      "isNew": false,
+      "subject": "the desk and the loft bed in the long family bedroom",
+      "beats": [
+        {
+          "id": "bedroom-rota",
+          "member": "beatriz",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "bedroom-story",
+          "member": "leo",
+          "app": "audiobookshelf",
+          "service": "Audible",
+          "origin": "now"
+        },
+        {
+          "id": "bedroom-forms",
+          "member": "beatriz",
+          "app": "bentopdf",
+          "service": "Adobe Acrobat",
+          "origin": "now"
+        },
+        {
+          "id": "bedroom-renewals",
+          "member": "beatriz",
+          "app": "wallos",
+          "service": "Rocket Money",
+          "origin": "now"
+        },
+        {
+          "id": "bedroom-sheet",
+          "member": "beatriz",
+          "app": "grist",
+          "service": "Airtable",
+          "origin": "add"
+        },
+        {
+          "id": "bedroom-mail",
+          "member": "beatriz",
+          "app": "listmonk",
+          "service": "Mailchimp",
+          "origin": "add"
+        },
+        {
+          "id": "bedroom-consent",
+          "member": "beatriz",
+          "app": "docuseal",
+          "service": "DocuSign",
+          "origin": "add"
+        },
+        {
+          "id": "bedroom-tasks",
+          "member": "beatriz",
+          "app": "vikunja",
+          "service": "Todoist",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kids",
+      "title": "Leo’s play zone",
+      "roomRole": "kids",
+      "isNew": false,
+      "subject": "the play tent and the kids' table",
+      "beats": [
+        {
+          "id": "kids-snail",
+          "member": "leo",
+          "app": "kiwix",
+          "service": "Google Search",
+          "origin": "now"
+        },
+        {
+          "id": "kids-lamps",
+          "member": "leo",
+          "app": "home-assistant",
+          "service": "Google Home",
+          "origin": "now"
+        },
+        {
+          "id": "kids-aloud",
+          "member": "leo",
+          "app": "kokoro",
+          "service": null,
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "living",
+      "title": "The living room",
+      "roomRole": "living",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "living-cartoon",
+          "member": "tiago",
+          "app": "pi-hole",
+          "service": "AdGuard",
+          "origin": "now"
+        },
+        {
+          "id": "living-film",
+          "member": "leo",
+          "app": "jellyfin",
+          "service": "Plex",
+          "origin": "now"
+        },
+        {
+          "id": "living-send",
+          "member": "tiago",
+          "app": "pairdrop",
+          "service": "AirDrop",
+          "origin": "add"
+        },
+        {
+          "id": "living-librespeed",
+          "member": null,
+          "app": "librespeed",
+          "service": "Speedtest by Ookla",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "entry",
+      "title": "The entry vestibule",
+      "roomRole": "entry",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "entry-endurain",
+          "member": null,
+          "app": "endurain",
+          "service": "Strava",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "kitchen",
+      "title": "The kitchen",
+      "roomRole": "kitchen",
+      "isNew": false,
+      "subject": "the breakfast bar in the open kitchen",
+      "beats": [
+        {
+          "id": "kitchen-list",
+          "member": "tiago",
+          "app": "mealie",
+          "service": "Paprika",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-week",
+          "member": "tiago",
+          "app": "yuvomi",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-vault",
+          "member": "beatriz",
+          "app": "vaultwarden",
+          "service": "LastPass",
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-reply",
+          "member": "tiago",
+          "app": "ci-hermes",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "kitchen-recipe",
+          "member": "leo",
+          "app": "donetick",
+          "service": "Tody",
+          "origin": "swap"
+        },
+        {
+          "id": "kitchen-ideas",
+          "member": "tiago",
+          "app": "blinko",
+          "service": "Google Keep",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-songs",
+          "member": "tiago",
+          "app": "mstream",
+          "service": "Spotify",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-searxng",
+          "member": null,
+          "app": "searxng",
+          "service": "Google Search",
+          "origin": "add"
+        },
+        {
+          "id": "kitchen-firefly-iii",
+          "member": null,
+          "app": "firefly-iii",
+          "service": "YNAB",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "dining",
+      "title": "The dining table",
+      "roomRole": "dining",
+      "isNew": true,
+      "subject": null,
+      "beats": [
+        {
+          "id": "dining-linkwarden",
+          "member": null,
+          "app": "linkwarden",
+          "service": "Raindrop.io",
+          "origin": "add"
+        }
+      ]
+    },
+    {
+      "chapter": "garden",
+      "title": "Out in the garden",
+      "roomRole": "garden",
+      "isNew": false,
+      "subject": null,
+      "beats": [
+        {
+          "id": "garden-snail",
+          "member": "tiago",
+          "app": "immich",
+          "service": "Google Photos",
+          "origin": "now"
+        },
+        {
+          "id": "garden-water",
+          "member": "leo",
+          "app": "hortusfox",
+          "service": null,
+          "origin": "now"
+        },
+        {
+          "id": "garden-drawio",
+          "member": null,
+          "app": "drawio",
+          "service": "Lucidchart",
+          "origin": "add"
+        }
+      ]
+    }
+  ],
+  "day": [
+    {
+      "at": "morning",
+      "beat": "kitchen-list",
+      "line": "The milk goes on the shared list."
+    },
+    {
+      "at": "morning",
+      "beat": "bedroom-tasks",
+      "line": "Beatriz lays out the charity's week."
+    },
+    {
+      "at": "midday",
+      "beat": "kitchen-songs",
+      "line": "Lunch cooks to the family's own playlist."
+    },
+    {
+      "at": "afternoon",
+      "beat": "kids-snail",
+      "line": "Leo asks where snails go in the rain."
+    },
+    {
+      "at": "afternoon",
+      "beat": "bedroom-consent",
+      "line": "A new helper signs the volunteer form."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-water",
+      "line": "Leo finds the fern a corner."
+    },
+    {
+      "at": "weekend",
+      "beat": "garden-drawio",
+      "line": "The garden plan is saved as a diagram."
+    }
+  ],
+  "ledger": {
+    "servicesNow": [
+      "Audible",
+      "Adobe Acrobat",
+      "Rocket Money",
+      "Google Search",
+      "Google Home",
+      "AdGuard",
+      "Plex",
+      "LastPass",
+      "Google Photos"
+    ],
+    "servicesFinal": [
+      "Audible",
+      "Adobe Acrobat",
+      "Rocket Money",
+      "Google Search",
+      "Google Home",
+      "AdGuard",
+      "Plex",
+      "Paprika",
+      "LastPass",
+      "Tody",
+      "Google Photos",
+      "Airtable",
+      "Mailchimp",
+      "DocuSign",
+      "Todoist",
+      "Google Keep",
+      "Spotify",
+      "AirDrop",
+      "Speedtest by Ookla",
+      "Strava",
+      "Raindrop.io",
+      "Lucidchart",
+      "YNAB"
+    ],
+    "count": 23
+  },
+  "details": {
+    "rule": "every beat of an adult or teen persona (13 or older) gets a detail (before, after, steps, fact); pair beats first",
+    "priority": [
+      "bedroom-mail",
+      "kitchen-ideas",
+      "kids-aloud",
+      "living-librespeed",
+      "dining-linkwarden",
+      "kitchen-songs",
+      "living-send",
+      "kitchen-recipe"
+    ],
+    "mustCarry": {
+      "yuvomi": [
+        "[note] Stored in SQLite on your Core. CalDAV and CardDAV sync are optional.",
+        "one household planner, not an account per person",
+        "already in the persona pool: share cap risk"
+      ],
+      "immich": [
+        "[note] Bundles its own database and a machine-learning service, so first start takes a while.",
+        "[note] No API is mentioned in the listing; treat as web interface only for agent purposes."
+      ],
+      "audiobookshelf": [],
+      "bentopdf": [
+        "Dual licence: AGPL-3.0 or paid commercial; fine for household use",
+        "Listing says \"nothing to leak\": drop that wording",
+        "Overlaps Stirling-PDF (the persona PDF app)"
+      ],
+      "wallos": [
+        "[note] Fetches logos for popular services from outside.",
+        "[claims] Do not promise savings."
+      ],
+      "kiwix": [
+        "[note] Needs content files (ZIM) downloaded once.",
+        "marketplace: Ships with an empty library: the compose runs kiwix-serve on /data/library.xml with no content and no way in the Hub to add or register ZIM files; the QA capture shows \"No result\"."
+      ],
+      "home-assistant": [
+        "[hardware] The Hub package runs without privileged host mounts. Integrations that need direct USB, Bluetooth or D-Bus access (a Zigbee stick, for example) are not enabled by default.",
+        "[note] Ships with a Matter server container alongside. Its manifest sets host_access true because that container uses host networking; no USB, Bluetooth or D-Bus access is granted.",
+        "[claims] Do not promise energy savings. Home Assistant has no energy figures in the listing.",
+        "Matter container uses host networking (host_access true); no USB, Bluetooth or D-Bus access is granted, so no Zigbee stick.",
+        "The QA capture is the onboarding page (shows the product, no data)."
+      ],
+      "pi-hole": [
+        "[claims] Network-wide blocking at DNS. Do not call it parental control or promise safety.",
+        "Blocks ad, tracker and bad domains at DNS: not parental control and no promise of safety",
+        "Unblocked lookups are forwarded to an upstream resolver (the upstream demo dashboard lists a public DNS, dns.google), so a DNS provider still sees them and it is not offline",
+        "Overlaps AdGuard Home: one per household"
+      ],
+      "jellyfin": [
+        "[note] Plays your own files. Say that, not \"Netflix\".",
+        "[claims] Do not say it plays copyrighted material from anywhere.",
+        "Plays your own media only: never \"streams any movie\".",
+        "QA capture is the setup wizard with a container id as the server name; the gallery frame is a demo library with lurid exploitation film posters: neither usable."
+      ],
+      "mealie": [
+        "[note] Pasting a recipe URL fetches that web page. Everything it saves stays on your Core.",
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "no QA screenshot",
+        "pasting a URL fetches that web page",
+        "per-app household logins exist (app feature)"
+      ],
+      "vaultwarden": [
+        "[note] Bitwarden-compatible server, unofficial. Do not say \"Bitwarden\".",
+        "marketplace: Login-wall QA capture only."
+      ],
+      "donetick": [
+        "[cloud-link] Notifications use Telegram or Pushover. Both are outside services.",
+        "NFC-tag completion needs a phone that reads NFC on the home network",
+        "Self-registration enabled (is_user_creation_disabled false)"
+      ],
+      "hortusfox": [
+        "Do not say it keeps plants alive",
+        "Plant health alerts and a public gallery exist: keep the gallery off in a story"
+      ],
+      "grist": [],
+      "listmonk": [
+        "[cloud-link] Sending at volume needs an SMTP provider or mail server. Do not promise delivery.",
+        "Do not promise delivery",
+        "Overlaps Keila",
+        "short_desc is the description"
+      ],
+      "docuseal": [
+        "[claims] Do not call signatures legally binding.",
+        "[note] Signers outside your home network need access to your Core.",
+        "Do not call signatures legally binding",
+        "Listing says \"secure\": do not repeat"
+      ],
+      "vikunja": [
+        "[note] Supports CalDAV sync.",
+        "QA shot is a sign-in wall",
+        "CalDAV sync with calendar apps"
+      ],
+      "blinko": [
+        "[qa] No QA screenshot on origin/main (e2e/screenshots). It is listed and installable, but nobody has recorded a verified run.",
+        "AI search and chat need a model provider added in the app (OpenAI, Ollama, LiteLLM...): not wired by the Hub.",
+        "No QA run; gallery frame is upstream marketing with a \"#Password\" tagged note and a gmail file name: reject.",
+        "Companion desktop and mobile clients are separate downloads."
+      ],
+      "mstream": [
+        "[note] Overlaps Navidrome.",
+        "Description says \"from anywhere\", \"completely private\" and \"no data collection\": absolute and remote claims, paraphrase",
+        "Overlaps Navidrome"
+      ],
+      "pairdrop": [
+        "none from the catalog"
+      ],
+      "kokoro": [
+        "[note] OpenAI-compatible speech API. No GPU requirement in the listing.",
+        "OpenAI-compatible speech API; web player included.",
+        "No GPU requirement in the listing; no speed claim.",
+        "Capture is real (FastKoko player) on a dark purple background."
+      ],
+      "librespeed": [
+        "Say \"the link to the Core\" or \"the Wi-Fi in this room\"; never \"internet speed\"",
+        "No speed figures in copy (num rules): show the act, not a number",
+        "Listing says \"privacy-focused\" and \"no tracking\": do not repeat"
+      ],
+      "searxng": [
+        "[cloud-link] It queries outside search engines for you. Say \"private search\", not \"offline search\".",
+        "cloud-link: the engines still see the query from the Core",
+        "listing says users are not tracked: do not repeat"
+      ],
+      "endurain": [
+        "[cloud-link] Optional sync with Strava and Garmin Connect. Bulk GPX and FIT upload is local.",
+        "[claims] Logging only. No health outcomes.",
+        "Strava and Garmin sync are outside links: say bulk upload is the local path",
+        "GPS history is location data: story must not map a home address",
+        "Logging only: no health outcomes"
+      ],
+      "linkwarden": [
+        "Sharing links publicly needs inbound reach: keep the story to saving, not sharing",
+        "The Pocket name in replaces is stale"
+      ],
+      "drawio": [
+        "Stateless: diagrams live in the browser or as .drawio files on the person's own device. The Core serves the editor only, so never say the diagram sits on the Core.",
+        "Listing says nothing else phones home: leave it.",
+        "QA screenshot is a blank editor."
+      ],
+      "firefly-iii": [
+        "[cloud-link] Bank import through GoCardless or Spectre is an outside service. CSV import stays local.",
+        "[claims] Bookkeeping tool. No financial advice and no savings promises.",
+        "marketplace: Replaces lists Mint, which Intuit retired in 2024."
+      ]
+    }
+  },
+  "needsCatalogEntry": [
+    {
+      "app": "librespeed",
+      "display": "LibreSpeed",
+      "reason": "not in catalog-apps.json",
+      "replaces": [
+        "Speedtest by Ookla"
+      ],
+      "qa": "screenshot",
+      "reviewerVerdict": "yes 4",
+      "caveats": [
+        "Say \"the link to the Core\" or \"the Wi-Fi in this room\"; never \"internet speed\"",
+        "No speed figures in copy (num rules): show the act, not a number",
+        "Listing says \"privacy-focused\" and \"no tracking\": do not repeat"
+      ],
+      "evidence": "CI-Marketplace apps/librespeed/config.json and docker-compose.json @ origin/main e9477219 (read by review slice m7)"
+    }
+  ],
+  "needsReviewedEntry": [
+    {
+      "app": "mealie",
+      "beats": [
+        "kitchen-list"
+      ]
+    },
+    {
+      "app": "blinko",
+      "beats": [
+        "kitchen-ideas"
+      ]
+    }
+  ],
+  "reminders": [
+    "popup title at most six words, body at most thirty, no digits, no dashes, no exclamation; second chip reads \"alternative to <Service>\"",
+    "name an app exactly as its display name; one app per beat, others in `with`",
+    "seeds are moments, not copy: rewrite them in the house voice and keep what is true"
+  ],
+  "skeptic": {
+    "patched": "2026-10-18",
+    "note": "run node skeptic-patch.mjs after any v3-build.mjs run; findings in skeptic.md"
+  }
+}

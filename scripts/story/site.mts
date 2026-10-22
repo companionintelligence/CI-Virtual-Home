@@ -14,7 +14,6 @@
 //      <out>/story/<slug>.<hash10>.json              the runtime tour (scripts/story/ship/player.mts)
 //      <out>/audio/<slug>/*  <out>/film/<slug>/*     the voice-over and the films' small files (ship/audio.mts, ship/films.mts)
 //      <out>/portal/og/<slug>.<hash10>.jpg           the family's link-preview image, when it is current (portal:og)
-//      <out>/portal/fonts/archivo-black.<hash10>.woff2   the display face, and portal/site.css is told its hashed name
 //   and whatever else scripts/story/ship/*.mts add through the ShipCtx seam (scripts/story/hooks.ts).
 //
 // What it does NOT do: the salvage's public build hid every home and house id (sanitised specs, a legacy-link map, a stub of
@@ -156,15 +155,7 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
     else ogStale.push(s.slug);
   }
 
-  // ---- fonts: Archivo Black, shipped under a hashed name that the stylesheet is told (site.css is copied before this runs)
-  const fontSrc = pic(path.join('portal', 'fonts', 'archivo-black.woff2'));
-  if (fs.existsSync(fontSrc)) {
-    const fontUrl = putHashed(fontSrc, path.join('portal', 'fonts'), 'archivo-black.woff2');
-    const licence = pic(path.join('portal', 'fonts', 'LICENSE-Archivo-Black.txt'));
-    if (fs.existsSync(licence)) put(path.join('portal', 'LICENSE-Archivo-Black.txt'), fs.readFileSync(licence));   // (OFL: the licence travels with the font; it sits beside portal/fonts/, not in it, because that folder's files are cached for a year)
-    const css = path.join(OUT, 'portal', 'site.css');
-    if (fs.existsSync(css)) fs.writeFileSync(css, fs.readFileSync(css, 'utf8').replace('fonts/archivo-black.woff2', fontUrl.replace(/^portal\//, '')));
-  } else problems.push('portal/fonts/archivo-black.woff2 is missing');
+  // (the pages are set in Manrope alone since the October 2026 restyle: portal/fonts/archivo-black.woff2 stays in the repo for the link-preview images, scripts/story/build-og.mts, and is not shipped)
 
   // ---- the cards, the data files, the manifest
   const cards: Card[] = sorted.map(s => cardOf(s, { catalog, order, thumb: `portal/thumbs/${s.house}.webp`, og: ogUrl[s.slug] || '' }));

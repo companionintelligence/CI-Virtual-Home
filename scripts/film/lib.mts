@@ -99,12 +99,26 @@ export type FilmText = {
   badge: string;
   names: Record<string, string>;
 };
-/** A silent film has no voice, so it does not print the synthetic-voice line (claims.json places it on the end card of a film with narration; saying a voice was generated under a silent film would be false). */
+/**
+ * The claims.json disclosures a film can print, by the place they go. `filmDisclosureIds` and `filmText` read the film's strings through this table, and `toolSha` hashes the
+ * texts of the ids a film prints and nothing else of claims.json (the film reads no other claim, and `style` is not read: the sign-off and the caption limits are constants in the
+ * code), so what makes a film stale and what the film shows cannot drift apart. A new disclosure on a card goes in here, or `test-film.mts` fails.
+ */
+export const FILM_DISCLOSURES = {
+  fictional: 'fictional-family', beta: 'beta-short', scripted: 'scripted-scenes', stylised: 'stylised-art', voice: 'synthetic-voice', agents: 'attribution-agents',
+} as const;
+/** The ids of the lines under the end card, in the order they are printed. A silent film has no voice, so it does not print the synthetic-voice line (claims.json places it on the end card of a film with narration; saying a voice was generated under a silent film would be false). */
+export function filmLineIds(rs: RuntimeStory, silent: boolean): string[] {
+  const ids: string[] = [FILM_DISCLOSURES.beta, FILM_DISCLOSURES.scripted, FILM_DISCLOSURES.stylised];
+  if (!silent) ids.push(FILM_DISCLOSURES.voice);
+  if (namesAgentRuntime(rs, rs.film.parts.map(p => p.id))) ids.push(FILM_DISCLOSURES.agents);
+  return ids;
+}
+/** Every disclosure this film prints anywhere: the title card, the badge and the end card. */
+export const filmDisclosureIds = (rs: RuntimeStory, silent: boolean): string[] => [FILM_DISCLOSURES.fictional, ...filmLineIds(rs, silent)];
 export function filmText(rs: RuntimeStory, claims: Claims = loadClaims(), o: { silent?: boolean } = {}): FilmText {
-  const fam = rs.family, fictional = disclosure(claims, 'fictional-family');
-  const lines = [disclosure(claims, 'beta-short'), disclosure(claims, 'scripted-scenes'), disclosure(claims, 'stylised-art')];
-  if (!o.silent) lines.push(disclosure(claims, 'synthetic-voice'));
-  if (namesAgentRuntime(rs, rs.film.parts.map(p => p.id))) lines.push(disclosure(claims, 'attribution-agents'));
+  const fam = rs.family, fictional = disclosure(claims, FILM_DISCLOSURES.fictional);
+  const lines = filmLineIds(rs, !!o.silent).map(id => disclosure(claims, id));
   const url = rs.closing.cta.url.replace(/^https?:\/\//, '');
   const names: Record<string, string> = {}; for (const m of rs.members) names[m.id] = m.companion ? m.companion.name : m.name;
   return {
@@ -182,19 +196,50 @@ export function sizeGuard(bytes: number, what: string, max = WEB_MAX_BYTES): str
   return bytes > max ? `${what} is ${(bytes / 1048576).toFixed(2)} MiB; a web film must stay under ${(max / 1048576).toFixed(0)} MiB (Cloudflare Pages caps a file at 25 MiB)` : null;
 }
 
-/** A hash of everything a film is made from: the three files, the code that draws it and the claims it prints. A change in any makes it stale. */
-export function toolSha(): string {
+/** every disclosure any film can print, in a fixed order: what `toolSha` hashes of claims.json when it is not told which a film prints */
+const ALL_FILM_DISCLOSURES: readonly string[] = Object.values(FILM_DISCLOSURES);
+/**
+ * A hash of the code that draws a film and of the text of the claims.json disclosures it prints (`printed`: the ids, default every id a film can print; `inputsShaOf` passes
+ * the ones this film prints). Nothing else of claims.json is in it: a claim the film does not show (the lander's `rent-line`, a disclosure's source, status or note, a
+ * disclosure only the site prints) cannot change a frame, so it must not make a film stale; a change to a printed text must. A change in the code makes it stale.
+ */
+export function toolSha(claims: Claims = loadClaims(), printed: readonly string[] = ALL_FILM_DISCLOSURES): string {
   const files: string[] = [];
   const add = (dir: string, re: RegExp) => { if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir).sort()) if (re.test(f)) files.push(path.join(dir, f)); };
   add(path.join(ROOT, 'assets', 'story', 'film'), /\.ts$/);
   add(path.join(ROOT, 'scripts', 'film'), /\.mts$/);
-  files.push(path.join(ROOT, 'scripts', 'render-family-film.mts'), path.join(ROOT, 'content', 'story', 'claims.json'), path.join(ROOT, 'assets', 'story', 'track.ts'), path.join(ROOT, 'assets', 'story', 'place.ts'));
+  files.push(path.join(ROOT, 'scripts', 'render-family-film.mts'), path.join(ROOT, 'assets', 'story', 'track.ts'), path.join(ROOT, 'assets', 'story', 'place.ts'));
   const h = crypto.createHash('sha256');
   for (const f of files) if (fs.existsSync(f)) h.update(path.relative(ROOT, f)).update(fs.readFileSync(f));
-  return h.digest('hex');
+  return h.update('claims.json: the disclosures a film prints').update(JSON.stringify(printed.map(id => [id, claims.disclosures.find(d => d.id === id)?.text ?? null]))).digest('hex');
 }
-/** (a silent film hashes a marker too, so a silent and a voiced film of one family are never taken for each other; a voiced film's hash is what it always was) */
-export const inputsShaOf = (fam: Family, res: number, tool = toolSha()): string => sha256(JSON.stringify([fam.shas.story, fam.shas.voice, fam.shas.bake, tool, res, ...(fam.silent ? ['silent'] : [])]));
+
+/** The lightings a film may be rendered at (a film is held to daylight and warm light like the ads: CI-Common ADS.md, never night). `story:film` takes `--lighting` or $FILM_LIGHTING from this list. */
+export const FILM_LIGHTINGS = ['day', 'golden'] as const;
+export type FilmLighting = (typeof FILM_LIGHTINGS)[number];
+export const FILM_LIGHTING: FilmLighting = 'day';
+export const isFilmLighting = (s: string): s is FilmLighting => (FILM_LIGHTINGS as readonly string[]).includes(s);
+
+/**
+ * THE pin of a film (films.json `inputsSha`), the one definition: `story:film` writes it and decides "current" with it, and the ship step checks freshness with it.
+ * It hashes the family's three files, the code (and the disclosures this film prints: `toolSha`), the lighting the page is opened with and the frame size
+ * (`res`, the short side: the height of the 16:9 film). A silent film hashes a marker too, so a silent and a voiced film of one family are never taken for each other.
+ * (`o.tool` and `o.claims` are for the tests.)
+ */
+export function inputsShaOf(fam: Family, res: number, o: { lighting?: FilmLighting; tool?: string; claims?: Claims } = {}): string {
+  const tool = o.tool ?? toolSha(o.claims, filmDisclosureIds(fam.rs, fam.silent));
+  return sha256(JSON.stringify([fam.shas.story, fam.shas.voice, fam.shas.bake, `${tool}|lighting=${o.lighting ?? FILM_LIGHTING}`, res, ...(fam.silent ? ['silent'] : [])]));
+}
+/** The frame size a films.json entry was rendered at: the height of its 16:9 film, else the width of its 9:16 film (both are `res`, `formatFor`). */
+export const entryRes = (e: FilmEntry): number => e.aspects['16x9']?.height ?? e.aspects['9x16']?.width ?? 1080;
+/**
+ * Is this films.json entry the film of this family now? The entry does not say which of the permitted lightings it was rendered at, so the pin of either one agrees; every
+ * other input must match the renderer's own pin exactly (the renderer, which knows the lighting it was asked for, compares with `inputsShaOf` directly).
+ */
+export function entryIsCurrent(fam: Family, e: FilmEntry, claims?: Claims): boolean {
+  const tool = toolSha(claims, filmDisclosureIds(fam.rs, fam.silent)), res = entryRes(e);
+  return FILM_LIGHTINGS.some(lighting => inputsShaOf(fam, res, { lighting, tool }) === e.inputsSha);
+}
 
 // ---- the captions of a silent film ---------------------------------------------------------------------------------------------------------------
 /** reading speed in characters a second: broadcast captions aim at 17 to 20 for adults; above WARN is hard to read, above FAIL cannot be read at all */

@@ -13,8 +13,8 @@
 // a header over a door, an arched head in a facade wall and a digest made before that.) A walk that
 // fails on that grid is retried, and only then, on a walker's grid built from the same boxes (`walkGrid`): rung 1 opens the doorways (a header over a
 // door is not a wall at the camera's eye) and climbs a spiral round its column the way the planner's own film does; rung 2 also lets the eye pass
-// over a hard piece up to 1.4 m tall (the eye is 1.55 m up). A walk that works on the planner's grid is never touched: the first rung is exactly
-// what the router did before, so a tour that had no cut because of this keeps its bytes. `Route.rescued` says which rung made a walk.
+// over a hard piece up to 1.4 m tall (the eye is 1.55 m up). A walk that works on the planner's grid and keeps clear of solids is not touched (one that goes
+// more than 2 cm into a wall or a hard piece is asked again on the ladder, `crossesSolid`), so a tour that had no cut and no such crossing keeps its bytes. `Route.rescued` says which rung made a walk.
 //
 // Pure and deterministic (fixed grids, fixed tie-breaks). Owner: story-bake. THREE-free.
 import type { V3 } from '../shot-probe.js';
