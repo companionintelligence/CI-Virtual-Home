@@ -193,14 +193,12 @@ html[data-story] .vh-help { z-index: 7; }
 /* (a phone's sheet is full width and is not trimmed: there the buttons fill their rows, as they always did) */
 .st-end[data-mode="sheet"] .st-actions .st-btn { flex: 1 1 auto; }
 .st-end-body { margin: 0; }
-.st-end .st-note { margin-top: 0.9rem; }
 /* the end card with its padding and gaps tighter, before it scrolls (the type is never touched) */
 .st-end.st-tight { padding: 0.8rem 1.1rem 0.7rem; line-height: 1.3; }
 .st-end.st-tight h2 { line-height: 1.05; }
 .st-end.st-tight .st-end-lead { margin: 0.3rem 0 0.4rem; }
 .st-end.st-tight .st-actions { margin: 0.5rem 0 0.6rem; gap: 0.4rem; }
 .st-end.st-tight .st-btn { min-height: max(44px, calc(var(--st-min) * 1.7)); padding-block: 0.2rem; }
-.st-end.st-tight .st-note { margin-top: 0.5rem; }
 
 /* ---- the chapters panel: a drawer on a wide screen, a sheet above the dock below that */
 .st-chapters { position: absolute; z-index: 5; pointer-events: auto; display: flex; flex-direction: column; overflow: hidden; background-color: var(--st-glass); background-image: var(--st-glass-sheen); -webkit-backdrop-filter: var(--st-glass-blur); backdrop-filter: var(--st-glass-blur); box-shadow: var(--st-glass-shadow); border-radius: var(--st-r-card); overflow-wrap: anywhere;

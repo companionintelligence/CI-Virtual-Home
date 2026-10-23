@@ -145,7 +145,6 @@ export function validate(story, { reviewed = [] } = {}) {
   if (ftueOrder.join() !== ftue.map((b) => b.id).join()) E('ftue', 'order', `ftue order must be ${ftueOrder.join(' > ')}`);
   const fb = (id) => ftue.find((b) => b.id === id);
   if (fb('ftue-plug-in') && !fb('ftue-plug-in').emphasis?.wake) E('ftue', 'ftue-plug-in', 'emphasis.wake must be true');
-  if (fb('ftue-plug-in') && fb('ftue-plug-in').popup.note !== 'Companion OS is in beta.') E('disclosure', 'ftue-plug-in', 'note must be "Companion OS is in beta."');
   if (fb('ftue-pick') && fb('ftue-pick').popup.note !== 'Installing apps uses the internet.') E('disclosure', 'ftue-pick', 'note must be "Installing apps uses the internet."');
   for (const id of ['ftue-join', 'ftue-pick']) if (fb(id) && fb(id).popup.kind !== 'phone') E('ftue', id, 'popup.kind must be phone');
   story.beats.forEach((b) => { if (b.popup.kind === 'phone' && b.chapter !== cs[0].id) E('ftue', b.id, 'phone popups belong to the ftue'); if (b.emphasis?.wake && b.id !== 'ftue-plug-in') E('ftue', b.id, 'only ftue-plug-in wakes the Core'); });
@@ -188,9 +187,9 @@ export function validate(story, { reviewed = [] } = {}) {
   if (sayCount > 6) E('say', 'count', `${sayCount} agent lines (max 6)`);
   if (firstHermes && firstHermes.popup.note !== 'Messages pass through the chat service you choose.') E('disclosure', firstHermes.id, 'the first Hermes beat carries the note "Messages pass through the chat service you choose."');
   const ftueHello = fb('ftue-hello'); if (ftueHello && !ftueHello.say) E('ftue', 'ftue-hello', 'the first agent greeting needs a `say` line');
-  // Companion Memory first mention carries (beta)
+  // a companion with Companion Memory connected is named somewhere
   const allText = story.beats.flatMap((b) => [[b.id, b.popup.title + ' ' + b.popup.body + ' ' + (b.popup.phone ? b.popup.phone.rows.join(' ') : '')]]);
-  const firstMem = allText.find(([, t]) => /Companion Memory/.test(t)); if (firstMem && !/Companion Memory \(beta\)/.test(firstMem[1])) E('disclosure', firstMem[0], 'first mention of Companion Memory reads "Companion Memory (beta)"');
+  const firstMem = allText.find(([, t]) => /Companion Memory/.test(t));
   if (memoryMember && !firstMem) W('disclosure', 'memory', 'a companion has Memory connected but no beat mentions Companion Memory');
 
   // ---- apps ----

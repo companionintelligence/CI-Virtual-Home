@@ -145,7 +145,6 @@ const ctaBand = (): string => `<section class="cta-band" id="core" aria-labelled
       <div class="cta-copy">
         <h2 id="cta-title">Meet the Companion Core.</h2>
         <p>${esc(coreLine('your desk'))}</p>
-        ${finePrint('home-band', {}, undefined, { cls: 'cta-note' }).html}
       </div>
       <div class="cta-actions">
         <a class="btn btn-buy" href="${LINKS.core}">Buy Companion Core</a>

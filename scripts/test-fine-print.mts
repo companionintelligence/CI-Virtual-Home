@@ -46,10 +46,10 @@ test('every surface names disclosures claims.json has, and the table carries eve
 test('a surface\'s rows follow the `where` of claims.json', () => {
   const where = (id: string): string => ((claims as any).disclosures.find((d: any) => d.id === id).where || []).join(' | ').toLowerCase();
   const fits: Record<string, RegExp> = {
-    'family-fold': /header|every page that names|landing hero/, 'family-start': /ftue|hermes or openclaw/,
-    'family-footer': /footer|about|credits|faq|audio|film end card/, 'home-band': /every page that names/, 'home-footer': /footer|about/, 'not-found': /footer/,
-    'player-about': /about|footer|player chrome|film end card|credits/, 'player-end': /every page that names|film end card/, 'tour-start': /footer|audio|film end card|every page that names/,
-    'lander-hero': /landing hero|header|every page that names/, 'lander-core': /every page that names|about|landing page/, 'lander-footer': /footer|about/,
+    'family-fold': /header|landing hero/, 'family-start': /ftue|hermes or openclaw/,
+    'family-footer': /footer|about|credits|faq|audio|film end card/, 'home-footer': /footer|about/, 'not-found': /footer/,
+    'player-about': /about|footer|player chrome|film end card|credits/, 'tour-start': /footer|audio|film end card/,
+    'lander-hero': /landing hero|header/, 'lander-core': /about|landing page/, 'lander-footer': /footer|about/,
   };
   for (const s of SURFACE_IDS) {
     assert.ok(fits[s], `a row for ${s} in this test`);
@@ -74,7 +74,7 @@ test('the facts decide: a voice, a named agent, a logo, the tour', () => {
   assert.deepEqual(owed('family-start', none), []);
   assert.deepEqual(owed('family-start', { agents: true }), ['internet-steps']);
   assert.ok(!owed('player-about', none).includes('fictional-family') && owed('player-about', { tour: true }).includes('fictional-family'));
-  assert.throws(() => finePrintItems('home-band', none, { disclosures: [] }), /no disclosure beta-short/, 'a renamed id breaks the build, it does not print nothing');
+  assert.throws(() => finePrintItems('home-footer', none, { disclosures: [] }), /no disclosure launch-not-offer/, 'a renamed id breaks the build, it does not print nothing');
 });
 
 test('the tour\'s start card prints the disclosures claims.json gives it, word for word (assets/story/popup.ts FINE_PRINT)', () => {
@@ -98,12 +98,12 @@ test('every disclosure a surface prints passes the banned-phrase rules except wh
 });
 
 // ---------------------------------------------------------------------------------------------------------- the pages
-test('every home\'s own page carries the Core band\'s beta line and the footer\'s fine print, and no banned sentence', () => {
+test('every home\'s own page carries the footer\'s fine print, and no banned sentence', () => {
   const some = [houses[0], houses[houses.length >> 1], houses[houses.length - 1]];
   for (const h of some) {
     const page = homePage(h, SITE), words = readableText(page);
-    for (const s of ['home-band', 'home-footer'] as Surface[]) assert.deepEqual(missingFinePrint(page, s), [], `${h.id}: ${s}`);
-    assert.ok(page.includes('data-fine="beta-short"') && page.includes('data-fine="launch-not-offer"') && page.includes('data-fine="beta-full"'));
+    for (const s of ['home-footer'] as Surface[]) assert.deepEqual(missingFinePrint(page, s), [], `${h.id}: ${s}`);
+    assert.ok(page.includes('data-fine="launch-not-offer"'));
     assert.ok(words.includes(coreLine('your desk')), 'the Core band says it with claims.json\'s words');
     assert.ok(!/your own AI, apps and memory|\bown(s|ed)?\b[^.]{0,20}\b(apps?|software|agents?)\b/i.test(words), 'no "your own AI, apps and memory" (cap-own-apps)');
     assert.deepEqual(broken(words.replace(/©[^.]*\./, '')), [], `${h.id}: the page's words`);
@@ -131,11 +131,11 @@ for (const s of L.stories) {
       const page = pageOf(s.slug, { narration });
       const facts: Facts = { agents, narration, logos: false };
       for (const surface of ['family-fold', 'family-footer', 'family-start'] as Surface[]) assert.deepEqual(missingFinePrint(page, surface, facts, L.claims), [], `${s.slug} (narration ${narration}): ${surface}`);
-      // the fold holds the label once as the header's chip and the beta line in the strip; the rest is the footer's, as claims.json places it
+      // the fold holds the label once as the header's chip; the rest is the footer's, as claims.json places it
       assert.equal((page.match(/data-fine="fictional-family"/g) || []).length, 1, 'the label is printed once in the fold');
-      const strip = (page.match(/<section class="strip"[\s\S]*?<\/section>/) || [''])[0], foot = (page.match(/<footer[\s\S]*<\/footer>/) || [''])[0];
-      assert.ok(strip.includes('data-fine="beta-short"') && !strip.includes('scripted-scenes') && !strip.includes('stylised-art'));
-      for (const id of ['launch-not-offer', 'beta-full', 'scripted-scenes', 'stylised-art', 'apps-availability', 'names-owners']) assert.ok(foot.includes(`data-fine="${id}"`), `${id} is in the footer`);
+      const foot = (page.match(/<footer[\s\S]*<\/footer>/) || [''])[0];
+      assert.ok(!page.includes('class="strip"'), 'the fold has no strip: the label is its one line of fine print');
+      for (const id of ['launch-not-offer', 'scripted-scenes', 'stylised-art', 'apps-availability', 'names-owners']) assert.ok(foot.includes(`data-fine="${id}"`), `${id} is in the footer`);
       assert.equal(foot.includes('data-fine="synthetic-voice"'), narration, 'the voice line only when there is a voice');
       assert.equal(foot.includes('data-fine="attribution-agents"') && foot.includes('data-fine="not-frontier"'), agents, 'the agents\' attribution and what a Core is not, when an agent is named');
       assert.equal(page.includes('data-fine="internet-steps"'), agents, 'the internet note next to the first run, when an agent is named');
@@ -156,19 +156,19 @@ test('a page with real logos and screenshots adds names-logos-owners to the foot
 });
 
 // ---------------------------------------------------------------------------------------------------------- the player
-test('the player\'s About panel and end card print the fine print from the table, and its Core sentence is claims.json\'s', () => {
+test('the player\'s About panel prints the fine print from the table, and its Core sentence is claims.json\'s', () => {
   const src = fs.readFileSync(path.join(ROOT, 'assets', 'viewer.ts'), 'utf8');
   assert.ok(!/your own AI, apps and memory/i.test(src), 'cap-own-apps: no "your own AI, apps and memory" in the player');
   assert.ok(/finePrintItems\(CLAIMS_SNAPSHOT, 'player-about', \{ tour: storyP !== null \}\)/.test(src), 'the About panel prints the player-about row (the tour adds its own)');
-  assert.ok(/finePrintItems\(CLAIMS_SNAPSHOT, 'player-end'\)/.test(src), 'the end card prints the player-end row');
+  assert.ok(!/player-end/.test(src), 'the end card prints no fine print row of its own');
   assert.equal((src.match(/coreLine\(CLAIMS_SNAPSHOT, 'the desk'\)/g) || []).length, 2, 'the end card and the About panel both say it with claims.json\'s words');
   assert.ok(/class="vh-fiction"[^>]*data-fine="fictional-family"/.test(src) && /html\[data-story\] \.vh\[data-state="ready"\] \.vh-fiction \{ display: block; \}/.test(src), 'the label is a chip of the player while a family tour is up');
 });
 
 test('what the lander must print is a row of the table (its package reads it from here)', () => {
-  assert.deepEqual(owed('lander-hero'), ['fictional-family', 'beta-short']);
-  assert.deepEqual(owed('lander-core'), ['beta-short', 'not-frontier', 'stylised-art'], 'the band, and the line beside the Core picture');
-  assert.deepEqual(owed('lander-footer'), ['launch-not-offer', 'beta-full', 'scripted-scenes', 'names-logos-owners', 'third-party-apps'], 'the page quotes a written scene and names apps');
+  assert.deepEqual(owed('lander-hero'), ['fictional-family']);
+  assert.deepEqual(owed('lander-core'), ['not-frontier', 'stylised-art'], 'the band, and the line beside the Core picture');
+  assert.deepEqual(owed('lander-footer'), ['launch-not-offer', 'scripted-scenes', 'names-logos-owners', 'third-party-apps'], 'the page quotes a written scene and names apps');
   for (const s of ['lander-hero', 'lander-core', 'lander-footer'] as Surface[]) assert.ok(s in SURFACES);
 });
 

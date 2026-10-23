@@ -1,6 +1,6 @@
 # Creative (`creative`): ten more user stories
 
-Draft written 2026-10-20 for the owner. It widens the stories of an archetype that already exists (`creative`, bible chapter 3.9, `personas.json`, `persona-apps.md`); it changes no source file. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: ages, jobs, rooms and lines are design choices for fictional characters. The wording law is `content/story/claims.json`; the catalog (`catalog-apps.json`) and the service registry (`services.json`) decide what may be named.
+Draft written 2026-10-20 for the owner. It widens the stories of an archetype that already exists (`creative`, bible chapter 3.9, `personas.json`, `persona-apps.md`); it changes no source file. Nobody here is a customer: ages, jobs, rooms and lines are design choices for fictional characters. The wording law is `content/story/claims.json`; the catalog (`catalog-apps.json`) and the service registry (`services.json`) decide what may be named.
 
 **One line.** A working designer, photographer, filmmaker, illustrator or musician whose client work, archive and brief are confidential. This file adds the creatives the chapter does not show: the songwriter at the piano, the picture-book illustrator with an editor at the table, the ceramicist before an open studio, the sound designer, the novelist at a signing, the second shooter, the composer with two machines, the studio with a new hire and the game artist.
 

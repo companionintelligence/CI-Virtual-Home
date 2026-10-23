@@ -108,14 +108,13 @@ Printed from `content/story/claims.json` (never typed in a family file), and rec
 | Id | Where | When |
 |---|---|---|
 | `fictional-family` | the corner mark on **every** frame; a pill on the end card | always |
-| `beta-short` | the end card ("Companion OS, Companion Memory and Companion Agents are in beta.") | always: a cut claims software behaviour |
 | `scripted-scenes` | the end card | always |
 | `stylised-art` | the end card ("The Companion Core is drawn as a stylised illustration, not a photograph.") | always |
 | `names-owners` | the end card | when a chip says `replaces <X>` (the third-party names are text; the logo of a service the Core replaces is never shown) |
 | `attribution-agents` | the end card | when a beat of the cut names Hermes or OpenClaw (an `agent`, or the app, or `with`) |
 
 `synthetic-voice` is not printed: a cut has no voice. No price, no ship date, no performance number, no customer quote, no app count, no "Buy": the one call to action is **See Companion Core** at `https://ci.computer/core`.
-Third-party software is named in the chips and the words, in text. The app's own real logo (`content/story/app-media.json`, story v2) may stand inside the chip that names it, never alone and never the logo of a service the Core replaces; the renderer draws text chips only, so no cut shows a logo yet. A screenshot is never in a cut (an inset stays off unless the owner turns it on: `story-v2.md`, App media). No builder credit and no mention of a game or a gallery a home came from is in a cut: the plan's words go through
+Third-party software is named in the chips and the words, in text. **Owner's ruling, 2026-10-22: a cut may carry logos and labelled screenshots as inserts** (never inside the 3D frame, and never in the tour), under these rules, which the renderer does not draw yet (a later track: `assets/story/film/cut/draw.ts`, `cut/plan.ts`, and the `--screenshots` flag of `scripts/render-persona-cuts.mts`, which does not exist today): the app's own real logo (`content/story/app-media.json`, story v2) stands inside the chip that names it, beside the name, never alone and never the logo of a service the Core replaces; a real screenshot is an inset beside the card or a full-frame proof beat between two beats, shown for that beat only, whole and unedited, never over the beat's subject or the burned captions, with its whole caption ("Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family." or, for a first-party app's CI-Docs capture, "Real screenshot of <Name> with sample data. Not a recording of this family.") at the 36 design px floor, and only for an app whose manifest entry has a `shot`; the end card may carry a row of the cut's app logos with their names. Until the renderer draws them, a cut shows text chips only. No builder credit and no mention of a game or a gallery a home came from is in a cut: the plan's words go through
 `claims.json`'s error rules and a credit guard (`Sims`, `Base Game`, `BG`) and a cut that fails either is `blocked` and not rendered.
 
 ## The look

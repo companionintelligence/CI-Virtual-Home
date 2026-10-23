@@ -6,7 +6,7 @@
 // THE PAGE (an ad's landing page: it reads with no JavaScript and no WebGL, in an in-app browser too; the tour is an enhancement):
 //   above the fold   the family's name, the tagline, a picture of the home, "Take the tour" (the player) and "See Companion Core"
 //                    (https://ci.computer/core, awareness, not "Buy"), one honest line about the 3D, the label ("Fictional family. Real software.") once as the
-//                    header's chip and the beta line as a compact strip. The rest of the fine print claims.json asks for is the footer's, and every line of
+//                    header's chip. The rest of the fine print claims.json asks for is the footer's, and every line of
 //                    it comes from scripts/story/lib/fine-print.mts (the rule table is assets/story/fine-print.ts; reference/story/fine-print.md)
 //   the family       one section per person (id = the member's id, so family/<slug>#sally is a link): who they are, the archetype word, the
 //                    room they use, their moments (title, words, the apps with what each replaces, "Watch this moment" into the tour at
@@ -23,7 +23,7 @@
 // every word, and a screenshot is then a link to the picture itself. Logos and screenshots are the real, unedited, labelled files of
 // content/story/app-media.json (scripts/story/lib/media.mts): lazy, with their width and height, the alt text and the caption the manifest holds.
 // The ad rules bind it (CI-Common ADS.md section 9 and "Still absolute", reference/story/personas.md "Ads"): the label, no UI mockup or
-// invented app screen, nobody a customer, daylight and warm light only, the beta line, no price, third-party software always named in text (its real
+// invented app screen, nobody a customer, daylight and warm light only, no price, third-party software always named in text (its real
 // logo identifies it beside the name, never alone; a real, unedited screenshot sits beside the story with its label, never inside a scene).
 //
 // A family page obeys the homes' pages' rules (scripts/build-portal.mts step 7 holds it to them): relative URLs, links without ".html",
@@ -36,7 +36,7 @@
 // The salvage's landing, credits page and sitemap writers (a families-first front page) are NOT here: git show
 // origin/salvage/2026-10-03-feat-story-site:scripts/story/pages.mts has them.
 import type { Story, Beat, Member, CastingFamily } from '../../assets/story/types.ts';
-import { FICTIONAL_LINE, BETA_LINE, SIGNOFF } from '../../assets/story/types.ts';
+import { FICTIONAL_LINE, SIGNOFF } from '../../assets/story/types.ts';
 import { memberChapter } from '../../assets/story/url.ts';
 import { displayName } from '../../assets/home-names.js';
 import { LINKS, SITE_NAME, TITLE_MAX, TWITTER_SITE, ldScript, nf, orgLd, siteLd } from '../portal-pages.mts';
@@ -115,12 +115,6 @@ export function homeNote(h: House): string {
 }
 
 /**
- * Until scripts/story/check-copy.mts asks for claims.json's `beta-short` instead of the OS-only line (its `must(BETA_LINE)`), the footer keeps that line too, so the
- * copy lint stays green. Set to false (and delete the line it prints) in the commit that moves the lint: the footer then says the beta once, in `beta-full`.
- */
-export const LEGACY_BETA_LINE = true;
-
-/**
  * The footer's fine print: what claims.json's `where` puts in "the footer" of a family page, from scripts/story/lib/fine-print.mts (the 'family-footer' surface).
  * `agents`: a member's companion is named on the page (attribution-agents, not-frontier); `narration`: the tour has a voice (synthetic-voice); `logos`: the page shows an
  * app's logo (names-logos-owners, which stands with names-owners until the pages say "alternative to").
@@ -145,7 +139,6 @@ export function footer(claims: any, house: House, o: { agents?: boolean; narrati
       </div>
       <div class="foot-notes">
         <p><b>${esc(FICTIONAL_LINE)}</b> The families on this site are made up. They are not customers.</p>
-        ${LEGACY_BETA_LINE ? `<p>${esc(BETA_LINE)}</p>` : ''}
         ${finePrintHtml(finePrintItems('family-footer', facts, claims))}
       </div>
     </div>
@@ -494,7 +487,7 @@ export function familyPage(c: FamilyPageCtx): string {
   const d = (id: string) => esc(disclosure(claims, id));
   const { own, shared } = momentsOf(s);
   const agents = s.members.some(m => m.companion);
-  // the fine print this page owes (scripts/story/lib/fine-print.mts): the label is the header's chip, once; the beta line is the strip; the rest is the footer's
+  // the fine print this page owes (scripts/story/lib/fine-print.mts): the label is the header's chip, once; the rest is the footer's
   const fold = finePrintItems('family-fold', {}, claims), label1 = fold.find(i => i.id === 'fictional-family')!.text;
   const facts: Facts = { agents, narration: !!c.narration, logos: !!media };
   const startNote = finePrintHtml(finePrintItems('family-start', facts, claims), { cls: 'note' });
@@ -589,12 +582,6 @@ export function familyPage(c: FamilyPageCtx): string {
         ${hasFilm ? `<button type="button" class="btn btn-ghost" id="film-open" aria-controls="film" aria-expanded="false">${icon('film')}<span>Watch the film</span></button>` : ''}
         <p class="hero-note">${esc(TOUR_NOTE)}</p>
       </div>${filmBlock}
-    </section>
-
-    <section class="strip" aria-label="What this page is">
-      <ul>
-        ${fold.filter(i => i.id !== 'fictional-family').map(i => `<li data-fine="${esc(i.id)}">${esc(i.text)}</li>`).join('\n        ')}
-      </ul>
     </section>
 
     <section class="block" aria-labelledby="meet">

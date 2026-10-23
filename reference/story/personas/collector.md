@@ -1,6 +1,6 @@
 # The Collector (`collector`)
 
-Draft deep dive for a fifteenth archetype, written on 2026-10-20 for the front page's Play filter chip. It is a proposal, not yet part of the contract: `personas.md`, `content/story/personas.json`, the schema, `assets/story/types.ts`, `scripts/story/build-casting.mts`, `scripts/story/cast-lint.mts` and `scripts/portal-front.mts` do not know it until the owner adds it (the checklist is at the end). Companion OS, Companion Agents and Companion Memory are in beta.
+Draft deep dive for a fifteenth archetype, written on 2026-10-20 for the front page's Play filter chip. It is a proposal, not yet part of the contract: `personas.md`, `content/story/personas.json`, the schema, `assets/story/types.ts`, `scripts/story/build-casting.mts`, `scripts/story/cast-lint.mts` and `scripts/portal-front.mts` do not know it until the owner adds it (the checklist is at the end).
 
 Shape and depth follow the Gamer chapter of [persona-bible.md](../persona-bible.md) (3.3) and the Gamer table of [persona-apps.md](../persona-apps.md). Nobody here is a customer. Ages, homes, jobs and lines are design choices for fictional characters. Every statement about how collectors live is an editorial synthesis, tagged [?] in the bible's evidence key; no statistic is quoted and none is needed. Home ids are crew-only; print display names.
 
@@ -103,7 +103,6 @@ The collector trusts people who know their format over any ranking or recommenda
 - "Can I listen on the road?" Not claimed. Every scene is on the home network (`cap-remote-access`).
 - "Does my partner get their own library?" Audiobookshelf remembers where each listener stopped; that is the app. Do not say each person on the Core gets a private shelf (`cap-multi-user`).
 - "Are the covers local?" BookLore fetches metadata and covers from outside; HomeBox's barcode and food lookups call outside services. Never "nothing leaves".
-- "Is Companion OS finished?" It is in beta, and the site says so beside any software claim.
 - "How fast?" No number: no bitrate, no file size, no start-up time, no "lossless" claim, no latency.
 - "Which film, which album?" The story never names a real title, an artist or a game, a book, an author or a label. Props and spines are unreadable.
 
@@ -135,7 +134,7 @@ What must never be said for this persona. Ids are from `content/story/claims.jso
 
 **The regulated-domain rule.** The collector sits mostly outside the regulated domains, so the rule is short. A child's reading, listening and viewing list is children's data: write only that the files sit on the Core and say nothing of protection, safety, privacy law or parental control. A film, comic or book is never described as age-suitable by the Core. No Core, no app, and no line of a collector beat gives advice about the value, valuation, tax treatment or insurance of a collection. No compliance, certification or security-guarantee claim appears anywhere for this persona.
 
-**Standing lines that ride along.** Fictional family, real software. Companion OS is in beta. Installing apps uses the internet. Remote access is not claimed. Daylight and warm light only. One household, one Core.
+**Standing lines that ride along.** Fictional family, real software. Installing apps uses the internet. Remote access is not claimed. Daylight and warm light only. One household, one Core.
 
 ## 10. Fit
 

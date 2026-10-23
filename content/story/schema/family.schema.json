@@ -96,7 +96,7 @@
         "job": { "type": "string", "minLength": 20, "maxLength": 90, "description": "One sentence naming tasks the listed apps can really do. Third person, present tense." },
         "personality": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "pattern": "^[a-z]{3,14}$" }, "description": "Three plain words. They colour the caption tone, never a capability." },
         "voice": { "$ref": "#/$defs/voiceKey", "description": "The agent's voice for beat.say lines. Different from the narrator and from every other companion in the family." },
-        "memory": { "type": "boolean", "description": "True when this member has connected Companion Memory (beta) to the agent, opt-in. If any member has it, the first mention of Companion Memory in the file reads 'Companion Memory (beta)'." },
+        "memory": { "type": "boolean", "description": "True when this member has connected Companion Memory to the agent, opt-in." },
         "limits": { "type": "string", "minLength": 12, "maxLength": 80, "description": "What it will not do alone, for example 'Drafts only. Dad sends every message.'" }
       }
     },
@@ -205,7 +205,7 @@
     "closing": {
       "type": "object", "additionalProperties": false, "required": ["body", "cta"],
       "properties": {
-        "body": { "type": "string", "minLength": 30, "maxLength": 220, "description": "At most 30 words. Second person to the viewer. Names Companion Core and one concrete thing the family now does at home. The sign-off 'UnCloud your life.' and the beta line are added by the site and the film from claims.json; never type them here." },
+        "body": { "type": "string", "minLength": 30, "maxLength": 220, "description": "At most 30 words. Second person to the viewer. Names Companion Core and one concrete thing the family now does at home. The sign-off 'UnCloud your life.' is added by the site and the film; never type it here." },
         "cta": {
           "type": "object", "additionalProperties": false, "required": ["label", "url"],
           "properties": { "label": { "type": "string", "maxLength": 28 }, "url": { "const": "https://ci.computer/core" } }

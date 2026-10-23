@@ -1,6 +1,6 @@
 # Host (`host`): ten new user stories
 
-Draft for the owner, written 2026-10-20. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: every name, age and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.6 of [persona-bible.md](../persona-bible.md), the `host` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
+Draft for the owner, written 2026-10-20. Nobody here is a customer: every name, age and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.6 of [persona-bible.md](../persona-bible.md), the `host` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
 
 **One line.** The person who knows where the passports are and that Thursday is bin day: they see that everyone is fed, is where they should be and can find what the house holds.
 
@@ -123,7 +123,7 @@ Format: "As a host, I want <job> so that <outcome>." Each story is tied to one c
 - **The children.** The children in US1, US2 and US8 use a checklist, a game of chores and a log; none uses a chat model or an agent. The guest in US4 is a visitor and has no companion.
 - **The old places.** A service is named only as the old place and in the chip "alternative to <Service>". No sentence says what a company does, charges, learns or watches.
 - **One household, one Core.** Nothing reaches the Core from outside the house; the shop-aisle list and the road are off the table, so the paper goes first in every story.
-- **The honest caveats that ride along on every story:** Companion OS is in beta; installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
+- **The honest caveats that ride along on every story:** installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
 
 ## 5. Open items for the owner
 

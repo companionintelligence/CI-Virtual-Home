@@ -1,6 +1,6 @@
 # The Persona Bible
 
-Reference book for improving the shots and scripts of the 36 virtual homes. Fourteen personas, researched read-only on 2026-10-19 for Companion Intelligence. Companion OS, Companion Agents and Companion Memory are in beta. Data twin: `persona-bible.json`.
+Reference book for improving the shots and scripts of the 36 virtual homes. Fourteen personas, researched read-only on 2026-10-19 for Companion Intelligence. Data twin: `persona-bible.json`.
 
 The book covers the first fourteen. Twelve more archetypes and the eight front-page categories that hold all twenty-six are listed in [personas/index.md](personas/index.md).
 
@@ -16,7 +16,7 @@ The book covers the first fourteen. Twelve more archetypes and the eight front-p
 
 **Lanes of copy.** Popup title: six words or fewer, no digits. Popup body: 30 words or fewer, ends with a full stop. Agent `say` line: 16 words or fewer, spoken only by a member with a companion, never a child (and, in this book, never a teen). Silent ad cuts burn the body in as captions at 150 words a minute. Appendix B tags each line as caption (third person) or quote (first person, an adult character, a disclosed synthetic voice).
 
-**Fixed by the contract.** "Fictional family. Real software." in the first two seconds and on the end card; the beta line beside any software claim; no app screens, no prices; the call to action is See Companion Core at ci.computer/core; the chip row is the app name, then "replaces <X>" from the app's own list; one household, one Core; remote access is not claimed.
+**Fixed by the contract.** "Fictional family. Real software." in the first two seconds and on the end card; no app screens, no prices; the call to action is See Companion Core at ci.computer/core; the chip row is the app name, then "replaces <X>" from the app's own list; one household, one Core; remote access is not claimed.
 
 **Where the researchers disagreed, this book rules.** Precedence: the contract and validator over a researcher's preference, a primary source over a summary. Open items are in section 6.
 
@@ -112,7 +112,7 @@ No survey measures pride in wanting AI for any of the fourteen, so every pride l
 | Contractor | pragmatic | One admin chore from site notes | Housecall Pro 2026: 48% of 248 pros [V, vendor]; UK trades: 4.8% [V] |
 | Marketer | pragmatic | One chore on the client's material | HubSpot 2026: 86.4% of teams [V]; Klaviyo: 31% always tell colleagues [V] |
 | Business Owner | pragmatic | Second beat, never the hook | Chamber 66% vs Census 17 to 20%: a sampling artefact [V] |
-| Organiser | pragmatic | Chore she approves; beta in the scene | Pew 2026: 50% of men, 47% of women have ever used a chatbot (the gap has closed); HBS found a 25% adoption gap in earlier studies [V] |
+| Organiser | pragmatic | Chore she approves | Pew 2026: 50% of men, 47% of women have ever used a chatbot (the gap has closed); HBS found a 25% adoption gap in earlier studies [V] |
 | Lawyer | split | One checkable chore; never the headline | ABA solos 18% vs Clio solos 71% [S]; 2,202 hallucination decisions, 872 with lawyers [V] |
 | Host | split | One household chore; she approves | 79% of parents use AI [V, Menlo]; 81% for parenting tasks [V, Lurie] |
 | Educator | pragmatic | Own materials, rewritten; never push | Gallup 2025: 60% used AI, 40% favour, 28% oppose [V] |
@@ -182,7 +182,7 @@ Rows are the apps useful to three or more personas; cells name the persona's job
 | Stirling-PDF | Adobe Acrobat, Smallpdf | 7 | merge, shrink |  |  | merge |  |  |  | tidy |  | permit packs |  | exhibits | received PDFs | redact | Never "redaction is complete" |
 | LibreOffice | Microsoft Office, Google Workspace | 7 | client .docx |  |  | essay |  |  |  | price lists |  |  |  | drafting | drafts | worksheets | PARTIAL: layout, macros |
 | Twenty | Salesforce | 4 | prospects |  |  |  |  |  |  | customer list | pipeline | leads | leads | referrers |  |  | PARTIAL: Salesforce only |
-| Companion Memory | none listed | 5 (first party) | her context |  |  | own notes |  |  |  | context |  |  | client context | across files | search by meaning |  | Beta; first party |
+| Companion Memory | none listed | 5 (first party) | her context |  |  | own notes |  |  |  | context |  |  | client context | across files | search by meaning |  | First party |
 | Immich | Google Photos, iCloud Photos | 19 over |  |  | phone full |  | archive | family album | photos |  | shoots | site photos |  |  |  |  | PARTIAL: not a backup |
 | Docuseal | DocuSign | 1 | contracts |  |  |  |  |  |  | agreements | releases | change orders |  | engagement letters |  |  | Never "legally binding" |
 | Invoice Ninja | FreshBooks, QuickBooks | 0 | invoices |  |  |  |  |  |  | quotes, invoices | invoices | quotes |  | invoices |  |  | PARTIAL: no ledger |
@@ -243,8 +243,8 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 |---|---|---|---|---|
 | Paperless-ngx | Evernote, Google Drive | Scans and PDFs only; not a DMS | Drop scans in the consume folder | 17 over |
 | Nextcloud | Google Drive, Dropbox | Home network only; share links do not carry | Google and Dropbox integration apps | 12 at cap |
-| Companion Planning | first party | Beta; Google sync off by default | Start fresh | 12 at cap |
-| Hermes | first party | Beta; messages pass through the chat service | None (agent) | 24 (first party) |
+| Companion Planning | first party | Google sync off by default | Start fresh | 12 at cap |
+| Hermes | first party | Messages pass through the chat service | None (agent) | 24 (first party) |
 | VaultWarden | LastPass, 1Password | Say "the Bitwarden apps"; attachments stay | Export CSV or 1pux, Bitwarden client | 12 at cap |
 | Akaunting | QuickBooks, Xero | Bookkeeping only; no tax claim | CSV or Excel import | 4 |
 | Docuseal | DocuSign | Outsiders need reach; never legally binding | Rebuild templates | 1 |
@@ -257,7 +257,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 
 **Comfort.** Runs a dozen cloud accounts and exports a CSV; cannot use a terminal or restore a backup. Calls her partner, vendor chat, a local IT contractor.
 
-**AI stance.** Pragmatic; pride conflicted [?]. Range: Pew 2026 finds 50% of men and 47% of women have ever used a chatbot, while the HBS aggregate of 18 earlier studies put women's adoption about 25% lower [V]; the story does not write that gap into a character. Rule: a local model does one named chore on her own documents and she approves last; the chore is the hero; say beta in the same scene.
+**AI stance.** Pragmatic; pride conflicted [?]. Range: Pew 2026 finds 50% of men and 47% of women have ever used a chatbot, while the HBS aggregate of 18 earlier studies put women's adoption about 25% lower [V]; the story does not write that gap into a character. Rule: a local model does one named chore on her own documents and she approves last; the chore is the hero.
 
 **Triggers and objections.** Triggers: a client clause on where documents sit; a vendor changing terms; the spring renewal list. Objections: "I am not the IT person"; "What about my email?"
 
@@ -270,7 +270,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 **Scripts.** Hooks: Sally finds last year's invoice by one word. / Three piles on the desk. One place on the Core. Titles: Sally finds last year's invoice; Three piles become one search.
 
 - 15 s (24 words): "Receipts and school forms go into Paperless-ngx on the Core. Every page is read and indexed. Last year's invoice comes up from one word." Chip: Paperless-ngx | replaces Google Drive.
-- 30 s (54 words, full text in the twin): Counter, Companion Planning; desk, the signed contract into Nextcloud; a Hermes draft she reads and sends (beta caption).
+- 30 s (54 words, full text in the twin): Counter, Companion Planning; desk, the signed contract into Nextcloud; a Hermes draft she reads and sends.
 
 ### 3.2 The Builder (`builder`)
 
@@ -446,7 +446,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 **Scripts.** Hooks: Photos in a photo cloud. Photos on a shelf. / The sorting is done for you. The painting is not. Titles: Bruk's weekend lives on the Core; Sorted by place, not by cloud.
 
 - 15 s (23 words): "Bruk shoots on weekends. His pictures sit in Immich on the Core, not in a photo cloud. The first sort takes a while." Chip: Immich | replaces Google Photos.
-- 30 s (45 words, full text in the twin): A take trimmed in AudioMass; the shoot in Immich; portfolio pages in Penpot; the beta line; "Your weekend can come home too."
+- 30 s (45 words, full text in the twin): A take trimmed in AudioMass; the shoot in Immich; portfolio pages in Penpot; "Your weekend can come home too."
 
 ### 3.6 The Host (`host`)
 
@@ -687,7 +687,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 | App | Replaces | Caveat | Import path | Now |
 |---|---|---|---|---|
 | Open WebUI | ChatGPT, Claude | No parity, speed or key | No importer; LibreChat reads exports | 17 over |
-| Companion Memory | first party | Beta; opt-in imports | Takeout and other exports | 5 (first party) |
+| Companion Memory | first party | Opt-in imports | Takeout and other exports | 5 (first party) |
 | Nextcloud | Google Drive, Dropbox | Home network only; share links do not carry | Google and Dropbox integration apps | 12 at cap |
 | Ghost | Mailchimp, ConvertKit | Public site needs outside reach | Mailchimp, Squarespace, Medium migrators | 0 |
 | Penpot | Figma, Sketch | No Figma importer found | Export and rebuild | 1 |
@@ -856,7 +856,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 
 **4.1 Twelve rules for writers**
 
-1. **One chore, one app, one limit per beat.** The hero is the chore (the invoice found by one word, the diff read, the transcript checked), never the AI. The limit rides in the same beat, in the persona's voice: beta, home network, "it can be wrong".
+1. **One chore, one app, one limit per beat.** The hero is the chore (the invoice found by one word, the diff read, the transcript checked), never the AI. The limit rides in the same beat, in the persona's voice: home network, "it can be wrong".
 2. **AI is never the hook or the first beat.** Keep to the ceilings in 2.2. Say "a model on the Core" or "agent"; never assistant, chatbot, "AI-powered", a hosted-model name, a key, parity, speed or accuracy. The human finishes: reads the diff, rewrites the comment, checks the quote, signs the letter.
 3. **Say where the thing sits, not how safe it is.** Template: "<Person> keeps <thing> in <App> on the Core, not in <the rented place>." Private, secure, safe, offline, never leaves, 100% local, compliant, privileged and legally binding fail the lint; "stays on the Core by default" passes.
 4. **Open on the persona's own noun inside three seconds.** Invoice, repository, brief, proof, quote, transcript, rota, recipe tin, handout. Not "Meet X". A video hook runs 6 to 12 words; a popup title is six words at most with no digits.
@@ -865,7 +865,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 7. **Children and teens never speak.** A `say` line needs a companion and no child is voiced (validator); teens have none in the cast and stay silent here too. Tell minors in third-person captions, address the adult for under-18 learners and gamers, never quote a child's question.
 8. **Narration is third person, present tense; first person only in a labelled adult quote.** Second person only in the pivot ("Your side projects can come home too"). One quote per cut at most, 30 words or fewer, never praise for the product, never a customer or testimonial voice.
 9. **Chips carry the comparison; sentences never attack.** First chip is the catalog name (Docuseal, VaultWarden, Paperless-ngx), then "replaces <X>" from the app's own list. The validator exempts a `replaces` chip from cap-parity, but "replaces ChatGPT" in a sentence fails: write "an alternative to". The villain is a pattern, never a company.
-10. **Carry each persona's honest limits.** Always: remote access is not claimed, the Core is not a backup, Companion OS, Agents and Memory are beta. Then the persona's own: no Clio or gradebook or Lightroom, no source protection, no tax claim, Valve keeps the account. A limit said lightly beats a footnote.
+10. **Carry each persona's honest limits.** Always: remote access is not claimed, the Core is not a backup. Then the persona's own: no Clio or gradebook or Lightroom, no source protection, no tax claim, Valve keeps the account. A limit said lightly beats a footnote.
 11. **Lead with apps that have headroom.** The fleet cap is 40% of homes (12 of 30; 14 of 36). Paperless-ngx (17), Immich (19), Open WebUI (17), Kiwix (18) and HortusFox (18) are over it; Nextcloud, VaultWarden, Forgejo and Companion Planning sit at 12. Give each new persona its specific app: Whisper-WebUI, Invoice Ninja, Docuseal, HomeBox, Radicale, Solidtime, Ghost, Penpot, Pi-hole.
 12. **Use the cast member's name, never a placeholder.** Maya, Imani, Dara, Marek, Odile and Hana are researchers' placeholders: Maya is on the avoid list (with Ben, Sarah, Dana, Alex, Sofia, Priya, Jordan, Lilia) and Hana is cast. A first name appears at most twice in the fleet, flagships excepted. No surnames in lines, no "Smith".
 
@@ -901,7 +901,7 @@ Fixed template: Who, Responsible for, Uses now, Hub replacements, Hangouts, How 
 9. **Never show, for every persona.** Third-party logos alone; real client names, case numbers or amounts; app screens; a hooded hacker, padlock or shield; scales or gavel; an apple on a desk; the frazzled mother; the midnight martyr; an RGB gamer; breach imagery; real or AI-made art; before-and-after splits.
 10. **Plan 9:16 as its own track, with type that fits.** Modal and caption text is 36 px or larger: shoot negative space. The member's name is a spaced capital kicker (S A L L Y); captions stay sentence case, two lines of 42 characters. Keep the lower third free for the popup card.
 11. **Choose rooms the persona truly uses.** Contractor: garage, mudroom, driveway. Creative: studio and the client at the dining table. Educator: the dining table and the Sunday pile. Avoid rooms that fight the persona: the toddler bed in Stone Gable's Study, Palm Knoll's gaming chair, Seraphine's rocking horse.
-12. **Show the limit as a held still, then the beta line.** Half a second of quiet and no camera move on the limit; the beta line beside any software claim; the end card holds 3.5 seconds with See Companion Core and ci.computer/core. Scripted scenes are never labelled recordings.
+12. **Show the limit as a held still.** Half a second of quiet and no camera move on the limit; the end card holds 3.5 seconds with See Companion Core and ci.computer/core. Scripted scenes are never labelled recordings.
 
 ## 5. Casting recommendations
 
@@ -1626,7 +1626,7 @@ Skeptic pass: five lines were rewritten on 2026-10-19 (gamer S6, journalist S1, 
 
 - S1 (quote) Client folder, school forms, tax receipts. Three piles, one Core. I know where each one is, and that is the whole point.
 - S2 (caption) The contract is signed and filed before the kettle boils. It sits on the Core in the client's folder, not in a rented drive.
-- S3 (quote) Companion Agents are in beta, so I read every draft. It is my name on the reply, so I would read it anyway.
+- S3 (quote) I read every draft. It is my name on the reply, so I would read it anyway.
 - S4 (quote) Last year's invoice comes up from one word on it. Paperless-ngx reads each page and indexes it, so I search instead of filing by hand.
 - S5 (quote) My week has two columns. Client calls first, then school pickups. Companion Planning keeps both in one file on the Core.
 - S6 (quote) Every spring I list what renews. Some stay. The documents I would rather keep in the house move home first.
@@ -1638,7 +1638,7 @@ Skeptic pass: five lines were rewritten on 2026-10-19 (gamer S6, journalist S1, 
 - S3 (quote) I list what I pay for and what I actually open. The two lists do not match.
 - S4 (caption) Work code stays where work keeps it. The side projects come home to Forgejo.
 - S5 (caption) A capable model on the Core drafts the commit message. John rewrites it anyway.
-- S6 (caption) Companion Agents are in beta. John's agent proposes, and he approves every change.
+- S6 (caption) John's agent proposes, and he approves every change.
 
 **The Gamer**
 
@@ -1665,7 +1665,7 @@ Skeptic pass: five lines were rewritten on 2026-10-19 (gamer S6, journalist S1, 
 - S3 (quote) My drafts are plain Markdown files in Obsidian. If I ever switch apps, the pages come with me.
 - S4 (quote) I do not want the painting done for me. I want the folders sorted. That is the part I put off.
 - S5 (quote) Records, rips and my own demos play from Navidrome in the kitchen. It plays files I hold, nothing else.
-- S6 (quote) It says beta on the page. Fine. I would rather read the limits first than find them on a Saturday.
+- S6 (quote) I would rather read the limits first than find them on a Saturday.
 
 **The Host**
 
@@ -1733,7 +1733,7 @@ Skeptic pass: five lines were rewritten on 2026-10-19 (gamer S6, journalist S1, 
 **The Journalist**
 
 - S1 (caption) Noor records the interview on a handheld recorder. At the kitchen table she adds the file to Whisper-WebUI, and the Core turns it into text.
-- S2 (caption) Companion OS is in beta. Whisper-WebUI turns the tape into text, and Noor still checks every quote against the audio.
+- S2 (caption) Whisper-WebUI turns the tape into text, and Noor still checks every quote against the audio.
 - S3 (caption) The records release arrives as eighty pages. Paperless-ngx makes them searchable by name, date and word.
 - S4 (caption) She asks the local model in Open WebUI which page mentions the contract. Then she reads that page herself.
 - S5 (quote) I ask where a recording lives before I ask what it costs.

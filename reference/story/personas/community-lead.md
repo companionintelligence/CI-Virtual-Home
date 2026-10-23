@@ -1,6 +1,6 @@
 # Community lead (`community-lead`)
 
-Deep dive for one proposed archetype. Draft for the repo, written 2026-10-20. Category: Host and care (`care`). Nearest existing archetype: `host`. Companion OS, Companion Agents and Companion Memory are in beta.
+Deep dive for one proposed archetype. Draft for the repo, written 2026-10-20. Category: Host and care (`care`). Nearest existing archetype: `host`.
 
 Nobody here is a customer. Ages, groups, homes and lines are design choices for fictional characters. Statements about how people live are editorial synthesis, tagged [?] when a reader could take them for a fact; nothing below is a statistic. Read this with [personas.md](../personas.md), [persona-apps.md](../persona-apps.md) and [persona-bible.md](../persona-bible.md), which win wherever they disagree.
 
@@ -102,7 +102,7 @@ What the Core and the apps cannot do for them.
 - No payments: subs are collected the way the group collects them today (cash, a bank transfer, a tin). Akaunting records; it does not take a card or give advice on money.
 - No compliance, charity, safeguarding, data-protection or insurance statement. The apps keep files where the lead put them.
 - The handover is a human job: the next lead needs someone to show them where the Core is and how to sign in. Say it as a limit the family handles (a printed card in the folder), not a feature.
-- Companion OS is in beta; installing apps uses the internet; remote access is not claimed.
+- installing apps uses the internet; remote access is not claimed.
 
 ## 9. Claims boundary
 
@@ -122,7 +122,7 @@ Never say or imply, for this persona. Ids are from `content/story/claims.json`.
 | A real club, a real person, a testimonial, "a real committee"; a home's house id | `fake-social-proof`, `f-testimonial`, `f-real-person`, `internal-ids` |
 | Voice: em or en dashes, exclamation marks, emoji, "easy", "simple", "seamless", "empower", "home server", "app store" | `dash-em-en`, `exclamation`, `emoji`, `buzz-core`, `buzz-simple-claims`, `vocab-home-server`, `vocab-app-store` |
 
-Ride-along lines for every family: Fictional family. Real software. Companion OS is in beta. Installing apps uses the internet. Remote access is not claimed.
+Ride-along lines for every family: Fictional family. Real software. Installing apps uses the internet. Remote access is not claimed.
 
 ## 10. Fit
 

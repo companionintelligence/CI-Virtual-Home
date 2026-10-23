@@ -1,6 +1,6 @@
 # Business owner (`business-owner`): ten new user stories
 
-Draft for the owner, written 2026-10-20. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: every name, age, business and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.8 of [persona-bible.md](../persona-bible.md), the `business-owner` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
+Draft for the owner, written 2026-10-20. Nobody here is a customer: every name, age, business and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.8 of [persona-bible.md](../persona-bible.md), the `business-owner` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
 
 **One line.** Runs a shop, workshop, studio or kitchen of one to fifteen people from the house or beside it: quotes, invoices, stock, the diary and the customer list.
 
@@ -123,7 +123,7 @@ Format: "As a business owner, I want <job> so that <outcome>." Each story is tie
 - **No model beats.** The persona's one bounded model chore is in the chapter (a late-payer reminder she reads and sends); these ten stories leave it there. The age rule of 16 never bites.
 - **A role is not a reflex.** Six of the owners are women and four are men; the ages run from 34 to 60; the businesses are a workshop, a stall, a shop, a café, a kitchen, a garden firm, a grooming room and a pair of sign-writers.
 - **The old places.** A service is named only as the old place and in the chip "alternative to <Service>". No sentence says what a company does, charges, learns or watches.
-- **The honest caveats that ride along on every story:** Companion OS is in beta; installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
+- **The honest caveats that ride along on every story:** installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
 
 ## 5. Open items for the owner
 

@@ -1,6 +1,6 @@
 # Tech family (`tech-family`): ten new user stories
 
-Draft for the owner, written 2026-10-20. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: every name, age and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.7 of [persona-bible.md](../persona-bible.md), the `tech-family` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
+Draft for the owner, written 2026-10-20. Nobody here is a customer: every name, age and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.7 of [persona-bible.md](../persona-bible.md), the `tech-family` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
 
 **One line.** The household lead of a family that already runs its own network, its lamp rules and a few apps, and who is judged by the people in the house who do not tinker.
 
@@ -123,7 +123,7 @@ Format: "As the household lead, I want <job> so that <outcome>." Each story is t
 - **Regulated words.** None touches health, legal, finance, children's records or education records. The one teenager's school laptop (US10) is mentioned only as the place an error appeared.
 - **The model.** US8 is the only chat beat, with an adult, a named chore and the limit said once. Pi-hole does not appear (the chapter owns it), and where it is meant it is only a DNS filter.
 - **The old places.** A service is named only as the old place and in the chip "alternative to <Service>". No sentence says what a company does, charges, learns or watches.
-- **The honest caveats that ride along on every story:** Companion OS is in beta; installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
+- **The honest caveats that ride along on every story:** installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
 
 ## 5. Open items for the owner
 

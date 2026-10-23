@@ -1,6 +1,6 @@
 # Money keeper (`money-keeper`)
 
-Deep dive for one proposed persona, written 2026-10-20 as a draft for the owner. Category: Run the household (`household`). Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: ages, households, names and lines are design choices for fictional characters. The shape follows the organiser chapter of [persona-bible.md](../persona-bible.md) and the tables of [persona-apps.md](../persona-apps.md); the contract is [personas.md](../personas.md), the wording law is `content/story/claims.json`.
+Deep dive for one proposed persona, written 2026-10-20 as a draft for the owner. Category: Run the household (`household`). Nobody here is a customer: ages, households, names and lines are design choices for fictional characters. The shape follows the organiser chapter of [persona-bible.md](../persona-bible.md) and the tables of [persona-apps.md](../persona-apps.md); the contract is [personas.md](../personas.md), the wording law is `content/story/claims.json`.
 
 **One line.** Owns the household ledger: bills, subscriptions, shared costs and the receipts behind them.
 
@@ -106,7 +106,7 @@ Sample first-person lines are allowed only as a labelled adult quote, one per cu
 | Is it safe? | State where the data sits, not that it is unbreakable (`sec-absolute`, `sec-never-leaves`). Installing apps uses the internet. |
 | Does the phone have an app? | Mobile is closed preview (`cap-mobile-app`). Say "your phone" and the browser; no store badges. |
 | Does my partner need a separate account on the Core? | One household, one Core. Per-app sign-ins exist only where the app has them. |
-| Is the setup hard? | Companion OS is in beta. Show the steps. Never "easy" (`buzz-simple-claims`). |
+| Is the setup hard? | Show the steps. Never "easy" (`buzz-simple-claims`). |
 
 What the Core and the apps cannot do for this person: pay anything, move money, read a scan automatically, sync a bank without an outside service, file a return, give advice, or reach the bill from anywhere other than the house.
 

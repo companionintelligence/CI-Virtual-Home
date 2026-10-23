@@ -1,6 +1,6 @@
 # Journalist: ten more user stories (`journalist`)
 
-Draft, written 2026-10-20 for the owner. It extends chapter 3.13 of [persona-bible.md](../persona-bible.md) and the `journalist` row of `content/story/personas.json`. Nobody here is a customer: ages, households, roles and lines are design choices for fictional characters. Companion OS, Companion Memory and Companion Agents are in beta. The law for every word is `content/story/claims.json`.
+Draft, written 2026-10-20 for the owner. It extends chapter 3.13 of [persona-bible.md](../persona-bible.md) and the `journalist` row of `content/story/personas.json`. Nobody here is a customer: ages, households, roles and lines are design choices for fictional characters. The law for every word is `content/story/claims.json`.
 
 **What this file is for.** The chapter shows the interview day: the recording turned into text (Whisper-WebUI), the notes (Obsidian), the records (Paperless-ngx), the model that finds the page (Open WebUI), Nextcloud, a PDF tool and a translator. These ten stories leave that ground. They are about the rest of a working writer's week: the morning list, the page that changes overnight, the spreadsheet that arrives, the structure of a long piece, the voice-over, the listening back, the borrowed kit, the pitch board, the Sunday read and the photo from the records office. Each is tied to a catalog app and a registry service that the chapter does not use.
 

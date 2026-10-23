@@ -2,7 +2,7 @@
 // @check-house skip — it tests dist/, which `pnpm run portal:build` makes; run `pnpm run portal:test -- --only hooks` after front page work
 //
 // What the page promises (reference/story/lander.md), held where a person meets it:
-//   the fold      at 1440 × 900 and 390 × 844 the message, the label, the beta line, what a Core is, "Take the tour" and Buy (and Download) are inside the first screen
+//   the fold      at 1440 × 900 and 390 × 844 the message, the label, what a Core is, "Take the tour" and Buy (and Download) are inside the first screen
 //   depth         the Core's offer is at most 3 screens down on a desktop and 2.5 on a phone, the whole page at most 5 and 7.5 (it was 9.6 and 23.5 down); the sticky header keeps
 //                 Buy and Download in reach after two screens of scroll; nothing scrolls sideways at 320, 390, 768 and 1440
 //   the chooser   a chip narrows the families and puts service= in the address with every other parameter (an ad's tags) kept byte for byte; the cards shown are the chip's
@@ -35,11 +35,11 @@ export default async function lander(ctx: TestCtx): Promise<void> {
     // ---- the fold
     const fold = await page.evaluate(() => {
       const box = (sel: string) => { const e = document.querySelector(sel); if (!e) return null; const b = e.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, left: b.left, right: b.right }; };
-      return { vh: innerHeight, vw: innerWidth, h1: box('h1'), label: box('.fiction-label'), beta: box('.beta-chip'), lede: box('.lede'), tour: box('#hero-play'), buy: box('.site-head .nav-buy'), dl: box('.site-head .nav-download'),
+      return { vh: innerHeight, vw: innerWidth, h1: box('h1'), label: box('.fiction-label'), lede: box('.lede'), tour: box('#hero-play'), buy: box('.site-head .nav-buy'), dl: box('.site-head .nav-download'),
         dlShown: getComputedStyle(document.querySelector('.site-head .nav-download')!).display !== 'none', h1Text: document.querySelector('h1')!.textContent, lede1: document.querySelector('.lede')!.textContent };
     });
     const inView = (b: { top: number; bottom: number; right: number } | null): boolean => !!b && b.top >= 0 && b.bottom <= fold.vh && b.right <= fold.vw + 1;
-    ok([fold.h1, fold.label, fold.beta, fold.lede, fold.tour, fold.buy, fold.dl].every(inView) && fold.dlShown, `${tag}: the message, the label, the beta line, what a Core is, "Take the tour", Buy and Download are all inside the first screen`);
+    ok([fold.h1, fold.label, fold.lede, fold.tour, fold.buy, fold.dl].every(inView) && fold.dlShown, `${tag}: the message, the label, what a Core is, "Take the tour", Buy and Download are all inside the first screen`);
     ok(fold.h1Text === claim('rent-line') && /^A Companion Core is a small personal server\b/.test(fold.lede1 || ''), `${tag}: the message is claims.json's rent-line ("${fold.h1Text}") and the next sentence says what a Core is`);
     // ---- depth, the order of the blocks, and the sticky header
     const depth = await page.evaluate((blocks: string[]) => {

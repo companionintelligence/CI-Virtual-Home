@@ -15,7 +15,6 @@
     "sourceTags": {
       "V": "verified against the campaign source",
       "E": "estimate: must be visibly labelled",
-      "BETA": "ships but disclosed as beta",
       "hold": "conflicted or unsigned: do not print until the owner rules"
     }
   },
@@ -458,7 +457,7 @@
       "pattern": "\\b(knows|remembers|reads|tracks|understands|sees) (everything|all)\\b|\\bnever forgets?\\b|\\breads your mind\\b|\\bpredicts? (your|what you)\\b|\\banticipat\\w+\\b|\\bproactive(ly)?\\b|\\bnotices what you'?ve dropped\\b|\\bknows you better\\b|\\bperfect (recall|memory)\\b",
       "flags": "i",
       "severity": "error",
-      "why": "Companion Memory is in beta. Proactive forecasting cards (\"Your week, taking shape\", \"It notices what you've dropped\") carry a Rolling out pill upstream. Today it supplies individual context to OpenClaw and Hermes.",
+      "why": "Proactive forecasting cards (\"Your week, taking shape\", \"It notices what you've dropped\") carry a Rolling out pill upstream. Today Companion Memory supplies individual context to OpenClaw and Hermes.",
       "fix": "Say what the agent was asked to do and what it pulled from Companion Memory."
     },
     {
@@ -546,7 +545,7 @@
       "pattern": "\\b(never (crash|crashes|fail|fails|goes down|breaks?|needs? (updates|maintenance|attention))|always works?|100% uptime|zero downtime|maintenance[- ]free|zero maintenance|set it and forget it|fire and forget|runs forever|lasts forever)\\b",
       "flags": "i",
       "severity": "error",
-      "why": "Unmeasured reliability claims. The sheet says \"without you babysitting it\" and \"walk away\" and discloses beta.",
+      "why": "Unmeasured reliability claims. The sheet says \"without you babysitting it\" and \"walk away\".",
       "fix": "Use the sheet's own phrases."
     },
     {
@@ -617,11 +616,11 @@
     },
     {
       "term": "Companion Memory",
-      "rule": "Title Case. First mention in a page or film carries \"(beta)\". Never Digital Memory, CI Memory, knowledge base, memory system."
+      "rule": "Title Case. Never Digital Memory, CI Memory, knowledge base, memory system."
     },
     {
       "term": "Companion OS",
-      "rule": "Title Case. In beta; say so wherever it is named in a hero or end card."
+      "rule": "Title Case."
     },
     {
       "term": "Companion account",
@@ -801,15 +800,14 @@
       "id": "os-job",
       "text": "Companion OS is a Linux distribution built for one job: running local models reliably for months at a time, without you babysitting it.",
       "source": "CAMPAIGN.md 7",
-      "tag": "V BETA",
-      "status": "ok-verbatim",
-      "note": "Beta chip required nearby."
+      "tag": "V",
+      "status": "ok-verbatim"
     },
     {
       "id": "os-recovery",
       "text": "Companion OS includes monitoring and recovery tooling, designed for a machine that lives in a closet. Updates are yours to take.",
       "source": "CAMPAIGN.md 7",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok"
     },
     {
@@ -869,28 +867,28 @@
       "id": "memory-file",
       "text": "Companion Memory is not a cloud profile and not an advertising or personalisation engine. It is a file on your disk that happens to know you.",
       "source": "CAMPAIGN.md 9",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok-verbatim"
     },
     {
       "id": "memory-graph",
       "text": "Companion Memory builds a knowledge graph of your own life: people, places, things, content, events and spaces.",
       "source": "CAMPAIGN.md 9",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok"
     },
     {
       "id": "memory-optin",
       "text": "Every Companion Memory integration is opt-in and revocable. Nothing is connected by default.",
       "source": "CAMPAIGN.md 9",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok-verbatim"
     },
     {
       "id": "memory-agents",
       "text": "Companion Memory works with OpenClaw and Hermes to give them individual context that improves their results.",
       "source": "CAMPAIGN.md 9b",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok",
       "note": "Today's capability, stated as today's capability. Also reachable by other agents over MCP."
     },
@@ -898,7 +896,7 @@
       "id": "memory-camera-saved",
       "text": "Companion Camera captures documents, notes and real-world context into the timeline. Saved Searches keep collecting a topic in the background.",
       "source": "CAMPAIGN.md 9",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok"
     },
     {
@@ -913,7 +911,7 @@
       "id": "agents-local",
       "text": "Agents operate on your local memory by default and work only on your behalf.",
       "source": "CAMPAIGN.md 10",
-      "tag": "V BETA",
+      "tag": "V",
       "status": "ok-verbatim"
     },
     {
@@ -1175,26 +1173,6 @@
       "notes": "Sheet rule 3: no simulated capability. An agent line on screen is scripted, not captured."
     },
     {
-      "id": "beta-short",
-      "text": "Companion OS, Companion Memory and Companion Agents are in beta.",
-      "where": [
-        "landing hero (a chip in the first screen, per COPY.md 1 note)",
-        "every film end card",
-        "every page that names any of the three"
-      ],
-      "required": true,
-      "notes": "First mention of Companion Memory in a page or film also carries \"(beta)\"."
-    },
-    {
-      "id": "beta-full",
-      "text": "Companion OS, Companion Agents and Companion Memory are in beta. They run on units in the field today. Some of what we want them to do is not built yet. We will tell you which is which in the updates rather than in the marketing. Companion Hub is shipping.",
-      "where": [
-        "About / footer, once"
-      ],
-      "required": true,
-      "hold": "The sheet's widened disclosure (CAMPAIGN.md 2d-i) contains the clause \"and everything shown in our video runs on software you will receive\". That is true only if every scene is faithful to real software. Dropped here; the owner decides whether to restore it."
-    },
-    {
       "id": "not-frontier",
       "text": "A Core runs capable open models, not the largest frontier models. If you need the best model in the world this month, a subscription buys that.",
       "where": [
@@ -1314,7 +1292,6 @@
       "inAlternativesTable": false,
       "alternativesCategory": null,
       "caveats": [
-        "Beta. First mention carries (beta).",
         "Never priced; included with Hub Pro, which is campaign terms and stays out of stories.",
         "No benchmark score; no integration count; no proactive forecasts.",
         "Imports are opt-in and revocable; nothing connected by default."
@@ -1339,7 +1316,7 @@
         "Attribute to Nous Research.",
         "Reaches you through messengers (Slack, Discord, Telegram, WhatsApp, email, SMS). Those carry the message; the messenger is not local.",
         "Can be pointed at cloud model providers. Private only on the Core's local model.",
-        "Beta (Companion Agents). Do not show an API key or a setup dialog that does not exist."
+        "Do not show an API key or a setup dialog that does not exist."
       ],
       "available": true,
       "source": "HUB/CI-Marketplace/apps/ci-hermes/config.json @ dev 8b6c0ebd"
@@ -1361,8 +1338,7 @@
         "Catalogue name is \"OpenClaw WebCLI\"; attribute to the OpenClaw Foundation.",
         "Browsing the web touches websites; that traffic is not private from them.",
         "Can connect to cloud providers; private only on the Core's local model.",
-        "Phone apps exist upstream; no store badges.",
-        "Beta (Companion Agents)."
+        "Phone apps exist upstream; no store badges."
       ],
       "available": true,
       "source": "HUB/CI-Marketplace/apps/ci-openclaw/config.json @ dev 8b6c0ebd"

@@ -3,7 +3,7 @@
  * shared chrome (header, buttons, chips, discs, footer) are in site.css; nothing here is a literal colour.
  *
  * Above the fold: the name, the tagline, the home's picture, "Take the tour" and "See Companion Core", one honest line about the 3D.
- * Then the disclosure strip, one section per person (a sticky nav of the people, the card "Rented before, on the Core now", the moments with their
+ * Then one section per person (a sticky nav of the people, the card "Rented before, on the Core now", the moments with their
  * "More about this moment", a strip of real screenshots), a day in the house, the home and its floor plan, the apps with their real logos, how it runs
  * (real screenshots of Companion Hub and of the Companion account page), how the Core starts, the next family and the close.
  * Real logos sit on a white tile (--pg-logo-bg) in both themes, so a dark mark stays visible. Hover and reveal effects are CSS only and the site's
@@ -43,10 +43,6 @@
 .film { grid-column: 1 / -1; margin-top: 8px; }
 .film video { display: block; width: 100%; border-radius: var(--radius-media); background: var(--pg-ink); aspect-ratio: 16 / 9; }
 .film-note { margin-top: 8px; font-size: 13px; color: var(--muted-foreground); }
-
-/* ---------------- the disclosure strip: the beta line, one compact row under the first screen (the label is the header's chip; scripted scenes, the stylised Core and the rest are the footer's) ---------------- */
-.strip { margin-top: 20px; padding: 9px 14px; border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--secondary); }
-.strip ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 24px; font-size: 13px; line-height: 1.45; color: var(--muted-foreground); }
 
 /* ---------------- sections ---------------- */
 .block { padding-top: clamp(34px, 5vw, 56px); }

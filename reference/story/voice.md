@@ -108,7 +108,7 @@ human judgement. Use `--sheet`, open `index.html` and listen on a phone speaker 
 - clear at normal volume; no buzz, hiss, pumping or swallowed consonants (the limiter works hardest on `v-deep-m`)
 - pace unhurried (about 150 words a minute); sentence ends fall rather than rise
 - the product names: Odoo, Koodo, Spliit, SearXNG, Keila, Affine, n8n, Immich, Nextcloud, Paperless-ngx, OpenClaw, Hermes
-- "Wi-Fi", "UnCloud", "Core's", "Companion Memory (beta)"
+- "Wi-Fi", "UnCloud", "Core's", "Companion Memory"
 - the agent voices sound different from the narrator and from each other
 - four of the eight voices are graded D (`v-bright-f`, `v-young-f`, `v-light-m`) or D+ (`v-deep-m`) by the model card, and Kokoro has no
   emotion control: if one sounds wrong for a scene, change the key in the story, or swap the voice here

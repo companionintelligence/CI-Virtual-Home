@@ -20,31 +20,27 @@ const r = (id: string, when?: keyof Facts): Rule => ({ id, when });
  * The lander (index.html) is another package's: its rows say what it must print from this table.
  */
 export const SURFACES = {
-  /** the first screen of a family's page: the label (the header chip) and the beta line (every page that names any of the three) */
-  'family-fold': [r('fictional-family'), r('beta-short')],
+  /** the first screen of a family's page: the label (the header chip) */
+  'family-fold': [r('fictional-family')],
   /** "How the Core starts" on a family's page, once an agent is named (internet-steps: "FTUE page", "any scene where Hermes or OpenClaw reaches outside the house") */
   'family-start': [r('internet-steps', 'agents')],
-  /** the footer of a family's page (launch-not-offer: footer; beta-full: About or footer, once; scripted-scenes and stylised-art: family page footer; synthetic-voice: near the audio, here too;
+  /** the footer of a family's page (launch-not-offer: footer; scripted-scenes and stylised-art: family page footer; synthetic-voice: near the audio, here too;
    *  names-owners stands with names-logos-owners until the pages say "alternative to"; not-frontier: the honesty clause, with the first agent) */
-  'family-footer': [r('launch-not-offer'), r('beta-full'), r('scripted-scenes'), r('stylised-art'), r('synthetic-voice', 'narration'), r('attribution-agents', 'agents'),
+  'family-footer': [r('launch-not-offer'), r('scripted-scenes'), r('stylised-art'), r('synthetic-voice', 'narration'), r('attribution-agents', 'agents'),
     r('not-frontier', 'agents'), r('apps-availability'), r('names-owners'), r('names-logos-owners', 'logos')],
-  /** the Core band of a home's own page (beta-short: every page that names any of the three) */
-  'home-band': [r('beta-short')],
-  /** the footer of a home's own page (launch-not-offer: footer; beta-full: footer, once) */
-  'home-footer': [r('launch-not-offer'), r('beta-full')],
+  /** the footer of a home's own page (launch-not-offer: footer) */
+  'home-footer': [r('launch-not-offer')],
   /** the 404 page, which offers Buy Companion Core (launch-not-offer: footer) */
   'not-found': [r('launch-not-offer')],
-  /** the player's About panel (launch-not-offer, beta-full, not-frontier: About; the tour adds what a family and its scenes owe) */
-  'player-about': [r('launch-not-offer'), r('beta-full'), r('not-frontier'), r('fictional-family', 'tour'), r('scripted-scenes', 'tour'), r('stylised-art', 'tour'),
+  /** the player's About panel (launch-not-offer, not-frontier: About; the tour adds what a family and its scenes owe) */
+  'player-about': [r('launch-not-offer'), r('not-frontier'), r('fictional-family', 'tour'), r('scripted-scenes', 'tour'), r('stylised-art', 'tour'),
     r('attribution-agents', 'tour'), r('names-logos-owners', 'tour')],
-  /** the card at the end of a shot: it names the Core and offers Buy */
-  'player-end': [r('beta-short')],
-  /** the tour's start card (assets/story/popup.ts FINE_PRINT is these four, in this order) */
-  'tour-start': [r('scripted-scenes'), r('synthetic-voice', 'narration'), r('stylised-art'), r('beta-short')],
-  /** THE LANDER (index.html, scripts/portal-front.mts): the hero's two chips, the Core band (what a Core is not, and the line beside its picture) and the footer (the page quotes a written scene and names apps). */
-  'lander-hero': [r('fictional-family'), r('beta-short')],
-  'lander-core': [r('beta-short'), r('not-frontier'), r('stylised-art')],
-  'lander-footer': [r('launch-not-offer'), r('beta-full'), r('scripted-scenes'), r('names-logos-owners'), r('third-party-apps')],
+  /** the tour's start card (assets/story/popup.ts FINE_PRINT is these three, in this order) */
+  'tour-start': [r('scripted-scenes'), r('synthetic-voice', 'narration'), r('stylised-art')],
+  /** THE LANDER (index.html, scripts/portal-front.mts): the hero's chip, the Core band (what a Core is not, and the line beside its picture) and the footer (the page quotes a written scene and names apps). */
+  'lander-hero': [r('fictional-family')],
+  'lander-core': [r('not-frontier'), r('stylised-art')],
+  'lander-footer': [r('launch-not-offer'), r('scripted-scenes'), r('names-logos-owners'), r('third-party-apps')],
 } as const satisfies Record<string, readonly Rule[]>;
 export type Surface = keyof typeof SURFACES;
 export const SURFACE_IDS = Object.keys(SURFACES) as Surface[];
@@ -92,16 +88,6 @@ export const CLAIMS_SNAPSHOT: ClaimsDoc = {
     {
       "id": "scripted-scenes",
       "text": "Scenes are written for this site. They show what the listed apps do. They are not recordings of a real session.",
-      "required": true
-    },
-    {
-      "id": "beta-short",
-      "text": "Companion OS, Companion Memory and Companion Agents are in beta.",
-      "required": true
-    },
-    {
-      "id": "beta-full",
-      "text": "Companion OS, Companion Agents and Companion Memory are in beta. They run on units in the field today. Some of what we want them to do is not built yet. We will tell you which is which in the updates rather than in the marketing. Companion Hub is shipping.",
       "required": true
     },
     {

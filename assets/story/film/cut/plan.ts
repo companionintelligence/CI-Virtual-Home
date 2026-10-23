@@ -307,7 +307,7 @@ export function planFamilyCuts(story: Story, times: Record<string, BeatTimes> | 
     if (L.duration < CUT.minS - 1e-9) status = 'short';
     const apps = parts.filter(p => p.card.app).map(p => ({ id: p.card.app!, replaces: p.card.replaces }));
     const used = parts.map(p => specs.find(s => s.beat.id === p.beat)!.beat);
-    const disclosures = ['fictional-family', 'beta-short', 'scripted-scenes', 'stylised-art'];
+    const disclosures = ['fictional-family', 'scripted-scenes', 'stylised-art'];
     if (parts.some(p => p.card.replaces.length)) disclosures.push('names-owners');
     if (used.some(namesAgentRuntime)) disclosures.push('attribution-agents');
     cuts.push({

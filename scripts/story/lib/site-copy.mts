@@ -24,7 +24,7 @@ import { userStrings, plain } from './text.mts';
 import { isV3Story } from './v3.mts';
 import { EXTRA_BANS } from './extra-bans.mts';
 import { sourceStrings } from './ts-strings.mts';
-import { FICTIONAL_LINE, BETA_LINE, type Story } from '../../../assets/story/types.ts';
+import { FICTIONAL_LINE, type Story } from '../../../assets/story/types.ts';
 
 export const decode = (s: string): string => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
 export const walkFiles = (dir: string, rel = ''): string[] => (fs.existsSync(path.join(dir, rel)) ? fs.readdirSync(path.join(dir, rel)) : []).flatMap((n) => {
@@ -77,11 +77,11 @@ export function headingProblems(headings: string[], proper: Set<string>): string
 export type Surface = 'gallery' | 'home' | 'family' | 'notfound' | 'player';
 /**
  * `enforced`: printed today on every page of the surface, so a page without it is an error. `pending`: claims.json owes it and nothing prints it yet.
- * `when` limits a row to pages that need it: `logos` (the page shows an app or service logo), `names` (it names Companion Memory, Companion Agents,
- * Hermes or OpenClaw), `voice` (the family's tour has narration), `family` (a home page that links a family).
+ * `when` limits a row to pages that need it: `logos` (the page shows an app or service logo), `voice` (the family's tour has narration),
+ * `family` (a home page that links a family).
  * Moving a row from pending to enforced is the whole of "the page now prints it" (every row is enforced today).
  */
-export interface Owed { id: string; surface: Surface; level: 'enforced' | 'pending'; when?: 'logos' | 'names' | 'voice' | 'family' }
+export interface Owed { id: string; surface: Surface; level: 'enforced' | 'pending'; when?: 'logos' | 'voice' | 'family' }
 export const DISCLOSURES: Owed[] = [
   { id: 'fictional-family', surface: 'gallery', level: 'enforced' },
   { id: 'fictional-family', surface: 'home', level: 'enforced', when: 'family' },
@@ -91,12 +91,6 @@ export const DISCLOSURES: Owed[] = [
   { id: 'stylised-art', surface: 'family', level: 'enforced' },
   { id: 'names-owners', surface: 'family', level: 'enforced' },
   { id: 'synthetic-voice', surface: 'family', level: 'enforced', when: 'voice' },
-  { id: 'beta-short', surface: 'family', level: 'enforced' },
-  { id: 'beta-short', surface: 'gallery', level: 'enforced' },
-  { id: 'beta-short', surface: 'home', level: 'enforced', when: 'names' },
-  { id: 'beta-short', surface: 'player', level: 'enforced' },
-  { id: 'beta-full', surface: 'gallery', level: 'enforced' },
-  { id: 'beta-full', surface: 'player', level: 'enforced' },
   { id: 'not-frontier', surface: 'player', level: 'enforced' },
   { id: 'launch-not-offer', surface: 'gallery', level: 'enforced' },
   { id: 'launch-not-offer', surface: 'home', level: 'enforced' },
@@ -176,10 +170,9 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
   const surfaceOf = (p: string): Surface | null => p === 'index.html' ? 'gallery' : p === '404.html' ? 'notfound' : p.startsWith('homes/') ? 'home' : p.startsWith('family/') ? 'family' : null;
   const pageFiles = ['index.html', '404.html', ...walkFiles(dir, 'homes').filter((f) => f.endsWith('.html')), ...walkFiles(dir, 'family').filter((f) => f.endsWith('.html'))].filter((f) => fs.existsSync(path.join(dir, f)));
   const missing = new Map<string, string[]>();          // "<id> on <surface>" -> pages without it
-  const owe = (s: Surface, p: string, text: string, ctx: { logos: boolean; names: boolean; voice: boolean; family: boolean }): void => {
+  const owe = (s: Surface, p: string, text: string, ctx: { logos: boolean; voice: boolean; family: boolean }): void => {
     for (const o of DISCLOSURES.filter((d) => d.surface === s)) {
       if (o.when === 'logos' && !ctx.logos) continue;
-      if (o.when === 'names' && !ctx.names) continue;
       if (o.when === 'voice' && !ctx.voice) continue;
       if (o.when === 'family' && !ctx.family) continue;
       const need = norm(disc(o.id));
@@ -205,13 +198,10 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
     const slug = path.basename(p, '.html');
     owe(surface, p, norm(r.text), {
       logos: /<img[^>]+src="[^"]*portal\/apps\//.test(html),
-      names: /\bCompanion (?:Memory|Agents)\b|\bHermes\b|\bOpenClaw\b/.test(r.text),
       voice: Object.keys(manifest?.byFamily?.[slug]?.audio || {}).length > 0,
       family: /class="family-block"|meet-family|family\//.test(html) && surface === 'home' && /Fictional family\. Real software\./.test(r.text),
     });
-    // (the short beta line stands apart from claims.json's beta-short: it is the one line every page of the story carries, see assets/story/types.ts)
-    // (the front page prints the full beta-short in its first screen, which DISCLOSURES holds it to; a family page keeps the OS-only line beside its strip)
-    if (surface === 'family' || surface === 'gallery') for (const line of surface === 'gallery' ? [FICTIONAL_LINE] : [FICTIONAL_LINE, BETA_LINE]) if (!r.text.includes(line)) res.errors.push(`${p}: the line is missing: "${line}"`);
+    if (surface === 'family' || surface === 'gallery') if (!r.text.includes(FICTIONAL_LINE)) res.errors.push(`${p}: the line is missing: "${FICTIONAL_LINE}"`);
   }
 
   // ---- the player's HTML: title, meta, <noscript>, the head script's strings (the loader and the failure card)
@@ -274,7 +264,7 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
     if (!fs.existsSync(file)) continue;
     for (const s of sourceStrings(file)) { res.counts.sourceStrings++; corpus.push(norm(s.text)); check(`${rel}:${s.line}`, s.text); }
   }
-  if (corpus.length) owe('player', 'assets/viewer.ts + assets/story', corpus.join(' '), { logos: false, names: true, voice: false, family: false });
+  if (corpus.length) owe('player', 'assets/viewer.ts + assets/story', corpus.join(' '), { logos: false, voice: false, family: false });
 
   // ---- the disclosures
   for (const [key, pages] of missing) {

@@ -230,7 +230,7 @@ export function drawDip(g: Ctx, f: CutFormat, amount: number) {
 // ---- the end card ---------------------------------------------------------------------------------------------------------------------------
 export type EndModel = { cta: string; url: string; fictional: string; lines: string[] };
 /**
- * The end card: the call to action as the headline, where to go, the fictional line on its own pill, and the plain disclosures (beta, scripted scenes, stylised art, and the rest
+ * The end card: the call to action as the headline, where to go, the fictional line on its own pill, and the plain disclosures (scripted scenes, stylised art, and the rest
  * the cut's beats require) at 36 design px. The headline and the address take the largest size that stays on one line. The panel sits between the corner mark and the bottom margin
  * (the corner mark is on every frame and must not be covered): if the disclosures at that size need more room than the frame has (a square), the panel goes tighter, never smaller in its
  * fine print: first its padding and spacing, then the disclosures run on as one paragraph, then the pill in the panel goes (the corner mark says it on the same frame).

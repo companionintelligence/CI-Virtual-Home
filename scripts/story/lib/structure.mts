@@ -1,6 +1,6 @@
 // Structure rules: casting agreement, members and companions, chapters and beat order, the FTUE chapter, agents and
 // approvals, `say` lines, the disclosure strings, voices. STORY-BIBLE sections 5, 7, 8 and 9.
-import { BETA_LINE, FIRST_PARTY, HERMES_NOTE, INTERNET_NOTE, OPENCLAW_WEB_NOTE, type Beat, type Member, type Story } from '../../../assets/story/types.ts';
+import { FIRST_PARTY, HERMES_NOTE, INTERNET_NOTE, OPENCLAW_WEB_NOTE, type Beat, type Member, type Story } from '../../../assets/story/types.ts';
 import type { Ctx } from './context.mts';
 import type { Report } from './report.mts';
 import { detailStrings, plain } from './text.mts';
@@ -127,7 +127,6 @@ export function checkFtue(story: Story, _ctx: Ctx, out: Report): void {
 
   const plug = fb('ftue-plug-in');
   if (plug && !plug.emphasis?.wake) out.E('ftue', 'ftue-plug-in', 'emphasis.wake must be true');
-  if (plug && plug.popup.note !== BETA_LINE) out.E('disclosure', 'ftue-plug-in', `note must be "${BETA_LINE}"`);
   const pick = fb('ftue-pick');
   if (pick && pick.popup.note !== INTERNET_NOTE) out.E('disclosure', 'ftue-pick', `note must be "${INTERNET_NOTE}"`);
   for (const id of ['ftue-join', 'ftue-pick']) { const b = fb(id); if (b && b.popup.kind !== 'phone') out.E('ftue', id, 'popup.kind must be phone'); }
@@ -184,7 +183,7 @@ export function checkAgents(story: Story, ctx: Ctx, out: Report, members: Map<st
   if (firstHermes && firstHermes.popup.note !== HERMES_NOTE) out.E('disclosure', firstHermes.id, `the first Hermes beat carries the note "${HERMES_NOTE}"`);
   out.stats.sayLines = sayCount;
 
-  // Companion Memory: the first mention anywhere in the file reads "Companion Memory (beta)" (claims.json disclosure beta-short)
+  // Companion Memory: a companion that has it connected is named somewhere in the file
   // (story v2: the house lede and spots, the profiles and the beat details are read in the order a visitor meets them)
   const f = story.family;
   const ordered: [string, string][] = [['family.tagline', plain(story.family.tagline)], ['family.story', plain(story.family.story)],
@@ -194,6 +193,5 @@ export function checkAgents(story: Story, ctx: Ctx, out: Report, members: Map<st
     ...(f.day || []).map((d, i): [string, string] => [`family.day${i}`, plain(d.line)]),
     ['closing', plain(story.closing.body)]];
   const firstMem = ordered.find(([, t]) => /Companion Memory/.test(t));
-  if (firstMem && !/Companion Memory \(beta\)/.test(firstMem[1])) out.E('disclosure', firstMem[0], 'the first mention of Companion Memory reads "Companion Memory (beta)"');
   if (story.members.some((m) => m.companion?.memory) && !firstMem) out.W('disclosure', 'memory', 'a companion has Companion Memory connected but no beat mentions it');
 }

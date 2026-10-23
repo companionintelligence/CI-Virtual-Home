@@ -59,13 +59,13 @@ test('the Brennan family has four cuts of 15 to 25 s, one a member, each ready t
 
 test('every cut carries the label and an end card of 3 to 4 s (a little over when it has to hold the last frame)', () => {
   for (const c of BRENNAN) {
-    assert.ok(c.disclosures.includes('fictional-family') && c.disclosures.includes('beta-short'), `${c.id}: label and beta line`);
+    assert.ok(c.disclosures.includes('fictional-family'), `${c.id}: the label`);
     const end = endModelOf(c, claims);
     assert.equal(end.fictional, 'Fictional family. Real software.');
     assert.equal(badgeOf(claims), 'Fictional family. Real software.');
     assert.equal(end.cta, 'See Companion Core');
     assert.equal(end.url, 'ci.computer/core');
-    assert.ok(end.lines.some(l => l === claims.disclosures.find((d: any) => d.id === 'beta-short').text), `${c.id}: the beta line is printed`);
+    assert.ok(end.lines.some(l => l === claims.disclosures.find((d: any) => d.id === 'scripted-scenes').text), `${c.id}: the scripted-scenes line is printed`);
     const len = c.end.t1 - c.end.t0;
     assert.ok(len >= CUT.endS - 1e-9 && len <= CUT.endMaxS + 0.1, `${c.id}: the end card is ${len.toFixed(2)} s`);
     assert.ok(c.hook.text.length > 0 && c.parts.length >= 1);
@@ -422,7 +422,7 @@ test('the manifest: well formed, one entry per cut, a hash that moves with the w
   const edited = clone(sally); edited.parts[0].text += ' x'; assert.notEqual(cutHash(edited, fam, claims), h0);
   const moved = clone(sally); moved.parts[0].tour!.from += 0.5; assert.notEqual(cutHash(moved, fam, claims), h0);
   const re = clone(fam); re.bake!.timeline.trackSha = 'f'.repeat(64); assert.notEqual(cutHash(sally, re, claims), h0);
-  const cl = clone(claims); cl.disclosures.find((d: any) => d.id === 'beta-short').text += ' '; assert.notEqual(cutHash(sally, fam, cl), h0);
+  const cl = clone(claims); cl.disclosures.find((d: any) => d.id === 'scripted-scenes').text += ' '; assert.notEqual(cutHash(sally, fam, cl), h0);
   assert.equal(manifestDrift(m, m).length, 0);
   assert.ok(manifestDrift(null, m).length === 1);
   const m2: Manifest = clone(m); m2.families.brennan.cuts[0].hash = '0'.repeat(64); assert.deepEqual(manifestDrift(m2, m), ['brennan-sally: changed']);

@@ -28,7 +28,6 @@
     "avoid": "Do not use in a story."
    },
    "caveatKinds": {
-    "beta": "Disclosed as beta on the sheet.",
     "hardware": "Needs hardware that is not in the box.",
     "cloud-link": "Part of the app talks to an outside service.",
     "public-access": "Needs outside reach into the Core (remote access, which the sheet leaves unfinished).",
@@ -60,7 +59,7 @@
      "A knowledge graph over raw data, persons, places, things, content, events and spaces, with multi-hop reasoning and temporal updates.",
      "Imports from 84 services (Apple, Google, Microsoft, streaming, social, fitness, financial); each opt-in and revocable; nothing connected by default.",
      "Works with Hermes, OpenClaw, Claude and other agents over MCP. Companion Camera and Saved Searches. \"100% local, no cloud calls\".",
-     "BETA. Included with the Hub Pro year that comes with every Core. Functionality freezes, nothing is deleted, if the subscription lapses."
+     "Included with the Hub Pro year that comes with every Core. Functionality freezes, nothing is deleted, if the subscription lapses."
     ],
     "catalog": [
      "Fully self-hosted AI memory appliance: local gateway, API, PostgreSQL with pgvector, object storage, orchestration, summarisation and HBPE services (manifest).",
@@ -69,13 +68,13 @@
      "Docs: typed tools and intents for search, knowledge, people, places, calendar and media. Standalone Import Tools app retired 2026-08-17; import is inside Memory."
     ],
     "watch": [
-     "Never call it shipped, finished or v1: it is beta.",
+     "Never call it shipped, finished or v1.",
      "Do not cite the Agentic Memory-System Benchmark score; the sheet says its numbers were not captured."
     ]
    },
    "ci-hermes": {
     "sheet": [
-     "Hermes, \"messaging AI\"; first-party on the Hub. Companion Agents are BETA. Agents operate on local memory by default and work only on your behalf."
+     "Hermes, \"messaging AI\"; first-party on the Hub. Agents operate on local memory by default and work only on your behalf."
     ],
     "catalog": [
      "Nous Research Hermes Agent packaged for the Hub with a web terminal and dashboard.",
@@ -91,7 +90,7 @@
    },
    "ci-openclaw": {
     "sheet": [
-     "OpenClaw, \"browser automation\"; first-party on the Hub. BETA. Sandboxed agents with permission controls."
+     "OpenClaw, \"browser automation\"; first-party on the Hub. Sandboxed agents with permission controls."
     ],
     "catalog": [
      "Store row name \"OpenClaw WebCLI\". Self-hosted personal AI assistant with browser automation and tool use (manifest).",
@@ -390,10 +389,6 @@
    "storySafe": "yes",
    "caveats": [
     {
-     "kind": "beta",
-     "text": "Companion Memory is in beta. Its functions will change and grow. Say so."
-    },
-    {
      "kind": "note",
      "text": "Imports from 84 services are opt-in and revocable; nothing is connected by default. Import now lives inside Companion Memory; the standalone Import Tools app was retired 2026-08-17."
     },
@@ -452,10 +447,6 @@
    },
    "storySafe": "yes",
    "caveats": [
-    {
-     "kind": "beta",
-     "text": "Companion Agents are in beta."
-    },
     {
      "kind": "cloud-link",
      "text": "Messages travel through the chat platform you choose (the manifest names Slack, Discord, email and SMS). The agent runs locally; the channel does not."
@@ -522,10 +513,6 @@
    },
    "storySafe": "yes",
    "caveats": [
-    {
-     "kind": "beta",
-     "text": "Companion Agents are in beta."
-    },
     {
      "kind": "public-access",
      "text": "Using the phone apps away from home needs Hub Private VPN or Web exposure (docs). The sheet says anywhere access is not finalised; keep stories on the home network."

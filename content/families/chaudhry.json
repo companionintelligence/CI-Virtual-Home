@@ -168,8 +168,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "Noor plugs the cable in, and Imran presses the button. The Core wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Noor plugs the cable in, and Imran presses the button. The Core wakes and opens its own Wi-Fi network."
       }
     },
     {
@@ -217,13 +216,13 @@
       "popup": {
         "kind": "phone",
         "title": "Pick the first agents and apps",
-        "body": "In the Companion Hub store, Noor picks OpenClaw and Gitea, and Imran adds KitchenOwl. The agents are Sparrowhawk and Pebble. Imran connects Companion Memory (beta) to Pebble.",
+        "body": "In the Companion Hub store, Noor picks OpenClaw and Gitea, and Imran adds KitchenOwl. The agents are Sparrowhawk and Pebble. Imran connects Companion Memory to Pebble.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agent: OpenClaw",
-            "Companion Memory (beta)",
+            "Companion Memory",
             "Apps: Gitea, KitchenOwl"
           ]
         }
@@ -251,8 +250,7 @@
       },
       "popup": {
         "title": "Sparrowhawk says hello",
-        "body": "Noor greets the agent she named Sparrowhawk, and it answers from the Core on her desk.",
-        "note": "Companion Agents are in beta."
+        "body": "Noor greets the agent she named Sparrowhawk, and it answers from the Core on her desk."
       },
       "say": {
         "speaker": "noor",
@@ -422,8 +420,7 @@
         "chips": [
           "Gitea",
           "replaces GitHub"
-        ],
-        "note": "Companion Agents are in beta."
+        ]
       }
     },
     {
@@ -811,7 +808,7 @@
     "The house has a tv-stand and a sofa in the Living Room, a breakfast bar (kitchen-island role), a crib and blocks in the Nursery, a telescope on the Lake Deck. The deck has no rail. No fireplace is told.",
     "Both agents run OpenClaw (casting signature ci-openclaw). kitchen-pebble opens a grocer's website, so it carries the OpenClaw website note; Imran checks the basket and places the order himself.",
     "garden-camera assumes the family owns an IP camera: it is not in the Core box and not in the 3D scene. Frigate faces the water, not people.",
-    "Pebble has Companion Memory connected, by Imran's choice; the first mention is ftue-pick (not a film beat) and reads Companion Memory (beta). Sparrowhawk has no memory.",
+    "Pebble has Companion Memory connected, by Imran's choice; the first mention is ftue-pick (not a film beat). Sparrowhawk has no memory.",
     "Zara is a baby: the one beat labelled hers (nursery-album) is told through Imran, because the validator wants a beat for every member under thirteen. Nap time is told in daylight, nobody is shown asleep.",
     "Chapter order follows the walk: the study, the deck beside it, then the living room and kitchen, up the stair to the nursery."
   ]

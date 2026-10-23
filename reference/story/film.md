@@ -70,8 +70,7 @@ bottom margin too (the portrait panel used to take a third of the band); a layou
 **Accessibility.** The words are always on screen (burned captions), and also written as WebVTT from the same cues. Contrast: text `#e8f2f4` on 88% ink glass is over 10:1 at its worst; the muted note
 `#a3babf` over 6:1; the not-yet-spoken caption word `#9db4ba` over 5:1; the spoken word on the sage highlight is ink on `#c5e8dc`, 13:1. Nothing flashes: the dips are 0.35 s fades.
 
-**Honesty.** Disclosures are printed from `content/story/claims.json`, never typed in a family file: the fictional line on the title card, the corner mark and the end card; beta
-(*Companion OS, Companion Memory and Companion Agents are in beta.*); scripted scenes; the Core drawn as a stylised illustration; the synthetic, locally generated voice; and, only when a film beat names an
+**Honesty.** Disclosures are printed from `content/story/claims.json`, never typed in a family file: the fictional line on the title card, the corner mark and the end card; scripted scenes; the Core drawn as a stylised illustration; the synthetic, locally generated voice; and, only when a film beat names an
 agent, *Hermes is from Nous Research. OpenClaw is from the OpenClaw Foundation. Companion Hub packages both.* No price, no ship date, no performance number, no customer quote.
 
 ## Silent mode

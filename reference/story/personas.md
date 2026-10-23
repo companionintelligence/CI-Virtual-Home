@@ -87,12 +87,12 @@ heritage, and never tied to the architecture.
    sit in Nextcloud on the Core, not in a rented drive." Never "private", "secure" or "safe" on their own.
 4. **Persona activity is told, not faked.** No app screenshots, no UI mockups on any screen in the scene, no invented app
    interface. The story lives in the popup, the chips and the camera; props and rooms carry the rest. (Real, labelled screenshots live on the
-   pages beside the story, never in a scene: see Ads below.)
+   pages beside the story and, as labelled inserts, in the cuts and the films; never in a scene or the tour: see Ads below.)
 5. **One household, one Core.** Per-app logins exist only where the app has them. Never a "separate account" per person
    on the platform (`cap-multi-user`).
 6. **Agents prepare, people approve.** An agent beat has `agent` and `approval`; at most six `say` lines a family.
    Children never speak. An agent is private only on the Core's local model: never mention a cloud key.
-7. **The ordinary honest caveats ride along:** Companion OS is in beta, installing apps uses the internet, Steam needs a
+7. **The ordinary honest caveats ride along:** installing apps uses the internet, Steam needs a
    Valve account, remote access is not claimed, messages pass through the chat service the family picks.
 
 ### Archetype specifics
@@ -130,7 +130,7 @@ heritage, and never tied to the architecture.
   `driveway` and `laundry`. No crew on site, no quote from the van (remote access is not claimed), never "tax ready",
   no payments or dispatch.
 - **marketer.** The client's list, files and briefs sit in the house and the model that drafts from them runs on the Core:
-  Open WebUI, Companion Memory (beta), Ghost, Penpot, Twenty. She edits and approves; never better copy, saved time or money.
+  Open WebUI, Companion Memory, Ghost, Penpot, Twenty. She edits and approves; never better copy, saved time or money.
   It cannot move the platforms, sending reputation or live co-editing with a client; Ghost holds the list and sending
   needs an outside mailer.
 - **lawyer.** The client file, the engagement letter and a first-pass summary she checks line by line: Paperless-ngx,
@@ -170,13 +170,15 @@ campaign):
 - No UI mockups, no screen recordings, no render that could pass for a photograph, no invented person presented as a
   customer. Characters are named, drawn and labelled as characters.
 - Daylight and warm light only. No neon, no glow, no RGB. Day or golden hour, never night bloom.
-- A software claim carries the beta line. App count, if printed: "300+ apps and agents available in the Companion Hub
+- App count, if printed: "300+ apps and agents available in the Companion Hub
   store." Never a price.
-- Third-party software is always named in text. Its real logo may identify it beside that name on the lander and the family pages and inside a
-  chip of an ad cut, never alone and never as decoration. A real, unedited screenshot of an app, of Companion Hub or of the Companion account page
-  may sit on the lander and the family pages with its label ("Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this
-  family."): the files, alt text, captions and the reasons for every refusal are `content/story/app-media.json` (`pnpm run story:media`,
-  [story-v2.md](story-v2.md) "App media"). No screenshot is ever composited into a scene, the tour or a cut (a screenshot inset in a cut is off
-  unless the owner says so: `--screenshots`). The homes are the product's own pieces: no builder credit and no mention of any game or gallery they
+- Third-party software is always named in text. Its real logo may identify it beside that name on the family pages and on the chip that names it in an
+  ad cut or a film, never alone and never as decoration. A real, unedited screenshot of an app, of Companion Hub or of the Companion account page
+  may sit on the family pages with its label ("Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family."; a first-party
+  app's screen from the product's own documentation: "Real screenshot of <Name> with sample data. Not a recording of this family."): the files, alt
+  text, captions and the reasons for every refusal are `content/story/app-media.json` (`pnpm run story:media`, [story-v2.md](story-v2.md) "App
+  media"). **Owner's ruling, 2026-10-22:** logos and labelled screenshots are wanted on family pages, in ad cuts and in films as inserts (a screenshot
+  inset or a proof beat carries its whole caption; a logo never stands alone); never inside the 3D tour or a scene, and the lander stays text only. The
+  cut and film renderers do not draw them yet (a later track). The homes are the product's own pieces: no builder credit and no mention of any game or gallery they
   came from appears on the lander, in a story or in an ad. The home is named by its display name only.
 - CTAs are awareness: See Companion Core (`https://ci.computer/core`). Not "Buy".
