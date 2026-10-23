@@ -70,7 +70,7 @@ export const PORTAL_CAPTION_HEAD = 'Real screenshot of the Companion account pag
 /** The three first-party apps every family may meet. */
 export const FIRST_PARTY = ['ci-hermes', 'ci-memory', 'ci-openclaw'];
 
-/** Every app id the 30 families use (`beat.app.id` and `beat.with`), the persona pools, the plan's signature apps and the first-party trio: the apps that should have media. */
+/** Every app id the families use (`beat.app.id` and `beat.with`), the persona pools, the plan's signature apps and the first-party trio: the apps that should have media. */
 export function usedAppIds(root: string = ROOT): string[] {
   const ids = new Set<string>(FIRST_PARTY);
   const dir = path.join(root, 'content', 'families');

@@ -132,7 +132,15 @@ export function cardOf(s: Story, ctx: { catalog: Loaded['catalog']; order: strin
 /** What the og manifest records per image: the text drawn on it and the picture under it (scripts/story/build-og.mts). */
 export const ogKey = (text: { kicker: string; title: string; line1: string; line2: string }, base: Uint8Array): string =>
   hash10(JSON.stringify(text) + sha256(base));
-export function ogText(kind: 'family' | 'home', s?: Story): { kicker: string; title: string; line1: string; line2: string } {
-  if (kind === 'home' || !s) return { kicker: 'COMPANION CORE · FICTIONAL FAMILIES', title: 'Uncloud your life with Companion Core', line1: 'Thirty fictional families.', line2: 'Walk through their homes in 3D and see what stays at home.' };
+export type OgText = { kicker: string; title: string; line1: string; line2: string };
+/**
+ * The text of a link-preview picture. The landing's says how many families there are, and a count is a word the build writes from the data, never one typed
+ * here (it was "Thirty" until the six apartments were cast): the caller passes the count in words, capitalised ("Thirty"; scripts/portal-pages.mts numberWord).
+ */
+export function ogText(kind: 'home', familiesInWords: string): OgText;
+export function ogText(kind: 'family', s: Story): OgText;
+export function ogText(kind: 'family' | 'home', arg: Story | string): OgText {
+  if (kind === 'home') return { kicker: 'COMPANION CORE · FICTIONAL FAMILIES', title: 'Uncloud your life with Companion Core', line1: `${arg as string} fictional families.`, line2: 'Walk through their homes in 3D and see what stays at home.' };
+  const s = arg as Story;
   return { kicker: 'COMPANION CORE · FICTIONAL FAMILY', title: familyTitle(s), line1: addressLine(s), line2: s.family.tagline };
 }

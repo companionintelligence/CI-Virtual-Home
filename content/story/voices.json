@@ -19,12 +19,12 @@
   "voices": {
     "v-warm-f":        { "kokoro": "bf_emma",     "sex": "f", "f0Hz": 178, "grade": "B-", "speed": 0.94, "accent": "en-GB", "status": "ready",   "narratorFor": 6, "agentFits": ["warm", "gentle", "calm", "patient"] },
     "v-clear-f":       { "kokoro": "bf_isabella", "sex": "f", "f0Hz": 190, "grade": "C",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 6, "agentFits": ["precise", "brisk", "organised", "clear"] },
-    "v-bright-f":      { "kokoro": "bf_lily",     "sex": "f", "f0Hz": 181, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 2, "agentFits": ["cheerful", "playful", "curious"] },
-    "v-young-f":       { "kokoro": "bf_alice",    "sex": "f", "f0Hz": 207, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 2, "agentFits": ["quick", "wry", "bright"] },
-    "v-steady-m":      { "kokoro": "bm_george",   "sex": "m", "f0Hz": 140, "grade": "C",  "speed": 0.94, "accent": "en-GB", "status": "ready",   "narratorFor": 5, "agentFits": ["steady", "patient", "practical"] },
-    "v-storyteller-m": { "kokoro": "bm_fable",    "sex": "m", "f0Hz": 124, "grade": "C",  "speed": 0.93, "accent": "en-GB", "status": "ready",   "narratorFor": 4, "agentFits": ["gentle", "old-fashioned", "thoughtful"] },
-    "v-deep-m":        { "kokoro": "bm_lewis",    "sex": "m", "f0Hz": 92,  "grade": "D+", "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 3, "agentFits": ["dry", "calm", "wry"] },
-    "v-light-m":       { "kokoro": "bm_daniel",   "sex": "m", "f0Hz": 125, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 2, "agentFits": ["curious", "gentle", "bright"] }
+    "v-bright-f":      { "kokoro": "bf_lily",     "sex": "f", "f0Hz": 181, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 3, "agentFits": ["cheerful", "playful", "curious"] },
+    "v-young-f":       { "kokoro": "bf_alice",    "sex": "f", "f0Hz": 207, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 3, "agentFits": ["quick", "wry", "bright"] },
+    "v-steady-m":      { "kokoro": "bm_george",   "sex": "m", "f0Hz": 140, "grade": "C",  "speed": 0.94, "accent": "en-GB", "status": "ready",   "narratorFor": 6, "agentFits": ["steady", "patient", "practical"] },
+    "v-storyteller-m": { "kokoro": "bm_fable",    "sex": "m", "f0Hz": 124, "grade": "C",  "speed": 0.93, "accent": "en-GB", "status": "ready",   "narratorFor": 5, "agentFits": ["gentle", "old-fashioned", "thoughtful"] },
+    "v-deep-m":        { "kokoro": "bm_lewis",    "sex": "m", "f0Hz": 92,  "grade": "D+", "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 4, "agentFits": ["dry", "calm", "wry"] },
+    "v-light-m":       { "kokoro": "bm_daniel",   "sex": "m", "f0Hz": 125, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 3, "agentFits": ["curious", "gentle", "bright"] }
   },
   "pending": {
     "$comment": "Needs the owner to approve a download of small .pt voice files (about 0.5 MB each) from huggingface.co/hexgrad/Kokoro-82M/voices. Not usable until approved. With them the fleet gains American accents and better-graded voices; the mapping then moves by editing `kokoro` above.",

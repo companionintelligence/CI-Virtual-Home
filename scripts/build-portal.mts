@@ -275,13 +275,13 @@ for (const h of houses) {
 }
 {
   // The homes with no current family keep a plain card (it opens the player) and a page of their own. Some are declared so by the cast plan (the
-  // apartments: no family has moved in); that is the plan's say and never a failure. A home that is neither current nor declared is a family that
-  // went stale (listed under "story:" above) or a home the plan does not know (cast-lint's error); --strict-families makes either an error.
+  // apartments until 2026-10-22, an office would be: no family has moved in); that is the plan's say and never a failure. A home that is neither current nor declared is a family that
+  // went stale or whose casting family has no file yet (both listed under "story:" above) or a home the plan does not know (cast-lint's error); --strict-families makes either an error.
   const none = houses.filter(h => !front.some(f => f.house === h.id));
   const declared = homesWithoutFamily(ROOT), planned = none.filter(h => h.id in declared), other = none.filter(h => !(h.id in declared));
   console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on the front page, ${none.length} home${none.length === 1 ? '' : 's'} with none`);
   if (planned.length) console.log(`front: ${planned.length} of them ${planned.length === 1 ? 'has' : 'have'} no family yet by the cast plan (content/story/cast-plan.json homesWithoutFamily), a plain card and a page of ${planned.length === 1 ? 'its' : 'their'} own, no tour: ${planned.map(h => h.id).join(', ')}`);
-  if (other.length) console.log(`front: ${other.length} ${other.length === 1 ? 'has' : 'have'} no current family and ${other.length === 1 ? 'is' : 'are'} not declared without one (a stale family: see story: above; or pnpm run story:cast-lint): ${other.map(h => h.id).join(', ')}`);
+  if (other.length) console.log(`front: ${other.length} ${other.length === 1 ? 'has' : 'have'} no current family and ${other.length === 1 ? 'is' : 'are'} not declared without one (a stale family or a casting family with no file yet: see story: above; or pnpm run story:cast-lint): ${other.map(h => h.id).join(', ')}`);
   if (story.strict) for (const h of other) problems.push(`front: ${h.id} has no current family and is not in the cast plan's homesWithoutFamily (--strict-families wants the whole cast there)`);
 }
 // ---- end front page ----

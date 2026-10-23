@@ -16,7 +16,7 @@ and what was measured. Everything below was tried in the engine; "measured" mean
 | `walkup-duplex` | Walk-up Duplex | two levels in a dark-brick deck-access block | 110 (both levels) | 4 |
 
 All six are built, baked, in the gallery (`Apartment` tag) and recorded (plans, isometrics, CAD sheets, planner tracks, thumbnails and
-link previews). None has a family yet (`homesWithoutFamily` in `content/story/cast-plan.json`); none has a golden baseline yet
+link previews). Each has a family in the cast plan (`content/story/cast-plan.json`, cast on 2026-10-22: valdivia in studio-loft, tehrani in city-one-bed, steyn in two-bed-flat, voss in corner-penthouse, penhallow in garden-flat, rademaker in walkup-duplex) and no story yet; none has a golden baseline yet
 (section 8). `studio-loft` is the exemplar: build the next one the way it is built.
 
 ---
@@ -410,7 +410,7 @@ there. Both ran clean on the loft (the only notices are catalog footprints missi
 - [ ] Stills: every room from two corners, the exterior, the orbit, the film strip: nothing floating, no blocked door, no empty
       room, no wall through a window, the Core visible in the last frame, no room too dark, reads as an apartment.
 - [ ] `test-floorplan-graph` and `test-spec-types` pass; `test-dress-phase` K's lamp-less census for the apartments (31 today) moves by what you add.
-- [ ] The derived files are the integration's (section 7): `<id>.plan.json`, `index.json`, `scenes/`, thumbs, the cast plan's `homesWithoutFamily`,
+- [ ] The derived files are the integration's (section 7): `<id>.plan.json`, `index.json`, `scenes/`, thumbs, the cast plan (a family, or a line in `homesWithoutFamily`),
       the planner track, the compose baseline, the goldens (macOS).
 
 ---
@@ -509,7 +509,7 @@ needed except for the CAD sheets' PNGs.
 | the composer's baseline | `node --experimental-strip-types scripts/compose-baseline.mts --write` | `test/fixtures/hashes/compose-baseline.json`; the 30 houses' hashes must not move, only the fleet totals and the new rows |
 | the names | `assets/home-names.ts` | the home's public name, pinned; **not a name any family's words contain** (`check-leaks.mts`) |
 | the picture | `pnpm run portal:thumbs -- --house <id> --no-hero [--gl default]` | `portal/thumbs/<id>.webp`, `portal/previews/<id>.jpg`; a tall block needs a line in `FRAME` (`scripts/build-thumbs.mts`) |
-| the story's side | `content/story/cast-plan.json` `homesWithoutFamily` (or a family), then `pnpm run story:cast` | `reference/story/cast.md`; `casting.json` stays the families' |
+| the story's side | `content/story/cast-plan.json` (a family, or a `homesWithoutFamily` line), then `pnpm run story:cast` | `reference/story/cast.md`; `casting.json` stays the families' |
 | the goldens | `pnpm run goldens:update --house <id>` **on the Mac** (`macos-metal`), then look at the frames | `test/goldens/macos-metal/<id>/` (five frames) |
 
 Fleet constants that count homes, and what changed for the six: `test-portal-redact` (the list is read from the specs, no number),

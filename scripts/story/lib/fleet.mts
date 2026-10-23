@@ -1,9 +1,9 @@
-// Fleet metrics: rules that only mean something across all 30 families (STORY-BIBLE section 5, "Fleet diversity").
+// Fleet metrics: rules that only mean something across all the families (STORY-BIBLE section 5, "Fleet diversity"): the cast, 36 with the six apartments.
 //
 // Two kinds of metric, because the writers deliver families one at a time:
 //   uniqueness metrics (surname, town, companion names, beat titles, beat bodies, first names) are true or false for any
 //   subset, so they always gate: a clash between two families fails the moment the second one lands.
-//   count metrics (30 slugs, topics, distinct apps, shares, narrator counts) are only meaningful for the complete set,
+//   count metrics (every casting slug, topics, distinct apps, shares, narrator counts) are only meaningful for the complete set,
 //   so they gate under `--complete` and are reported as "partial" otherwise.
 import { ARCHETYPES, CATEGORIES, FIRST_PARTY, type Story } from '../../../assets/story/types.ts';
 import type { Ctx } from './context.mts';
@@ -16,7 +16,7 @@ export type MetricStatus = 'pass' | 'fail' | 'partial';
 export interface FleetMetric { rule: string; label: string; value: string; target: string; status: MetricStatus; detail?: string[] }
 export interface FleetResult { families: number; complete: boolean; metrics: FleetMetric[]; findings: Finding[] }
 
-export const FLEET = { families: 30, topicMin: 10, appsMin: 70, appShareMax: 0.4, richMin: 3, smallBusinessShare: 0.18, firstNameMax: 2, archetypeMin: 6, gamerMax: 12 } as const;
+export const FLEET = { topicMin: 10, appsMin: 70, appShareMax: 0.4, richMin: 3, smallBusinessShare: 0.18, firstNameMax: 2, archetypeMin: 6, gamerMax: 12 } as const;
 /**
  * Story v3 fleet constants (reference/story/story-v3.md, "Fleet"). They gate only once EVERY family is a v3 family (isV3Story), so the fleet is never
  * held to more than it is today while the thirty families are being rewritten; until then the metrics are reported, not gated.
@@ -26,7 +26,9 @@ export const FLEET = { families: 30, topicMin: 10, appsMin: 70, appShareMax: 0.4
  *   kiwixMax      families that name Kiwix (Kiwix is marked avoid since the 2026-10-19 decisions, so this is 0 in a v3 fleet; the cap is the old plan's)
  *   rareHomes     an app in at most this many homes is rare; rareShare is reported (info), never gated
  *   v3Required    fleet-v3: every family is a v3 family. Off until the last home is rewritten; the last PR sets it
- * The app cap stays appShareMax of the families present (appCap): 12 of 30 now, 14 of 36 once the six apartments are folded in. Nothing hard-codes it.
+ * The app cap stays appShareMax of the families present (appCap): 12 of the 30 families written so far, 14 of 36 once the six apartments (cast since
+ * 2026-10-22, stories to come) have theirs. Nothing hard-codes it, and there is no `families` constant: the size of the fleet is the casting's
+ * (content/story/casting.json, from cast-plan.json) and cast-lint.mts derives the same cap from the plan.
  */
 export const FLEET_V3 = { appsMin: 100, pairShareMin: 0.8, servicesMin: 70, servicesPerHomeMin: 14, kiwixMax: 6, rareHomes: 8, rareShare: 0.4, v3Required: false } as const;
 /** The most families (of the n present) a third-party app may be in: 40 percent, rounded down. */
@@ -35,8 +37,9 @@ export const appCap = (n: number): number => Math.floor(FLEET.appShareMax * n + 
  * The archetypes the fleet must show in at least FLEET.archetypeMin families. Story v3 has fourteen archetypes (ARCHETYPES: the original six, then
  * tech-family, business-owner, creative, contractor, marketer, lawyer, journalist and educator), and the gate stays on these four: after the 30 homes are
  * recast (persona-bible.md 5.1) organiser is in 16 families, builder 16, gamer 9 and learner 21, each above the gate of six. The other ten are reported
- * in `fleet-archetypes` and never gated. FLEET.families (30) and the app cap (appShareMax, 40 percent: 12 of 30, 14 of 36 once the six apartments are
- * folded in) are restated for the 30 homes; the apartments change the numbers, not the rule.
+ * in `fleet-archetypes` and never gated. The app cap (appShareMax, 40 percent: 12 of 30, 14 of 36 with the six apartments) is a share of the families
+ * present, not a number; the apartments change the numbers, not the rule. With their six families cast (organiser 24, builder 23, gamer 9, learner 21)
+ * the four gated archetypes stay above the gate of six.
  */
 const CORE_ARCHETYPES = ['organiser', 'builder', 'gamer', 'learner'] as const;
 const TOPICS = CATEGORIES.filter((c) => c !== 'setup');

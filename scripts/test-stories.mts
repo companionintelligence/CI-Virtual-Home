@@ -292,11 +292,14 @@ test('claims.json: every sanctioned allowedClaims text passes the ban list (hold
 // ---------------------------------------------------------------------------------------------------------------------
 // casting.json and the houses
 // ---------------------------------------------------------------------------------------------------------------------
-test('casting.json: 30 unique slugs, no creator name in a slug, narrators add up, every house has a spec and a plan', () => {
+test('casting.json: one family per home the plan does not declare without one, unique slugs, no creator name in a slug, narrators add up, every house has a spec and a plan', () => {
   const fams = ctx.casting.families;
-  assert.equal(fams.length, 30);
-  assert.equal(new Set(fams.map((f) => f.slug)).size, 30);
-  assert.equal(new Set(fams.map((f) => f.house)).size, 30);
+  // the size of the fleet is the plan's (30 houses, 36 with the six apartments), never a number typed here: homes minus the homes declared without a family
+  const homes = J('content', 'houses', 'index.json').houses.length, declared = Object.keys(J('content', 'story', 'cast-plan.json').homesWithoutFamily ?? {}).length;
+  assert.equal(fams.length, homes - declared);
+  assert.ok(fams.length >= 30, 'the 30 houses have had a family since the first cast');
+  assert.equal(new Set(fams.map((f) => f.slug)).size, fams.length);
+  assert.equal(new Set(fams.map((f) => f.house)).size, fams.length);
   const authors = new Set<string>();
   for (const f of fams) {
     const spec = J('content', 'houses', `${f.house}.json`);
@@ -322,7 +325,7 @@ test('every home has a family or is declared without one: the plan\'s homesWitho
   assert.deepEqual(homes.filter((id) => !cast.has(id)).sort(), without, 'a home with no family is in the plan\'s homesWithoutFamily, and only such a home (story:cast-lint says which)');
   for (const id of without) assert.ok(homes.includes(id), `${id} is declared without a family but is not a home`);
   assert.ok(homes.length >= cast.size, 'the story fleet is never larger than the gallery');
-  // casting.json stays the 30 families: the apartments are not in it until a family moves in
+  // casting.json casts every home that is not declared (the six apartments were declared until 2026-10-22; an office would be until its family moves in)
   assert.equal(without.length, homes.length - cast.size);
 });
 
@@ -966,7 +969,7 @@ test('cli: the exemplar exits 0 with 0 errors and 0 review in --json (warnings o
   assert.ok(JSON.parse(bad.stdout).families[0].errors.some((e: any) => e.rule === 'ftue-claims' && e.fix));
 });
 
-test('cli: no family files is a pass with a note; --complete then fails on the missing thirty; unknown flags and missing files are refused', () => {
+test('cli: no family files is a pass with a note; --complete then fails on the missing families; unknown flags and missing files are refused', () => {
   const dir = path.join(ROOT, 'content', 'families');
   const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^[a-z0-9][a-z0-9-]*\.json$/.test(f) && f !== 'films.json') : [];
   if (!files.length) {
@@ -979,4 +982,31 @@ test('cli: no family files is a pass with a note; --complete then fails on the m
   assert.equal(cli('--nonsense').status, 2);
   const missing = cli('no-such-family');
   assert.equal(missing.status, 1); assert.match(missing.stdout, /no such family file/);
+});
+
+test('cli: a casting family without a file is a note, an error under --strict-families (or CI_STORY_STRICT=1), and naming a family says nothing of the others', () => {
+  const dir = path.join(ROOT, 'content', 'families');
+  const have = new Set(fs.readdirSync(dir).filter((f) => /^[a-z0-9][a-z0-9-]*\.json$/.test(f) && f !== 'films.json').map((f) => f.replace(/\.json$/, '')));
+  const missing = ctx.casting.families.map((f) => f.slug).filter((s) => !have.has(s));   // none once every family is written: the assertions then take the other branch
+  const run = (...args: string[]) => cli('--json', ...args);
+  const soft = run(), j = JSON.parse(soft.stdout);
+  assert.deepEqual(j.casting, { families: ctx.casting.families.length, withoutFile: missing, strict: false });
+  assert.equal(soft.status, 0, 'a family the plan has not had written yet is a note, never a failure of a whole-set run');
+  assert.ok(!j.problems.some((p: string) => /casting family without a file/.test(p)));
+  const text = cli();
+  assert.equal(text.status, 0);
+  assert.equal(/^note +casting family without a file: /m.test(text.stdout), missing.length > 0);
+  for (const s of missing) assert.ok(text.stdout.includes(s), `${s} is named in the note`);
+  // strict: one error for each, by the flag and by the environment
+  const viaEnv = spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'validate-stories.mts'), '--json'], { encoding: 'utf8', cwd: ROOT, env: { ...process.env, CI_STORY_STRICT: '1' } });
+  for (const strict of [run('--strict-families'), viaEnv]) {
+    const k = JSON.parse(strict.stdout);
+    assert.equal(k.casting.strict, true);
+    assert.deepEqual(k.problems.filter((p: string) => /^casting family without a file: /.test(p)).map((p: string) => p.split(' ')[5]), missing);
+    assert.equal(strict.status, missing.length ? 1 : 0);
+  }
+  // one family named: the others are not its business
+  const one = JSON.parse(run('--strict-families', [...have].sort()[0]).stdout);
+  assert.deepEqual(one.casting.withoutFile, []);
+  assert.equal(one.ok, true);
 });

@@ -1,5 +1,5 @@
 #!/usr/bin/env -S node --experimental-strip-types
-// Real logos and real screenshots of the apps the 30 families use, of Companion Hub and of the Companion account page (the Portal),
+// Real logos and real screenshots of the apps the families use, of Companion Hub and of the Companion account page (the Portal),
 // built into small content-hashed WebP files and the manifest the page generators read (reference/story/story-v2.md "App media").
 //
 //   pnpm run story:media [--out <dir>] [--apps a,b] [--no-ci] [--check] [--update-sources] [--fetch] [--verbose]
