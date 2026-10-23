@@ -5,8 +5,7 @@ and where its write-ups are. Twenty-six archetypes in eight categories; each arc
 app pools, the rules a beat must follow) is [personas.md](../personas.md); the research book for the first fourteen is
 [persona-bible.md](../persona-bible.md).
 
-Nobody here is a customer. Ages, households, names and lines are design choices for fictional characters. Companion OS, Companion Memory and
-Companion Agents are in beta. The regulated domains (a carer's post, a researcher's sources, a club's member list, a lawyer's client file)
+Nobody here is a customer. Ages, households, names and lines are design choices for fictional characters. The regulated domains (a carer's post, a researcher's sources, a club's member list, a lawyer's client file)
 are told as record keeping only: what the app does and where the files live, with no advice and no compliance, certification, safety or
 security claim. Nobody under 16 uses a chat model or an agent. A household has one Core: no persona has a separate account, a private space
 or a multi-user promise, and none has a remote-access promise.

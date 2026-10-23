@@ -210,7 +210,7 @@ export function manifestProblems(m: Manifest): string[] {
       if (!(c.durationS >= CUT.minS - 1e-9 && c.durationS <= CUT.maxS + 1e-9) && c.status !== 'short') at(`${c.durationS} s is not within ${CUT.minS} to ${CUT.maxS}`);
       if (!c.hook || !c.hook.text) at('no hook');
       if (!c.beats.length || c.beats.length !== c.captions.length) at('beats and captions do not match');
-      if (!c.disclosures.includes('fictional-family') || !c.disclosures.includes('beta-short')) at('the label or the beta line is missing');
+      if (!c.disclosures.includes('fictional-family')) at('the label is missing');
       if (c.cta.label !== 'See Companion Core' || c.cta.url !== 'https://ci.computer/core') at('the call to action is not See Companion Core at ci.computer/core');
       if (!c.aspects.length || c.aspects.some(a => !CUT_KEYS.includes(a))) at('aspects');
     }

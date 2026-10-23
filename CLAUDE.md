@@ -113,7 +113,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 <!-- front page -->
 - **The front page is the story's lander** (`index.html`, `portal/gallery.js`, `scripts/portal-front.mts`, `scripts/story/lib/lander.mts` and `pairs.mts`, the plan `content/story/lander.json`; the contract and the checks are
   `reference/story/lander.md`; `portal:build` writes it at step 5d from the current families, `story.built`). Six blocks and a sticky header, in this order: the hero ("Stop renting your intelligence.", the claim `rent-line` of
-  `claims.json`; what a Core is in one sentence; "Fictional family. Real software." and the full beta line; `Take the tour` is its one action, the Brennans' tour, `hero` in the plan; `See Companion Core` only points at the band),
+  `claims.json`; what a Core is in one sentence; "Fictional family. Real software."; `Take the tour` is its one action, the Brennans' tour, `hero` in the plan; `See Companion Core` only points at the band),
   "From rented to kept" (claims.json's words), "One pair, in full" (a beat of a family file, with `Watch this moment` into the tour), the one Core band (`#core`: the claims, the engine's stylised Core, Buy, Download, the docs, what a Core
   is not), the chooser "What do you rent today?" and the families (six featured cards, then every other family and home in a native `<details>`). Say it once: the header, the band and the footer keep `Buy Companion Core` and
   `Download Companion`. A family's card goes to its page (`family/<slug>`, which goes on to the tour); a home with no current family keeps its plain card, which goes to the player. The cards are **static HTML in the built
@@ -168,7 +168,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `story:voice -- <slug> --stale`, `story:bake -- <slug>`, `portal:og`, then `portal:build` and `portal:test`. The `.voice.json`,
   `.bake.json`, audio and link-preview images are generated and committed; never hand-edit them. Every app a story names must be in
   `content/story/catalog-apps.json` (the Companion Hub's catalog); do not invent an app or a capability, and take product claims only from
-  `content/story/claims.json`. Companion OS is in beta and the site says so. The families are fictional and say so wherever a family is
+  `content/story/claims.json`. No page, film or ad is required to carry a beta line or label, and no copy says beta (`story:copy` fails the word in anything a visitor reads: rule `release-status-beta` in `scripts/story/lib/extra-bans.mts`). The families are fictional and say so wherever a family is
   ("Fictional family. Real software."); the Companion Core is always drawn stylised. No UI mockup or invented app screen, no household with
   separate platform accounts, no person presented as a customer, daylight and warm light only (CI-Common `ADS.md`: the lander and the
   videos are held to it). A family file tells exactly the people `casting.json` lists for its home (id, name, age, role, archetype, companion's
@@ -191,7 +191,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   makes every stale family, every casting family without a file and every ship-step note an error: use it where the whole cast must be
   there (the production deploy). `--stale-report` prints every reason.
 - Copy on the site follows the Uncloud voice (CI-Common `uncloud-voice`): no em or en dashes, sentence case, no price or performance number
-  that is not on the fact sheet, "Fictional family. Real software." wherever a family is, Companion OS is in beta.
+  that is not on the fact sheet, "Fictional family. Real software." wherever a family is.
   `scripts/story/check-copy.mts` (`pnpm run story:copy -- dist`, in CI after `portal:build` and in `portal:test`'s `gallery` and `hooks` legs) lints every built page and data file a visitor reads
   (the front page and its band and footer, the homes' pages, the family pages, the 404, the player's HTML, the tours' data, the cards, the ad plan and the player's strings) against `content/story/claims.json`; a disclosure the claims owe a page that nothing prints yet is listed as pending, never silently skipped (`--strict` fails on it).
 - **The voice-over is generated locally** (`pnpm run story:voice`, Kokoro-82M, Apache-2.0, CPU, no network at run time). No cloud
@@ -208,7 +208,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 <!-- ---- family pages ---- -->
 - **A family's page is an ad's landing page** (`scripts/story/pages.mts`, `portal/family.css`; the ad rules of `reference/story/personas.md` "Ads" bind it). It reads with no JavaScript and no
   WebGL. Above the fold: the name, the tagline, the home's picture, "Take the tour" and "See Companion Core" (exactly `https://ci.computer/core`; the chrome keeps "Buy Companion Core" and "Download
-  Companion"), the one line "The tour draws the home in 3D in your browser." (never "streamed"), and the disclosure strip printed from `claims.json`. Then a section per person with the member's id as
+  Companion"), the one line "The tour draws the home in 3D in your browser." (never "streamed"), and the label "Fictional family. Real software." printed from `claims.json`. Then a section per person with the member's id as
   its `id` (`family/<slug>#sally`), their moments (each "Watch this moment" = `&beat=<id>`) and "Start with <name>" (`&member=<id>`). Every link into the player carries `data-campaign` and the page loads
   `portal/campaign.js` when the tree has it (the build tolerates its absence). Three homes carry one family name, so a page's title takes the place of its address when the name is shared
   (`uniqueLabels`): the build fails on two pages with one title. The footer never says "no analytics" or "no third-party requests" (the deployed site adds Google Analytics).
@@ -219,7 +219,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 <!-- ---- end family pages ---- -->
 <!-- ---- ad kit ---- -->
 - **The ad kit** (`pnpm run story:ads`, `reference/story/ads.md`): a persona CUT is one member's story as a 15 to 25 second SILENT vertical ad (the hook beat's title, the beat on the tour's own camera with
-  its card, chips and burned captions, an end card: "See Companion Core", `ci.computer/core`, the beta line and the other disclosures `claims.json` requires), 9:16, 1:1, 4:5 and 16:9. It is made by
+  its card, chips and burned captions, an end card: "See Companion Core", `ci.computer/core` and the disclosures `claims.json` requires), 9:16, 1:1, 4:5 and 16:9. It is made by
   `scripts/render-persona-cuts.mts` from a family's story and bake lock (estimated durations are fine: no voice, no voice lock) through the same offline path as `story:film`, with the page's own
   `?lighting=day` so a dusk home is lit as an ad may be (ADS.md: day or golden hour, never night); the overlay is the canon's LIGHT set. `content/story/ads.json` is the plan, generated for every family
   that parses (never hand-edit; `story:ads -- --check` says when it is stale); the videos are under `video/ads/` (gitignored: videos never ship in git or on Pages). The GPU path is `--gl default`

@@ -1,6 +1,6 @@
 # The Athlete (`athlete`)
 
-Draft deep dive for a new archetype, written on 2026-10-20 for the front page's Play category ("Play and explore"). It is a proposal, not yet part of the contract: `personas.md`, `content/story/personas.json`, the schema, `assets/story/types.ts`, `scripts/story/build-casting.mts`, `scripts/story/cast-lint.mts` and `scripts/portal-front.mts` do not know it until the owner adds it (the checklist is at the end). Companion OS, Companion Agents and Companion Memory are in beta.
+Draft deep dive for a new archetype, written on 2026-10-20 for the front page's Play category ("Play and explore"). It is a proposal, not yet part of the contract: `personas.md`, `content/story/personas.json`, the schema, `assets/story/types.ts`, `scripts/story/build-casting.mts`, `scripts/story/cast-lint.mts` and `scripts/portal-front.mts` do not know it until the owner adds it (the checklist is at the end).
 
 Shape and depth follow the Gamer chapter of [persona-bible.md](../persona-bible.md) (3.3), the Gamer table of [persona-apps.md](../persona-apps.md) and the sibling drafts in this folder. Nobody here is a customer. Ages, homes, jobs and lines are design choices for fictional characters. Every statement about how athletes live is an editorial synthesis, tagged [?] in the bible's evidence key; no statistic is quoted and none is needed. Home ids are crew-only; print display names.
 
@@ -116,7 +116,6 @@ The athlete trusts a training partner and a club member over any ranking or app 
 - "My photos are on my phone's cloud." Immich takes the photos the phone sends it on the home network; it is slow on first start, and it is not a promise that everything already in a cloud arrives.
 - "Is the Core my backup?" Not claimed. The story says where the files sit and that Immich backs the phone's photos up to the Core over the home network; it says nothing about protection or about losing a file, and gives no advice about copies.
 - "Are the maps local?" The catalog is silent. Never "works offline" (`sec-offline`), never "nothing leaves" (`sec-never-leaves`).
-- "Is Companion OS finished?" It is in beta, and the site says so beside any software claim.
 - "How fast, how far, how accurate?" No number: no pace, distance, time, heart rate, sample rate, GPS accuracy or start-up time.
 
 ## 9. Claims boundary
@@ -146,7 +145,7 @@ What must never be said for this persona. Ids are from `content/story/claims.jso
 
 **The regulated-domain rule.** Health, and a young person's training log, are regulated domains. Write only what the app does (logs a run, a ride, a set, a habit, a meal; plans and maps a route) and where the files live (on the Core). Say nothing of health outcomes, nothing of advice, nothing of protection, safety, privacy law, certification or compliance, no security guarantee, and nothing about how a log is "used" by anyone else. A log kept by a member under 18 is children's data: same rule, and the member is shown in third-person captions, never voiced.
 
-**Standing lines that ride along.** Fictional family, real software. Companion OS is in beta. Installing apps uses the internet. Remote access is not claimed. Daylight and warm light only. One household, one Core.
+**Standing lines that ride along.** Fictional family, real software. Installing apps uses the internet. Remote access is not claimed. Daylight and warm light only. One household, one Core.
 
 ## 10. Fit
 

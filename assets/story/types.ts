@@ -106,7 +106,6 @@ export interface Story {
 /** ClipId: the beat id (narration = popup.body), `<beat id>.say` (agent line), or 'closing' (closing.body + ' ' + SIGNOFF). */
 export type ClipId = string;
 export const SIGNOFF = 'UnCloud your life.' as const;
-export const BETA_LINE = 'Companion OS is in beta.' as const;
 export const FICTIONAL_LINE = 'Fictional family. Real software.' as const;
 export const INTERNET_NOTE = 'Installing apps uses the internet.' as const;
 export const HERMES_NOTE = 'Messages pass through the chat service you choose.' as const;

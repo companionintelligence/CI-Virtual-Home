@@ -368,7 +368,6 @@ test('what the film prints is in the Uncloud voice and carries every disclosure'
   assert.equal(t.title.fictional, 'Fictional family. Real software.'); assert.equal(t.badge, t.title.fictional); assert.equal(t.end.fictional, t.title.fictional);
   assert.equal(t.end.signoff, 'UnCloud your life.'); assert.equal(t.end.url, 'ci.computer/core');
   const joined = t.end.lines.join(' ');
-  assert.match(joined, /Companion OS, Companion Memory and Companion Agents are in beta\./);
   assert.match(joined, /Scenes are written for this site\./); assert.match(joined, /stylised illustration, not a photograph/); assert.match(joined, /generated locally with an open text-to-speech model/);
   // the film names an agent (b2's companion speaks): Hermes and OpenClaw are credited
   assert.ok(namesAgentRuntime(rs, ['b1', 'b2']) === false || true);
@@ -455,7 +454,7 @@ test('silent: the end card does not claim a voice; a voiced one does', () => {
   assert.ok(filmText(rs, claims).end.lines.some(l => /generated locally with an open text-to-speech model/.test(l)));
   const t = filmText(rs, claims, { silent: true });
   assert.ok(!t.end.lines.some(l => /text-to-speech|Narration/.test(l)), 'no voice line under a silent film');
-  assert.match(t.end.lines.join(' '), /in beta\./); assert.match(t.end.lines.join(' '), /Scenes are written for this site\./); assert.match(t.end.lines.join(' '), /stylised illustration/);
+  assert.match(t.end.lines.join(' '), /Scenes are written for this site\./); assert.match(t.end.lines.join(' '), /stylised illustration/);
   assert.deepEqual(filmText(rs, claims).title, t.title);
 });
 
@@ -618,7 +617,7 @@ test('the pin: toolSha ignores every claim the film does not print, and follows 
   for (const key of Object.keys(claims).filter(k => k !== 'disclosures')) assert.equal(toolSha(withClaims(c => { c[key] = JSON.stringify(c[key]) + ' changed'; })), base, `claims.json "${key}" is not printed by a film`);
   assert.equal(toolSha(withClaims(c => { c.disclosures.reverse(); })), base, 'the pin looks a disclosure up by id, so the order of the file is not part of it');
   const printed = new Set<string>(Object.values(FILM_DISCLOSURES));
-  assert.equal(printed.size, 6);
+  assert.equal(printed.size, 5);
   for (const d of claims.disclosures) {
     const meta = withClaims(c => { const x = byId(c.disclosures, d.id); x.source = 'changed'; x.status = 'changed'; x.note = 'changed'; x.tag = 'changed'; });
     assert.equal(toolSha(meta), base, `${d.id}: a disclosure's source, status and note are not printed`);
@@ -673,7 +672,7 @@ test('the pin: the renderer and the ship step share one definition, and an entry
   assert.ok(!entryIsCurrent({ ...fam, shas: { ...fam.shas, bake: 'z'.repeat(64) } }, entry(both, day)), 'a changed bake is stale');
   // a printed disclosure changes the verdict, one the film does not print (and the lander's rent-line) does not
   const claimsOf = (id: string) => withClaims(c => { byId(c, id).text += ' (changed)'; });
-  assert.ok(!entryIsCurrent(fam, entry(both, day), claimsOf('beta-short')), 'the beta line is on the end card');
+  assert.ok(!entryIsCurrent(fam, entry(both, day), claimsOf('scripted-scenes')), 'the scripted-scenes line is on the end card');
   assert.ok(entryIsCurrent(fam, entry(both, day), claimsOf('synthetic-voice')), 'a silent film prints no voice line');
   const voiced = { ...fam, silent: false, shas: { ...fam.shas, voice: 'v'.repeat(64) } }, voicedPin = inputsShaOf(voiced, 1080);
   assert.ok(entryIsCurrent(voiced, entry(both, voicedPin)));

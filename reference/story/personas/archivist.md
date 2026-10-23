@@ -1,6 +1,6 @@
 # The Archivist (`archivist`)
 
-Draft deep dive for a new, fifteenth archetype. Category: Make and keep (`make`). Nearest existing persona: the Maker (`maker`). Status: draft for the owner's review; nothing here is wired into `personas.json`, the schema, `ARCHETYPES` or the cast plan yet. Companion OS, Companion Agents and Companion Memory are in beta.
+Draft deep dive for a new, fifteenth archetype. Category: Make and keep (`make`). Nearest existing persona: the Maker (`maker`). Status: draft for the owner's review; nothing here is wired into `personas.json`, the schema, `ARCHETYPES` or the cast plan yet.
 
 The Archivist scans the family's slides, letters and home films and files them where the family's later readers can find them. Nobody here is a customer: ages, places, jobs and lines are design choices for fictional characters. Real-world statements are tagged **[?]** (inference or generalisation, not read from a source for this file); nothing in this file is a statistic. Every app and service id below was checked against `content/story/catalog-apps.json` and `content/story/services.json` (see "Checks run" at the end).
 
@@ -76,7 +76,7 @@ Two further store apps are in the live store and fit the job (`photoview` is sto
 - `ci-photo-time-machine` (Photo Time Machine). It is a background app with no recorded QA screenshot and a caveat that no speed or hardware claim is allowed. It cannot carry a beat. It may be named, if a writer must, as a background app that the Archivist does not need to look at.
 - `photoview` (Photoview). No recorded QA screenshot, and its map view uses a token the family would have to add. Leave it as a fallback for a PhotoPrism beat that needs a second photo app.
 
-Companion Memory (`ci-memory`) is a chat app (`ai: chat`) and in beta. It is left out of the pool: the persona's whole argument is that the Archivist does the filing and a human reads the result. A family that casts an Archivist with a companion of 16 or older may use it for one named chore (see section 7), never as the hero.
+Companion Memory (`ci-memory`) is a chat app (`ai: chat`). It is left out of the pool: the persona's whole argument is that the Archivist does the filing and a human reads the result. A family that casts an Archivist with a companion of 16 or older may use it for one named chore (see section 7), never as the hero.
 
 ## 5. Where they spend time
 
@@ -143,7 +143,7 @@ Limits that must ride along (the persona's own):
 3. No remote access, no sharing with someone outside the house.
 4. No search over the words on a page. Filed and tagged.
 5. Machine labels are suggestions.
-6. Companion OS is in beta. Installing apps uses the internet.
+6. Installing apps uses the internet.
 7. Crash reports from first-party apps go to Companion Intelligence unless switched off. Never write that nothing leaves the Core.
 
 ## 9. Claims boundary
@@ -270,7 +270,7 @@ Each is the first sentence a visitor reads: it says what the rented place held, 
 5. **Navidrome.** The wedding band's tape sat in a drawer; now Navidrome plays it from a file the family holds.
 6. **Duplicati.** The home films had one copy and a plan with a renewal date; Duplicati writes a second to a disk in the house.
 
-Each seed is a first line and needs the beta line beside the software claim and "Fictional family. Real software." in the first two seconds, as the contract says. A seed is 25 words or fewer here; the popup body limit is 30 words, the headline six.
+Each seed is a first line and needs "Fictional family. Real software." in the first two seconds, as the contract says. A seed is 25 words or fewer here; the popup body limit is 30 words, the headline six.
 
 ## Checks run
 

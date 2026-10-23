@@ -48,7 +48,7 @@ builders for the pair component (the apartments are cast in a separate file and 
   only); nothing is promised that the Hub listing does not do (AudioMass saves where the person chooses, Steam needs a Valve account, a speed is never
   stated, a class list or a grade never lives on a home Core).
 - *Voice:* the bible's twelve writer rules and twelve cinematographer rules; sentence case; no em or en dash, no exclamation mark; "Companion Core / Hub /
-  Memory / OS", "agent" not assistant; the beta line wherever software is claimed; no price; daylight only.
+  Memory / OS", "agent" not assistant; no price; daylight only.
 
 ## Compatibility and the v3 family
 

@@ -1,6 +1,6 @@
 # Carer (`carer`)
 
-Deep dive for one proposed persona, written 2026-10-20 as a draft for the owner. Category: Host and care (`care`). Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: ages, households, names and lines are design choices for fictional characters. The shape follows the Host chapter of [persona-bible.md](../persona-bible.md) (3.6) and the tables of [persona-apps.md](../persona-apps.md); the law for every word is `content/story/claims.json`.
+Deep dive for one proposed persona, written 2026-10-20 as a draft for the owner. Category: Host and care (`care`). Nobody here is a customer: ages, households, names and lines are design choices for fictional characters. The shape follows the Host chapter of [persona-bible.md](../persona-bible.md) (3.6) and the tables of [persona-apps.md](../persona-apps.md); the law for every word is `content/story/claims.json`.
 
 **One line.** Looks after a parent, partner or relative and keeps the letters, the calendar and the notes in one place, with that person's say.
 
@@ -109,7 +109,7 @@ Eight apps, all live in the store and `inLiveStore`, listed in order of story st
 **Do not reach for these** (on a carer's beat):
 - Frigate, cameras, motion or presence: `f-surveillance`, `cap-camera-capture`. Watching a person in their home is the opposite of the persona.
 - Home Assistant for anything about the person's whereabouts, doors, falls or night: `f-medical-care`, `sec-safety-people`.
-- Companion Memory holding a person's life as a timeline, and any agent that "notices": `f-proactive`, `cap-omniscient`. Memory is beta and is about the carer's own context at most.
+- Companion Memory holding a person's life as a timeline, and any agent that "notices": `f-proactive`, `cap-omniscient`. Memory is about the carer's own context at most.
 - Hermes or OpenClaw contacting a clinic, a council or a shop: `f-agent-autonomy`.
 - Kiwix (`storySafe` avoid), OurHome (stale), the Audible and MyChart accounts themselves (nothing is imported).
 
@@ -147,7 +147,7 @@ Nobody is proud of wanting it. None is hiding it either; the persona is a reluct
 
 | Objection (in the persona's words, written for this file, not quoted) | Honest answer |
 |---|---|
-| "I do not want to be the IT department." | Nothing makes you one. Companion OS is in beta; someone sets the Core up once, and the household's tech person is the one called when it breaks. |
+| "I do not want to be the IT department." | Nothing makes you one. Someone sets the Core up once, and the household's tech person is the one called when it breaks. |
 | "Can I get at it from the waiting room?" | No. Remote access is not claimed, so every scene is at home on the home Wi-Fi. The paper list and the paper calendar stay on the fridge. |
 | "Who else can see my father's letters?" | One household, one Core. The apps have their own sign-ins where they have any, and nothing here promises that one person cannot see another's. Who may open what is a family agreement, not a feature. |
 | "What if the Core breaks?" | The Core is not a backup. Keep the paper. Say it lightly and early. |
@@ -158,9 +158,9 @@ Nobody is proud of wanting it. None is hiding it either; the persona is a reluct
 | "Is it safe?" | Say where the files sit: on the Core, by default. Never "safe", never "secure". |
 | "I had my photos in the cloud already." | Immich is a slow first start and not a backup; the cloud library does not move on its own. |
 | "Can it take over my audio books?" | It plays audio files the family holds. No importer is claimed. |
-| "Does Companion Memory help?" | Not in this persona. Memory is beta, and a person's life as a timeline is not a carer's tool. |
+| "Does Companion Memory help?" | Not in this persona. A person's life as a timeline is not a carer's tool. |
 
-Always, on every carer beat: Companion OS is in beta; installing apps uses the internet; remote access is not claimed; the Core is not a backup; one household, one Core.
+Always, on every carer beat: installing apps uses the internet; remote access is not claimed; the Core is not a backup; one household, one Core.
 
 ## 9. Claims boundary
 
@@ -186,7 +186,7 @@ This section quotes banned words in full. Sections 5 and 6 name a few of them on
 | A person as a "patient", a "burden", a "senior", an "elderly parent"; a condition by name | persona rule; `sec-safety-people` | The person's name, or "his mother" |
 | Pointing the persona at a child as the person looked after, or a child as the carer | children's data; age rule 16 | Not cast |
 
-Voice of everything a visitor can read: sentence case, no em or en dash, no exclamation mark, no ad-speak, daylight only, the beta line beside any software claim, the call to action "See Companion Core" at ci.computer/core.
+Voice of everything a visitor can read: sentence case, no em or en dash, no exclamation mark, no ad-speak, daylight only, the call to action "See Companion Core" at ci.computer/core.
 
 ## 10. Fit
 

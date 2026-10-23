@@ -9,6 +9,7 @@
 //   * a disclosure a kind of page owes: the one printed today is an error when missing, the one nobody prints yet is pending until --strict
 //   * the string finder reads copy and not code (templates, tags, attributes; not an error message, a selector or a class list)
 //   * the extra rules (cloud gaming, "sorts the photos") are warnings in the story validator's report and in the lint
+//   * the word beta is an error in the lint (CLAUDE.md: no copy says beta; no page, film or ad is required to carry a beta line)
 // @check-house node-test
 // @check-house quick
 import { test } from 'node:test';
@@ -23,7 +24,7 @@ import { EXTRA_BANS, withExtraBans } from './story/lib/extra-bans.mts';
 import { loadContext, ROOT } from './story/lib/context.mts';
 import { validateStory } from './story/lib/validate.mts';
 import type { Story } from '../assets/story/types.ts';
-import { FICTIONAL_LINE, BETA_LINE } from '../assets/story/types.ts';
+import { FICTIONAL_LINE } from '../assets/story/types.ts';
 
 const claims = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'claims.json'), 'utf8'));
 const say = (id: string): string => claims.disclosures.find((d: { id: string }) => d.id === id).text;
@@ -40,11 +41,11 @@ function makeSite(opts: { v3?: boolean; chips?: string[]; homeName?: string; ban
   if (opts.v3) beat.service = 'google-photos';
   write('story/okafor.bbbb.json', JSON.stringify({ v: 1, slug: 'okafor', family: { surname: 'Okafor', tagline: 'Four people, one quiet computer.', story: 'A family.', address: { line: '4 Elm Lane', place: 'Ashby' } }, members: [{ id: 'ada', name: 'Ada', work: 'Nurse' }], chapters: [{ id: 'kitchen', title: 'The kitchen' }], beats: [beat], closing: { body: 'That is the day.', cta: { label: 'Start again' } }, media: {} }));
   write('story/manifest.json', JSON.stringify({ v: 1, families: 'story/families.aaaa.json', byFamily: { okafor: { house: 'newcrest', story: 'story/okafor.bbbb.json', audio: {}, narration: false } } }));
-  const foot = `<footer>Product names belong to their owners. ${say('launch-not-offer')} ${say('beta-full')} © 2026</footer>`;
-  write('index.html', `<!doctype html><html><head><title>Thirty homes</title><meta name="description" content="A home for every family."></head><body><main><h1>Thirty homes. ${FICTIONAL_LINE}</h1><p>${BETA_LINE}</p><p>${say('beta-short')}</p><ul><li>${homeName} · 2 storeys</li></ul></main><section class="cta-band"><p>${opts.bandText ?? 'A Companion Core is a small personal server.'}</p></section>${['scripted-scenes', 'stylised-art', 'not-frontier', 'names-logos-owners', 'third-party-apps'].map((id) => `<p>${say(id)}</p>`).join('')}${foot}</body></html>`);
+  const foot = `<footer>Product names belong to their owners. ${say('launch-not-offer')} © 2026</footer>`;
+  write('index.html', `<!doctype html><html><head><title>Thirty homes</title><meta name="description" content="A home for every family."></head><body><main><h1>Thirty homes. ${FICTIONAL_LINE}</h1><ul><li>${homeName} · 2 storeys</li></ul></main><section class="cta-band"><p>${opts.bandText ?? 'A Companion Core is a small personal server.'}</p></section>${['scripted-scenes', 'stylised-art', 'not-frontier', 'names-logos-owners', 'third-party-apps'].map((id) => `<p>${say(id)}</p>`).join('')}${foot}</body></html>`);
   write('404.html', `<!doctype html><html><head><title>Not found</title></head><body><main><h1>That page is not here</h1></main>${foot}</body></html>`);
-  write('homes/newcrest.html', `<!doctype html><html><head><title>${homeName}</title></head><body><main><h1>${homeName}</h1><p>${FICTIONAL_LINE}</p><p>${say('beta-short')}</p><section class="family-block"><a href="../family/okafor">Meet the family</a></section></main>${foot}</body></html>`);
-  const strip = [FICTIONAL_LINE, BETA_LINE, say('beta-short'), say('scripted-scenes'), say('stylised-art'), say('names-owners')].map((t) => `<p>${t}</p>`).join('');
+  write('homes/newcrest.html', `<!doctype html><html><head><title>${homeName}</title></head><body><main><h1>${homeName}</h1><p>${FICTIONAL_LINE}</p><section class="family-block"><a href="../family/okafor">Meet the family</a></section></main>${foot}</body></html>`);
+  const strip = [FICTIONAL_LINE, say('scripted-scenes'), say('stylised-art'), say('names-owners')].map((t) => `<p>${t}</p>`).join('');
   write('family/okafor.html', `<!doctype html><html><head><title>The Okafor family</title></head><body><header></header><main><h1>The Okafor family</h1>${strip}${opts.familyExtra ?? ''}<p class="home-note">The home is <a href="../homes/newcrest">${homeName}</a>.</p></main>${foot}</body></html>`);
   write('room-creator.html', `<!doctype html><html><head><title>Companion virtual home</title><script>var t = 'We could not open this home. Check the link, or pick a home from the gallery.'; throw new Error('this is not copy for a visitor, it is a message');</script></head><body><noscript><p>The virtual homes need JavaScript. Turn it on to fly through a home in 3D.</p></noscript><div id="app">Frame rate 30 fps</div></body></html>`);
   return { dir, write, read: (rel) => fs.readFileSync(path.join(dir, rel), 'utf8') };
@@ -190,7 +191,7 @@ test('the string finder reads copy, markup text and attributes, and leaves code,
 });
 
 test('the extra rules: a cloud gaming service and "sorts the photos" are warnings in the lint, the held no-account claim is an error, and a rule claims.json carries wins', () => {
-  assert.deepEqual(EXTRA_BANS.filter((b) => b.severity !== 'warn').map((b) => b.id), ['held-no-account'], 'only the held claim is an error; the caveats are warnings');
+  assert.deepEqual(EXTRA_BANS.filter((b) => b.severity !== 'warn').map((b) => b.id).sort(), ['held-no-account', 'release-status-beta'], 'only the held claim and the word beta are errors; the caveats are warnings');
   assert.ok(new RegExp(EXTRA_BANS.find((b) => b.id === 'held-no-account')!.pattern, 'i').test('Set up without an account and no activation needed.') && !/\bno (?:vendor )?account (?:needed|required)/i.test('no accounting advice'));
   assert.deepEqual(withExtraBans([{ id: 'cap-cloud-gaming' }], (e) => ({ id: e.id })).map((r) => r.id).sort(), ['cap-cloud-gaming', ...EXTRA_BANS.map((b) => b.id).filter((i) => i !== 'cap-cloud-gaming')].sort());
   const s = makeSite({ tourBody: 'Steve cancelled his cloud gaming plan, and Immich sorts your photos.' });
@@ -201,6 +202,33 @@ test('the extra rules: a cloud gaming service and "sorts the photos" are warning
   } finally { done(s); }
   const held = makeSite({ tourBody: 'Ada sets it up without an account.' });
   try { assert.ok(lint(held).errors.some((e) => e.includes('held-no-account'))); } finally { done(held); }
+});
+
+test('the word beta is an error wherever a visitor reads it: a page, a tour, the player\'s HTML and the card data (no copy says beta, CLAUDE.md)', () => {
+  const rule = EXTRA_BANS.find((b) => b.id === 'release-status-beta')!;
+  assert.equal(rule.severity, 'error');
+  const re = new RegExp(rule.pattern, rule.flags);
+  for (const yes of ['Companion Memory (beta)', 'Companion OS is in beta.', 'Join the Beta program', 'a beta-tester', 'BETA']) assert.ok(re.test(yes), `${yes} is caught`);
+  for (const no of ['alphabet soup', 'the Betamax tape', 'metadata', 'Bethany']) assert.ok(!re.test(no), `${no} is not`);
+  const where: [string, (s: Site) => void][] = [
+    ['index.html', (s) => s.write('index.html', s.read('index.html').replace('A Companion Core is', 'In beta, a Companion Core is'))],
+    ['homes/newcrest.html', (s) => s.write('homes/newcrest.html', s.read('homes/newcrest.html').replace('Meet the family', 'Meet the family (beta)'))],
+    ['family/okafor.html', (s) => s.write('family/okafor.html', s.read('family/okafor.html').replace('<header></header>', '<header><p>Companion Memory is in beta.</p></header>'))],
+    ['404.html', (s) => s.write('404.html', s.read('404.html').replace('That page is not here', 'The beta page is not here'))],
+    ['room-creator.html', (s) => s.write('room-creator.html', s.read('room-creator.html').replace('Turn it on', 'Beta: turn it on'))],
+  ];
+  for (const [page, edit] of where) {
+    const s = makeSite({ bandText: 'A Companion Core is a small personal server.' });
+    try {
+      edit(s);
+      const r = lint(s);
+      assert.ok(r.errors.some((e) => e.startsWith(page) && e.includes('release-status-beta')), `${page}: ${r.errors.join('\n') || 'no error'}`);
+    } finally { done(s); }
+  }
+  const tour = makeSite({ tourBody: 'Ada looks for last summer in Immich. Companion Memory (beta) comes along.' });
+  try { assert.ok(lint(tour).errors.some((e) => e.includes('story/okafor') && e.includes('release-status-beta'))); } finally { done(tour); }
+  const clean = makeSite({ tourBody: 'Ada looks for last summer in Immich. Companion Memory comes along.' });
+  try { assert.deepEqual(lint(clean).errors, []); } finally { done(clean); }
 });
 
 test('copyReport runs the lint and the app check over a site and a folder of families, and reports in three lists', () => {

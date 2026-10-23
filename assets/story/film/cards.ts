@@ -327,7 +327,7 @@ export function drawTitle(g: Ctx, f: FilmFormat, t: TitleModel, ft: number, alph
 
 // ---- the end card -------------------------------------------------------------------------------------------------------------------------
 export type EndModel = { signoff: string; url: string; fictional: string; lines: string[] };
-/** The end card: the sign-off, where to go, the fictional line, and the plain disclosures (beta, scripted scenes, stylised art, synthetic voice, attribution) at 36 design px, inside
+/** The end card: the sign-off, where to go, the fictional line, and the plain disclosures (scripted scenes, stylised art, synthetic voice, attribution) at 36 design px, inside
  *  the safe area (the bottom margin too: a portrait panel no longer takes a third of the band a phone's interface covers). A panel too tall for the room goes tighter (padding, the
  *  sign-off a size down), never smaller in its fine print. Returns the panel's rectangle (the film's QA reads it). */
 export function drawEnd(g: Ctx, f: FilmFormat, m: EndModel, alpha: number): Box {

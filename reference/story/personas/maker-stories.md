@@ -1,6 +1,6 @@
 # Maker (`maker`): ten new user stories
 
-Draft for the owner, written 2026-10-20. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: every name, age and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.5 of [persona-bible.md](../persona-bible.md), the `maker` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
+Draft for the owner, written 2026-10-20. Nobody here is a customer: every name, age and household below is a design choice for a fictional character, and the example names are not cast members yet. Read for this file: chapter 3.5 of [persona-bible.md](../persona-bible.md), the `maker` row of `content/story/personas.json`, the 30 family files in `content/families/` (the six apartments are not in `content/houses/` yet, so they have no family file), `catalog-apps.json` and `services.json` (both as of 2026-10-19), `claims.json` and [validator.md](../validator.md). The law for every word is `content/story/claims.json`.
 
 **One line.** A person with a day job who paints, photographs, writes, plays or builds in the margins of the week, and keeps what they make as files in a place they can open.
 
@@ -123,7 +123,7 @@ Format: "As a maker, I want <job> so that <outcome>." Each story is tied to one 
 - **Regulated words.** None of the ten touches health, legal, finance, children's records or education records. Amara, Ezra and Tavita are named only as makers; no claim is made about children's data beyond where the files sit.
 - **The old places.** A service is named only as the old place and in the chip "alternative to <Service>". No sentence says what a company does, charges, learns or watches.
 - **One household, one Core.** No story says who can open what. Everything happens on the home Wi-Fi; no story reaches the Core from outside.
-- **The honest caveats that ride along on every story:** Companion OS is in beta; installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
+- **The honest caveats that ride along on every story:** installing apps uses the internet; the Core is not a backup; no price, no saving, no time saved, no speed.
 
 ## 5. Open items for the owner
 

@@ -160,8 +160,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "Mats plugs in the cable, and Ingrid presses the button. The Companion Core wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Mats plugs in the cable, and Ingrid presses the button. The Companion Core wakes and opens its own Wi-Fi network."
       },
       "film": true
     },
@@ -210,13 +209,13 @@
       "popup": {
         "kind": "phone",
         "title": "Two agents get their names",
-        "body": "In the Companion Hub store, Ingrid and Mats pick OpenClaw, and Ingrid approves its link to Companion Memory (beta). The family names the agents Rosemary and Thyme.",
+        "body": "In the Companion Hub store, Ingrid and Mats pick OpenClaw, and Ingrid approves its link to Companion Memory. The family names the agents Rosemary and Thyme.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agent: OpenClaw",
-            "Companion Memory (beta)",
+            "Companion Memory",
             "Apps: Twenty, Kimai"
           ]
         }
@@ -243,8 +242,7 @@
       },
       "popup": {
         "title": "Rosemary says hello",
-        "body": "Ingrid greets Rosemary, the agent the family named. Rosemary answers from the Core on Ingrid’s desk.",
-        "note": "Companion Agents are in beta."
+        "body": "Ingrid greets Rosemary, the agent the family named. Rosemary answers from the Core on Ingrid’s desk."
       },
       "say": {
         "speaker": "ingrid",
@@ -280,8 +278,7 @@
         "chips": [
           "Twenty",
           "replaces Salesforce"
-        ],
-        "note": "Companion Agents are in beta."
+        ]
       },
       "film": true
     },
@@ -684,8 +681,7 @@
         "body": "On Thursday Mats forgets the timer. He lists the afternoon’s tasks, and Thyme opens Kimai in its own browser and enters the hours. Mats reads them before he invoices.",
         "chips": [
           "Kimai"
-        ],
-        "note": "Companion Agents are in beta."
+        ]
       },
       "say": {
         "speaker": "mats",

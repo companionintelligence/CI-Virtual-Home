@@ -166,8 +166,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "Sione plugs in the cable, and Malia presses the button. The Core wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Sione plugs in the cable, and Malia presses the button. The Core wakes and opens its own Wi-Fi network."
       },
       "film": true
     },
@@ -248,8 +247,7 @@
       },
       "popup": {
         "title": "Chai says hello",
-        "body": "Sione greets Chai, the agent he named. Chai answers from the Core on the desk.",
-        "note": "Companion Agents are in beta."
+        "body": "Sione greets Chai, the agent he named. Chai answers from the Core on the desk."
       },
       "say": {
         "speaker": "sione",
@@ -720,7 +718,7 @@
       },
       "popup": {
         "title": "Marigold drafts, Malia sends",
-        "body": "A customer asks which print suits a narrow hall. Marigold drafts a reply from the notes Malia connected to Companion Memory (beta). Malia reads it and sends it herself.",
+        "body": "A customer asks which print suits a narrow hall. Marigold drafts a reply from the notes Malia connected to Companion Memory. Malia reads it and sends it herself.",
         "chips": [
           "Hermes"
         ],
@@ -789,7 +787,7 @@
     "The Study has no desk item in the spec (the Core stands on its own writing desk), so Sione’s desk beats anchor on the core, the room and the fireplace.",
     "WordPress beats stay on the Core and the home network: no beat says a client or customer can reach a site from outside, and no beat sells from a shop page.",
     "Hermes (Marigold) is the first Hermes beat at sunroom-reply and carries the chat-service note; Chai is OpenClaw and opens only apps on the Core.",
-    "Companion Memory (beta) is named once, in the film beat sunroom-reply; only the notes Malia connected are claimed, nothing else.",
+    "Companion Memory is named once, in the film beat sunroom-reply; only the notes Malia connected are claimed, nothing else.",
     "Every app used has a QA screenshot, so reviewed.json needs no entry for tuala.",
     "GlassHome and Jellyfin stay on the home network; no beat says the lights or the TV need no cloud account.",
     "The garden beds hold no alliums in the spec (they are on the sunroom roof), so the garden beat says only a new planting."

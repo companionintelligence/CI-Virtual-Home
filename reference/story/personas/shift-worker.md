@@ -1,6 +1,6 @@
 # Shift worker (`shift-worker`)
 
-Deep dive for one proposed archetype. Draft for the repo, written 2026-10-20. Category: Run the household (`household`). Nearest existing archetype: `organiser`. Companion OS, Companion Agents and Companion Memory are in beta.
+Deep dive for one proposed archetype. Draft for the repo, written 2026-10-20. Category: Run the household (`household`). Nearest existing archetype: `organiser`.
 
 Nobody here is a customer. Ages, jobs, homes and lines are design choices for fictional characters. Statements about how people live are editorial synthesis, tagged [?] when a reader could take them for a fact; nothing below is a statistic and nothing is a quotation. Statements about the registry and the catalog are checked against `content/story/services.json`, `content/story/catalog-apps.json` and `content/story/claims.json` as read on 2026-10-20. Read this with [personas.md](../personas.md), [persona-apps.md](../persona-apps.md) and [persona-bible.md](../persona-bible.md), which win wherever they disagree.
 
@@ -115,7 +115,7 @@ Rule: no chat or agent app is in this persona's pool and no beat opens on AI. If
 | Swaps are agreed with colleagues, in a chat. | Those stay in the chat. Outside people cannot be invited to a household calendar or board (reach, `cap-multi-user`); the person adds the agreed swap themselves. |
 | A reminder should reach their phone. | Donetick's notifications use Telegram or Pushover, outside services. The stories write no reminder. Radicale is a sync server, not a push alert. |
 | They do not want to be tracked. | HomeHub is a board, not a presence tracker. No location, no "who is home", no camera is claimed (`f-surveillance`). |
-| It sounds like an extra job for them. | Somebody in the house sets it up. The persona is the user, not the installer. Companion OS is in beta and installing apps uses the internet. |
+| It sounds like an extra job for them. | Somebody in the house sets it up. The persona is the user, not the installer. Installing apps uses the internet. |
 | What if the Core is off? | The Core is not a backup. Nothing is said about uptime (`cap-uptime`). |
 | Audiobooks and films: from where? | The family's own files only. Neither Audiobookshelf nor Jellyfin is a store; no Audible or streaming library is brought across and no content is implied from anywhere. |
 | Everyone sees everything. | One household, one Core. Per-app accounts exist only where the app has them; platform-level separation between people is not claimed (`cap-multi-user`). |
@@ -145,7 +145,7 @@ What must never be said for this persona. Ids are from `content/story/claims.jso
 | A price, a saving, "no subscription", a tier | Money claims | `num-dollar`, `num-savings`, `no-subscription`, `campaign-terms` |
 | Night, a person worn out or slumped, the absent parent, the martyr | Daylight only; stereotype | ADS.md; personas.md "Ads" |
 
-Always carry: "Fictional family. Real software."; the beta line beside any software claim (`beta-short`); the scripted-scenes line on the page footer; no app screen is readable. Copy voice: sentence case, no em or en dash, no exclamation mark, "Companion Core" in full on first mention and "the Core" after.
+Always carry: "Fictional family. Real software."; the scripted-scenes line on the page footer; no app screen is readable. Copy voice: sentence case, no em or en dash, no exclamation mark, "Companion Core" in full on first mention and "the Core" after.
 
 ## 10. Fit
 

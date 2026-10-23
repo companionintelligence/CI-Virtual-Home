@@ -349,8 +349,8 @@ for (const h of houses) {
     at(/<!-- lander-swap:[\s\S]*?-->/, swapBlock(lander, front), 'lander-swap');
     at(/<!-- lander-count:[\s\S]*?-->/, esc(lander.count), 'lander-count');
     at(/<!-- lander-apps:[\s\S]*?-->/, appsNamed(front), 'lander-apps');
-    // the fine print: the hero's two chips, the band's lines (the stylised-art line is the figure's caption when there is a figure), the footer's
-    at(/<!-- fine-hero:[\s\S]*?-->/, `<div class="hero-chips">${finePrint('lander-hero').html.replace('<p data-fine="fictional-family">', '<p class="fiction-label" data-fine="fictional-family">').replace('<p data-fine="beta-short">', '<p class="beta-chip" data-fine="beta-short">')}</div>`, 'fine-hero');
+    // the fine print: the hero's chip, the band's lines (the stylised-art line is the figure's caption when there is a figure), the footer's
+    at(/<!-- fine-hero:[\s\S]*?-->/, `<div class="hero-chips">${finePrint('lander-hero').html.replace('<p data-fine="fictional-family">', '<p class="fiction-label" data-fine="fictional-family">')}</div>`, 'fine-hero');
     at(/<!-- fine-core:[\s\S]*?-->/, finePrintHtml(finePrint('lander-core').items.filter((i) => i.id !== 'stylised-art' || !fig), { cls: 'cta-note' }), 'fine-core');
     at(/<!-- fine-foot:[\s\S]*?-->/, `<div class="foot-notes">${finePrint('lander-footer').html}</div>`, 'fine-foot');
   }

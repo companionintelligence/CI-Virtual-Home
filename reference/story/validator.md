@@ -135,7 +135,7 @@ quotes are folded first.
 | `incumbent-attack` | error | (Names GeForce Now, Xbox Cloud and Stadia as well as the companies of the first list.) No unsourced factual claim about a named company. The CI-Common matrix of such judgements is uncited. A Kickstarter-adjacent page is commercial speech; escalate comparative use to counsel. |
 | `logo-trademark` | error | The logo of a service the Core replaces (Google, Apple, Amazon, Microsoft and the like) is never shown (CAMPAIGN.md 6c). An app's own real logo, from the app media manifest, stands beside its name (`story-v2.md`, App media). |
 | `cap-parity` | error | (Also "ChatGPT-level", "Claude-grade" and a bare "as smart as".) The sheet concedes this: a Core runs a very good open-weight model, not the best model in the world this month. Never imply parity. |
-| `cap-omniscient` | error | Companion Memory is in beta. Proactive forecasting cards ("Your week, taking shape", "It notices what you've dropped") carry a Rolling out pill upstream. Today it supplies individual context to OpenClaw and Hermes. |
+| `cap-omniscient` | error | Proactive forecasting cards ("Your week, taking shape", "It notices what you've dropped") carry a Rolling out pill upstream. Today Companion Memory supplies individual context to OpenClaw and Hermes. |
 | `cap-autonomy` | review | Agents act inside permissions the family sets. No story may show an agent spending money, contacting a third party or cancelling something without the person approving. |
 | `cap-cloud-model` | review | OpenClaw and Hermes can be pointed at cloud model providers. A "private agent" scene is private only on the Core's local model; never show or mention a cloud key. |
 | `cap-messaging-private` | error | Hermes reaches you through messengers that are someone else's servers. The message travels through them. |
@@ -146,7 +146,7 @@ quotes are folded first.
 | `cap-gaming` | error | "Gaming PC", "console replacement", "replaces your console", "play anywhere", "no Steam account": Steam Headless needs the family's own Valve account and a GPU the Core may not have, streams inside the home network only, and is none of those things. |
 | `cap-own-apps` | error | Owner ruling 22 Sep 2026: "Own outright" is retired. Users do not own the apps. "No API bill" is the accurate line. ("The AI That You Own" is the sanctioned tagline, used verbatim only.) |
 | `cap-made-in` | error | Owner ruling 22 Sep 2026: only "Assembled, configured and burn-in tested in California; mainboards from Framework." "Designed" is nowhere on the sheet and country-of-origin wording is regulated. |
-| `cap-uptime` | error | Unmeasured reliability claims. The sheet says "without you babysitting it" and "walk away" and discloses beta. |
+| `cap-uptime` | error | Unmeasured reliability claims. The sheet says "without you babysitting it" and "walk away". |
 | `cap-camera-capture` | error | Never present covert or blanket recording of family members or guests. Companion Capture records the user's own machine; Frigate records the family's own cameras on their own property. Neither is for monitoring people who have not agreed. |
 | `fake-social-proof` | error | The families are fiction (see disclosures). Nothing may read as a testimonial, review, case study or usage count. CAMPAIGN.md 17: never present any person as a customer or team member. |
 | `fake-photo` | review | No simulated capability. A scripted scene is not a recording. Only say "photograph" or "recording" for a real photograph or session on real hardware. |
@@ -184,7 +184,7 @@ quotes are folded first.
 | `refs` | error | `member`, `agent` or `approval` is not a member |
 | `ftue` | error / warn | five or six beats; the six ids in fixed order (`ftue-unbox` optional); `wake` only on `ftue-plug-in`; phone popups only in the ftue; `ftue-hello` has a `say`; (warning) the anchors the bible fixes |
 | `ftue-claims` | error | the ftue text shows an SSID, pairing code, QR, account step or an offline claim |
-| `disclosure` | error | `ftue-plug-in` note "Companion OS is in beta."; `ftue-pick` note "Installing apps uses the internet."; the first Hermes beat carries "Messages pass through the chat service you choose."; an OpenClaw beat that opens a website carries "OpenClaw reaches websites over your home internet."; the first mention of Companion Memory reads "Companion Memory (beta)" |
+| `disclosure` | error | `ftue-pick` note "Installing apps uses the internet."; the first Hermes beat carries "Messages pass through the chat service you choose."; an OpenClaw beat that opens a website carries "OpenClaw reaches websites over your home internet." |
 | `agent` | error | an agent without a companion; an agent without `approval` (an agent prepares, a person approves) |
 | `agent-app` | error | Hermes on an app whose agent link is not `wired` or `mcp`; OpenClaw on an app with no web interface |
 | `say` | error | more than six; a speaker without a companion; a child voiced; a claim in the line ("I can", "everything", "for you") |
@@ -283,8 +283,7 @@ with every v2 field, validated against the test world's copy of its house (a sta
 | `day` | error / warn | a `beat` id that is not in the story; `at` not in morning, midday, afternoon, after-school, weekend; the order goes back; a line over 14 words, or equal to the beat's own title or body; fewer than 5 or more than 10 entries. Warning: an adult or teen member (13 or older) who is in no entry | `bad-43-day`, `bad-44-day-member` |
 | `profile` | error | a bio over 45 words; the text rules and `digits` (no age: the page shows it) apply | `bad-45-profile` |
 
-`body-end` warns when a detail `before`, `after` or `fact`, a lede, a spot or day line or a bio does not end with a full stop. `disclosure`: the first mention of
-Companion Memory anywhere reads "Companion Memory (beta)", counting the house text, the bios, the details and the day in the order a visitor meets them.
+`body-end` warns when a detail `before`, `after` or `fact`, a lede, a spot or day line or a bio does not end with a full stop.
 
 ### House
 

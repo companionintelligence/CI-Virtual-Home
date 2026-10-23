@@ -270,7 +270,7 @@ test('claims.json: 72 ban rules, ids unique, every regex compiles and none is gl
 
 test('claims.json: the three excellent beats of STORY-BIBLE section 11 pass the text rules', () => {
   const good = [
-    'A draft, never sent alone', 'A client asks a tricky question. Mika texts Odette, and Odette drafts a reply using the context Mika connected to Companion Memory (beta). Mika reads it and sends it herself.', 'Here is a draft. Please read it before you send it.',
+    'A draft, never sent alone', 'A client asks a tricky question. Mika texts Odette, and Odette drafts a reply using the context Mika connected to Companion Memory. Mika reads it and sends it herself.', 'Here is a draft. Please read it before you send it.',
     'Every subscription, in one list', 'Mika opens Wallos at the counter. It lists every subscription the household still pays for, with a reminder before each one renews.', 'replaces Rocket Money',
     'Join it from a phone', 'Elias opens the Wi-Fi settings on his phone and joins the Core\'s own network. Then he chooses the home network from the list.', 'Join the Core\'s own network', 'Choose your home network', 'Enter its password',
     'UnCloud your life.',

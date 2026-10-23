@@ -1,6 +1,6 @@
 # The Translator (`translator`)
 
-Deep dive for one proposed persona, the fifteenth archetype. Draft for the owner; nothing here is wired yet (the schema enum, `ARCHETYPES`, `content/story/personas.json`, `PERSONAS` in `scripts/portal-front.mts` and `content/story/cast-plan.json` are unchanged). Written on 2026-10-20 against `content/story/catalog-apps.json`, `services.json`, `claims.json` and `roles.json` as they stand in this tree. Companion OS, Companion Agents and Companion Memory are in beta.
+Deep dive for one proposed persona, the fifteenth archetype. Draft for the owner; nothing here is wired yet (the schema enum, `ARCHETYPES`, `content/story/personas.json`, `PERSONAS` in `scripts/portal-front.mts` and `content/story/cast-plan.json` are unchanged). Written on 2026-10-20 against `content/story/catalog-apps.json`, `services.json`, `claims.json` and `roles.json` as they stand in this tree.
 
 Home chip: **Work from home**. Nobody here is a customer. Ages, homes, jobs and lines are design choices for fictional characters; the only tagged statements describe the world, and none was read from a page for this chapter, so every one carries **[?]** (inference or lived-experience generalisation). Do not present a [?] line as a fact. The example name is a placeholder (`Noa`, unused in the cast, the retired families and the avoid list); a household's real translator gets a name from the cast step.
 
@@ -130,7 +130,7 @@ Ids are `bannedPhrases` in `content/story/claims.json`, unless noted. This list 
 10. **Never a named company doing something to the reader** (`incumbent-attack`). Say what the app does; "an alternative to <Service>" lives in the chip.
 11. **Never a testimonial** (`fake-social-proof`): no "I trust it", no "customers", no "translators say". A quote above is a labelled scripted line from a fictional adult.
 12. **Never the word "enterprise", and no SSO, team or multi-seat promise.** One household's Core.
-13. **Beta line beside any software claim**; "Fictional family. Real software." where a family is; no exclamation mark; no em or en dash; sentence case; daylight only.
+13. "Fictional family. Real software." where a family is; no exclamation mark; no em or en dash; sentence case; daylight only.
 14. **Never a flag, a globe, a speech bubble, a national costume or a language shown by an accent.** No stereotype by gender, age, culture or disability; a person is not given this role by reflex.
 
 ## 10. Fit: homes, rooms, furniture and casting

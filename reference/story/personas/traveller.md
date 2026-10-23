@@ -1,6 +1,6 @@
 # The Traveller (`traveller`)
 
-Deep dive for one proposed persona, the fifteenth archetype. Draft for the owner; nothing here is wired yet (the schema enum, `ARCHETYPES`, `content/story/personas.json`, `PERSONAS` in `scripts/portal-front.mts` and `content/story/cast-plan.json` are unchanged). Written on 2026-10-20 against `content/story/catalog-apps.json`, `services.json`, `claims.json` and `roles.json` as they stand in this tree. Companion OS, Companion Agents and Companion Memory are in beta.
+Deep dive for one proposed persona, the fifteenth archetype. Draft for the owner; nothing here is wired yet (the schema enum, `ARCHETYPES`, `content/story/personas.json`, `PERSONAS` in `scripts/portal-front.mts` and `content/story/cast-plan.json` are unchanged). Written on 2026-10-20 against `content/story/catalog-apps.json`, `services.json`, `claims.json` and `roles.json` as they stand in this tree.
 
 Home chip: **Play** (category `play`, "Play and explore"). Nobody here is a customer. Ages, homes, jobs and lines are design choices for fictional characters. The only tagged statements describe the world, and none was read from a page for this chapter, so every statement about habits, communities or attitudes carries **[?]** (inference or lived-experience generalisation). Do not present a [?] line as a fact. Statements about the catalog, the registry, the claims file and the roles file were read from this tree on 2026-10-20 and are tagged **[repo]**. There is no statistic in this file on purpose. The example name is a placeholder (`Rune`, unused in the cast, the retired families, the avoid list and the other persona files); a household's real traveller gets a name from the cast step.
 
@@ -119,7 +119,7 @@ All of this is an editorial reading [?]. No community was read for this chapter,
 - *Wary or opposed.* Some find that planning is the pleasure and an AI plan takes it away. Others distrust a model's facts about times, places and rules, and they are right to.
 - *No view.* Some have not thought about it. The persona does not need AI.
 
-**Ceiling for a story.** AI is never the hook and never the first beat (rule 2 of the bible). At most one beat per traveller: the household's agent turns the rough notes from a planning evening into a day-by-day list, the traveller checks every line against the booking, and nothing is booked, paid, sent or cancelled by it (`cap-autonomy`). It never states an opening time, a price, an entry rule, a health requirement or what is safe, because a model on the Core can be wrong and travel facts change. Use Hermes (`ci-hermes`) or OpenClaw (`ci-openclaw`), not named in the pool, with the beta line. The age rule applies: only a member aged 16 or older uses an agent, and a younger family member appears only as the one being helped. LibreTranslate is a tool, not a chat model, and stays open to a younger member. No survey of travellers' attitudes to AI was read for this chapter; treat the range as a design choice [?].
+**Ceiling for a story.** AI is never the hook and never the first beat (rule 2 of the bible). At most one beat per traveller: the household's agent turns the rough notes from a planning evening into a day-by-day list, the traveller checks every line against the booking, and nothing is booked, paid, sent or cancelled by it (`cap-autonomy`). It never states an opening time, a price, an entry rule, a health requirement or what is safe, because a model on the Core can be wrong and travel facts change. Use Hermes (`ci-hermes`) or OpenClaw (`ci-openclaw`), not named in the pool. The age rule applies: only a member aged 16 or older uses an agent, and a younger family member appears only as the one being helped. LibreTranslate is a tool, not a chat model, and stays open to a younger member. No survey of travellers' attitudes to AI was read for this chapter; treat the range as a design choice [?].
 
 ## 8. Objections and the honest limits
 
@@ -130,7 +130,7 @@ All of this is an editorial reading [?]. No community was read for this chapter,
 | "Can the whole group use it?" | The shared costs are added at the table at home, by people who are at the house. Friends who are elsewhere cannot reach the Core, and the app moves no money (the claims file). | Held still on the limit. No "share a link" (`cap-remote-access`). |
 | "Is it accurate?" | No accuracy or quality claim is made for LibreTranslate. It gives a reading of a message; the person decides what to answer. | The traveller, in one sentence. |
 | "Where do my photos go?" | The Core is not a backup. First start of Immich takes a while. Phone backup needs the phone on the home network. | The beat that files the photos, or none. |
-| "I do not want to run software." | Companion OS is in beta, and the Core is the household's, not a service. Setup is the household's tech person's job, as with the host. | The household's tech person, not the traveller. |
+| "I do not want to run software." | The Core is the household's, not a service. Setup is the household's tech person's job, as with the host. | The household's tech person, not the traveller. |
 | "What about my booking site accounts?" | They stay with the airline, the rail operator and the booking site. The Core holds the family's own copy of the plan, the log, the costs and the files. | One honest line per family. |
 | "Does it find me the best fare?" | No. Nothing in the Hub finds, compares or books a fare. | Never raised in a beat. |
 
@@ -154,7 +154,7 @@ Ids are `bannedPhrases` in `content/story/claims.json`, unless noted. This list 
 12. **Never covert capture** (`cap-camera-capture`): photos of the family on a trip are the family's own; a story never records guests or children "all day".
 13. **Never an app name that is an ordinary word used wrongly.** `TRIP` matches case-sensitively; `Wanderer` matches as a whole word; `Surmai` and `AdventureLog` only for the apps. Check the story with the validator, not by eye.
 14. **Never a real address, a real person's trip or a real company's logo** (`fake-address-real`, `logo-trademark`). A city or a country is fine as a destination; a real street address is not.
-15. **Beta line beside any software claim**; "Fictional family. Real software." where a family is; no exclamation mark; no em or en dash; sentence case; daylight only.
+15. "Fictional family. Real software." where a family is; no exclamation mark; no em or en dash; sentence case; daylight only.
 
 ## 10. Fit: homes, rooms, furniture and casting
 

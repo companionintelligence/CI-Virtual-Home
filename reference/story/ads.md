@@ -108,7 +108,6 @@ Printed from `content/story/claims.json` (never typed in a family file), and rec
 | Id | Where | When |
 |---|---|---|
 | `fictional-family` | the corner mark on **every** frame; a pill on the end card | always |
-| `beta-short` | the end card ("Companion OS, Companion Memory and Companion Agents are in beta.") | always: a cut claims software behaviour |
 | `scripted-scenes` | the end card | always |
 | `stylised-art` | the end card ("The Companion Core is drawn as a stylised illustration, not a photograph.") | always |
 | `names-owners` | the end card | when a chip says `replaces <X>` (the third-party names are text; the logo of a service the Core replaces is never shown) |

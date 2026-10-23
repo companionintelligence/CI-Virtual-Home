@@ -184,8 +184,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "Hugo plugs in the cable and Lea presses the button. The Core wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Hugo plugs in the cable and Lea presses the button. The Core wakes and opens its own Wi-Fi network."
       },
       "film": true
     },
@@ -378,7 +377,7 @@
         "chips": [
           "Hermes"
         ],
-        "note": "Messages pass through the chat service you choose. Companion Agents are in beta."
+        "note": "Messages pass through the chat service you choose."
       },
       "say": {
         "speaker": "claire",
@@ -901,7 +900,7 @@
     "The Garden Room has a chaise, a potting bench and an armchair, no desk. Etienne anchors on the chaise (couch, second instance) and the room; the text names only the chaise and the potting bench.",
     "Hugo’s room has a platform bed and no screen. Beats say laptop and browser, never a screen. Steam carries the Valve-account and graphics-power note.",
     "Blockbench is told as the Core serving a browser editor; no beat says where its files are saved. Hugo’s export then goes to Forgejo, so its home is the repository.",
-    "Neither companion has Companion Memory connected, so no beat names it. Both agents are Hermes; each beat names who reads and who sends. The Companion Agents beta line sits on Claire’s second Hermes beat.",
+    "Neither companion has Companion Memory connected, so no beat names it. Both agents are Hermes; each beat names who reads and who sends.",
     "Pi-hole is told as one household resolver the router points at, covering only devices that use it for DNS. No parental-control wording."
   ]
 }

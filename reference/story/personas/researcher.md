@@ -1,6 +1,6 @@
 # The Researcher (`researcher`)
 
-Draft deep dive for one proposed fifteenth archetype. Category: Study and research (`study`). Not yet in `content/story/personas.json`, the schema enum or `ARCHETYPES`; the row to add is at the end of this file. Written for the persona bible's chapter shape (`persona-bible.md` section 3) and the app guide of `persona-apps.md`. Companion OS, Companion Agents and Companion Memory are in beta.
+Draft deep dive for one proposed fifteenth archetype. Category: Study and research (`study`). Not yet in `content/story/personas.json`, the schema enum or `ARCHETYPES`; the row to add is at the end of this file. Written for the persona bible's chapter shape (`persona-bible.md` section 3) and the app guide of `persona-apps.md`.
 
 Nobody here is a customer. Ages, homes, jobs and sample lines are design choices for fictional characters. Statements about how researchers work are editorial syntheses and are tagged **[?]** (inference, not a fact to print). No statistic is quoted. Nothing here is advice of any kind, and no app is claimed to make anyone follow any rule.
 

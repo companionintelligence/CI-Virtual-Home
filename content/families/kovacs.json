@@ -184,8 +184,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "Gabor plugs the Core in, and Bence presses the button. It wakes and opens its own Wi-Fi network.",
-        "note": "Companion OS is in beta."
+        "body": "Gabor plugs the Core in, and Bence presses the button. It wakes and opens its own Wi-Fi network."
       },
       "film": true
     },
@@ -405,7 +404,7 @@
       },
       "popup": {
         "title": "Basil drafts the stonemason’s reply",
-        "body": "Eszter asks Basil to answer the stonemason’s quote. Basil drafts it on the Core’s local model, using dates she connected to Companion Memory (beta). Eszter reads and sends it herself.",
+        "body": "Eszter asks Basil to answer the stonemason’s quote. Basil drafts it on the Core’s local model, using dates she connected to Companion Memory. Eszter reads and sends it herself.",
         "chips": [
           "Hermes"
         ],
@@ -914,7 +913,7 @@
     "The house has no desk, only the Core shelf. Gabor works at the Games Den trestle table, the counter with two stools and the fireplace; the text never says desk.",
     "In the resolver the Salon, Games Den and TV Room are living rooms by area: room living nth 0 is the Salon, nth 2 the TV Room. Couch nth 0 and 1 are the Salon sofas, nth 2 the sectional.",
     "bed nth 2 with room bedroom is the West Bedroom canopy bed. The garden role resolves to the forecourt fountain, so the garden beat stands at the front after the kitchen.",
-    "Both agents run Hermes: the chat note rides on ftue-hello, salon-draft and den-sorrel. The only Companion Memory mention reads (beta), in salon-draft. In every agent beat the person reads and sends.",
+    "Both agents run Hermes: the chat note rides on ftue-hello, salon-draft and den-sorrel. The only Companion Memory mention is in salon-draft. In every agent beat the person reads and sends.",
     "Steam Headless: Valve account named, no frame rate, no title, home network only. west-homework uses the replaces ChatGPT chip; the text names a model on the Core and never a cloud key.",
     "Pi-hole covers only devices that use it for DNS, one household instance set up by Gabor. Home Assistant needs no cloud account of its own; the fountain pump and hall lantern sit on network devices.",
     "west-reading carries the BookLore cloud-link note (covers and details come from outside). salon-dns carries the privacy topic."

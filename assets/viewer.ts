@@ -124,7 +124,6 @@ const FLY_FLOOR = 0.25;       // m: the lowest the free camera goes (the lot's g
 const FINE_CSS = `.vh-help-fine { margin: 0.9rem 0 0; padding-top: 0.9rem; border-top: 1px solid var(--vh-ring); color: var(--muted-foreground); }
     .vh-help-fine p { margin: 0 0 0.6rem; font-size: var(--st-min); line-height: 1.34; }
     .vh-help-fine p:last-child { margin-bottom: 0; }
-    .vh-end .vh-end-fine { margin: 2px 0 8px; font-size: 12px; line-height: 1.45; }
     .vh-fiction { display: none; position: absolute; z-index: 5; pointer-events: none; left: calc(var(--vh-gap) + env(safe-area-inset-left, 0px)); top: calc(var(--vh-gap) + var(--vh-top-h) + 8px + env(safe-area-inset-top, 0px));
       padding: 4px 12px; border-radius: var(--st-r-ctl); background: var(--st-glass-sheen), var(--vh-glass-strong); -webkit-backdrop-filter: var(--st-glass-blur); backdrop-filter: var(--st-glass-blur); box-shadow: var(--st-glass-shadow); color: var(--foreground); font-size: calc(var(--st-min) * 0.62); font-weight: 700; line-height: 1.3; }
     html[data-story] .vh[data-state="ready"] .vh-fiction { display: block; }`;
@@ -224,7 +223,6 @@ export function mountViewer(api: Api) {
       <div class="vh-end" hidden role="group" aria-labelledby="vh-end-title">
         <h2 id="vh-end-title">Meet the Companion Core.</h2>
         <p class="vh-end-body">${coreLine(CLAIMS_SNAPSHOT, 'the desk')}</p>
-        ${finePrintHtml(finePrintItems(CLAIMS_SNAPSHOT, 'player-end'), { cls: 'vh-end-fine' })}
         <p class="vh-end-links">${newTab(BUY_URL, 'Buy Companion Core', 'Buy Core')}${newTab(DOWNLOAD_URL, 'Download Companion', 'Download')}</p>
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>

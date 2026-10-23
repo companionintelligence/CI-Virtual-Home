@@ -1,6 +1,6 @@
 # Contractor (`contractor`): ten more user stories
 
-Draft written 2026-10-20 for the owner. It widens the stories of an archetype that already exists (`contractor`, bible chapter 3.10, `personas.json`, `persona-apps.md`); it changes no source file. Companion OS, Companion Memory and Companion Agents are in beta. Nobody here is a customer: ages, trades, rooms and lines are design choices for fictional characters. The wording law is `content/story/claims.json`; the catalog (`catalog-apps.json`) and the service registry (`services.json`) decide what may be named.
+Draft written 2026-10-20 for the owner. It widens the stories of an archetype that already exists (`contractor`, bible chapter 3.10, `personas.json`, `persona-apps.md`); it changes no source file. Nobody here is a customer: ages, trades, rooms and lines are design choices for fictional characters. The wording law is `content/story/claims.json`; the catalog (`catalog-apps.json`) and the service registry (`services.json`) decide what may be named.
 
 **One line.** A self-employed tradesperson or small building contractor: a trade is two jobs, the hands on site and then the firm at the end of the day. This file adds the contractor's other hours: the order sheet at 6:30, a delivery on the driveway, the snag sheet by the work jackets, a letter in a language read slowly, the diary by the door, the Friday client note, the apprentice's Saturday, the January folder, a tile saw shared with a neighbour and the week's site lunches.
 
