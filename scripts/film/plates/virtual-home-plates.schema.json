@@ -1,0 +1,258 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/companionintelligence/CI-Common/main/packages/video-kit/schema/virtual-home-plates.schema.json",
+  "title": "Companion Virtual Home plates, v1",
+  "description": "The contract between Companion Virtual Home (which renders a 3D house into overlay-free per-beat plates) and the video-kit (which composes them into landscape and portrait films with `ci-video import-home`). A JSON file, not an import: neither side loads the other's code. The normative text is PLATES.md; where this schema and `src/sources/virtual-home.ts` disagree, the code is what the kit enforces and this is a bug in the schema. Every path is relative to the folder plates.json is in and may not leave it. Every string a viewer reads is checked for em and en dashes, exclamation marks, banned words and the word \"beta\".",
+  "type": "object",
+  "required": ["v", "kind", "id", "displayName", "lighting", "fps", "text", "beats"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "v": { "const": 1, "description": "The contract version. A kit reads the version it was written for and refuses any other." },
+    "kind": {
+      "enum": ["family-film", "home-tour"],
+      "description": "family-film: a fictional family's story told beat by beat (family is required). home-tour: a home with no family (family must be null)."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "A family slug or a home's display id. Never a builder handle or a house id. It becomes the film's name: out/<id>-landscape.mp4."
+    },
+    "displayName": { "type": "string", "minLength": 1, "description": "The title card: 'The Fenwick family of Marlowe'. A home's display name, never the name its spec was filed under." },
+    "family": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["slug", "name", "place", "tagline"],
+          "additionalProperties": false,
+          "properties": {
+            "slug": { "type": "string", "minLength": 1 },
+            "name": { "type": "string", "minLength": 1 },
+            "place": { "type": "string", "minLength": 1 },
+            "tagline": { "type": "string", "minLength": 1, "description": "The line under the title on the poster card." }
+          }
+        }
+      ]
+    },
+    "lighting": { "const": "day", "description": "Day only. The owner's ruling of 2026-10-22: films are lit as day, never dusk or night." },
+    "fps": { "type": "integer", "minimum": 24, "maximum": 60, "description": "Frames a second of every plate. Virtual Home renders 30." },
+    "profile": {
+      "type": "object",
+      "description": "Provenance of the render (browser build, GPU path, ffmpeg). Recorded, never interpreted.",
+      "additionalProperties": { "type": "string" }
+    },
+    "text": {
+      "type": "object",
+      "description": "The strings the kit prints, resolved by the renderer from its claims file so the kit never parses claims.",
+      "required": ["label", "cta", "link", "disclosures"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "Shown on every frame in a corner pill: 'Fictional family. Real software.' May not be empty." },
+        "cta": { "type": "string", "minLength": 1, "description": "The last line of the film. The fleet closes on 'UnCloud your life.'" },
+        "tagline": { "type": "string", "minLength": 1, "description": "The line under the call to action: 'See Companion Core'." },
+        "link": { "const": "ci.computer/core", "description": "The only link an end card of a home film carries." },
+        "codaTitle": { "type": "string", "minLength": 1, "description": "The heading of the disclosure card. Default 'Said plainly'." },
+        "disclosures": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The disclosures the end card prints, verbatim, in order.",
+          "items": {
+            "type": "object",
+            "required": ["id", "text"],
+            "additionalProperties": false,
+            "properties": { "id": { "type": "string", "minLength": 1 }, "text": { "type": "string", "minLength": 1 } }
+          }
+        },
+        "hook": {
+          "type": "object",
+          "description": "The claim the 15 s and 30 s cuts open on (the owner-approved line, resolved from the claims file). Without it only the film is written.",
+          "required": ["text"],
+          "additionalProperties": false,
+          "properties": {
+            "text": { "type": "string", "minLength": 1 },
+            "accent": {
+              "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }],
+              "description": "A phrase, or phrases, of the text to set in the accent colour. Each must appear in the text as whole words."
+            }
+          }
+        }
+      }
+    },
+    "beats": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per beat, in film order. The first is usually an approach plate with no member.",
+      "items": { "$ref": "#/definitions/beat" }
+    },
+    "inserts": {
+      "type": "array",
+      "description": "Real, whole, unedited screenshots that may be shown as labelled full-frame inserts between the apps and the end card. Never composited into a plate.",
+      "items": { "$ref": "#/definitions/insert" }
+    },
+    "cuts": {
+      "type": "object",
+      "description": "The beats each short cut shows, by cut length in seconds. Absent, the kit picks the first moments of the film, one per person.",
+      "additionalProperties": false,
+      "properties": {
+        "15": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "30": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+    "audio": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/audio" }],
+      "description": "null for a silent, captioned film (the state until the local model is approved). Otherwise the local Kokoro recordings, one per beat that is read."
+    },
+    "platesSha": { "type": "string", "pattern": "^[0-9a-f]{8,64}$", "description": "Digest of all the plates, for the renderer's cache." },
+    "claimsSha": { "type": "string", "pattern": "^[0-9a-f]{8,64}$", "description": "Digest of the claims file the text was resolved from." },
+    "inputsSha": { "type": "string", "pattern": "^[0-9a-f]{8,64}$", "description": "Digest of everything the render was a function of." }
+  },
+  "definitions": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "rect": {
+      "type": "object",
+      "description": "A rectangle as fractions of the frame, inside it.",
+      "required": ["x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "w": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "h": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "beat": {
+      "type": "object",
+      "required": ["id", "title", "plates"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Kebab-case; a scene id and a filename. title, hook, apps, apps-N, proof-N, close, plainly and label are the kit's own and are refused." },
+        "member": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["id", "name"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                "name": { "type": "string", "minLength": 1 },
+                "companion": { "type": "string", "description": "The companion's name. Recorded, not printed." }
+              }
+            }
+          ],
+          "description": "Whose beat it is. Their name is the chapter kicker. null for an approach plate."
+        },
+        "title": { "type": "string", "minLength": 1, "description": "The caption, in the lower third. Two lines at most." },
+        "body": { "type": "string", "minLength": 1, "description": "The beat's words. Shown as one cue across the beat when `cues` is absent and the beat is not read aloud." },
+        "chips": {
+          "type": "array",
+          "description": "The apps in this beat, in order of appearance. The apps scene lists each app once.",
+          "items": {
+            "type": "object",
+            "required": ["app"],
+            "additionalProperties": false,
+            "properties": {
+              "app": { "type": "string", "minLength": 1, "description": "The app's name. A logo is only ever shown beside it." },
+              "logo": { "type": "string", "description": "A .png, .webp or .jpg beside plates.json. The real logo, identified by the name next to it." },
+              "pairText": { "type": "string", "pattern": "^.+, alternative to .+$", "description": "'<app>, alternative to <service>', exactly as the renderer's pair rules write it. Never 'replaces'." }
+            }
+          }
+        },
+        "cues": {
+          "type": "array",
+          "description": "Caption cues from the renderer's clock, seconds from the start of the plate. One on screen at a time.",
+          "items": {
+            "type": "object",
+            "required": ["fromS", "toS", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "fromS": { "type": "number", "minimum": 0 },
+              "toS": { "type": "number", "exclusiveMinimum": 0 },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "plates": {
+          "type": "object",
+          "required": ["landscape"],
+          "additionalProperties": false,
+          "description": "One pre-rendered plate per aspect. The aspects share one clock and agree on length to within two frames. A format is built only if every beat has a plate for it.",
+          "properties": {
+            "landscape": { "$ref": "#/definitions/plate" },
+            "portrait": { "$ref": "#/definitions/plate" },
+            "square": { "$ref": "#/definitions/plate" }
+          }
+        }
+      }
+    },
+    "plate": {
+      "type": "object",
+      "required": ["sha256", "durationS", "width", "height"],
+      "additionalProperties": false,
+      "description": "Exactly one of file and sequence. The aspect of width over height must be 16:9 for landscape, 9:16 for portrait and 1:1 for square, to within one percent.",
+      "properties": {
+        "file": { "type": "string", "pattern": "\\.mp4$", "description": "An H.264 yuv420p .mp4 at the film's frame rate. Mastering containers are refused by name." },
+        "sequence": {
+          "type": "object",
+          "required": ["pattern", "count"],
+          "additionalProperties": false,
+          "description": "A frame sequence the kit encodes to H.264 at import (CRF 14, BT.709, one thread, bit-exact).",
+          "properties": {
+            "pattern": { "type": "string", "pattern": "%0?\\d*d", "description": "A printf-style path with a counter: frames/landscape/sally/%05d.png." },
+            "count": { "type": "integer", "minimum": 1 },
+            "start": { "type": "integer", "minimum": 0, "default": 0 }
+          }
+        },
+        "sha256": { "$ref": "#/definitions/sha256", "description": "Of the file's bytes; for a sequence, of the frames' bytes concatenated in order." },
+        "durationS": { "type": "number", "exclusiveMinimum": 0 },
+        "width": { "type": "integer", "minimum": 2, "multipleOf": 2 },
+        "height": { "type": "integer", "minimum": 2, "multipleOf": 2 },
+        "subject": { "$ref": "#/definitions/rect", "description": "What the plate is about, as fractions of this aspect's frame. The kit's caption, subtitles and label may cover at most 2 percent of it." },
+        "camera": { "type": "object", "description": "How the camera moved. Recorded for audit, never interpreted." }
+      }
+    },
+    "insert": {
+      "type": "object",
+      "required": ["id", "file", "sha256", "alt", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "app": { "type": "string" },
+        "file": { "type": "string", "description": "A .png, .webp or .jpg." },
+        "sha256": { "$ref": "#/definitions/sha256" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "alt": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1, "description": "Printed for as long as the picture is up, verbatim: 'Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family.' An insert with no label is refused." }
+      }
+    },
+    "audio": {
+      "type": "object",
+      "required": ["engine", "model", "rev", "voice", "clips"],
+      "additionalProperties": false,
+      "properties": {
+        "engine": { "const": "kokoro", "description": "The local, seeded model. No cloud text-to-speech." },
+        "model": { "type": "string", "minLength": 1 },
+        "rev": { "type": "string", "minLength": 1 },
+        "voice": { "type": "string", "minLength": 1 },
+        "clips": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["beat", "file", "sha256", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "beat": { "type": "string" },
+              "file": { "type": "string", "description": "A .m4a, .mp3, .wav or .aac." },
+              "sha256": { "$ref": "#/definitions/sha256" },
+              "atS": { "type": "number", "minimum": 0, "default": 0, "description": "Seconds into the beat the recording starts. It may not run past the end of the plate." },
+              "text": { "type": "string", "minLength": 1, "description": "The exact words the recording reads." }
+            }
+          }
+        }
+      }
+    }
+  }
+}
