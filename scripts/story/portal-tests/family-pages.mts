@@ -115,7 +115,8 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
     const imgs = (t.match(/<img\b[^>]*>/g) || []).filter(i => !/src="\.\.\/portal\/(apps|ci)\//.test(i));
     need(imgs.length === 3, `no third-party image that is not a real logo or screenshot of the manifest (three others: the brand mark twice and the home), got ${imgs.length}`);
     need(!/[$€£]\s?\d|\b\d[\d,.]*\s?(USD|dollars?|euros?|pounds?)\b/i.test(words), 'no price (an amount of money)');
-    need(!/analytics|no cookies|no third-party/i.test(words), 'no claim about analytics, cookies or third parties (the deployed site adds Google Analytics)');
+    // a claim about the SITE: a story may name Google Analytics as the service a web-analytics app (Umami) is an alternative to, which is a pair, not a promise about the page
+    need(!/\bno analytics\b|\banalytics[- ]free\b|\bwithout analytics\b|\bno cookies\b|\bno third-party\b/i.test(words), 'no claim about analytics, cookies or third parties (the deployed site adds Google Analytics)');
     for (const a of t.match(/<a\b[^>]*href="\.\.\/room-creator[^"]*"[^>]*>/g) || []) need(/ data-campaign/.test(a), `a link into the player has no data-campaign: ${a.slice(0, 80)}`);
     if (campaignJs) need(/<script src="\.\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(t) && t.indexOf('campaign.js') < t.indexOf('location.replace('), 'portal/campaign.js loads, hashed, before the script that forwards a shared moment');
     const voiced = !!by[s.slug].story && Object.keys(by[s.slug].audio || {}).length > 0;
