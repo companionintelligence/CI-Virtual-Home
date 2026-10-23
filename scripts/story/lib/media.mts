@@ -6,7 +6,9 @@
 //
 // The rules a page follows (reference/story/story-v2.md "App media"):
 //   - a logo identifies the app it names, so it always sits beside that app's name, and carries its alt text;
-//   - a screenshot is real and unedited: it is shown whole, with its caption, and never composited into anything;
+//   - a screenshot is real and unedited: it is shown whole, with its caption, and never composited into a scene (the 3D frame) or the tour. The owner's ruling of
+//     2026-10-22 lets a family page, an ad cut and a film show it, and a logo on its chip, as a labelled insert (story-v2.md "App media"); this module serves the
+//     pages only, and the cut and film renderers do not draw them yet;
 //   - every image is lazy, with its width and height set (no layout shift); the front page loads none above the fold;
 //   - an app with no entry, or a `null` logo or shot, is simply shown without one: never a stand-in.
 // `logoImg` and `shotFigure` below write exactly that markup; a page that writes its own must keep those four properties.

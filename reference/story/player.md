@@ -53,8 +53,8 @@ Everything here is optional on a story and costs a story without it nothing: no 
 
 - **The app's real logo.** `scripts/story/ship/player.mts` puts `media` in the shipped story: for each app a beat names (`app`, `with`) the manifest's logo (`content/story/app-media.json`:
   file, size, alt text; `RuntimeMedia` in `runtime.ts`). The card puts that logo, 1.3 times the card's type (33 px at 1440; it was 20 px before the type grew) on a light tile (`--foreground`, so a dark mark stays visible), at the start of the chip whose text is the app's
-  name; the `replaces ...` chip has none, and a logo never stands alone. **No screenshot is ever in the tour** (`ads` rule: a real capture is never composited into a scene; the family page
-  carries them beside the story). The file is the page's own `./portal/apps/<id>/logo.<hash10>.webp`, asked for when the card is built (a few KB, cached for a year).
+  name; the `replaces ...` chip has none, and a logo never stands alone. **No screenshot is ever in the tour** (the owner's ruling of 2026-10-22 keeps the tour and the scenes free of them: the family page
+  carries them beside the story, and the cuts and films may show them as labelled inserts, `story-v2.md` "App media"). The file is the page's own `./portal/apps/<id>/logo.<hash10>.webp`, asked for when the card is built (a few KB, cached for a year).
 - **"More".** A beat with a `detail` has a button at the right of the card's top line: "More", `aria-expanded`, `aria-controls`, `aria-label="More about this moment"`, a 44 px control whose box
   overlaps the kicker line by the few px it is taller than the monogram disc (negative margins), so **the card is no taller for it** and the placement of every closed card is what it was. It opens the beat's
   `before` and `after` (not the steps or the fact: those are the family page's) in the card, under the chips. The card's words (kicker, title, body, chips, scripted line, note) stay `aria-hidden`

@@ -105,7 +105,8 @@ loaded from a third party at run time: the site makes no third-party request.
 
 The pictures on the site (thumbnails, posters, link previews, the hero) are renders of our own HouseSpecs; the link previews
 are drawn by `scripts/story/build-og.mts` over them. No photograph or portrait is used. A third-party app's logo and real screenshots of it appear
-only as the app media below (a logo beside the app it names, a screenshot with its label); nothing is drawn, mocked up or composited.
+only as the app media below (a logo beside the app it names, a screenshot with its label); nothing is drawn or mocked up, and nothing is composited into a scene or the tour
+(the family pages show them today; the owner's ruling of 2026-10-22 also wants them as labelled inserts in the ad cuts and the films, which do not draw them yet).
 
 **Considered and not used.** [axe-core](https://github.com/dequelabs/axe-core) (the accessibility checker) is **MPL-2.0**, which
 is outside the licence list this repository takes (MIT, BSD, ISC, Apache-2.0, CC0), so `pnpm run portal:test` carries its own

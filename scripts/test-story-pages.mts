@@ -318,7 +318,9 @@ test('the Brennan page, with its media: the sticky nav, the card, the logos, the
     for (const r of new Set(mine.flatMap(b => b.app!.replaces))) assert.ok(swap.includes(`<li>${r}</li>`), `${m.id}: ${r} in "Rented before"`);
     const right = (swap.match(/<div class="swap-col swap-now">[\s\S]*$/) || [''])[0];
     for (const id of new Set(mine.map(b => b.app!.id))) {
-      const a = appMedia(media, id)!;
+      const a = appMedia(media, id);
+      // the frozen fixture may name an app no shipped story uses any more (kiwix): with no entry the page shows the app by name alone, which is the rule
+      if (!a || !a.logo) { assert.ok(!right.includes(`alt="${id} logo"`), `${m.id}: an app with no logo is shown by name alone`); continue; }
       assert.ok(right.includes(`alt="${a.logo!.alt}"`) && right.includes(`<span>${a.name}</span>`), `${m.id}: ${a.name} with its logo in "On the Core now"`);
     }
     // the moments' details: a native disclosure with before, after, the steps as an ordered list and the fact
