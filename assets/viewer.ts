@@ -249,6 +249,8 @@ export function mountViewer(api: Api) {
           <button class="vh-tool" data-act="path" aria-pressed="false" title="Show the camera path  P">${icon('route')}<span>Path</span></button>
           <button class="vh-tool" data-act="fly" aria-pressed="false" title="Fly the camera yourself  F">${icon('fly')}<span>Fly</span></button>
           <button class="vh-tool" data-act="hq" aria-pressed="false" title="Best quality: ambient occlusion, bloom and colour grading. Slower on most devices.">${icon('sparkles', 'vh-i-hq')}${icon('loader', 'vh-i-busy')}<span>Best quality</span></button>
+          <button class="vh-tool vh-show-tour" data-act="prev" title="Previous home  [">${icon('prev')}<span>Previous home</span></button>
+          <button class="vh-tool vh-show-tour" data-act="next" title="Next home  ]">${icon('next')}<span>Next home</span></button>
           <button class="vh-tool vh-show-compact" data-act="fullscreen" title="Full screen">${icon('maximize', 'vh-i-max')}${icon('minimize', 'vh-i-min')}<span>Full screen</span></button>
           <button class="vh-tool vh-show-compact" data-act="help" aria-haspopup="dialog" title="About, and what the Companion Core is">${icon('help')}<span>About</span></button>
         </div>

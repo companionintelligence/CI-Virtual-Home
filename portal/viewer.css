@@ -299,6 +299,8 @@ html[data-mode="view"] .vh-fail-actions > :first-child:hover { background: var(-
 }
 /* shown only in the compact layout (phones, and short landscape screens) */
 .vh .vh-show-compact { display: none; }
+/* shown only on a phone while a family tour runs (portal/story.css): Previous home and Next home leave the top bar for the More sheet, so the bar has room for the home's name */
+.vh .vh-show-tour { display: none; }
 
 /* the one glass: the floor colour (what the contrast audit stacks), the sheen over it, the blur and the edge (a rule below that sets its own background keeps the sheen by setting background-color only) */
 .vh-glass, .vh-top > *, .vh-dock, .vh-flybar, .vh-help, .vh-toast {
@@ -376,7 +378,7 @@ html[data-mode="view"] .vh-fail-actions > :first-child:hover { background: var(-
 .vh-flybar {
   position: absolute;
   top: calc(var(--vh-gap) + var(--vh-top-h) + 8px + env(safe-area-inset-top, 0px));
-  left: 50%;
+  left: calc(50% + (env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
   transform: translate(-50%, -8px);
   opacity: 0; visibility: hidden;
   pointer-events: none;
@@ -385,7 +387,7 @@ html[data-mode="view"] .vh-fail-actions > :first-child:hover { background: var(-
   padding: 5px 5px 5px 14px;
   border-radius: var(--vh-radius);
   white-space: nowrap;
-  max-width: calc(100% - 2 * var(--vh-gap));
+  max-width: calc(100% - 2 * var(--vh-gap) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
 }
 .vh[data-fly="1"] .vh-flybar { opacity: 1; visibility: visible; transform: translate(-50%, 0); pointer-events: auto; transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s; }
 .vh-flybar-label { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
@@ -409,10 +411,11 @@ html[data-mode="view"] .vh-fail-actions > :first-child:hover { background: var(-
 /* ---- the dock: shots · time of day / play · scrubber · time · tools */
 .vh-dock {
   position: absolute;
-  left: 50%;
+  /* centred in the room the notch and the home bar leave (a phone on its side has an inset at each end) */
+  left: calc(50% + (env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
   bottom: calc(var(--vh-gap) + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
-  width: min(1000px, calc(100% - 2 * var(--vh-gap)));
+  width: min(1000px, calc(100% - 2 * var(--vh-gap) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
   padding: 10px 12px 10px;
   border-radius: var(--vh-radius);
   pointer-events: auto;
@@ -646,9 +649,9 @@ html[data-mode="view"] .vh-scrub input {
 
 /* ---- toast and help: under the top bar, and under the free-camera bar while it shows */
 .vh-toast {
-  position: absolute; left: 50%; top: calc(var(--vh-gap) + var(--vh-top-h) + 12px + env(safe-area-inset-top, 0px));
+  position: absolute; left: calc(50% + (env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2); top: calc(var(--vh-gap) + var(--vh-top-h) + 12px + env(safe-area-inset-top, 0px));
   transform: translate(-50%, -6px);
-  max-width: calc(100% - 32px);
+  max-width: calc(100% - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
   padding: 9px 14px;
   border-radius: var(--vh-radius);
   font-weight: 600; font-size: 12.5px;
@@ -663,7 +666,7 @@ html[data-mode="view"] .vh-scrub input {
 .vh-help {
   position: absolute; right: calc(var(--vh-gap) + env(safe-area-inset-right, 0px)); top: calc(var(--vh-gap) + var(--vh-top-h) + 8px + env(safe-area-inset-top, 0px));
   width: 40rem;
-  max-width: calc(100% - 2 * var(--vh-gap));
+  max-width: calc(100% - 2 * var(--vh-gap) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
   padding: 1.1rem 1.5rem 1.4rem;
   border-radius: var(--st-r-card);
   font-size: var(--st-min); line-height: 1.38;
@@ -713,7 +716,9 @@ html[data-mode="view"] .vh-scrub input {
 @media (max-width: 760px), (max-height: 500px) {
   html[data-mode="view"] { --vh-gap: 8px; --vh-radius: 5px; --vh-top-h: 46px; }
   .vh-title { max-width: none; flex: 1 1 auto; padding: 5px 12px 6px; }
-  .vh-name { font-size: 14px; }
+  /* the home's name is shown in full: it wraps to a second line before it is ever cut (every display name is two lines at the width a phone's bar leaves it), and the meta line under it
+     is the only thing that may be cut with an ellipsis (a tour drops it on a narrow phone: portal/story.css) */
+  .vh-name { font-size: 14px; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.2; }
   .vh-meta { font-size: 11px; }
   .vh-actions { margin-left: 0; flex: none; }
   .vh-sep { display: none; }
@@ -777,6 +782,11 @@ html[data-mode="view"] .vh-scrub input {
   .vh-dock { flex-direction: row; align-items: center; gap: 6px; }
   .vh-row-chips { flex: 0 1 46%; }
   .vh-transport { flex: 1 1 54%; }
+}
+/* the narrowest phones (320 px): the bar holds back, the title and up to three buttons, so the title gives up a little padding and a point of type before a word is ever broken */
+@media (max-width: 340px) {
+  .vh-title { padding-inline: 8px; }
+  .vh-name { font-size: 13px; }
 }
 @media (max-width: 480px) {
   .vh-flybar-label b { display: none; }
