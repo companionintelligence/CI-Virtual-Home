@@ -600,7 +600,11 @@ test('the tour\'s cards are the light glass: two corners (5 px on a card, 3 px o
   const literal = (src: string) => [...src.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*?border-radius:\s*([^;}]+)[;}]/g)].map(m => [m[1].trim().split(',').pop()!.trim(), m[2].trim()] as const).filter(([, v]) => !/^var\(--(st-r-(card|sheet|ctl)|vh-radius)\)$/.test(v));
   assert.deepEqual(literal(sc), [], 'story.css: every border-radius is --st-r-card, --st-r-sheet or --st-r-ctl');
   assert.deepEqual(literal(view).filter(([sel]) => !/slider-thumb|range-thumb/.test(sel)), [], 'viewer.css: every border-radius but the scrubber\'s thumb is a token');
-  assert.ok(!/white-space:\s*nowrap|text-overflow:\s*ellipsis/.test(sc.replace(/\.st-live-region[^}]*\}/, '')), 'story.css: no reading text is nowrap or cut with an ellipsis (the live region is off screen)');
+  // (the two rows that scroll sideways on a phone are control rows, judged by their own box like the dock's chips: the family's person chips on the start sheet (`.st-member`) and the apps of a
+  // beat sheet (`.st-chip`); each keeps its one line. Nothing else may be nowrap, and no text is ever cut with an ellipsis.)
+  const reading = sc.replace(/\.st-live-region[^}]*\}/, '').replace(/[^{}]*\.st-(members?|chips?)\b[^{}]*\{[^{}]*\}/g, '');
+  assert.ok(!/white-space:\s*nowrap|text-overflow:\s*ellipsis/.test(reading), 'story.css: no reading text is nowrap or cut with an ellipsis (the live region is off screen; the phone\'s person chips and app chips are rows that scroll sideways)');
+  assert.ok(/\.st-member[^{]*\{[^}]*white-space:\s*nowrap/.test(sc) && !/text-overflow:\s*ellipsis/.test(sc), 'the person chips are one line each and nothing is cut with an ellipsis');
   assert.ok(/\.st \{[^}]*overflow-wrap:\s*anywhere/.test(sc), 'the tour\'s layer wraps any word');
   assert.deepEqual([...sc.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/g)].map(m => m[0]), [], 'story.css has no hex or rgb colour: tokens only');
   // the glass and its text are tokens of viewer.css, in the canon's light set (room-creator.html's light token block)

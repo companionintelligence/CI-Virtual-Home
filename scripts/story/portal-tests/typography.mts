@@ -97,7 +97,8 @@ export default async function typography(ctx: TestCtx): Promise<void> {
       if (s.display === 'none' || s.display === 'contents' || s.visibility === 'hidden' || (b.width === 0 && b.height === 0)) continue;
       n++;
       for (const k of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'] as const) { const v = (s as any)[k] as string; if (!/^(0px|5px|3px)( (0px|5px|3px))?$/.test(v)) { radii.push(`${name(el)} ${k.replace(/^border|Radius$/g, '')} ${v}`); break; } }
-      if (s.whiteSpace === 'nowrap' || s.whiteSpace === 'pre' || s.textOverflow === 'ellipsis') nowrap.push(`${name(el)} (${s.whiteSpace}, ${s.textOverflow})`);
+      // (a phone's two rows that scroll sideways by design, the family's person chips on the start sheet and the apps on a beat sheet, keep each chip to one line: controls, judged by their row's box)
+      if ((s.whiteSpace === 'nowrap' || s.whiteSpace === 'pre' || s.textOverflow === 'ellipsis') && !el.closest('.st-members-list, .st-card[data-mode="sheet"] .st-chips')) nowrap.push(`${name(el)} (${s.whiteSpace}, ${s.textOverflow})`);
       if (el !== root && !scrolledAway(el) && (b.right > pb.r + 0.6 || b.left < pb.l - 0.6)) escapes.push(`box ${name(el)} ${Math.round(b.left - pb.l)}..${Math.round(b.right - pb.r)}`);
       if (el.matches('.st-chip, .st-btn, .st-disc, .st-logo, .vh-help a, .vh-help kbd')) widest = Math.max(widest, b.right - rr.left);
     }
@@ -245,7 +246,9 @@ export default async function typography(ctx: TestCtx): Promise<void> {
       const fits = (g: any, what: string) => ok(!!g && g.spare >= -0.5 && g.spare <= 3 && (g.solved === null || g.w <= g.solved + 0.5), `${label}: ${what} fits its text: ${g && g.spare} px spare at the right of its widest line (${g && Math.round(g.w)} px of at most ${g && g.solved})`);
       // the start card, the top bar and the dock
       clean(await page.evaluate(GLASS, '.st-start-card'), 'the start card');
-      fits(await page.evaluate(GLASS, '.st-start-card'), 'the start card');
+      // (a phone's start card is the full-width bottom sheet of "On a phone", not trimmed to its widest line: at most half the window)
+      if (sheet && PHONE(vw)) { const sc = await page.evaluate(() => { const c = document.querySelector('.st-start-card') as HTMLElement, r = c.getBoundingClientRect(); return { w: r.width, h: r.height, vh: innerHeight, layout: c.dataset.layout }; }); ok(sc.layout === 'sheet' && Math.abs(sc.w - (vw - 16)) <= 1 && sc.h <= sc.vh * 0.5 + 1, `${label}: the start card's sheet is full width (${Math.round(sc.w)} of ${vw - 16} px) and ${Math.round(sc.h / sc.vh * 100)} % of the height (at most 50 %)`); }
+      else fits(await page.evaluate(GLASS, '.st-start-card'), 'the start card');
       clean(await page.evaluate(GLASS, '.vh-top'), 'the top bar', true);
       clean(await page.evaluate(GLASS, '.vh-dock'), 'the dock', true);
       await page.locator('.st-start .st-actions .st-btn').last().click(); await sleep(500);
