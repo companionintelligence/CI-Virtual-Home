@@ -58,12 +58,12 @@
       {
         "at": "afternoon",
         "beat": "kitchen-merge",
-        "line": "The trip pack goes to the office as one file."
+        "line": "Fernanda marks a batch in timed rounds."
       },
       {
         "at": "after-school",
         "beat": "bedroom-sources",
-        "line": "Ayaan saves sources for his history project."
+        "line": "Ayaan saves the articles for his history project."
       },
       {
         "at": "after-school",
@@ -73,12 +73,12 @@
       {
         "at": "weekend",
         "beat": "balcony-papers",
-        "line": "Chike files the tenancy papers on the balcony."
+        "line": "Chike adds his weekend project's page to a watch list."
       },
       {
         "at": "weekend",
         "beat": "living-audiobook",
-        "line": "Dmitri catches up on his set text from the sofa."
+        "line": "Dmitri puts a playlist on while he models."
       }
     ]
   },
@@ -142,7 +142,7 @@
       "colour": "chart-3",
       "archetype": "learner",
       "profile": {
-        "bio": "Ayaan studies in Bedroom Two. He saves sources for his history project, checks his German against the textbook and listens to his essays read back before he rewrites them."
+        "bio": "Ayaan studies in Bedroom Two. He keeps his history notes with their sources, checks his German against the textbook and listens to his essays read back before he rewrites them."
       }
     },
     {
@@ -154,7 +154,7 @@
       "colour": "chart-4",
       "archetype": "gamer",
       "profile": {
-        "bio": "Dmitri is in sixth form, plays Steam from the desk by the door and models in his spare time. His games, his models and his audiobooks all run on the Core."
+        "bio": "Dmitri is in sixth form, plays Steam from the desk by the door and models in his spare time. His games, his models and his music all run on the Core."
       }
     }
   ],
@@ -377,11 +377,8 @@
       "segment": "consumer",
       "app": {
         "id": "steam-headless",
-        "replaces": [
-          "Xbox Cloud Gaming"
-        ]
+        "replaces": []
       },
-      "service": "xbox-cloud-gaming",
       "capability": "run Steam on your Core and play it in a browser on a screen in the house",
       "anchor": {
         "role": "core",
@@ -404,22 +401,21 @@
         "side": "right"
       },
       "popup": {
-        "title": "The game runs by the door",
-        "body": "Dmitri signs in with his own Valve account, and Steam runs on the Core by the front door. He plays in a browser tab on his laptop.",
+        "title": "One install, two laptops",
+        "body": "Dmitri installs his games once, on the Core, and Steam runs there. On either laptop, he signs in with his Valve account and opens the session in a browser tab.",
         "chips": [
-          "Steam Headless",
-          "alternative to Xbox Cloud Gaming"
+          "Steam Headless"
         ],
         "note": "Steam needs a Valve account. A Core may lack the graphics power a game wants."
       },
       "film": true,
       "detail": {
-        "before": "Dmitri played through Xbox Cloud Gaming, with every session running on someone else's hardware.",
-        "after": "Steam Headless runs his own Steam library on the Core, and he opens the session in a browser. Valve still keeps the account and the library.",
+        "before": "Every game was installed on each laptop that played it, and each laptop held its own copy of the downloads.",
+        "after": "Steam Headless holds the one install on the Core. Each laptop only opens the session in a browser tab, and Valve still keeps the account and the library.",
         "steps": [
+          "Install the game once on the Core",
           "Sign in with his own Valve account",
-          "Open the session in a browser tab",
-          "Pick a game from his library"
+          "Open the session in a browser tab"
         ],
         "fact": "Steam Headless runs Steam on your Core and plays it in a browser on a screen in the house."
       }
@@ -487,13 +483,13 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "audiobookshelf",
+        "id": "navidrome",
         "replaces": [
-          "Audible"
+          "Apple Music"
         ]
       },
-      "service": "audible",
-      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "service": "apple-music",
+      "capability": "stream your own music collection to any device",
       "anchor": {
         "role": "couch",
         "room": "living",
@@ -512,22 +508,22 @@
         "side": "auto"
       },
       "popup": {
-        "title": "The set text, read to him",
-        "body": "Dmitri listens to a chapter of his English set text on the sofa. Audiobookshelf holds the audiobook on the Core and keeps his place for any phone in the flat.",
+        "title": "A playlist for the modelling",
+        "body": "On the sofa, Dmitri plays the family's music files through Navidrome on the Core while he models. The playlist is a list of files, not an account.",
         "chips": [
-          "Audiobookshelf",
-          "alternative to Audible"
+          "Navidrome",
+          "alternative to Apple Music"
         ]
       },
       "detail": {
-        "before": "Dmitri bought his set texts as audiobooks in Audible, and each one stayed in that library.",
-        "after": "Audiobookshelf keeps the audiobook on the Core and remembers the place. Any phone in the flat picks up where the last one stopped.",
+        "before": "Dmitri's modelling playlists lived in Apple Music, apart from the songs the family already owned.",
+        "after": "Navidrome streams the music files on the Core to any device in the flat. His playlists sit beside the files they play.",
         "steps": [
-          "Add the audiobook folder",
-          "Start the chapter on the sofa",
-          "Pick it up on another phone"
+          "Open Navidrome in a browser",
+          "Pick songs from the music folder",
+          "Press play on the sofa"
         ],
-        "fact": "Audiobookshelf lets you listen to your audiobooks and podcasts, and pick up where you left off on any device."
+        "fact": "Navidrome streams your own music collection to any device."
       }
     },
     {
@@ -752,13 +748,13 @@
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "stirling-pdf",
+        "id": "super-productivity",
         "replaces": [
-          "Smallpdf"
+          "Todoist"
         ]
       },
-      "service": "smallpdf",
-      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "service": "todoist",
+      "capability": "plan your day, track time and run a Pomodoro timer",
       "anchor": {
         "role": "kitchen-island",
         "nth": 0,
@@ -780,22 +776,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "The trip pack becomes one file",
-        "body": "The museum trip needs one file for the school office. Fernanda merges the information sheet and the blank consent form in Stirling-PDF at the breakfast bar.",
+        "title": "Marking in timed rounds",
+        "body": "Fernanda marks the class's essays in Super Productivity on the Core, one timed round for each batch of five. The timer runs, and the breaks are on the list.",
         "chips": [
-          "Stirling-PDF",
-          "alternative to Smallpdf"
+          "Super Productivity",
+          "alternative to Todoist"
         ]
       },
       "detail": {
-        "before": "Fernanda merged her PDFs on the Smallpdf website, one file at a time.",
-        "after": "Stirling-PDF merges the pages on the Core. She drags both files in, checks the order and saves one PDF to the trip folder.",
+        "before": "Marking ran on in long stretches, and the to-do list lived in Todoist apart from the timer.",
+        "after": "Super Productivity keeps the marking list and a Pomodoro timer together on the Core, so each round starts with the next batch.",
         "steps": [
-          "Drag in the information sheet",
-          "Add the blank consent form",
-          "Merge them and save one PDF"
+          "Add a task for each batch",
+          "Start the timer for the round",
+          "Take the break when it ends"
         ],
-        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+        "fact": "Super Productivity helps you plan your day, track time and run a Pomodoro timer."
       }
     },
     {
@@ -954,16 +950,16 @@
       "id": "balcony-papers",
       "chapter": "balcony",
       "member": "chike",
-      "category": "privacy",
+      "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "papra",
+        "id": "uptime-kuma",
         "replaces": [
-          "Google Drive"
+          "New Relic"
         ]
       },
-      "service": "google-drive",
-      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "service": "new-relic",
+      "capability": "watch your sites and services and get an alert when one goes down",
       "anchor": {
         "role": "patio-seat",
         "nth": 1,
@@ -984,22 +980,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "The tenancy papers, filed",
-        "body": "At the bistro table on the balcony, Chike files the tenancy agreement and the boiler record in Papra. The landlord's paperwork now sits in one archive on the Core.",
+        "title": "The weekend project, watched",
+        "body": "On the balcony, Chike adds his weekend project's test page to Uptime Kuma on the Core. If the page stops answering, he hears about it first.",
         "chips": [
-          "Papra",
-          "alternative to Google Drive"
+          "Uptime Kuma",
+          "alternative to New Relic"
         ]
       },
       "detail": {
-        "before": "Chike kept the tenancy agreement and the receipts in one Google Drive folder.",
-        "after": "Papra archives each paper on the Core, so the agreement and the boiler record are there when the landlord asks.",
+        "before": "The weekend project's page had no check, and Chike learned it was down from a tester's message.",
+        "after": "Uptime Kuma checks the page every few minutes from the Core, and Chike hears about a failure before his testers do.",
         "steps": [
-          "Add the tenancy agreement",
-          "File the boiler record beside it",
-          "Open both when the landlord asks"
+          "Add the test page as a check",
+          "Pick who gets the alert",
+          "Read the history after a deploy"
         ],
-        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+        "fact": "Uptime Kuma watches your sites and services and sends an alert when one goes down."
       }
     },
     {
@@ -1223,13 +1219,13 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "linkwarden",
+        "id": "readeck",
         "replaces": [
-          "Raindrop.io"
+          "Instapaper"
         ]
       },
-      "service": "raindrop-io",
-      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "service": "instapaper",
+      "capability": "save articles to read later without a hosted bookmarking service",
       "anchor": {
         "role": "room",
         "room": "bedroom",
@@ -1248,23 +1244,23 @@
         "side": "right"
       },
       "popup": {
-        "title": "A source that cannot vanish",
-        "body": "Ayaan saves each source for his history project in Linkwarden. It keeps a screenshot and a PDF of the page, so a page that disappears is still there.",
+        "title": "Articles kept for the project",
+        "body": "Ayaan saves the articles for his history project in Readeck on the Core. Each one is kept as a clean copy he can read at his desk.",
         "chips": [
-          "Linkwarden",
-          "alternative to Raindrop.io"
+          "Readeck",
+          "alternative to Instapaper"
         ]
       },
       "film": true,
       "detail": {
-        "before": "Ayaan bookmarked his sources in Raindrop.io, and a page that vanished left only the bookmark.",
-        "after": "Linkwarden saves each page with a screenshot and a PDF on the Core, so the source is still there when the site moves.",
+        "before": "Ayaan saved articles to Instapaper, and the only copy lived in that account.",
+        "after": "Readeck keeps each article as a copy on the Core, so it opens at his desk even if the page changes.",
         "steps": [
-          "Save the page for the project",
+          "Save the article in Readeck",
           "Tag it with the topic",
-          "Open the saved copy when the page is gone"
+          "Open the copy when he writes the essay"
         ],
-        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+        "fact": "Readeck saves articles to read later without a hosted bookmarking service."
       }
     },
     {
@@ -1441,11 +1437,12 @@
     }
   },
   "notes": [
-    "Told in the v3 shape: 17 of 20 room beats are pair beats. The three pair-less ones are the Companion Memory draft, the OpenClaw permit form and Kokoro reading an essay back.",
+    "Told in the v3 shape: 16 of 20 room beats are pairs. The four pair-less ones are the Companion Memory draft, the OpenClaw permit form, Kokoro reading an essay back and Dmitri's Steam Headless session.",
     "The file is rademaker.json because the slug is the family's (cast plan: rademaker lives in the home with the long table); the home is the walkup-duplex apartment.",
-    "Steam Headless is paired with Xbox Cloud Gaming, a pair the catalog lists and lander.json does not hold; the geforce-now pair on the hold list is not used.",
+    "Steam Headless is pair-less on purpose, as in the Voss flat: its only pairs are cloud gaming services, which the copy lint refuses by name. The persona-replaces warning on living-session is that choice.",
     "Age rule 16: Ayaan (13) and Dmitri (16) use no chat model or agent in their own beats; Clove and Cassia work only for Fernanda and Chike, who approve every result.",
     "Honest edges carried: Steam needs a Valve account; Pi-hole forwards unblocked lookups to the family DNS provider; Donetick reminders use an outside notification service; BookLore fetches covers from outside; Spliit does not move money.",
-    "The home has no TV: the media beat at the couch is the Audiobookshelf audiobook; Dmitri plays in a browser tab at the desk by the door."
+    "The home has no TV: the media beat at the couch is Dmitri's Navidrome playlist; he plays Steam in a browser tab at the desk by the door.",
+    "No third-party app is in more than two of the six apartments: Uptime Kuma, Super Productivity, Navidrome and Readeck are this flat's."
   ]
 }

@@ -63,7 +63,7 @@
       {
         "at": "afternoon",
         "beat": "nook-merge",
-        "line": "The records Saeed requested arrive, and he puts them in order."
+        "line": "Saeed's hours for each piece add up."
       },
       {
         "at": "afternoon",
@@ -537,13 +537,10 @@
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "stirling-pdf",
-        "replaces": [
-          "Smallpdf"
-        ]
+        "id": "kimai",
+        "replaces": []
       },
-      "capability": "merge, split, compress and convert PDFs on your own Core",
-      "service": "smallpdf",
+      "capability": "track time per project and client, with reports",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -559,22 +556,21 @@
         "side": "left"
       },
       "popup": {
-        "title": "Nine files become one record",
-        "body": "A records request comes back as nine separate PDFs. Saeed merges them in date order with Stirling-PDF, and the single file stays on the Core.",
+        "title": "Hours per piece, summed weekly",
+        "body": "Saeed times each commission in Kimai on the Core. On Friday the hours for each piece are already added up for the invoice.",
         "chips": [
-          "Stirling-PDF",
-          "alternative to Smallpdf"
+          "Kimai"
         ]
       },
       "detail": {
-        "before": "Saeed merged records through Smallpdf, uploading each file to its website, one at a time.",
-        "after": "Stirling-PDF merges the files on the Core. Saeed puts the pages in date order and saves the result beside his notes.",
+        "before": "Saeed guessed his hours for each commission on Friday evening and invoiced from memory.",
+        "after": "Kimai times each piece as he works and reports the hours per client on the Core.",
         "steps": [
-          "Drop the files into Stirling-PDF",
-          "Put the pages in date order",
-          "Save the merged file beside the notes"
+          "Start the timer on a piece",
+          "Stop it when he leaves the desk",
+          "Read the hours per client on Friday"
         ],
-        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+        "fact": "Kimai tracks time per project and client, with reports."
       }
     },
     {
@@ -584,13 +580,13 @@
       "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "excalidraw",
+        "id": "drawio",
         "replaces": [
-          "Miro"
+          "Lucidchart"
         ]
       },
-      "capability": "a whiteboard with a hand-drawn look to sketch ideas",
-      "service": "miro",
+      "capability": "draw flowcharts, floor plans and network maps in the browser",
+      "service": "lucidchart",
       "anchor": {
         "role": "room",
         "room": "office"
@@ -600,22 +596,22 @@
         "side": "right"
       },
       "popup": {
-        "title": "A timeline sketched by hand",
-        "body": "Saeed sketches who knew what, and when, on a whiteboard in his browser. The sketch is a file on the Core, ready to redraw when a date moves.",
+        "title": "A decision drawn as a flowchart",
+        "body": "Saeed draws how a funding decision passed through three committees in draw.io on the Core. Each shape is a committee, and each arrow is a vote.",
         "chips": [
-          "Excalidraw",
-          "alternative to Miro"
+          "draw.io",
+          "alternative to Lucidchart"
         ]
       },
       "detail": {
-        "before": "Saeed's story timelines lived on Miro boards.",
-        "after": "Excalidraw opens in a browser tab from the Core. The timeline is a file there, and he redraws it when a date moves.",
+        "before": "His flowcharts lived in Lucidchart, away from the notes they explained.",
+        "after": "draw.io opens in a browser tab from the Core, and the chart is a file beside the story's notes.",
         "steps": [
-          "Open Excalidraw in a browser tab",
-          "Draw the events in date order",
-          "Save the board with the story's notes"
+          "Draw a shape for each committee",
+          "Join the shapes with arrows for the votes",
+          "Save the chart with the story's notes"
         ],
-        "fact": "Excalidraw is a whiteboard with a hand-drawn look, for sketching ideas together."
+        "fact": "draw.io draws flowcharts, floor plans and network maps in the browser."
       }
     },
     {
@@ -625,13 +621,13 @@
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "pairdrop",
+        "id": "cryptpad",
         "replaces": [
-          "AirDrop"
+          "Google Workspace"
         ]
       },
-      "capability": "send files between phones and laptops on the same Wi-Fi",
-      "service": "airdrop",
+      "capability": "write, draw and plan together",
+      "service": "google-workspace",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -653,22 +649,22 @@
         "from": "right"
       },
       "popup": {
-        "title": "A handwritten letter reaches the laptop",
-        "body": "A source mails Saeed a handwritten letter. He takes pictures of each page, and PairDrop sends them to the laptop over the home Wi-Fi.",
+        "title": "A sensitive draft in one pad",
+        "body": "Saeed drafts a long piece about a source in CryptPad on the Core. The pad stays on the Core until he decides to share it.",
         "chips": [
-          "PairDrop",
-          "alternative to AirDrop"
+          "CryptPad",
+          "alternative to Google Workspace"
         ]
       },
       "detail": {
-        "before": "Saeed's phone pictures reached the laptop by AirDrop, one transfer at a time.",
-        "after": "PairDrop opens in a browser tab on the phone and the laptop, served from the Core. The files pass over the home Wi-Fi.",
+        "before": "Saeed drafted sensitive pieces in a Google Workspace document, and every revision stayed in that account.",
+        "after": "CryptPad keeps the draft as one pad on the Core, and Saeed shares it only when he chooses.",
         "steps": [
-          "Open PairDrop on the phone and the laptop",
-          "Pick the laptop on the phone",
-          "Save the pages beside the notes"
+          "Start a pad for the piece",
+          "Write the draft in it",
+          "Share the pad when the piece is ready"
         ],
-        "fact": "PairDrop sends files between phones and laptops on the same Wi-Fi."
+        "fact": "CryptPad lets you write, draw and plan together."
       }
     },
     {
@@ -732,13 +728,13 @@
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "docuseal",
+        "id": "activepieces",
         "replaces": [
-          "DocuSign"
+          "Zapier"
         ]
       },
-      "capability": "fill and sign PDF forms on any device, from your own Core",
-      "service": "docusign",
+      "capability": "connect your apps with visual automations",
+      "service": "zapier",
       "anchor": {
         "role": "couch",
         "fallback": [
@@ -754,22 +750,22 @@
         "eye": "seated"
       },
       "popup": {
-        "title": "The supplier signs on the sofa",
-        "body": "A paper supplier's rep visits the flat to renew the trade terms. She signs the PDF on Nasrin's tablet, and the signed file sits on the Core.",
+        "title": "Every order email becomes a row",
+        "body": "When an order email arrives, Activepieces on the Core adds a line to the shop's stock table. Nasrin checks the lines on the sofa each evening.",
         "chips": [
-          "Docuseal",
-          "alternative to DocuSign"
+          "Activepieces",
+          "alternative to Zapier"
         ]
       },
       "detail": {
-        "before": "The trade terms went out through DocuSign for each signature, and the signed copies came back by email.",
-        "after": "Docuseal fills and signs the PDF on Nasrin's tablet in the room. The signed file is saved on the Core.",
+        "before": "Order emails were copied into the stock table by hand, and some were forgotten until a customer asked.",
+        "after": "Activepieces watches for the order email and adds the line to the stock table on the Core. Nasrin reads it and corrects anything wrong.",
         "steps": [
-          "Open the terms PDF in Docuseal",
-          "Hand the tablet to the supplier's rep",
-          "Save the signed file on the Core"
+          "Pick the order email as the starting point",
+          "Add the step that writes a stock line",
+          "Check the new lines each evening"
         ],
-        "fact": "Docuseal fills and signs PDF forms on any device, from your own Core."
+        "fact": "Activepieces connects your apps with visual automations."
       }
     },
     {
@@ -963,13 +959,13 @@
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "papra",
+        "id": "vikunja",
         "replaces": [
-          "Google Drive"
+          "Todoist"
         ]
       },
-      "capability": "archive receipts, warranties and contracts you rarely look at",
-      "service": "google-drive",
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "service": "todoist",
       "anchor": {
         "role": "laundry",
         "room": "laundry",
@@ -987,22 +983,22 @@
         "eye": "seated"
       },
       "popup": {
-        "title": "The washer's receipt and manual",
-        "body": "The washing machine stops mid-cycle, and Nasrin needs the receipt. Papra archived it with the manual and the repair terms, so she finds all three together.",
+        "title": "The bedding wash repeats itself",
+        "body": "Nasrin sets the bedding wash as a recurring job in Vikunja on the Core. A reminder comes every second Sunday, and she ticks it off at the machine.",
         "chips": [
-          "Papra",
-          "alternative to Google Drive"
+          "Vikunja",
+          "alternative to Todoist"
         ]
       },
       "detail": {
-        "before": "The receipt sat in a Google Drive folder, away from the manual and the repair terms.",
-        "after": "Papra archives receipts, manuals and terms on the Core, so one search finds all three.",
+        "before": "The wash days lived in Todoist as one-off reminders that Nasrin retyped each fortnight.",
+        "after": "Vikunja repeats the job on its own schedule and keeps the list on the Core, shared with Saeed.",
         "steps": [
-          "Scan the receipt and the manual",
-          "Add the repair terms",
-          "Search for the machine's name"
+          "Add the bedding wash as a task",
+          "Set it to repeat every second Sunday",
+          "Tick it off at the machine"
         ],
-        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+        "fact": "Vikunja gives you lists, boards and calendars for tasks, with reminders and recurring jobs."
       }
     },
     {
@@ -1387,12 +1383,13 @@
     }
   },
   "notes": [
-    "Paperless-ngx is over the 40 percent app cap, so the cast plan's paperless is swapped for Papra (laundry-receipt); the plan and the derived casting are changed to match.",
+    "Paperless-ngx is over the 40 percent app cap, so the plan's paperless was swapped. Papra is told in two other flats and is left out here; the plan lists Twenty instead.",
     "Whisper-WebUI would suit Saeed's interview tape but has no QA screenshot, so it needs an owner entry in reviewed.json; it is left out and the tape is not told.",
     "Umami and Hi.Events carry the catalog's public-access caveat. Each beat carries the note and tells a count or a guest list at home, never a public link.",
     "Listmonk sending needs an outside mail provider; the beat says so and promises no delivery. Docuseal: the supplier signs in the room, never from outside the home network.",
     "Endurain: syncing out is optional (catalog caveat); the beat logs rides only and makes no health claim. Wallos carries its logo-fetch note.",
     "Barberry (Hermes) acts on Obsidian through its MCP entry and only lists; Sumac (OpenClaw) opens Invoice Ninja and only drafts. Both are approved line by line by their owner.",
-    "Camera: the first run walks the street to the Core, then every room beat is on the second level. The only walk off it is down the stairs to the street for out-front and the outro."
+    "Camera: the first run walks the street to the Core, then every room beat is on the second level; the only walk off it is down to the street for out-front and the outro. No TV: the couch media beat is the podcast.",
+    "No third-party app is in more than two of the six apartments: Vikunja, Kimai, Activepieces, draw.io and CryptPad are this flat's. Kimai and the Homarr start page are pair-less."
   ]
 }

@@ -49,7 +49,7 @@
       {
         "at": "midday",
         "beat": "bar-plan",
-        "line": "Zaid fills in a content plan at the bar."
+        "line": "Zaid lines up every client's launches at the bar."
       },
       {
         "at": "midday",
@@ -59,7 +59,7 @@
       {
         "at": "afternoon",
         "beat": "studio-form",
-        "line": "Cacao fills in the paper order after lunch."
+        "line": "Cacao checks paper stock after lunch."
       },
       {
         "at": "afternoon",
@@ -115,7 +115,7 @@
       "companion": {
         "name": "Cacao",
         "runtime": "OpenClaw",
-        "job": "Fills in supplier order forms with the details Ximena typed.",
+        "job": "Checks supplier stock pages for the paper Ximena names and lists what it finds.",
         "personality": [
           "calm",
           "dry",
@@ -123,10 +123,10 @@
         ],
         "voice": "v-deep-m",
         "memory": false,
-        "limits": "One form at a time. Ximena reads each field and sends it herself."
+        "limits": "One page at a time. Ximena reads the list and places the order herself."
       },
       "profile": {
-        "bio": "Ximena photographs for clients and pulls screen prints at the bench beside the Core. Her shoots, line art and press papers sit on the Core, and Cacao fills in the order forms that she checks and sends herself."
+        "bio": "Ximena photographs for clients and pulls screen prints at the bench beside the Core. Her shoots, line art and press papers sit on the Core, and Cacao checks supplier stock pages for the paper she names."
       }
     }
   ],
@@ -266,7 +266,7 @@
       "segment": "consumer",
       "with": [
         "ghost",
-        "grist",
+        "baserow",
         "penpot",
         "photoprism"
       ],
@@ -280,14 +280,14 @@
       "popup": {
         "kind": "phone",
         "title": "Zaid and Ximena choose their agents",
-        "body": "In the Companion Hub store, Zaid picks Hermes and Ximena picks OpenClaw. Companion Memory comes along, with Ghost, Grist, Penpot and PhotoPrism. Then they walk away.",
+        "body": "In the Companion Hub store, Zaid picks Hermes and Ximena picks OpenClaw. Companion Memory comes along, with Ghost, Baserow, Penpot and PhotoPrism. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
             "Companion Memory",
-            "Apps: Ghost, Grist, Penpot, PhotoPrism"
+            "Apps: Ghost, Baserow, Penpot, PhotoPrism"
           ]
         }
       }
@@ -480,8 +480,8 @@
         "side": "auto"
       },
       "popup": {
-        "title": "Cacao fills in the paper order",
-        "body": "Cacao opens the paper supplier's website and fills in the sizes Ximena typed. Ximena reads every field, then sends the order herself.",
+        "title": "Cacao finds the paper in stock",
+        "body": "Cacao opens three paper suppliers' stock pages and lists which have the sheet size Ximena wants. Ximena reads the list and places the order herself.",
         "chips": [
           "OpenClaw"
         ],
@@ -489,15 +489,15 @@
       },
       "say": {
         "speaker": "ximena",
-        "text": "The form is filled in. Please check the sizes before you send it."
+        "text": "Two suppliers have the sheets in stock. Please choose which one before I go on."
       },
       "detail": {
-        "before": "Ordering paper meant typing the same sizes and the same address into a supplier's form, field by field.",
-        "after": "Cacao opens the supplier's page in its browser and fills in the form from what Ximena typed. Ximena reads every field and sends it herself.",
+        "before": "Comparing paper suppliers meant opening each website in turn and keeping the sizes and prices in her head.",
+        "after": "Cacao opens each supplier's page in its browser and lists what is in stock. Ximena compares the list and orders herself.",
         "steps": [
-          "Type the sizes and the quantity",
-          "Let Cacao fill in the form",
-          "Read every field, then send it"
+          "Type the sheet size she wants",
+          "Let Cacao check each supplier's page",
+          "Read the list, then order herself"
         ],
         "fact": "OpenClaw is an agent with browser automation and tool use, running in a sandboxed app on your Core."
       }
@@ -506,16 +506,16 @@
       "id": "studio-warranty",
       "chapter": "studio",
       "member": "ximena",
-      "category": "home",
+      "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "papra",
+        "id": "tldraw",
         "replaces": [
-          "Google Drive"
+          "Miro"
         ]
       },
-      "service": "google-drive",
-      "capability": "archive the receipts and contracts you rarely look at",
+      "service": "miro",
+      "capability": "a shared whiteboard on an infinite canvas",
       "anchor": {
         "role": "bookshelf",
         "room": "office",
@@ -533,22 +533,22 @@
         "side": "right"
       },
       "popup": {
-        "title": "The press warranty turns up",
-        "body": "The press jams after three winters, and the warranty is in Papra on the Core. It was filed with the receipt the week the press arrived.",
+        "title": "Paper samples on one board",
+        "body": "Ximena pins photos of paper samples and ink swatches onto one board in tldraw on the Core. The autumn run's palette takes shape beside the files.",
         "chips": [
-          "Papra",
-          "alternative to Google Drive"
+          "tldraw",
+          "alternative to Miro"
         ]
       },
       "detail": {
-        "before": "Receipts and warranties went into a Google Drive folder, and finding one meant remembering what it was called.",
-        "after": "Papra keeps each receipt with its warranty and its date on the Core, so the press's papers come up by name.",
+        "before": "The samples lived on a Miro board that held the pictures but none of the files they came from.",
+        "after": "tldraw runs as a shared whiteboard on the Core, so the board sits beside the sample photos and both of them can add to it.",
         "steps": [
-          "Scan the receipt the day it arrives",
-          "File it with the warranty",
-          "Search for the press's name when it jams"
+          "Drop in a picture of each sample",
+          "Group the samples by paper",
+          "Pick the palette and note its name"
         ],
-        "fact": "Papra archives the receipts and contracts you rarely look at, until you need them."
+        "fact": "tldraw is a shared whiteboard on an infinite canvas."
       }
     },
     {
@@ -603,13 +603,13 @@
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "grist",
+        "id": "baserow",
         "replaces": [
           "Airtable"
         ]
       },
       "service": "airtable",
-      "capability": "a spreadsheet-database with real Python formulas, stored as a SQLite file",
+      "capability": "build a no-code database for orders, inventory or projects",
       "anchor": {
         "role": "kitchen-island",
         "fallback": [
@@ -624,22 +624,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "The plan counts its own gaps",
-        "body": "At the breakfast bar, Zaid keeps a client's content plan in Grist on the Core. A Python formula flags the weeks with nothing booked.",
+        "title": "Every client's launches in one table",
+        "body": "At the breakfast bar, Zaid keeps every client's launches in one Baserow table on the Core. A filter picks out the weeks with nothing booked.",
         "chips": [
-          "Grist",
+          "Baserow",
           "alternative to Airtable"
         ]
       },
       "detail": {
-        "before": "A client's plan lived in Airtable, one view for each channel, with the formulas inside that editor.",
-        "after": "Grist stores the plan as a SQLite file on the Core, with Python formulas, and Zaid can copy the file out with it.",
+        "before": "Each client's launches sat in its own Airtable base, so one empty week took four tabs to find.",
+        "after": "Baserow holds every client's launches in one table on the Core, and a filter on the table lists the weeks with nothing booked.",
         "steps": [
-          "Add a row for each planned post",
-          "Write a formula that flags the empty weeks",
-          "Copy the file out when a client asks"
+          "Add a row for each planned launch",
+          "Add a filter for the empty weeks",
+          "Share the table with Ximena"
         ],
-        "fact": "Grist is a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+        "fact": "Baserow lets you build a no-code database for orders, inventory or projects."
       }
     },
     {
@@ -1020,13 +1020,13 @@
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "stirling-pdf",
+        "id": "logseq",
         "replaces": [
-          "Adobe Acrobat"
+          "Notion"
         ]
       },
-      "service": "adobe-acrobat",
-      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "service": "notion",
+      "capability": "write notes and a daily journal in plain Markdown files",
       "anchor": {
         "role": "bookshelf",
         "room": "living",
@@ -1045,22 +1045,22 @@
         "side": "auto"
       },
       "popup": {
-        "title": "One PDF for the client pack",
-        "body": "Zaid merges the brief, the plan and the report into one PDF in Stirling-PDF on the Core. The client gets a single file.",
+        "title": "Notes that find their book",
+        "body": "Zaid keeps his reading notes in Logseq on the Core, one page for each book on the shelf. A link in a client brief jumps to the passage.",
         "chips": [
-          "Stirling-PDF",
-          "alternative to Adobe Acrobat"
+          "Logseq",
+          "alternative to Notion"
         ]
       },
       "detail": {
-        "before": "The pack was merged in Adobe Acrobat on one laptop, so only that laptop could rebuild it.",
-        "after": "Stirling-PDF merges, splits and compresses PDFs on the Core, so either laptop can rebuild the pack from the same folder.",
+        "before": "His reading notes lived in a Notion workspace, away from the Markdown files he kept for client work.",
+        "after": "Logseq writes each page as a Markdown file on the Core, with a daily journal and links between the pages.",
         "steps": [
-          "Collect the brief, plan and report",
-          "Merge them into one PDF",
-          "Compress it for the email"
+          "Open a page for each book",
+          "Link a passage from a client brief",
+          "Find it again from the journal"
         ],
-        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+        "fact": "Logseq lets you write notes and a daily journal in plain Markdown files."
       }
     },
     {
@@ -1070,13 +1070,13 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "audiobookshelf",
+        "id": "koodo-reader",
         "replaces": [
-          "Audible"
+          "Amazon Kindle"
         ]
       },
-      "service": "audible",
-      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "service": "kindle",
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
       "anchor": {
         "role": "couch",
         "nth": 0
@@ -1087,22 +1087,22 @@
         "side": "auto"
       },
       "popup": {
-        "title": "An audiobook that keeps his place",
-        "body": "Between calls Zaid listens to an audiobook from the Core, stretched out on the sofa. When he switches to his phone, it picks up where he left off.",
+        "title": "A chapter and its highlights",
+        "body": "Between calls Zaid reads a chapter of a marketing book on the sofa in Koodo Reader. The highlights he marks are kept with the book on the Core.",
         "chips": [
-          "Audiobookshelf",
-          "alternative to Audible"
+          "Koodo Reader",
+          "alternative to Kindle"
         ]
       },
       "detail": {
-        "before": "His audiobooks sat in Audible, apart from the podcasts he followed.",
-        "after": "Audiobookshelf keeps the audiobooks and the podcasts on the Core and remembers his place on every device.",
+        "before": "His ebooks and highlights lived in the Kindle app, and the notes stayed inside it.",
+        "after": "Koodo Reader opens the family's own ebooks in a browser and keeps the notes and highlights with them. The library sits on the Core.",
         "steps": [
-          "Add the audiobook folder to the Core",
-          "Press play on the sofa",
-          "Pick it up again on the phone"
+          "Add the book to the Core library",
+          "Highlight a passage as he reads",
+          "Open the highlights from his notes"
         ],
-        "fact": "Audiobookshelf plays your audiobooks and podcasts, and picks up where you left off on any device."
+        "fact": "Koodo Reader reads ebooks in your browser, with notes, highlights and text-to-speech."
       }
     },
     {
@@ -1112,13 +1112,13 @@
       "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "excalidraw",
+        "id": "comfyui",
         "replaces": [
-          "Miro"
+          "Midjourney"
         ]
       },
-      "service": "miro",
-      "capability": "a whiteboard with a hand-drawn look, to sketch ideas together",
+      "service": "midjourney",
+      "capability": "generate images with node-based pipelines on your own AMD GPU",
       "anchor": {
         "role": "room",
         "room": "living",
@@ -1130,22 +1130,22 @@
         "side": "auto"
       },
       "popup": {
-        "title": "Where each print will hang",
-        "body": "Ximena sketches the hanging plan for the open weekend in Excalidraw on the Core, one frame for each print. Zaid drags a frame to try another order.",
+        "title": "A paper texture, tried three ways",
+        "body": "Ximena builds a node pipeline in ComfyUI on the Core and tries a paper texture for the poster. She keeps the texture she likes and drops the rest.",
         "chips": [
-          "Excalidraw",
-          "alternative to Miro"
+          "ComfyUI",
+          "alternative to Midjourney"
         ]
       },
       "detail": {
-        "before": "The hanging plan lived on a Miro board, apart from the files for the prints it described.",
-        "after": "Excalidraw runs as a whiteboard on the Core, so the plan sits beside the print files and both of them can sketch on it.",
+        "before": "Textures came from Midjourney, one prompt at a time, and the results stayed in that service.",
+        "after": "ComfyUI runs the node pipeline on the Core and saves each result beside the poster files.",
         "steps": [
-          "Draw a frame for each print",
-          "Label the frames by title",
-          "Drag a frame to try another order"
+          "Wire a texture pipeline from nodes",
+          "Run it and compare the results",
+          "Save the best beside the poster files"
         ],
-        "fact": "Excalidraw is a whiteboard with a hand-drawn look, for sketching ideas together."
+        "fact": "ComfyUI generates images with node-based pipelines on your own AMD GPU."
       }
     },
     {
@@ -1409,8 +1409,8 @@
   },
   "notes": [
     "Told in the v3 shape: 19 of 23 room beats are pair beats naming a service from content/story/services.json; the four pair-less ones are Companion Memory, OpenClaw, FreeCut and GlassHome.",
-    "Every app is a production-store catalog app with a QA screenshot, so no beat needs an owner entry in reviewed.json. No app here is in more than 14 of the 36 families.",
-    "Immich and KitchenOwl are left out on purpose (over, or near, the 40 percent cap): the cast plan now lists PhotoPrism and Grocy for this home in their place.",
+    "Every app is a production-store catalog app with a QA screenshot. No third-party app is in more than two of the six apartments, and none is in more than 14 of the 36 families.",
+    "Immich and KitchenOwl are left out (near the 40 percent cap): the plan lists PhotoPrism and Grocy. New here: Vikunja, Baserow, Logseq, Koodo Reader, tldraw and ComfyUI (AMD build, no speed claim).",
     "Honest edges carried: Ghost sends through an outside mailer; Postiz posts to outside platforms and Zaid approves each draft; FreeCut runs in the editing device browser; a photo library is not a backup.",
     "Docuseal makes no claim about signatures. The signer sits at the breakfast bar on the home network: the next bay is a neighbour, not a remote signer.",
     "Camera: no cuts and no tier 2 pose in story:spline. The back court is walked to round the west side of the lot; the platform is one flight up the ladder-stair. One room anchor per room, so no two beats share a shot.",

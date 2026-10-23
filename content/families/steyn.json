@@ -1231,13 +1231,10 @@
       "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "inkscape",
-        "replaces": [
-          "Adobe Illustrator"
-        ]
+        "id": "mazanoke",
+        "replaces": []
       },
-      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
-      "service": "adobe-illustrator",
+      "capability": "resize and compress images in the browser",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -1256,22 +1253,21 @@
         "from": "right"
       },
       "popup": {
-        "title": "One icon, drawn for every leaflet",
-        "body": "Lindiwe draws the charity’s small house icon once in Inkscape. The file sits on the Core, so every leaflet and poster starts from the same lines.",
+        "title": "Photos sized for the leaflet",
+        "body": "Lindiwe drops the drive’s photos into Mazanoke on the Core and picks a smaller size for the leaflet. The photos are resized in her browser tab, with no upload.",
         "chips": [
-          "Inkscape",
-          "alternative to Adobe Illustrator"
+          "Mazanoke"
         ]
       },
       "detail": {
-        "before": "The icon was an Adobe Illustrator file that only opened on one old laptop.",
-        "after": "Inkscape draws the icon as vector lines in a browser tab, and the file stays on the Core for every leaflet.",
+        "before": "Photos for the leaflet went through an online resizer, one picture at a time.",
+        "after": "Mazanoke resizes a batch of photos in the browser tab and saves the small copies beside the originals on the Core.",
         "steps": [
-          "Draw the house icon as vector lines",
-          "Save the file on the Core",
-          "Open the same file for the next leaflet"
+          "Drop the photos into Mazanoke",
+          "Pick the size for the leaflet",
+          "Save the small copies beside the originals"
         ],
-        "fact": "Inkscape draws logos, diagrams and line art as vector graphics, in your browser."
+        "fact": "Mazanoke resizes and compresses images in the browser, with no upload."
       }
     },
     {
@@ -1341,13 +1337,13 @@
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "twenty",
+        "id": "memos",
         "replaces": [
-          "Salesforce"
+          "Google Keep"
         ]
       },
-      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
-      "service": "salesforce",
+      "capability": "capture quick notes and journal entries in Markdown",
+      "service": "google-keep",
       "anchor": {
         "role": "patio-seat",
         "nth": 0,
@@ -1367,22 +1363,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "The quiet corner for a call",
-        "body": "Lindiwe takes a partner call on the bench in the back court. Afterwards she adds the new contact and the next step in Twenty on the Core.",
+        "title": "Next steps, jotted outdoors",
+        "body": "After a call on the court bench, Lindiwe jots the next steps into Memos on her phone. The note is on the Core when she is at her desk.",
         "chips": [
-          "Twenty",
-          "alternative to Salesforce"
+          "Memos",
+          "alternative to Google Keep"
         ]
       },
       "detail": {
-        "before": "A partner’s details used to go into a Salesforce record, typed in after the call.",
-        "after": "Twenty keeps the contact and the next step in a CRM on the Core, hosted by the family.",
+        "before": "The next steps after a partner’s call were typed into a Google Keep note, lost among all the others.",
+        "after": "Memos keeps the note as Markdown on the Core, so the next steps are in a file she can search.",
         "steps": [
-          "Take the call on the court bench",
-          "Add the contact to Twenty",
-          "Write the next step beside it"
+          "Jot the next steps right after the call",
+          "Add the partner’s name as a tag",
+          "Search the notes before the next call"
         ],
-        "fact": "Twenty keeps customers, deals and custom fields in a CRM you host yourself."
+        "fact": "Memos captures quick notes and journal entries in Markdown."
       }
     },
     {
@@ -1466,9 +1462,10 @@
   },
   "notes": [
     "Told in the v3 shape: nineteen of twenty-two room beats are pairs. The three pair-less beats are the Hermes chase note, Foldergram and Companion Planning; none of them replaces anything in the catalog.",
-    "The plan lists Paperless-ngx and Frigate and neither is told: Paperless-ngx is over the fleet app cap (Papra holds the tenancy papers), and the flat has no camera of the family's own, so Pi-hole is the iot beat.",
+    "The plan lists Pi-hole for the network: the flat has no camera of the family’s own, so Frigate is not told. Paperless-ngx is over the fleet app cap (Papra holds the tenancy papers).",
     "Tamsin is six: no chat model and no agent in her beats (age rule 16). The maker pool has no app a child uses, so her pool beat is Companion Planning, a block Matthias adds for the day she picks.",
     "LinkStack is a limit card: the page is tested over the home Wi-Fi and the note says only devices there reach it. Listmonk carries the mail provider note and promises no delivery. No beat anchors on a bed.",
-    "The Front Balcony is 1 m deep and the camera cannot stand in it, so the garden chapter is the back court bench (patio-seat). It sits last before the outro: two cuts in all, the walk out and the walk round to the street."
+    "The Front Balcony is 1 m deep and the camera cannot stand in it, so the garden chapter is the back court bench (patio-seat). It sits last before the outro: two cuts in all, the walk out and the walk round to the street.",
+    "No third-party app is in more than two of the six apartments: Mazanoke (pair-less) and Memos replace Inkscape and Twenty, which are told in two other flats."
   ]
 }

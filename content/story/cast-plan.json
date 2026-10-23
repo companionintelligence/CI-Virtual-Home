@@ -640,7 +640,7 @@
    "reason": "A brick loft in a converted warehouse for two: the Desk and Workshop (workbench, the Core on the desk) is the studio, the Living Loft holds the sofa and the shelves, and the record player stands on the Sleeping Platform.",
    "household_text": "A couple in a converted warehouse: one markets, one makes.",
    "care": "Client briefs and finished work stay on the Core.",
-   "signatureApps": ["ci-memory", "penpot", "photoprism", "ghost", "grist", "invoice-ninja", "postiz"],
+   "signatureApps": ["ci-memory", "penpot", "photoprism", "ghost", "baserow", "invoice-ninja", "postiz"],
    "beatApps": {"home": "jotty", "food": "grocy", "iot": "glasshome"},
    "members": [
     {"id": "zaid", "name": "Zaid", "age": 34, "role": "partner", "archetype": "marketer", "work": "freelance marketing consultant", "room": "Living Loft", "sleepsIn": "Sleeping Platform", "companion": "Pomelo"},
@@ -660,7 +660,7 @@
    "reason": "A one-bedroom flat above the shops: the Desk Nook with the Core is the reporter's, the Living Room sofa is where the shop owner does the books, and the shop itself is downstairs.",
    "household_text": "A couple above the shops: one runs a stationery shop, one reports.",
    "care": "The shop's orders and the reporter's notes stay on the Core.",
-   "signatureApps": ["ci-hermes", "invoice-ninja", "obsidian", "umami", "hi-events", "papra", "archivebox"],
+   "signatureApps": ["ci-hermes", "invoice-ninja", "obsidian", "umami", "hi-events", "twenty", "archivebox"],
    "beatApps": {"food": "homehub", "iot": "homarr", "privacy": "duplicati"},
    "members": [
     {"id": "nasrin", "name": "Nasrin", "age": 41, "role": "partner", "archetype": "business-owner", "work": "runs a stationery shop in the building", "room": "Living Room", "sleepsIn": "Bedroom", "companion": "Sumac"},
@@ -679,8 +679,8 @@
    "reason": "A walk-up flat with a Study Alcove, a Dining Room and a Kids' Room with an easel: a marketer at the alcove desk, a writer at the dining table and a six-year-old who paints.",
    "household_text": "Two parents and a six-year-old in the tenement flat with the easel.",
    "care": "A six-year-old's paintings and two parents' drafts stay on the Core.",
-   "signatureApps": ["ci-openclaw", "inkscape", "linkwarden", "foldergram", "listmonk", "linkstack", "paperless"],
-   "beatApps": {"food": "homehub", "iot": "frigate"},
+   "signatureApps": ["ci-openclaw", "linkwarden", "foldergram", "listmonk", "linkstack", "papra", "grist"],
+   "beatApps": {"food": "homehub", "iot": "pi-hole"},
    "members": [
     {"id": "lindiwe", "name": "Lindiwe", "age": 36, "role": "parent", "archetype": "marketer", "work": "marketing lead for a housing charity, remote", "room": "Study Alcove", "sleepsIn": "Primary Bedroom", "companion": "Rooibos"},
     {"id": "matthias", "name": "Matthias", "age": 38, "role": "parent", "archetype": "journalist", "work": "feature writer", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Caraway"},
@@ -700,8 +700,8 @@
    "reason": "A penthouse with an Office, a Library Nook and a 33 m2 Living Room: a lawyer at the standing desk, a shop owner at the writing desk, a gamer in the big room and a learner with a bedroom of her own.",
    "household_text": "Two parents and two teens in the glass penthouse above the corner shop.",
    "care": "The shop's accounts and a client file stay on separate shelves of one Core.",
-   "signatureApps": ["ci-hermes", "nextcloud", "docuseal", "steam-headless", "libretranslate", "papra", "stirling-pdf"],
-   "beatApps": {"home": "bookstack", "food": "grocy", "iot": "heimdall"},
+   "signatureApps": ["ci-hermes", "nextcloud", "grist", "steam-headless", "libretranslate", "papra", "stirling-pdf"],
+   "beatApps": {"home": "bookstack", "food": "kitchenowl", "iot": "uptime-kuma"},
    "members": [
     {"id": "esperanza", "name": "Esperanza", "age": 47, "role": "parent", "archetype": "lawyer", "work": "family-law solicitor with her own practice", "room": "Office", "sleepsIn": "Primary Suite", "companion": "Paprika"},
     {"id": "takumi", "name": "Takumi", "age": 45, "role": "parent", "archetype": "business-owner", "work": "runs the bike shop in the building", "room": "Library Nook", "sleepsIn": "Primary Suite", "companion": "Matcha"},
@@ -721,7 +721,8 @@
    "reason": "A level ground-floor flat with a terrace: the Study holds the Core and the retired solicitor, the Kitchen and the Garden Terrace belong to the cook, and a nine-year-old has the Grandchild's Bedroom with a desk.",
    "household_text": "Two grandparents and their nine-year-old grandchild in the ground-floor flat.",
    "care": "A retired solicitor's papers and a child's drawings stay on the Core.",
-   "signatureApps": ["ci-memory", "stirling-pdf", "home-assistant", "koodo-reader", "hortusfox", "kitchenowl", "nextcloud"],
+   "signatureApps": ["ci-memory", "nextcloud", "koodo-reader", "kitchenowl", "docuseal", "cryptgeon", "vaultwarden"],
+   "beatApps": {"iot": "frigate"},
    "members": [
     {"id": "wilfred", "name": "Wilfred", "age": 67, "role": "grandparent", "archetype": "lawyer", "work": "retired solicitor, still advises two clients", "room": "Study", "sleepsIn": "Primary Bedroom", "companion": "Tamarind"},
     {"id": "anwen", "name": "Anwen", "age": 65, "role": "grandparent", "archetype": "host", "work": "cooks and keeps the terrace", "room": "Kitchen", "sleepsIn": "Primary Bedroom", "companion": "Fenugreek"},
@@ -740,8 +741,8 @@
    "reason": "A two-storey flat up its own stair with a 28 m2 Kitchen and Dining room and a Study Landing desk: a teacher at the long table, a developer at the landing desk, a gamer in the Living Room and a learner in Bedroom Two.",
    "household_text": "Two parents and two teens in the two-storey flat with the long table.",
    "care": "A teacher's lesson folders and two teenagers' schoolwork stay on the Core.",
-   "signatureApps": ["ci-openclaw", "libretranslate", "n8n", "linkwarden", "steam-headless", "forgejo", "libreoffice"],
-   "beatApps": {"home": "donetick", "food": "yuvomi", "iot": "music-assistant"},
+   "signatureApps": ["ci-openclaw", "libretranslate", "n8n", "steam-headless", "forgejo", "libreoffice", "readeck"],
+   "beatApps": {"home": "donetick", "food": "grocy", "iot": "pi-hole"},
    "members": [
     {"id": "fernanda", "name": "Fernanda", "age": 44, "role": "parent", "archetype": "educator", "work": "secondary school teacher", "room": "Kitchen & Dining", "sleepsIn": "Primary Bedroom", "companion": "Clove"},
     {"id": "chike", "name": "Chike", "age": 42, "role": "parent", "archetype": "builder", "work": "backend developer, remote", "room": "Study Landing", "sleepsIn": "Primary Bedroom", "companion": "Cassia"},

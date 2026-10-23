@@ -5390,24 +5390,24 @@
           "hook": {
             "beat": "dining-merge",
             "kind": "title",
-            "text": "The schedules join the contract",
+            "text": "The talk's outline, drafted together",
             "rule": "flagged"
           },
           "beats": [
             "dining-merge"
           ],
           "captions": [
-            "Wilfred merges a contract and its schedules into one PDF in Stirling-PDF, on the Core, not on a PDF website."
+            "Wilfred drafts the outline for his talk to the local law society in CryptPad on the Core. Anwen reads along on her tablet and adds a line."
           ],
           "chips": [
-            "Stirling-PDF",
-            "alternative to Smallpdf"
+            "CryptPad",
+            "alternative to Microsoft Office"
           ],
           "apps": [
             {
-              "id": "stirling-pdf",
+              "id": "cryptpad",
               "replaces": [
-                "Smallpdf"
+                "Microsoft Office"
               ]
             }
           ],
@@ -5427,39 +5427,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 15,
-          "frames": 450,
+          "durationS": 17.466666666666665,
+          "frames": 524,
           "timeline": {
             "parts": [
               {
                 "beat": "dining-merge",
                 "kind": "hook",
                 "at": 0,
-                "end": 10.8,
+                "end": 13.6,
                 "narrAt": 2,
-                "narrEnd": 10,
-                "sentences": "1/1",
+                "narrEnd": 12.8,
+                "sentences": "2/2",
                 "tour": {
                   "from": 138.48,
-                  "to": 147.578
+                  "to": 150.378
                 }
               }
             ],
             "pads": [
               {
-                "t0": 10.8,
-                "t1": 11.15,
+                "t0": 13.6,
+                "t1": 13.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 11.15,
-              "t1": 15,
-              "panelAt": 11.35
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
             }
           },
           "notes": [],
-          "hash": "7d655c539273aeb36e43a9a66f35284a31748cd704599cc646783decde37ec84"
+          "hash": "3b81b9f38a069ca265561d17fbd35a60eea4dd7085c5039cbcfefd89c6915874"
         },
         {
           "id": "penhallow-anwen",
@@ -5470,22 +5470,22 @@
           "hook": {
             "beat": "kitchen-recipes",
             "kind": "title",
-            "text": "A recipe book with chapters",
+            "text": "A journal page for every dish",
             "rule": "flagged"
           },
           "beats": [
             "kitchen-recipes"
           ],
           "captions": [
-            "Anwen writes her recipes into BookStack, a chapter for soups and one for puddings. Each page keeps its history."
+            "Anwen writes each recipe as a page in Logseq on the Core, and links it to the ingredients. A search for rhubarb finds every pudding that uses it."
           ],
           "chips": [
-            "BookStack",
+            "Logseq",
             "alternative to Notion"
           ],
           "apps": [
             {
-              "id": "bookstack",
+              "id": "logseq",
               "replaces": [
                 "Notion"
               ]
@@ -5507,39 +5507,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 15,
-          "frames": 450,
+          "durationS": 17.866666666666667,
+          "frames": 536,
           "timeline": {
             "parts": [
               {
                 "beat": "kitchen-recipes",
                 "kind": "hook",
                 "at": 0,
-                "end": 10.633,
+                "end": 14,
                 "narrAt": 2,
-                "narrEnd": 9.6,
+                "narrEnd": 13.2,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 252.444,
-                  "to": 261.142
+                  "from": 255.861,
+                  "to": 268.159
                 }
               }
             ],
             "pads": [
               {
-                "t0": 10.633,
-                "t1": 10.983,
+                "t0": 14,
+                "t1": 14.35,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 10.983,
-              "t1": 15,
-              "panelAt": 11.183
+              "t0": 14.35,
+              "t1": 17.867,
+              "panelAt": 14.55
             }
           },
           "notes": [],
-          "hash": "65a774ac5fcdaa18c7530c4c76e01112dc5741a949f1680993c2397feb8dea1f"
+          "hash": "13da2d91eb4f862d094cafb6f787b0c14e116c2da67462e4804e5a57cbfba11b"
         },
         {
           "id": "penhallow-petra",
@@ -5647,7 +5647,7 @@
           "notes": [
             "kids-reader alone is under 15 s: the cut goes on to kids-record (1 of 2 sentences)"
           ],
-          "hash": "7fbcb46536218551171d0ae895c91d07d0cac269a623a4770212e32e4e230d01"
+          "hash": "2ab60db7f7f8995dcf6ef4d09df917e26930fa0f269bdfdd091fcdcf98b0eae6"
         }
       ]
     },
@@ -6203,8 +6203,8 @@
                 "narrEnd": 12.4,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 146.642,
-                  "to": 158.14
+                  "from": 145.742,
+                  "to": 157.24
                 }
               }
             ],
@@ -6222,7 +6222,7 @@
             }
           },
           "notes": [],
-          "hash": "ea9eb1aa7120b51a13f5b494cc60fa8e65786fb7d0b75735c4eba29f7ca2d94b"
+          "hash": "91d20062a06dee8c1afcd9e23a607ef5e6ec9651b76d7f8cd82864c158674c39"
         },
         {
           "id": "rademaker-chike",
@@ -6283,8 +6283,8 @@
                 "narrEnd": 10.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 270.957,
-                  "to": 280.855
+                  "from": 270.057,
+                  "to": 279.955
                 }
               }
             ],
@@ -6302,7 +6302,7 @@
             }
           },
           "notes": [],
-          "hash": "bb65ae3021998095a019adcfff0a0ad2448728ee38b32769bcd83ace5428e153"
+          "hash": "9d3ca9d32de7a2ac32609fd239ef214de4870470f2ef9a317c4f7b834aa8c7d9"
         },
         {
           "id": "rademaker-ayaan",
@@ -6313,104 +6313,24 @@
           "hook": {
             "beat": "bedroom-sources",
             "kind": "title",
-            "text": "A source that cannot vanish",
+            "text": "Articles kept for the project",
             "rule": "flagged"
           },
           "beats": [
             "bedroom-sources"
           ],
           "captions": [
-            "Ayaan saves each source for his history project in Linkwarden. It keeps a screenshot and a PDF of the page, so a page that disappears is still there."
+            "Ayaan saves the articles for his history project in Readeck on the Core. Each one is kept as a clean copy he can read at his desk."
           ],
           "chips": [
-            "Linkwarden",
-            "alternative to Raindrop.io"
+            "Readeck",
+            "alternative to Instapaper"
           ],
           "apps": [
             {
-              "id": "linkwarden",
+              "id": "readeck",
               "replaces": [
-                "Raindrop.io"
-              ]
-            }
-          ],
-          "disclosures": [
-            "fictional-family",
-            "scripted-scenes",
-            "stylised-art",
-            "names-owners"
-          ],
-          "cta": {
-            "label": "See Companion Core",
-            "url": "https://ci.computer/core"
-          },
-          "aspects": [
-            "9x16",
-            "1x1",
-            "4x5",
-            "16x9"
-          ],
-          "durationS": 17.866666666666667,
-          "frames": 536,
-          "timeline": {
-            "parts": [
-              {
-                "beat": "bedroom-sources",
-                "kind": "hook",
-                "at": 0,
-                "end": 14,
-                "narrAt": 2,
-                "narrEnd": 13.2,
-                "sentences": "2/2",
-                "tour": {
-                  "from": 321.025,
-                  "to": 333.323
-                }
-              }
-            ],
-            "pads": [
-              {
-                "t0": 14,
-                "t1": 14.35,
-                "to": "end"
-              }
-            ],
-            "end": {
-              "t0": 14.35,
-              "t1": 17.867,
-              "panelAt": 14.55
-            }
-          },
-          "notes": [],
-          "hash": "2d8c01e799e40bf7dc99102d249de13d4f49da2fe17009873e5747e33f3e03b8"
-        },
-        {
-          "id": "rademaker-dmitri",
-          "member": "dmitri",
-          "name": "Dmitri",
-          "archetype": "gamer",
-          "status": "ready",
-          "hook": {
-            "beat": "living-session",
-            "kind": "title",
-            "text": "The game runs by the door",
-            "rule": "flagged"
-          },
-          "beats": [
-            "living-session"
-          ],
-          "captions": [
-            "Dmitri signs in with his own Valve account, and Steam runs on the Core by the front door. He plays in a browser tab on his laptop."
-          ],
-          "chips": [
-            "Steam Headless",
-            "alternative to Xbox Cloud Gaming"
-          ],
-          "apps": [
-            {
-              "id": "steam-headless",
-              "replaces": [
-                "Xbox Cloud Gaming"
+                "Instapaper"
               ]
             }
           ],
@@ -6435,7 +6355,7 @@
           "timeline": {
             "parts": [
               {
-                "beat": "living-session",
+                "beat": "bedroom-sources",
                 "kind": "hook",
                 "at": 0,
                 "end": 13.6,
@@ -6443,8 +6363,8 @@
                 "narrEnd": 12.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 71.458,
-                  "to": 85.058
+                  "from": 320.125,
+                  "to": 332.023
                 }
               }
             ],
@@ -6462,7 +6382,83 @@
             }
           },
           "notes": [],
-          "hash": "aa90d4a2b3fdf62693ef389d41ed635cec1903ab3017831c72fce98b5b7786a1"
+          "hash": "30cc3dffbda3ad51fbb6d7e6ada4c0a69856daf33b6c7e0530b16986accb0d25"
+        },
+        {
+          "id": "rademaker-dmitri",
+          "member": "dmitri",
+          "name": "Dmitri",
+          "archetype": "gamer",
+          "status": "ready",
+          "hook": {
+            "beat": "living-session",
+            "kind": "title",
+            "text": "One install, two laptops",
+            "rule": "flagged"
+          },
+          "beats": [
+            "living-session"
+          ],
+          "captions": [
+            "Dmitri installs his games once, on the Core, and Steam runs there. On either laptop, he signs in with his Valve account and opens the session in a browser tab."
+          ],
+          "chips": [
+            "Steam Headless"
+          ],
+          "apps": [
+            {
+              "id": "steam-headless",
+              "replaces": []
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 18.666666666666668,
+          "frames": 560,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "living-session",
+                "kind": "hook",
+                "at": 0,
+                "end": 14.8,
+                "narrAt": 2,
+                "narrEnd": 14,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 71.458,
+                  "to": 85.423
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 14.8,
+                "t1": 15.15,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 15.15,
+              "t1": 18.667,
+              "panelAt": 15.35
+            }
+          },
+          "notes": [],
+          "hash": "8492d71d009b11df7a5c0d52c570ebe65e627757aacd11a015a1494337cdc427"
         }
       ]
     },
@@ -6877,7 +6873,7 @@
             }
           },
           "notes": [],
-          "hash": "570be49c3eed2712e0ef95f461a0cfb397317018075c9a0accd79573ff793a77"
+          "hash": "6a05db3a51d67f2c76681d3cf735b7d8596978298496841590ba4e2e79752f85"
         },
         {
           "id": "steyn-matthias",
@@ -6957,7 +6953,7 @@
             }
           },
           "notes": [],
-          "hash": "c69a3c4f371e145c45f28b6f61ebfaa908214be3becab528503b0a344a35e60c"
+          "hash": "afb418c37d4c52920bc78985f13dd7fc4b935c23a018a54584955b523d79f99e"
         },
         {
           "id": "steyn-tamsin",
@@ -7037,7 +7033,7 @@
             }
           },
           "notes": [],
-          "hash": "440633c27c6a62390dd44b421671a2d37de7bed7cd0382831aeb79601b09c124"
+          "hash": "ca6acfa5665d8c2716737b89b210823ad0a6517db1b2b3da264283b59294524c"
         }
       ]
     },
@@ -7104,8 +7100,8 @@
                 "narrEnd": 10,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 182.603,
-                  "to": 193.403
+                  "from": 181.403,
+                  "to": 192.203
                 }
               }
             ],
@@ -7123,7 +7119,7 @@
             }
           },
           "notes": [],
-          "hash": "115fa8bdad2e58af6294fba92dc18974cb515ed3d21c7911710f188b42a46056"
+          "hash": "fc259969b1772aa003861c8ecf2e8c3c77e9f1447f93e56d0e751fbb1d4c2aec"
         },
         {
           "id": "tehrani-saeed",
@@ -7204,7 +7200,7 @@
             }
           },
           "notes": [],
-          "hash": "e5c81affc7d60021b3f19868a3221225154047cae0a010dc6d0102961cc89f7f"
+          "hash": "4a86eb3fc52b3238100f69043200303eaa6db0a626ef0b16cba24b3196ab34c0"
         }
       ]
     },
@@ -7760,8 +7756,8 @@
                 "narrEnd": 10.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 165.853,
-                  "to": 175.828
+                  "from": 168.253,
+                  "to": 178.228
                 }
               }
             ],
@@ -7779,7 +7775,7 @@
             }
           },
           "notes": [],
-          "hash": "a63ac82f2628d24296a0278762f9543a03a4004bfd9c6eadfa77bdb90f170e5f"
+          "hash": "c1ad5f21ef5480f7592fc6ca00cca477fe73f35cadb22e41bb2040eadd5c8719"
         },
         {
           "id": "valdivia-ximena",
@@ -7859,7 +7855,7 @@
             }
           },
           "notes": [],
-          "hash": "de2a019635ac1c8eaac7d1ff3d9cbb36edc88622b3099f99fe22193fb851390a"
+          "hash": "b3b495e145b3a0db868c5301eaea30d9760224dddffc1c9c4fb4191aeec23d49"
         }
       ]
     },
@@ -7922,8 +7918,8 @@
                 "narrEnd": 13.6,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 197.959,
-                  "to": 210.657
+                  "from": 199.559,
+                  "to": 212.257
                 }
               }
             ],
@@ -7941,7 +7937,7 @@
             }
           },
           "notes": [],
-          "hash": "716ebad6fa52794066cd2db94b4ba19b013c4283c63345d59abf9fed789ec314"
+          "hash": "67e81261045c4e5635ea30959a620959baab2d0d7b8a20bf12f42b214121a2de"
         },
         {
           "id": "voss-takumi",
@@ -8002,8 +7998,8 @@
                 "narrEnd": 10.4,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 213.456,
-                  "to": 222.954
+                  "from": 215.056,
+                  "to": 224.554
                 }
               }
             ],
@@ -8021,7 +8017,7 @@
             }
           },
           "notes": [],
-          "hash": "ef377ea93c430f7ce304d1de26f58dc482a800ea98fa345063a5367b0c95ad68"
+          "hash": "782dc78a880295c7fe1851ca2f54053a119b4b4352ccb15c2a8441338290892b"
         },
         {
           "id": "voss-anouk",
@@ -8078,8 +8074,8 @@
                 "narrEnd": 11.2,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 116.058,
-                  "to": 128.058
+                  "from": 118.058,
+                  "to": 130.058
                 }
               }
             ],
@@ -8097,7 +8093,7 @@
             }
           },
           "notes": [],
-          "hash": "a4209e0c6ad167e8bfa5202c3573419e4b5d53ab8550046ecd044c9bc7beb93b"
+          "hash": "fca4590a63f40e5db12d0fd3062eb1d3c9f693f0eaaa79b1aff98bc61e9bc0b3"
         },
         {
           "id": "voss-yara",
@@ -8158,8 +8154,8 @@
                 "narrEnd": 11.2,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 353.741,
-                  "to": 365.039
+                  "from": 356.541,
+                  "to": 367.839
                 }
               }
             ],
@@ -8177,7 +8173,7 @@
             }
           },
           "notes": [],
-          "hash": "b86c132309cb24172687bebb4ab440d2f02ce366ef1d43677ed2ab555e7f611f"
+          "hash": "1a07a7a8ad8c368cee88b17b745a6e36d4d59ab3657035dabf9b993a4eb839b3"
         }
       ]
     },

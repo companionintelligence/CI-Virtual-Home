@@ -58,7 +58,7 @@
       {
         "at": "afternoon",
         "beat": "terrace-sources",
-        "line": "Wilfred reads on the terrace and keeps what he will cite."
+        "line": "Wilfred sets the bills aside on the terrace."
       },
       {
         "at": "after-school",
@@ -601,13 +601,13 @@
       "segment": "consumer",
       "film": true,
       "app": {
-        "id": "stirling-pdf",
+        "id": "cryptpad",
         "replaces": [
-          "Smallpdf"
+          "Microsoft Office"
         ]
       },
-      "service": "smallpdf",
-      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "service": "microsoft-office",
+      "capability": "write, draw and plan together",
       "anchor": {
         "role": "dining-table",
         "fallback": [
@@ -627,22 +627,22 @@
         "side": "right"
       },
       "popup": {
-        "title": "The schedules join the contract",
-        "body": "Wilfred merges a contract and its schedules into one PDF in Stirling-PDF, on the Core, not on a PDF website.",
+        "title": "The talk's outline, drafted together",
+        "body": "Wilfred drafts the outline for his talk to the local law society in CryptPad on the Core. Anwen reads along on her tablet and adds a line.",
         "chips": [
-          "Stirling-PDF",
-          "alternative to Smallpdf"
+          "CryptPad",
+          "alternative to Microsoft Office"
         ]
       },
       "detail": {
-        "before": "Wilfred merged PDFs by uploading each set of pages to Smallpdf, then downloading the result.",
-        "after": "Stirling-PDF merges, splits and compresses PDFs on the Core. Wilfred opens it in a browser tab and saves the result to the client folder.",
+        "before": "Wilfred drafted talks in Microsoft Office and emailed the file back and forth for comments.",
+        "after": "CryptPad keeps one pad on the Core that both of them write in, so the outline has a single copy.",
         "steps": [
-          "Open Stirling-PDF in a browser tab",
-          "Drop in the contract and its schedules",
-          "Save the merged file to the client folder"
+          "Start a pad for the talk",
+          "Write the outline in it",
+          "Share the pad with Anwen on the home Wi-Fi"
         ],
-        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+        "fact": "CryptPad lets you write, draw and plan together."
       }
     },
     {
@@ -794,13 +794,13 @@
       "category": "iot",
       "segment": "consumer",
       "app": {
-        "id": "pi-hole",
+        "id": "frigate",
         "replaces": [
-          "NextDNS"
+          "Nest Cam"
         ]
       },
-      "service": "nextdns",
-      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "service": "nest-cam",
+      "capability": "a local video recorder with object detection for your IP cameras",
       "anchor": {
         "role": "tv",
         "fallback": [
@@ -815,37 +815,39 @@
         "side": "right"
       },
       "popup": {
-        "title": "Every screen asks the Core first",
-        "body": "The television, the tablets and both phones ask the Core's Pi-hole where to go first. Pi-hole blocks ad and tracker domains for every device on the network.",
+        "title": "The fox on the terrace wall",
+        "body": "Frigate on the Core keeps a clip each time the terrace camera sees something move. This morning's clip has the fox at the planters.",
         "chips": [
-          "Pi-hole",
-          "alternative to NextDNS"
-        ]
+          "Frigate",
+          "alternative to Nest Cam"
+        ],
+        "note": "Frigate needs IP cameras, which are not part of the Core."
       },
       "detail": {
-        "before": "Each device in the flat was pointed at NextDNS, one setting at a time.",
-        "after": "Pi-hole answers for every device on the home network and blocks ad and tracker domains. The router now asks the Core first.",
+        "before": "The terrace had no camera of its own, and the fox was known only by what it left in the planters.",
+        "after": "Frigate stores the clips on the Core and tags the ones where something moved, so Anwen can watch the fox in the morning.",
         "steps": [
-          "Point the router at the Core",
-          "Let every device ask Pi-hole first"
+          "Point Frigate at the terrace camera",
+          "Let it keep a clip when something moves",
+          "Watch the morning's clips over tea"
         ],
-        "fact": "Pi-hole blocks ads, trackers and bad domains for every device on your network at the DNS level."
+        "fact": "Frigate is a local video recorder with object detection for your IP cameras."
       }
     },
     {
       "id": "living-listen",
       "chapter": "living",
       "member": "anwen",
-      "category": "media",
+      "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "audiobookshelf",
+        "id": "airtrail",
         "replaces": [
-          "Apple Podcasts"
+          "Flighty"
         ]
       },
-      "service": "apple-podcasts",
-      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "service": "flighty",
+      "capability": "log your flights and see your whole travel history on a world map",
       "anchor": {
         "role": "fireplace",
         "fallback": [
@@ -860,22 +862,22 @@
         "side": "right"
       },
       "popup": {
-        "title": "The story waits where she stopped",
-        "body": "Anwen's podcast pauses when the kettle boils, and Audiobookshelf keeps her place. She picks the episode up by the fireplace after lunch.",
+        "title": "Every trip on one map",
+        "body": "By the fireplace, Anwen adds the autumn trip to Wales in AirTrail on the Core. Every journey the family has flown sits on one world map.",
         "chips": [
-          "Audiobookshelf",
-          "alternative to Apple Podcasts"
+          "AirTrail",
+          "alternative to Flighty"
         ]
       },
       "detail": {
-        "before": "Anwen's podcasts lived in Apple Podcasts, and the place she stopped lived on one phone.",
-        "after": "Audiobookshelf holds the audiobooks and podcasts on the Core and remembers where she stopped, on any of the family's devices.",
+        "before": "The family's flights were scattered across booking emails and one old Flighty account.",
+        "after": "AirTrail keeps the flight log as data on the Core, with every trip drawn on a world map.",
         "steps": [
-          "Add the podcast to Audiobookshelf",
-          "Listen in the kitchen",
-          "Pick the episode up by the fireplace"
+          "Add the flight with its date",
+          "Open the world map",
+          "Look back at the trips before it"
         ],
-        "fact": "Audiobookshelf plays audiobooks and podcasts and picks up where you left off on any device."
+        "fact": "AirTrail logs your flights and shows your whole travel history on a world map."
       }
     },
     {
@@ -976,13 +978,13 @@
       "segment": "consumer",
       "film": true,
       "app": {
-        "id": "bookstack",
+        "id": "logseq",
         "replaces": [
           "Notion"
         ]
       },
       "service": "notion",
-      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "capability": "write notes and a daily journal in plain Markdown files",
       "anchor": {
         "role": "range",
         "nth": 0,
@@ -998,22 +1000,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "A recipe book with chapters",
-        "body": "Anwen writes her recipes into BookStack, a chapter for soups and one for puddings. Each page keeps its history.",
+        "title": "A journal page for every dish",
+        "body": "Anwen writes each recipe as a page in Logseq on the Core, and links it to the ingredients. A search for rhubarb finds every pudding that uses it.",
         "chips": [
-          "BookStack",
+          "Logseq",
           "alternative to Notion"
         ]
       },
       "detail": {
         "before": "Anwen's recipes were scattered across a Notion page, a few texts and a card box.",
-        "after": "BookStack writes the recipes as a book on the Core, with chapters, search and page history.",
+        "after": "Logseq writes each recipe as a Markdown page on the Core, with links between the pages and a daily journal.",
         "steps": [
-          "Start a book for the family recipes",
-          "Add a chapter for soups",
-          "Write the stew, then edit it later"
+          "Start a page for the stew",
+          "Link the ingredients on the page",
+          "Search an ingredient to find the dishes"
         ],
-        "fact": "BookStack writes a wiki or a set of manuals in books, chapters and pages, with search and history."
+        "fact": "Logseq lets you write notes and a daily journal in plain Markdown files."
       }
     },
     {
@@ -1118,13 +1120,13 @@
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "papra",
+        "id": "vaultwarden",
         "replaces": [
-          "Evernote"
+          "LastPass"
         ]
       },
-      "service": "evernote",
-      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "service": "lastpass",
+      "capability": "store every password in a vault you host",
       "anchor": {
         "role": "counter",
         "nth": 2,
@@ -1140,22 +1142,22 @@
         "side": "auto"
       },
       "popup": {
-        "title": "The dishwasher's receipt is found",
-        "body": "When the dishwasher stops mid-cycle, the receipt and the paperwork are in Papra, filed the day it arrived. A search for the brand name finds both.",
+        "title": "The Wi-Fi password leaves the fridge",
+        "body": "The Wi-Fi password, the energy account and the library card used to hang on a note by the fridge. VaultWarden on the Core holds them now.",
         "chips": [
-          "Papra",
-          "alternative to Evernote"
+          "VaultWarden",
+          "alternative to LastPass"
         ]
       },
       "detail": {
-        "before": "Receipts went into an Evernote notebook called house, and the dishwasher's was never found.",
-        "after": "Papra archives the receipts, warranties and contracts the household rarely looks at, on the Core, until the day one is needed.",
+        "before": "The passwords lived on a note by the fridge and in a LastPass account that only Wilfred understood.",
+        "after": "VaultWarden keeps each password in a vault on the Core, and Wilfred and Anwen both open it from their phones.",
         "steps": [
-          "Scan the receipt",
-          "File it with the paperwork",
-          "Search for it when the dishwasher stops"
+          "Move each password into the vault",
+          "Add the vault to both phones",
+          "Take the note off the fridge"
         ],
-        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+        "fact": "VaultWarden stores every password in a vault you host."
       }
     },
     {
@@ -1309,16 +1311,16 @@
       "id": "terrace-sources",
       "chapter": "terrace",
       "member": "wilfred",
-      "category": "productivity",
+      "category": "money",
       "segment": "consumer",
       "app": {
-        "id": "linkwarden",
+        "id": "monetr",
         "replaces": [
-          "Raindrop.io"
+          "YNAB"
         ]
       },
-      "service": "raindrop-io",
-      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "service": "ynab",
+      "capability": "budget around recurring expenses by setting money aside for upcoming bills and goals",
       "anchor": {
         "role": "patio-seat",
         "nth": 0,
@@ -1334,22 +1336,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "A cited page stays readable",
-        "body": "Reading on the terrace, Wilfred saves the page he will cite in Linkwarden. The copy keeps a screenshot and a PDF, so the source is still there next year.",
+        "title": "Bills set aside in advance",
+        "body": "On the terrace, Wilfred sets money aside in monetr for the boiler service and the water bill. The plan sits on the Core, not on a budgeting website.",
         "chips": [
-          "Linkwarden",
-          "alternative to Raindrop.io"
+          "monetr",
+          "alternative to YNAB"
         ]
       },
       "detail": {
-        "before": "Wilfred bookmarked each cited page in Raindrop.io, and a few of the links later led nowhere.",
-        "after": "Linkwarden saves each cited page with a screenshot and a PDF on the Core, so the page he read is still there.",
+        "before": "The household bills were tracked in YNAB, and the plan lived in that account.",
+        "after": "monetr plans around the recurring bills on the Core, setting money aside for each due date.",
         "steps": [
-          "Save the page in Linkwarden",
-          "Tag it with the matter",
-          "Open the saved copy when the link fails"
+          "Add the boiler service and the water bill",
+          "Set the money aside each month",
+          "Check the plan before a bill falls due"
         ],
-        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+        "fact": "monetr budgets around recurring expenses by setting money aside for upcoming bills and goals."
       }
     },
     {
@@ -1429,11 +1431,12 @@
     }
   },
   "notes": [
-    "The plan's signature apps home-assistant and hortusfox are left out on purpose: both are over the fleet's 40 percent cap. The terrace is told through Donetick, LibrePhotos and mStream, and the network through Pi-hole.",
+    "The plan's home-assistant and hortusfox are left out: both are over the fleet's 40 percent cap. The terrace is told through Donetick, LibrePhotos and mStream, and the network through Frigate (the fox on the wall).",
     "The house has no kitchen island, so the kitchen beats anchor on the counter, the range and the fridge. The Study has no desk item of its own: Wilfred's beats anchor on the Core, the ladder shelf and the room.",
     "Tamarind (OpenClaw) acts only on Nextcloud on the Core and no beat opens an outside site. Fenugreek (Hermes) drafts and Anwen sends. Three agent lines in the file.",
     "The Study is narrow: the Core can be framed only from the passage, so the first-run beats and study-summary share that view. The ftue beats carry no side or eye hint for the same reason.",
     "Terrace beats use the bench, the patio, the planter and two beds. patio-seat nth 1 and garden nth 0 are the communal back garden north of the block, so the beats avoid them. Eyes stand on the pavement over the hedge.",
-    "Every app has a QA screenshot in the catalog, so no reviewed.json entry is needed. Pairs are written alternative to; none is on the lander hold list. Docuseal is in-room only and never called binding."
+    "Every app has a QA screenshot in the catalog, so no reviewed.json entry is needed. Pairs are written alternative to; none is on the lander hold list. Docuseal is in-room only and never called binding.",
+    "No third-party app is in more than two of the six apartments: VaultWarden, CryptPad, monetr, Logseq, Frigate and AirTrail are this flat's. Frigate needs IP cameras, which are not part of the Core."
   ]
 }

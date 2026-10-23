@@ -3685,7 +3685,7 @@
    "businessText": null,
    "narrator": "v-light-m",
    "tenure": "renter",
-   "storeys": 3,
+   "storeys": 2,
    "areaSqm": 52,
    "homeStyle": "A converted brick warehouse on a city street, three storeys of red brick with soldier-course arches over tall steel-framed windows, a deep parapet and a stair core with its own street door; the loft apartment takes the west bay of the first two floors, one tall open room with a steel-railed sleeping platform on a ladder-stair, a kitchen run along the back wall and a workbench by the street door, with its neighbours' bays closed beside it and a steel balcony over the walled back court",
    "lotGround": "urban",
@@ -3723,7 +3723,7 @@
      "companion": "Cacao"
     }
    ],
-   "signatureApps": ["ci-memory","penpot","photoprism","ghost","grist","invoice-ninja","postiz"],
+   "signatureApps": ["ci-memory","penpot","photoprism","ghost","baserow","invoice-ninja","postiz"],
    "beatApps": {
     "home": "jotty",
     "food": "grocy",
@@ -3811,7 +3811,7 @@
    "businessText": "stationery shop with online orders",
    "narrator": "v-young-f",
    "tenure": "owner",
-   "storeys": 6,
+   "storeys": 1,
    "areaSqm": 58,
    "homeStyle": "A mid-rise of pale render on a city street, five floors under a flat roof with a stair head, shops behind tall shopfront glass on the ground floor, a teal lobby door in the stair core, charcoal-framed windows and a steel-railed balcony band on every floor above; the one-bedroom apartment is the street-side bay of the first floor up, about 58 square metres for a couple who both work from home, with a short entry hall, an open living room and kitchen that open onto the street balcony, a desk nook by a west window, a bedroom and bathroom at the back and a laundry closet, its neighbours' flats closed beside it and behind it",
    "lotGround": "urban",
@@ -3849,7 +3849,7 @@
      "companion": "Barberry"
     }
    ],
-   "signatureApps": ["ci-hermes","invoice-ninja","obsidian","umami","hi-events","papra","archivebox"],
+   "signatureApps": ["ci-hermes","invoice-ninja","obsidian","umami","hi-events","twenty","archivebox"],
    "beatApps": {
     "food": "homehub",
     "iot": "homarr",
@@ -3951,7 +3951,7 @@
    "businessText": null,
    "narrator": "v-bright-f",
    "tenure": "renter",
-   "storeys": 3,
+   "storeys": 1,
    "areaSqm": 84,
    "homeStyle": "A three-storey walk-up tenement block on a city street, warm yellow stock brick with white sash windows under stone lintels, a pair of stacked canted bay windows, a stone stoop up to the stair core's oxblood street door and a slate hip roof with two dormers and a brick stack; the family's two-bedroom apartment is the whole first floor up, an entry hall and a passage that run back to a study alcove, a living room with a hearth and French doors onto an iron balcony over the street, a bay-windowed dining room, a closed kitchen with a terracotta floor, two bedrooms, a bathroom and a laundry along the back, with a ground-floor flat below and another flat above, both closed behind their blinds, and a walled brick court behind the block",
    "lotGround": "urban",
@@ -3990,10 +3990,10 @@
     },
     {"id":"tamsin","name":"Tamsin","age":6,"role":"child","archetype":"maker","work":"primary school","room":"Kids' Room","level":"l2","roomRoles":["bedroom","kids"],"anchors":["easel","desk","room:bedroom"],"sleepsIn":"Kids' Room"}
    ],
-   "signatureApps": ["ci-openclaw","inkscape","linkwarden","foldergram","listmonk","linkstack","paperless"],
+   "signatureApps": ["ci-openclaw","linkwarden","foldergram","listmonk","linkstack","papra","grist"],
    "beatApps": {
     "food": "homehub",
-    "iot": "frigate"
+    "iot": "pi-hole"
    },
    "coreRoom": "Living Room",
    "coreSpot": {
@@ -4079,7 +4079,7 @@
    "businessText": "bike shop in the building",
    "narrator": "v-deep-m",
    "tenure": "owner",
-   "storeys": 3,
+   "storeys": 1,
    "areaSqm": 134,
    "homeStyle": "A white-rendered penthouse pavilion with a deep flat roof overhang and floor-to-ceiling glass stands at the corner of a two-storey stone podium on a city street, a corner shop, a bike store, two flats and a stair lobby beneath it; the podium roof is a stone-floored terrace wrapping the pavilion behind glass rails, reached from the pavement by one long garden stair or by the private stair from the lobby, and the penthouse apartment inside is a long living room with a hearth, an island kitchen, a primary suite, two further bedrooms, an office and a book-lined nook",
    "lotGround": "urban",
@@ -4119,11 +4119,11 @@
     {"id":"anouk","name":"Anouk","age":16,"role":"teen","archetype":"gamer","work":"sixth form","room":"Living Room","level":"l3","roomRoles":["living"],"anchors":["couch","room:living"],"sleepsIn":"Bedroom Two"},
     {"id":"yara","name":"Yara","age":14,"role":"teen","archetype":"learner","work":"secondary school","room":"Bedroom Three","level":"l3","roomRoles":["bedroom"],"anchors":["room:bedroom"],"sleepsIn":"Bedroom Three"}
    ],
-   "signatureApps": ["ci-hermes","nextcloud","docuseal","steam-headless","libretranslate","papra","stirling-pdf"],
+   "signatureApps": ["ci-hermes","nextcloud","grist","steam-headless","libretranslate","papra","stirling-pdf"],
    "beatApps": {
     "home": "bookstack",
-    "food": "grocy",
-    "iot": "heimdall"
+    "food": "kitchenowl",
+    "iot": "uptime-kuma"
    },
    "coreRoom": "Living Room",
    "coreSpot": {
@@ -4214,7 +4214,7 @@
    "businessText": null,
    "narrator": "v-storyteller-m",
    "tenure": "owner",
-   "storeys": 2,
+   "storeys": 1,
    "areaSqm": 96,
    "homeStyle": "A low two-storey block of vertical timber on a stone plinth under one long mono-pitch roof, with a charcoal stair core at its west end; the ground-floor apartment takes the east twelve metres, level from the street gate to every room, with a wide glazed living and dining room opening onto its own fenced garden terrace, a study on the front door's axis, two bedrooms and a bathroom with a level-access shower along a central passage, and a closed maisonette above",
    "lotGround": "lawn",
@@ -4253,7 +4253,10 @@
     },
     {"id":"petra","name":"Petra","age":9,"role":"child","archetype":"learner","work":"primary school","room":"Grandchild's Bedroom","level":"l1","roomRoles":["bedroom","kids"],"anchors":["desk","room:kids"],"sleepsIn":"Grandchild's Bedroom"}
    ],
-   "signatureApps": ["ci-memory","stirling-pdf","home-assistant","koodo-reader","hortusfox","kitchenowl","nextcloud"],
+   "signatureApps": ["ci-memory","nextcloud","koodo-reader","kitchenowl","docuseal","cryptgeon","vaultwarden"],
+   "beatApps": {
+    "iot": "frigate"
+   },
    "coreRoom": "Study",
    "coreSpot": {
     "room": "Study",
@@ -4330,7 +4333,7 @@
    "businessText": null,
    "narrator": "v-steady-m",
    "tenure": "renter",
-   "storeys": 4,
+   "storeys": 2,
    "areaSqm": 110,
    "homeStyle": "A four-storey dark brick block on a city street with white-railed access walkways across its face, a long flight of steps up to the first of them, a stair tower at one end and parking and stores on the ground floor; the family's duplex apartment takes the middle bay of the second and third floors, a kitchen and dining room opening onto a balcony over the back court, a living room with a desk against a brick wall, the family stair rising to three bedrooms, a bath and a study landing, with its neighbours' flats closed on either side and a flat roof above",
    "lotGround": "urban",
@@ -4370,11 +4373,11 @@
     {"id":"ayaan","name":"Ayaan","age":13,"role":"teen","archetype":"learner","work":"secondary school","room":"Bedroom Two","level":"l3","roomRoles":["bedroom"],"anchors":["room:bedroom"],"sleepsIn":"Bedroom Two"},
     {"id":"dmitri","name":"Dmitri","age":16,"role":"teen","archetype":"gamer","work":"sixth form","room":"Living Room","level":"l2","roomRoles":["living"],"anchors":["desk","couch","room:living"],"sleepsIn":"Bedroom Three"}
    ],
-   "signatureApps": ["ci-openclaw","libretranslate","n8n","linkwarden","steam-headless","forgejo","libreoffice"],
+   "signatureApps": ["ci-openclaw","libretranslate","n8n","steam-headless","forgejo","libreoffice","readeck"],
    "beatApps": {
     "home": "donetick",
-    "food": "yuvomi",
-    "iot": "music-assistant"
+    "food": "grocy",
+    "iot": "pi-hole"
    },
    "coreRoom": "Living Room",
    "coreSpot": {

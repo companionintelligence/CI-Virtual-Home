@@ -43,7 +43,7 @@
       {
         "at": "morning",
         "beat": "office-letter",
-        "line": "Esperanza reads the shop's supplier letter at the standing desk."
+        "line": "Esperanza redrafts the shop's supplier letter at the standing desk."
       },
       {
         "at": "morning",
@@ -119,7 +119,7 @@
       "companion": {
         "name": "Matcha",
         "runtime": "OpenClaw",
-        "job": "Opens a supplier's order form and fills in what Takumi typed.",
+        "job": "Renames and sorts the shop's product photos from the part numbers Takumi types.",
         "personality": [
           "steady",
           "patient",
@@ -127,10 +127,10 @@
         ],
         "voice": "v-steady-m",
         "memory": false,
-        "limits": "One form at a time. Takumi reads each field and sends it himself."
+        "limits": "One folder at a time. Takumi checks each folder before anything goes up."
       },
       "profile": {
-        "bio": "Takumi runs the bike shop in the building and keeps its books at the writing desk in the library nook. Matcha fills in the supplier's order form, and he sends it himself."
+        "bio": "Takumi runs the bike shop in the building and keeps its books at the writing desk in the library nook. Matcha sorts the shop's product photos by part number, and he checks the folders himself."
       }
     },
     {
@@ -154,7 +154,7 @@
       "colour": "chart-4",
       "archetype": "learner",
       "profile": {
-        "bio": "Yara has the bedroom at the end of the hall. She checks her Spanish, saves her sources and reads her book club novel with tools that each do one job on the Core."
+        "bio": "Yara has the bedroom at the end of the hall. She checks her Spanish, plans her essays and reads her book club novel with tools that each do one job on the Core."
       }
     }
   ],
@@ -306,8 +306,8 @@
       "segment": "consumer",
       "with": [
         "nextcloud",
-        "docuseal",
-        "bookstack"
+        "bookstack",
+        "grist"
       ],
       "anchor": {
         "role": "core"
@@ -319,14 +319,14 @@
       "popup": {
         "kind": "phone",
         "title": "Esperanza and Takumi pick agents",
-        "body": "In the Companion Hub store, Esperanza picks Hermes and Takumi picks OpenClaw. Companion Memory comes along, with Nextcloud, Docuseal and BookStack. Then they walk away.",
+        "body": "In the Companion Hub store, Esperanza picks Hermes and Takumi picks OpenClaw. Companion Memory comes along, with Nextcloud, BookStack and Grist. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
             "Companion Memory",
-            "Apps: Nextcloud, Docuseal, BookStack"
+            "Apps: Nextcloud, BookStack, Grist"
           ]
         }
       }
@@ -378,12 +378,14 @@
       "id": "living-start",
       "chapter": "living",
       "category": "iot",
-      "segment": "consumer",
+      "segment": "small-business",
       "app": {
-        "id": "heimdall",
-        "replaces": []
+        "id": "uptime-kuma",
+        "replaces": [
+          "Datadog"
+        ]
       },
-      "capability": "a dashboard of links to your apps",
+      "capability": "watch your sites and services and get an alert when one goes down",
       "anchor": {
         "role": "core",
         "fallback": [
@@ -399,22 +401,24 @@
         "side": "left"
       },
       "popup": {
-        "title": "One start page for the flat",
-        "body": "Every phone in the flat has the same bookmark. It opens one page of links to the apps on the Core, so nobody has to remember an address.",
+        "title": "An alert before a customer notices",
+        "body": "Uptime Kuma on the Core checks the shop's website every few minutes. If it goes down, an alert reaches the family before a customer notices.",
         "chips": [
-          "Heimdall"
+          "Uptime Kuma",
+          "alternative to Datadog"
         ]
       },
       "detail": {
-        "before": "Each phone kept its own bookmarks, and the Core's address lived on a card in the hall.",
-        "after": "Heimdall shows one page of links to the apps on the Core. The same bookmark opens it on any phone in the flat.",
+        "before": "When the shop's website went down, the family found out from a customer's message.",
+        "after": "Uptime Kuma checks the website from the Core on a schedule and raises an alert the moment it stops answering.",
         "steps": [
-          "Add the bookmark to each phone",
-          "Open the page of links",
-          "Pick the app that is needed"
+          "Add the shop's website as a check",
+          "Set how often the Core looks",
+          "Choose who gets the alert"
         ],
-        "fact": "Heimdall is a dashboard of links to your apps."
-      }
+        "fact": "Uptime Kuma watches your sites and services and sends an alert when one goes down."
+      },
+      "service": "datadog"
     },
     {
       "id": "living-house-book",
@@ -468,16 +472,16 @@
       "id": "living-playlist",
       "chapter": "living",
       "member": "anouk",
-      "category": "media",
+      "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "mstream",
+        "id": "comfyui",
         "replaces": [
-          "Apple Music"
+          "Midjourney"
         ]
       },
-      "service": "apple-music",
-      "capability": "stream your own music from your Core to a browser or an app",
+      "service": "midjourney",
+      "capability": "generate images with node-based pipelines on your own AMD GPU",
       "anchor": {
         "role": "fireplace",
         "fallback": [
@@ -497,22 +501,22 @@
         "side": "left"
       },
       "popup": {
-        "title": "Headphones on by the hearth",
-        "body": "Anouk builds a playlist from the family's music files in mStream, served by the Core. She plays it to her headphones.",
+        "title": "Concept art by the hearth",
+        "body": "By the hearth, Anouk feeds a character description into a ComfyUI pipeline on the Core. Three sketches come back, and she redraws the best one in her game notes.",
         "chips": [
-          "mStream",
-          "alternative to Apple Music"
+          "ComfyUI",
+          "alternative to Midjourney"
         ]
       },
       "detail": {
-        "before": "Anouk's playlists lived in Apple Music, next to everything else she streamed.",
-        "after": "mStream streams the music files on the Core to a browser or an app. Her playlists sit beside the files they play.",
+        "before": "Anouk's character sketches came from Midjourney prompts, and each result stayed in that service.",
+        "after": "ComfyUI turns the description into sketches on the Core, and she keeps them in a folder beside her game notes.",
         "steps": [
-          "Open mStream in a browser",
-          "Pick songs from the family's music folder",
-          "Press play on the headphones"
+          "Write the character description",
+          "Run the pipeline and look at the sketches",
+          "Keep the best one in her folder"
         ],
-        "fact": "mStream streams your own music from your Core to a browser or an app."
+        "fact": "ComfyUI generates images with node-based pipelines on your own AMD GPU."
       }
     },
     {
@@ -589,8 +593,8 @@
         "side": "auto"
       },
       "popup": {
-        "title": "The spring service note goes out",
-        "body": "Takumi writes the shop's spring note in Keila, and the customer list sits on the Core. Sending still goes through an outside mail provider.",
+        "title": "A spring reminder for bikes due",
+        "body": "Takumi picks the customers whose bikes are due a service and writes them a spring reminder in Keila. An outside mail provider delivers it.",
         "chips": [
           "Keila",
           "alternative to Mailchimp"
@@ -598,11 +602,11 @@
         "note": "Delivery depends on the mail provider."
       },
       "detail": {
-        "before": "The shop's customer list lived in Mailchimp, together with the draft of every note.",
-        "after": "Keila holds the list and the drafts on the Core. An outside mail provider sends each note.",
+        "before": "Every customer got the same shop note, whether their bike was due a service or not.",
+        "after": "Keila holds the list on the Core, and Takumi sends the reminder only to the customers whose bikes are due. An outside mail provider delivers it.",
         "steps": [
-          "Write the spring note in Keila",
-          "Check the customer list",
+          "Pick the customers with bikes due",
+          "Write the spring reminder",
           "Send it through the mail provider"
         ],
         "fact": "Keila sends newsletters and email campaigns from your own Core."
@@ -614,13 +618,10 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "grocy",
-        "replaces": [
-          "OurGroceries"
-        ]
+        "id": "kitchenowl",
+        "replaces": []
       },
-      "service": "ourgroceries",
-      "capability": "track the pantry, shopping lists, recipes, chores and household habits",
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
       "anchor": {
         "role": "fridge",
         "fallback": [
@@ -638,22 +639,21 @@
         "side": "left"
       },
       "popup": {
-        "title": "The pantry list at the fridge",
-        "body": "When the last tin comes out of the pantry, whoever takes it adds it to the Grocy list. The shopping run starts from that list.",
+        "title": "Dinner chosen in turn",
+        "body": "In KitchenOwl on the Core, each night has a name beside it, and that person picks the dish. The shopping list follows the plan.",
         "chips": [
-          "Grocy",
-          "alternative to OurGroceries"
+          "KitchenOwl"
         ]
       },
       "detail": {
-        "before": "The shopping list lived in OurGroceries on one phone, and the pantry was checked by looking.",
-        "after": "Grocy tracks the pantry and the shopping list together on the Core. Whoever empties a shelf adds the item before they forget.",
+        "before": "Dinner was decided at six each evening, and the shopping list was written for a plan that did not exist.",
+        "after": "KitchenOwl plans the week's dinners on the Core, and the shopping list is built from the plan.",
         "steps": [
-          "Log the tin when it comes out",
-          "Check the list before the shopping run",
-          "Tick items off as they go in the basket"
+          "Put a name beside each night",
+          "Let that person pick the dish",
+          "Read the shopping list before the run"
         ],
-        "fact": "Grocy tracks pantry stock, shopping lists, recipes, chores and household habits."
+        "fact": "KitchenOwl is a shared grocery list, recipe book, meal planner and expense tracker for the household."
       }
     },
     {
@@ -865,13 +865,13 @@
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "jotty",
+        "id": "vikunja",
         "replaces": [
-          "Trello"
+          "Todoist"
         ]
       },
-      "service": "trello",
-      "capability": "lightweight checklists and notes with Kanban boards",
+      "service": "todoist",
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
       "anchor": {
         "role": "bookshelf",
         "room": "office",
@@ -894,22 +894,22 @@
         "side": "right"
       },
       "popup": {
-        "title": "The board copies the job tags",
-        "body": "Every bike in the shop wears a job tag, and the board in Jotty copies it. When a customer calls, Takumi reads the board from the nook.",
+        "title": "A due date on every repair",
+        "body": "Each repair gets a task in Vikunja on the Core with the pick-up date. When a customer calls, Takumi reads the date from the list.",
         "chips": [
-          "Jotty",
-          "alternative to Trello"
+          "Vikunja",
+          "alternative to Todoist"
         ]
       },
       "detail": {
-        "before": "The repair jobs sat on a Trello board, and the paper tags on the hooks were the only other copy.",
-        "after": "Jotty keeps the three columns of the board on the Core. The tag on the bike is still the truth, and the board is the copy.",
+        "before": "Repair dates lived on paper tags and in Takumi's head, and a late bike was noticed when the customer called.",
+        "after": "Vikunja keeps each repair as a task with a due date and a reminder on the Core.",
         "steps": [
-          "Write the job on the tag",
-          "Hang the tag by the bike",
-          "Move the card to the next column"
+          "Add a task for each bike",
+          "Set the pick-up date as the due date",
+          "Tick it off when the bike goes home"
         ],
-        "fact": "Jotty keeps lightweight checklists and notes, with Kanban boards and sharing."
+        "fact": "Vikunja gives you lists, boards and calendars for tasks, with reminders and recurring jobs."
       }
     },
     {
@@ -991,24 +991,23 @@
         "side": "auto"
       },
       "popup": {
-        "title": "Matcha fills in the supplier order",
-        "body": "Matcha opens the supplier's order form and fills in the inner tubes Takumi typed. Takumi checks every field, then sends it himself.",
+        "title": "Matcha names the product photos",
+        "body": "Matcha renames the week's product photos by part number, using the list Takumi typed. Takumi checks the folders before the shop's listing goes up.",
         "chips": [
           "OpenClaw"
-        ],
-        "note": "OpenClaw reaches websites over your home internet."
+        ]
       },
       "say": {
         "speaker": "takumi",
-        "text": "The order form is filled in. Please check the quantities before you send it."
+        "text": "The photos are renamed and sorted. Please check a few before you list them."
       },
       "detail": {
-        "before": "Restocking meant typing the same shop details into a supplier's form, field by field, every month.",
-        "after": "Matcha opens the supplier's page in its browser and fills in the form from what Takumi typed. He reads every field and sends it himself.",
+        "before": "Photos from the shop's phone arrived with camera numbers for names, and each one was renamed by hand.",
+        "after": "Matcha renames each photo from Takumi's list and moves it to the right folder. He checks the folders before anything goes online.",
         "steps": [
-          "Type what the shop needs",
-          "Let Matcha fill in the form",
-          "Read every field, then send it"
+          "Type the list of part numbers",
+          "Let Matcha rename and sort the photos",
+          "Check the folders, then list the parts"
         ],
         "fact": "OpenClaw is an agent with browser automation and tool use, running in a sandboxed app on your Core."
       }
@@ -1102,13 +1101,13 @@
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "docuseal",
+        "id": "onlyoffice",
         "replaces": [
-          "DocuSign"
+          "Microsoft Office"
         ]
       },
-      "service": "docusign",
-      "capability": "fill and sign PDF forms on any device, from your own Core",
+      "service": "microsoft-office",
+      "capability": "write documents, spreadsheets and slides with a full office suite in your browser",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -1124,23 +1123,22 @@
         "framing": "wide"
       },
       "popup": {
-        "title": "The supplier letter gets signed",
-        "body": "Esperanza reads the shop's supplier letter at the standing desk. Takumi signs it on her tablet in Docuseal, and the signed PDF stays on the Core.",
+        "title": "The supplier letter, redrafted",
+        "body": "Esperanza redrafts the shop's supplier letter in ONLYOFFICE Desktop Editors on the Core, at the standing desk. Takumi reads the final copy there before it goes.",
         "chips": [
-          "Docuseal",
-          "alternative to DocuSign"
-        ],
-        "note": "Signers outside the home network need to reach the Core."
+          "ONLYOFFICE Desktop Editors",
+          "alternative to Microsoft Office"
+        ]
       },
       "detail": {
-        "before": "Agreements were signed through DocuSign, and the finished copy was kept there.",
-        "after": "Docuseal fills in the PDF on the Core. Takumi signs on her tablet, and the signed copy stays on the Core.",
+        "before": "Letters were redrafted in Microsoft Office on two laptops, and the latest version was whichever one was saved last.",
+        "after": "ONLYOFFICE Desktop Editors opens the letter in a browser session from the Core, so there is one copy to redraft.",
         "steps": [
-          "Open the PDF in Docuseal",
-          "Fill in the fields",
-          "Sign on the tablet"
+          "Open the letter in the browser session",
+          "Redraft the paragraphs she wants changed",
+          "Save it for Takumi to read"
         ],
-        "fact": "Docuseal fills in and signs PDF forms on any device, from your own Core."
+        "fact": "ONLYOFFICE Desktop Editors writes documents, spreadsheets and slides with a full office suite in your browser."
       }
     },
     {
@@ -1250,13 +1248,13 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "linkwarden",
+        "id": "tldraw",
         "replaces": [
-          "Raindrop.io"
+          "Miro"
         ]
       },
-      "service": "raindrop-io",
-      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "service": "miro",
+      "capability": "a shared whiteboard on an infinite canvas",
       "anchor": {
         "role": "bed",
         "room": "bedroom",
@@ -1273,22 +1271,22 @@
         "framing": "medium"
       },
       "popup": {
-        "title": "Sources for the history essay",
-        "body": "Yara saves the pages for her history essay in Linkwarden, each with a copy of the page. If a link disappears, her sources are still there.",
+        "title": "Causes laid out on one board",
+        "body": "Yara lays out the causes of her history essay as notes on one tldraw board on the Core. She drags them into order, and the order becomes her plan.",
         "chips": [
-          "Linkwarden",
-          "alternative to Raindrop.io"
+          "tldraw",
+          "alternative to Miro"
         ]
       },
       "detail": {
-        "before": "Yara bookmarked her sources in Raindrop.io, and a page that vanished left only a dead link.",
-        "after": "Linkwarden saves each page with a screenshot and a PDF on the Core, so the source stays readable after the link dies.",
+        "before": "Yara planned her essays on sticky notes that curled and fell off the wall.",
+        "after": "tldraw keeps the notes on an infinite board on the Core, so she can drag them into a new order.",
         "steps": [
-          "Save each source page in Linkwarden",
-          "Check the copy has the part she quotes",
-          "Cite it from the saved copy"
+          "Add a note for each cause",
+          "Drag the notes into order",
+          "Write the essay from the board"
         ],
-        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+        "fact": "tldraw is a shared whiteboard on an infinite canvas."
       }
     },
     {
@@ -1411,13 +1409,13 @@
     }
   },
   "notes": [
-    "Told in the v3 shape: 17 of 21 room beats are pair beats naming a registry service; the four pair-less ones are the Heimdall start page, Anouk's Steam Headless session, Paprika's Companion Memory draft and Matcha's order form.",
+    "Told in the v3 shape: 17 of 21 room beats are pairs. The four pair-less ones are Anouk's Steam Headless session, the KitchenOwl dinner plan, Paprika's Companion Memory draft and Matcha's photo sorting.",
     "Steam Headless is pair-less on purpose: geforce-now|steam-headless is on the content/story/lander.json hold list, and no cloud gaming service is named. The persona-replaces warning on living-game is that choice.",
     "The home has no TV: Anouk plays in a browser tab on a laptop from the sofa, which is also the media beat at the couch the validator asks for.",
     "Age rule 16: Anouk (sixteen) and Yara (fourteen) use no chat model or agent; Paprika and Matcha work only for Esperanza and Takumi, who approve every result.",
     "Honest edges carried: Steam needs a Valve account; Keila sends through an outside mail provider; Invio client links reach only people who can reach the Core; BookLore fetches covers from outside.",
     "Camera, for the geometry stream: room-quests is a cut (no walkable leg on l3): the gallery, office and bedrooms are closed bays the camera cannot reach from the open plan. The terrace (entry above ground) and the outro are the other cuts.",
     "Small rooms have one standing place each, so the bedroom and office beats carry no from or side hint. The terrace beat is told from the roof terrace loungers (patio-seat), because no deck of this home can be framed.",
-    "Apps chosen clear of the fleet cap: no immich, hortusfox, paperless, open-webui, yuvomi, home-assistant or jellyfin. LibreTranslate reaches fourteen of thirty-six families with the plan's rademaker, which is the cap."
+    "Apps chosen clear of the fleet cap (no immich, hortusfox, paperless, open-webui, yuvomi, home-assistant or jellyfin), and none is in more than two of the six apartments. LibreTranslate sits at the cap of fourteen."
   ]
 }
