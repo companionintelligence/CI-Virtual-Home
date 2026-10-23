@@ -18,6 +18,29 @@
 html[data-story] .vh-shots,
 html[data-story] .vh-tool[data-act="speed"],
 html[data-story] .vh-end { display: none !important; }
+/* a phone, and a phone on its side, while the tour runs: the dock is one row (play, seek, time, More) because the hour chips are put away with the shot chips (the tour opens in daylight and
+   a person who wants another hour is a person who wants the player: the chapters panel and the seek bar are the tour's own navigation). The home's name is shown whole: it wraps to a second
+   line before it is ever cut (every display name is two lines at the width a phone's bar leaves it), and the meta line under it is the only thing that may be cut (a tour drops it on a narrow
+   phone, below). That is the tour's rule, not the player's: the plain player's bar keeps its one line with an ellipsis. Every one of them is back when the tour ends (html[data-story] goes with it). */
+@media (max-width: 760px), (max-height: 500px) {
+  html[data-story] .vh-tods, html[data-story] .vh-row-chips { display: none; }
+  /* (and the chapters sheet stands closer to the one-row dock) */
+  html[data-story] .st-chapters { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  html[data-story] .vh-name { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.2; }
+}
+/* a phone held upright keeps room for the home's name by sending Previous home and Next home to the More sheet (viewer.ts puts a row for each there). On its side the bar is wide (the name has
+   the room) and the More sheet is short (it has the height for five rows, not seven), so the two stay where they were. */
+@media (max-width: 760px) and (orientation: portrait) {
+  html[data-story] .vh-actions [data-act="prev"], html[data-story] .vh-actions [data-act="next"] { display: none; }
+  html[data-story] .vh .vh-tool.vh-show-tour { display: inline-flex; }
+}
+@media (max-width: 480px) {
+  html[data-story] .vh-meta { display: none; }
+}
+/* the narrowest phones (320 px): the bar holds back, the title and two buttons, so the title gives up a little padding before a word is ever broken (the type stays the player's own 14 px) */
+@media (max-width: 340px) {
+  html[data-story] .vh-title { padding-inline: 8px; }
+}
 
 /* ---- the tour's layer */
 .st { position: absolute; inset: 0; z-index: 6; pointer-events: none; font-family: var(--vh-font); color: var(--foreground); overflow-wrap: anywhere; }
@@ -127,6 +150,30 @@ html[data-story] .vh-help { z-index: 7; }
 .st-card[data-mode="sheet"] .st-row { margin-top: 0.5rem; }
 .st-card[data-mode="sheet"] .st-more { gap: 0.4rem; padding-top: 0.5rem; }
 
+/* ---- a phone's beat sheet (portrait, under 768 px): the same card, as tall as its words and no more, with a one-line kicker (the person; the companion's name is the agent's line's own label) and
+   the "More" toggle at the right of it, 44 px tall, where a thumb reaches a sheet that stands at the bottom (25 beats of 27 in the Brennan tour) and where the head sticks when the sheet scrolls.
+   The director gives the sheet a top edge and a max-height (at most 40 % of the window, popup.ts put()), and the sheet is as tall as its content under that; the agent's line, which comes part way
+   through a beat, is not held a room before it has come (it grows the sheet downward, into room the solver counted). The apps are one row of chips that scrolls sideways (a control row, judged by
+   its own box) and not a wrapped block. Type is the floor, as everywhere. ---- */
+.st-card[data-mode="sheet"] .st-kicker { flex-wrap: nowrap; gap: 0 0.55rem; }
+.st-card[data-mode="sheet"] .st-kicker > .st-with { display: none; }
+.st-card[data-mode="sheet"] .st-who { flex: 0 1 auto; }
+.st-card[data-mode="sheet"] .st-row { flex-wrap: nowrap; }
+.st-card[data-mode="sheet"] .st-chips { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; margin: 0 -0.4rem; padding: 3px 0.4rem; }
+.st-card[data-mode="sheet"] .st-chips::-webkit-scrollbar { display: none; }
+.st-card[data-mode="sheet"] .st-chip { flex: none; white-space: nowrap; max-width: none; }
+.st-card[data-mode="sheet"][data-chips="more"] .st-chips { -webkit-mask-image: linear-gradient(90deg, black calc(100% - 1.4rem), transparent); mask-image: linear-gradient(90deg, black calc(100% - 1.4rem), transparent); }
+/* a sheet that has been scrolled keeps its head (the person, the More toggle) in view on an opaque band, as the open card's head always did */
+.st-card[data-mode="sheet"] .st-head { position: sticky; top: calc(-1 * var(--st-pt)); z-index: 1; margin: calc(-1 * var(--st-pt)) calc(-1 * var(--st-px)) 0; padding: var(--st-pt) var(--st-px) 0.2rem; }
+.st-card[data-mode="sheet"][data-scrolled="1"] .st-head { background: var(--st-paper); }
+/* the agent's line is not held a room before it comes (display: none); while the director measures the sheet it is shown, hidden, so the solver counts the room the sheet may grow into */
+.st-card[data-mode="sheet"] .st-say:not(.st-on) { display: none; }
+.st-card[data-mode="sheet"].st-reserve .st-say { display: block; }
+.st-card[data-mode="sheet"] .st-say.st-on { animation: st-say-in 0.25s ease both; }
+@keyframes st-say-in { from { opacity: 0; transform: translateY(4px); } }
+/* a sheet at the bottom leaves the home's own label (the chip under the top bar) showing and does not repeat it; one under the top bar covers the chip and says it on its last line */
+.st-card[data-mode="sheet"][data-where="bottom"] .st-foot { display: none; }
+
 /* the card with its padding and gaps tighter, when nothing else keeps it off the subject or out of a scroll (every word stays, and the type is never touched: it is the floor) */
 .st-card.st-tight { --st-pt: 0.6rem; --st-px: 0.9rem; padding: var(--st-pt) var(--st-px) 0.5rem; line-height: 1.28; }
 .st-card.st-tight .st-title { margin: 0.35rem 0 0.1rem; }
@@ -174,6 +221,58 @@ html[data-story] .vh-help { z-index: 7; }
 .st-members + .st-fine { margin-top: 1.4rem; }
 .st-start-more > .st-fine:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 
+/* ---- the phone's start sheet and a phone-on-its-side's start panel (reference/story/player.md, "On a phone"). popup.ts StartCard picks the layout with the same two media queries
+   (`data-layout` on the scrim and the dialog: "sheet" under 768 px, "panel" in a window at most 500 px tall and wider than tall, else "wide") and moves the same nodes: no rule here is under a
+   media query, so the CSS and the script cannot disagree. The home stays in view: the scrim is only a soft shade behind the sheet. A sheet is at most half the window (a panel at most 45 % of its
+   width) and scrolls inside when its words are taller than that. Its parts, in reading order: the kicker, the title, the tagline, THE ACTION BAR (the one primary action, 44 px or taller, which sticks
+   to the bottom edge of the sheet whenever the rest would push it out of view and is otherwise where the words end), the family as one row of person chips that scrolls sideways, and the disclosure
+   "About this family", which holds the facts, the home's line and every line of fine print. The type is the scale's, as ever; what gives is the length of the page: nothing is cut, the long copy is
+   behind the disclosure. ---- */
+.st-start[data-layout="sheet"], .st-start[data-layout="panel"] {
+  overflow: hidden;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) calc(8px + env(safe-area-inset-left, 0px));
+}
+/* The scrim takes every tap (it is a dialog: nothing behind it answers while it is up), so the player's own bars under it must look put away, not live: a veil over the band that holds the top bar
+   and the home's label (fading out below it), then the home itself clear, then the soft shade behind the sheet (or, on its side, behind the panel). */
+.st-start[data-layout="sheet"], .st-start[data-layout="panel"] { --st-veil: color-mix(in srgb, var(--vh-ink) 34%, transparent); --st-band: calc(env(safe-area-inset-top, 0px) + 96px); }
+.st-start[data-layout="sheet"] { align-items: flex-end; background: linear-gradient(180deg, var(--st-veil), var(--st-veil) var(--st-band), transparent calc(var(--st-band) + 56px), transparent 35%, var(--st-veil)); }
+.st-start[data-layout="panel"] { align-items: stretch; justify-content: flex-start; background: linear-gradient(180deg, var(--st-veil), var(--st-veil) var(--st-band), transparent calc(var(--st-band) + 56px)), linear-gradient(90deg, var(--st-veil), transparent 65%); }
+.st-start-card[data-layout="sheet"], .st-start-card[data-layout="panel"] {
+  display: block; margin: 0; padding: 0.8rem 1.1rem 0; min-height: 0; border-radius: var(--st-r-sheet);
+  overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--foreground) 40%, transparent) transparent;
+  line-height: 1.3; width: 100%; max-width: none;
+}
+.st-start-card[data-layout="sheet"] { max-height: 50%; }
+/* (at most 45 % of the width, but never narrower than 17.5rem: below 660 px of width, an iPhone SE held on its side, 45 % is 255 px, in which the kicker's first word, "INTERACTIVE", set at the scale's size with its tracking, is wider than the line and breaks in the middle) */
+.st-start-card[data-layout="panel"] { width: max(45%, 17.5rem); max-width: max(45%, 17.5rem); max-height: 100%; }
+.st-start-card[data-layout="sheet"] .st-start-kick, .st-start-card[data-layout="panel"] .st-start-kick { margin: 0 0 0.3rem; line-height: 1.15; }
+.st-start-card[data-layout="sheet"] h2, .st-start-card[data-layout="panel"] h2 { margin: 0 0 0.35rem; line-height: 1.06; }
+.st-start-card[data-layout="sheet"] .st-start-p, .st-start-card[data-layout="panel"] .st-start-p { margin: 0; line-height: 1.3; }
+/* the action bar: opaque (the light set's paper), so the words that scroll under it are hidden; a hairline on top. It spans the sheet (the card's padding is taken back with margins). */
+.st-start-card[data-layout="sheet"] .st-actions, .st-start-card[data-layout="panel"] .st-actions {
+  position: sticky; bottom: 0; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem;
+  margin: 0.5rem -1.1rem 0; padding: 0.5rem 1.1rem; background: var(--st-paper); border-top: 1px solid var(--vh-ring);
+}
+.st-start-card[data-layout="sheet"] .st-actions .st-btn, .st-start-card[data-layout="panel"] .st-actions .st-btn { width: 100%; }
+/* the family: a label and one row of chips, each a 44 px target on one line (a control, so its words may not wrap: the row is judged by its own box), scrolling sideways, faded at the right edge while more is beyond */
+.st-start-card[data-layout="sheet"] .st-members, .st-start-card[data-layout="panel"] .st-members { margin: 0.5rem 0 0; }
+.st-start-card[data-layout="sheet"] .st-members-h, .st-start-card[data-layout="panel"] .st-members-h { margin: 0 0 0.25rem; line-height: 1.2; }
+.st-start-card[data-layout="sheet"] .st-members-list, .st-start-card[data-layout="panel"] .st-members-list { display: flex; gap: 0.5rem; padding: 3px; margin: 0 -3px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; scroll-snap-type: x proximity; }
+.st-start-card[data-layout="sheet"] .st-members-list::-webkit-scrollbar, .st-start-card[data-layout="panel"] .st-members-list::-webkit-scrollbar { display: none; }
+.st-start-card[data-row="more"] .st-members-list { -webkit-mask-image: linear-gradient(90deg, black calc(100% - 1.4rem), transparent); mask-image: linear-gradient(90deg, black calc(100% - 1.4rem), transparent); }
+.st-start-card[data-layout="sheet"] .st-members-list > li, .st-start-card[data-layout="panel"] .st-members-list > li { flex: none; scroll-snap-align: start; }
+.st-start-card[data-layout="sheet"] .st-member, .st-start-card[data-layout="panel"] .st-member { display: inline-flex; align-items: center; gap: 0.5rem; width: auto; min-height: 44px; padding: 0.2rem 0.9rem 0.2rem 0.45rem; white-space: nowrap; }
+.st-start-card[data-layout="sheet"] .st-member .st-disc, .st-start-card[data-layout="panel"] .st-member .st-disc { grid-row: auto; }
+/* the disclosure: a native <details>, a 44 px summary, the words behind it */
+.st-about-sum { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; list-style: none; cursor: pointer; font-size: var(--st-min); font-weight: 600; line-height: 1.2; color: var(--muted-foreground); -webkit-tap-highlight-color: transparent; }
+.st-about-sum::-webkit-details-marker { display: none; }
+.st-about[open] .st-more-i { transform: rotate(180deg); }
+.st-about-body { padding: 0.2rem 0 0.6rem; }
+.st-about-body > * { margin: 0; }
+.st-about-body .st-start-meta { margin: 0 0 0.6rem; }
+.st-about-body .st-start-home { margin: 0 0 0.6rem; }
+.st-about-body .st-fine { margin: 0; padding: 0.7rem 0 0; }
+
 /* ---- buttons (a finger and a pointer: at least 44 px, and as tall as the type needs). Manrope 500, flat. */
 .st-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .st-btn { display: inline-flex; align-items: center; justify-content: center; min-height: max(44px, calc(var(--st-min) * 2)); padding: 0.4rem 1.4rem; border: 0; border-radius: var(--st-r-ctl); font: inherit; font-size: var(--st-min); font-weight: 500; line-height: 1.15; letter-spacing: var(--st-track); text-align: center; text-decoration: none; cursor: pointer; color: var(--foreground); background: var(--vh-hover); box-shadow: inset 0 0 0 1px var(--vh-ring); pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: background-color 0.15s ease; }
@@ -198,11 +297,22 @@ html[data-story] .vh-help { z-index: 7; }
 .st-end.st-tight h2 { line-height: 1.05; }
 .st-end.st-tight .st-end-lead { margin: 0.3rem 0 0.4rem; }
 .st-end.st-tight .st-actions { margin: 0.5rem 0 0.6rem; gap: 0.4rem; }
+/* a phone on its side (popup.ts EndCard.setSide): the panel is at most 45 % of the width and, in the room between the top bar and the dock, 250 px or so tall, which the heading alone (three
+   lines at the heading's size) all but fills. The story's call to action, which is what the card is for, is a bar at the END of the card (`.st-go`) that sticks to the bottom edge of the panel,
+   opaque like the start sheet's action bar so the words that scroll under it are hidden, a hairline on top. The other buttons are a stack above it, reached by scrolling (each a full row).
+   The panel has no bottom padding of its own (the bar has it), so the bar sits on the panel's edge. (These come after the tight rules above, which they must win over.) */
+.st-end[data-side="1"] { --st-ex: 1.5rem; padding-bottom: 0; }
+.st-end[data-side="1"].st-tight { --st-ex: 1.1rem; }
+.st-end[data-side="1"] .st-actions { margin: 0.7rem 0 1rem; }
+.st-end[data-side="1"] .st-actions .st-btn { flex: 1 1 100%; }
+.st-end[data-side="1"] .st-go { position: sticky; bottom: 0; z-index: 2; margin: 0.5rem calc(-1 * var(--st-ex)) 0; padding: 0.5rem 0.6rem; background: var(--st-paper); border-top: 1px solid var(--vh-ring); }
+/* (the bar is nearly edge to edge and its button takes the room the card's padding would have: the panel is 255 px wide on the narrowest phone on its side, where the call to action is two lines, not three) */
+.st-end[data-side="1"] .st-go .st-btn { display: flex; width: 100%; padding-inline: 0.5rem; }
 .st-end.st-tight .st-btn { min-height: max(44px, calc(var(--st-min) * 1.7)); padding-block: 0.2rem; }
 
 /* ---- the chapters panel: a drawer on a wide screen, a sheet above the dock below that */
 .st-chapters { position: absolute; z-index: 5; pointer-events: auto; display: flex; flex-direction: column; overflow: hidden; background-color: var(--st-glass); background-image: var(--st-glass-sheen); -webkit-backdrop-filter: var(--st-glass-blur); backdrop-filter: var(--st-glass-blur); box-shadow: var(--st-glass-shadow); border-radius: var(--st-r-card); overflow-wrap: anywhere;
-  right: calc(var(--vh-gap, 12px) + env(safe-area-inset-right, 0px)); top: calc(var(--vh-gap, 12px) + var(--vh-top-h, 50px) + 12px + env(safe-area-inset-top, 0px)); bottom: 104px; width: 340px; animation: st-slide 0.22s ease both; }
+  right: calc(var(--vh-gap, 12px) + env(safe-area-inset-right, 0px)); top: calc(var(--vh-gap, 12px) + var(--vh-top-h, 50px) + 12px + env(safe-area-inset-top, 0px)); bottom: calc(104px + env(safe-area-inset-bottom, 0px)); width: 340px; animation: st-slide 0.22s ease both; }
 @keyframes st-slide { from { opacity: 0; transform: translateX(10px); } }
 .st-ch-head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 6px 6px 6px 16px; border-bottom: 1px solid var(--vh-ring); }
 .st-ch-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
@@ -230,18 +340,14 @@ html[data-story] .vh-help { z-index: 7; }
 
 /* ---- below a desktop: the panel is a sheet above the dock */
 @media (max-width: 1099px) {
-  .st-chapters { left: 8px; right: 8px; width: auto; top: auto; bottom: 88px; max-height: min(62%, 520px); }
+  .st-chapters { left: calc(8px + env(safe-area-inset-left, 0px)); right: calc(8px + env(safe-area-inset-right, 0px)); width: auto; top: auto; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); max-height: min(62%, 520px); }
   /* the sheet takes the cards' place while it is open (one panel at a time, as on a phone): a card at the larger type has no room beside a sheet this wide */
   .vh[data-chapters="1"] .st-card, .vh[data-chapters="1"] .st-end { visibility: hidden; }
 }
-/* a phone (under 768 px): the beat card is a full-width bottom sheet of up to 55 % of the window; the chapters panel takes its place while it is open */
+/* a phone (under 768 px): the beat card is a full-width bottom sheet of up to 40 % of the window; the chapters panel takes its place while it is open */
 @media (max-width: 767px) {
-  .st-start { padding: 0.6rem; }
-  .st-start-card { grid-template-columns: minmax(0, 1fr); padding: 1.2rem 1.1rem 1.1rem; border-radius: var(--st-r-sheet); }
-  .st-start-card h2 { margin-bottom: 0.6rem; }
-  .st-members + .st-fine, .st-fine { margin-top: 1.1rem; }
   .vh[data-chapters="1"] .st-card[data-mode="sheet"] { visibility: hidden; }
-  .st-end { left: 8px !important; width: calc(100% - 16px) !important; padding: 1rem 1rem 0.9rem; border-radius: var(--st-r-sheet); }
+  .st-end[data-mode="sheet"] { left: calc(8px + env(safe-area-inset-left, 0px)) !important; width: calc(100% - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) !important; padding: 1rem 1rem 0.9rem; border-radius: var(--st-r-sheet); }
 }
 /* the tools sheet that More opens (a phone, or a short window: the player's own compact layout) takes the place of the tour's cards while it is open, as the chapters panel does:
    one panel at a time, and the sheet is not left under the card, where About could not be reached */
@@ -262,5 +368,6 @@ html[data-story] .vh-help { z-index: 7; }
   .st-card, .st-say, .st-end, .st-w, .st-btn, .st-member { transition: none !important; transform: none !important; }
   .st-more-btn::before, .st-more-i { transition: none !important; }
   .st-pin-ring { animation: none !important; display: none; }
+  .st-card[data-mode="sheet"] .st-say.st-on { animation: none !important; }
   .st-chapters { animation: none !important; }
 }

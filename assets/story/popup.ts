@@ -167,6 +167,8 @@ export class BeatCard {
     this.el = el('div', 'st-card');
     this.el.hidden = true;
     for (const ev of ['wheel', 'touchstart', 'pointerdown', 'keydown'] as const) this.el.addEventListener(ev, () => { this.touched = Date.now(); }, { passive: true });
+    // (a card that has been scrolled puts its head, the person and the More toggle, on an opaque band; a phone's sheet sticks its head always: portal/story.css)
+    this.el.addEventListener('scroll', () => { this.el.dataset.scrolled = this.el.scrollTop > 2 ? '1' : '0'; }, { passive: true });
     host.append(this.leader, this.el);
     this.leader.style.display = 'none';
   }
@@ -179,7 +181,7 @@ export class BeatCard {
     this.beatId = b.id;
     c.textContent = '';
     c.classList.remove('st-open');
-    c.scrollTop = 0; this.litNow = null;
+    c.scrollTop = 0; this.litNow = null; c.dataset.scrolled = '0'; c.dataset.chips = '0';
     this.more = null; this.morePanel = null;
     c.dataset.kind = b.popup.kind === 'phone' ? 'phone' : 'card';
     c.dataset.beat = b.id;
@@ -210,6 +212,8 @@ export class BeatCard {
         li.append(t);
         ul.append(li);
       }
+      // (a phone's sheet shows the apps as one row that scrolls sideways; it fades at the right edge while there are more beyond it)
+      ul.addEventListener('scroll', () => this.markChips(), { passive: true });
       row.append(ul);
     }
     if (b.detail) {
@@ -253,8 +257,32 @@ export class BeatCard {
     this.morePanel.hidden = !open;
     this.el.classList.toggle('st-open', open);
     this.onMore(open);
-    if (open && user) requestAnimationFrame(() => { const c = this.el, p = this.morePanel, h = c.querySelector<HTMLElement>('.st-head'); if (p && c.scrollHeight > c.clientHeight + 1) c.scrollTop = Math.max(0, p.offsetTop - (h ? h.offsetHeight : 0) - 8); });
+    if (open && user) requestAnimationFrame(() => {
+      const c = this.el, p = this.morePanel, h = c.querySelector<HTMLElement>('.st-head');
+      if (!p || c.scrollHeight <= c.clientHeight + 1) return;
+      // the opened text is brought to the top of what scrolls, under the card's stuck head (the person and the toggle)
+      c.scrollTop = Math.max(0, p.offsetTop - (h ? h.offsetHeight : 0) - 8);
+    });
     if (!open) this.el.scrollTop = 0;
+  }
+  /**
+   * A phone's sheet whose words are taller than its room (at most 40 % of the window) brings the rest up by itself as the beat's time goes, when no voice is lighting words for it to
+   * follow (keepLit does that), the person has not touched it in the last few seconds and "More" is shut: a tour that moves on without the reader must not hide the end of a card under
+   * its edge. `frac` is how far through the beat the clock is (0 to 1): the first third reads what is in view, the rest scrolls to the end by four fifths of the beat. It only ever goes
+   * down the card (a reader who scrolled ahead is not pulled back). Never with reduced motion (the tour is stepped then, and a card is read at the reader's own pace).
+   */
+  follow(frac: number): void {
+    const c = this.el;
+    if (c.hidden || c.dataset.mode !== 'sheet' || c.classList.contains('st-open') || Date.now() - this.touched < 4000) return;
+    const max = c.scrollHeight - c.clientHeight;
+    if (max <= 1) return;
+    const want = Math.max(0, Math.min(1, (frac - 0.3) / 0.5)) * max;
+    if (want > c.scrollTop + 0.5) c.scrollTop = want;
+  }
+  /** a phone's row of apps: faded at its right edge while more of it is beyond (`data-chips="more"`) */
+  private markChips(): void {
+    const ul = this.el.querySelector<HTMLElement>('.st-chips');
+    this.el.dataset.chips = ul && this.el.dataset.mode === 'sheet' && ul.scrollWidth > ul.clientWidth + 1 && ul.scrollLeft + ul.clientWidth < ul.scrollWidth - 2 ? 'more' : '0';
   }
   /** the "More" button, to give focus back to it when Esc has closed the detail */
   focusMore(): void { try { this.more?.focus({ preventScroll: true }); } catch { /* gone */ } }
@@ -301,19 +329,35 @@ export class BeatCard {
   }
   /** the agent's line takes its room from the start (so the card never grows when it appears) */
   private setSayReserve(on: boolean): void { this.el.classList.toggle('st-reserve', on); }
-  put(r: Rect, mode: 'card' | 'sheet'): void {
+  /** the card's kind, before it is laid out: a phone's sheet is a different arrangement of the same card (portal/story.css `[data-mode="sheet"]`), so it is measured as one */
+  setMode(mode: 'card' | 'sheet'): void { this.el.dataset.mode = mode; }
+  /**
+   * `where`: a sheet's place (the solver's): 'top' under the top bar or 'bottom' above the dock. A sheet that stands over the home's own label (the "Fictional family. Real
+   * software." chip under the top bar, which a top sheet covers) carries the label on its last line; one at the bottom leaves the chip showing and does not.
+   */
+  put(r: Rect, mode: 'card' | 'sheet', where: 'top' | 'bottom' = 'bottom'): void {
     const c = this.el;
     c.dataset.mode = mode;
-    c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = '';
+    if (mode === 'sheet') {
+      // A phone's sheet is as tall as its words (no room held for a line that has not come yet), up to the height the solver gave it (which counted the agent's line: it grows into
+      // room the solver already kept clear). Its top edge is the solver's, so what a person is reading does not move when it grows.
+      c.dataset.where = where;
+      c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = ''; c.style.maxHeight = `${Math.round(r.h)}px`;
+    } else {
+      delete c.dataset.where;
+      c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = '';
+    }
     c.dataset.solvedW = String(Math.round(r.w));
-    let w = Math.round(r.w);
+    let w = Math.round(r.w), h = Math.round(r.h);
     whileLaidOut(c, () => {
       // the container fits the text: a wide window's card is trimmed to its widest line (a phone's sheet is full width by contract); the left edge and the height stay
       if (mode === 'card') w = fitWidth(c, r.w);
       // a card whose content is taller than its box scrolls inside it, so it takes the pointer (one that fits leaves the picture to the pointer)
-      c.dataset.scroll = c.scrollHeight > Math.round(r.h) + 1 ? '1' : '0';
+      c.dataset.scroll = c.scrollHeight > (mode === 'sheet' ? c.clientHeight : Math.round(r.h)) + 1 ? '1' : '0';
+      if (mode === 'sheet') h = Math.round(c.getBoundingClientRect().height);
+      this.markChips();
     });
-    this.rect = { x: Math.round(r.x), y: Math.round(r.y), w, h: Math.round(r.h) };
+    this.rect = { x: Math.round(r.x), y: Math.round(r.y), w, h };
   }
   private rect: Rect = { x: 0, y: 0, w: 0, h: 0 };
   /** the card's box as drawn (px, in the tour's layer): the trimmed width, not the solved one. The leader starts from this edge. */
@@ -404,6 +448,15 @@ export function firstSentence(t: string): string {
 export type StartChoice = 'sound' | 'silent';
 /** One person of the family on the start card: "Start with Sally" opens the tour at `beat`, the first beat of her own room (url.ts memberBeat). */
 export type StartMember = { id: string; name: string; archetype: string; colour: string; beat: number };
+/**
+ * How the start card is laid out. `wide`: the dialog in two columns (the copy and the buttons; the family and the fine print), as it always was. `sheet` (under 768 px): a bottom
+ * sheet of at most half the window with the home visible above it. `panel` (a phone on its side: a window at most 500 px tall and wider than tall): a side panel of at most 45 %
+ * of the width. The last two share one DOM (portal/story.css, "the phone's start sheet"), which scrolls inside the card, in reading order: the kicker, the title, the tagline, the action bar
+ * (the one primary action, which sticks to the bottom edge of the sheet while the rest would push it out of view), the family as a single scrolling row of person chips, and the
+ * disclosure "About this family", which holds the long copy and every line of fine print the claims require.
+ */
+export type StartLayout = 'wide' | 'sheet' | 'panel';
+const PHONE_Q = '(max-width: 767px)', SIDE_Q = '(max-height: 500px) and (orientation: landscape)';
 export class StartCard {
   readonly el: HTMLElement;
   /** the dialog inside the scrim */
@@ -411,6 +464,14 @@ export class StartCard {
   private primary: HTMLButtonElement;
   private secondary: HTMLButtonElement;
   private gone = false;
+  private layoutNow: StartLayout | null = null;
+  private mqs: MediaQueryList[] = [];
+  private onMq = () => { if (!this.gone) this.fit(); };
+  // the pieces, kept so a change of layout moves them and never rebuilds them
+  private copy: HTMLElement; private more: HTMLElement;
+  private about: HTMLDetailsElement; private aboutBody: HTMLElement;
+  private kick: HTMLElement; private h: HTMLElement; private p: HTMLElement; private meta: HTMLElement; private acts: HTMLElement;
+  private home: HTMLElement | null = null; private members: HTMLElement | null = null; private fine: HTMLElement;
   constructor(host: HTMLElement, rs: RuntimeStory, opts: {
     shared: RuntimeBeat | null; audio: boolean;
     /** the person ?member= asked to start with, when it named one of the family */
@@ -419,23 +480,23 @@ export class StartCard {
     members?: StartMember[];
     onChoose: (c: StartChoice, at?: number) => void;
   }) {
-    // the outer element is the scrim, the inner one the dialog. Two columns on a wide screen (the copy and the buttons; the family and the fine print), one below.
+    // the outer element is the scrim, the inner one the dialog. Two columns on a wide screen (the copy and the buttons; the family and the fine print); a phone's sheet and a
+    // phone-on-its-side's panel are one column that scrolls inside the card, with the action bar stuck to its bottom edge (layout(), below).
     const wrap = (this.el = el('div', 'st-start'));
     const c = (this.card = el('div', 'st-start-card'));
     c.setAttribute('role', 'dialog'); c.setAttribute('aria-labelledby', 'st-start-h'); c.setAttribute('aria-describedby', 'st-start-p');
     wrap.append(c);
-    const copy = el('div', 'st-start-copy'), more = el('div', 'st-start-more');
-    c.append(copy, more);
+    this.copy = el('div', 'st-start-copy'); this.more = el('div', 'st-start-more');
     const shared = opts.shared;
     const mins = Math.max(1, Math.round(rs.duration / 60));
     // (the kicker line is all caps with wide tracking in the accent, and "Starting with John" is a person's name: the string stays as written, CSS makes the capitals)
-    copy.append(el('p', 'st-start-kick', shared ? 'A shared moment' : opts.member ? `Starting with ${opts.member.name}` : 'Interactive tour'));
-    const h = el('h2', '', shared ? shared.popup.title : `The ${rs.family.surname} family home`);
+    this.kick = el('p', 'st-start-kick', shared ? 'A shared moment' : opts.member ? `Starting with ${opts.member.name}` : 'Interactive tour');
+    const h = (this.h = el('h2', '', shared ? shared.popup.title : `The ${rs.family.surname} family home`));
     h.id = 'st-start-h';
-    const p = el('p', 'st-start-p', shared ? `From the ${rs.family.surname} family tour. ${rs.family.tagline}` : rs.family.tagline);
+    const p = (this.p = el('p', 'st-start-p', shared ? `From the ${rs.family.surname} family tour. ${rs.family.tagline}` : rs.family.tagline));
     p.id = 'st-start-p';
-    copy.append(h, p, el('p', 'st-start-meta', `${rs.beats.length} stops, about ${mins} minute${mins === 1 ? '' : 's'}. ${FICTIONAL_LINE}`));
-    const acts = el('div', 'st-actions');
+    this.meta = el('p', 'st-start-meta', `${rs.beats.length} stops, about ${mins} minute${mins === 1 ? '' : 's'}. ${FICTIONAL_LINE}`);
+    const acts = (this.acts = el('div', 'st-actions'));
     this.primary = el('button', 'st-btn st-primary', shared ? 'Play from here' : opts.audio ? 'Start with narration' : 'Start the tour');
     this.primary.type = 'button'; this.primary.dataset.start = opts.audio ? 'sound' : 'silent';
     this.secondary = el('button', 'st-btn', shared ? 'Play from here without sound' : 'Start without sound');
@@ -444,10 +505,9 @@ export class StartCard {
     this.secondary.addEventListener('click', () => opts.onChoose('silent'));
     acts.append(this.primary);
     if (opts.audio) acts.append(this.secondary);
-    copy.append(acts);
     // story v2: the home in one line (the first sentence of the family's `home.lede`, which is true to the house's spec)
     const lede = rs.family.home?.lede ? firstSentence(rs.family.home.lede) : '';
-    if (lede) copy.append(el('p', 'st-start-home', lede));
+    if (lede) this.home = el('p', 'st-start-home', lede);
     // the family: a way in at one person's room. It starts without sound (a person who chose a name did not choose a voice; M turns narration on).
     const members = (opts.members || []).filter(m => m.beat >= 0);
     if (members.length) {
@@ -463,23 +523,83 @@ export class StartCard {
         b.addEventListener('click', () => opts.onChoose('silent', m.beat));
         li.append(b); ul.append(li);
       }
-      g.append(gh, ul); more.append(g);
+      ul.addEventListener('scroll', () => this.markScroll(), { passive: true });
+      g.append(gh, ul); this.members = g;
     }
-    const fine = el('ul', 'st-fine');
+    const fine = (this.fine = el('ul', 'st-fine'));
     for (const t of FINE_PRINT) if (opts.audio || t !== SYNTHETIC_VOICE_LINE) fine.append(el('li', '', t));
-    more.append(fine);
+    // the disclosure of a phone's sheet: the long copy and the fine print, behind one 44 px summary. A native <details>, so the words are in the page whether it is open or not.
+    const about = (this.about = document.createElement('details')); about.className = 'st-about';
+    const sum = el('summary', 'st-about-sum');
+    sum.append(el('span', 'st-about-label', 'About this family'));
+    sum.insertAdjacentHTML('beforeend', '<svg class="st-more-i" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>');
+    this.aboutBody = el('div', 'st-about-body');
+    about.append(sum, this.aboutBody);
+    // (an opened disclosure brings its words into view: the body scrolls to the end of them)
+    // (an open disclosure also moves the action bar to the end of the card, below the words, where it sticks to the sheet's bottom edge for as long as they are read: a bar that stays after the
+    // tagline scrolls out of the sheet with it, and the primary action would be off screen while the long copy is. Shut, it is after the tagline again, where it is first reached. The same
+    // node moves, so the reading and the focus order are the order on screen; a wide dialog has no disclosure and does not move it)
+    about.addEventListener('toggle', () => {
+      if (this.layoutNow !== 'wide') { if (about.open) this.card.append(this.acts); else this.p.after(this.acts); }
+      if (about.open) this.card.scrollTo({ top: this.card.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      this.markScroll();
+    });
+    this.card.addEventListener('scroll', () => this.markScroll(), { passive: true });
+    for (const q of [PHONE_Q, SIDE_Q]) { const m = matchMedia(q); try { m.addEventListener('change', this.onMq); this.mqs.push(m); } catch { /* an old engine: the director's resize observer fits it */ } }
+    this.layout();
     host.append(wrap);
     this.fit();
     // (the web font arriving re-wraps the lines: fit again when it has)
     try { void document.fonts.ready.then(() => { if (!this.gone) this.fit(); }); } catch { /* no font API */ }
   }
+  /** which layout a window of this size takes (portal/story.css says the same in its media rules) */
+  static layoutFor(): StartLayout { return matchMedia(SIDE_Q).matches ? 'panel' : matchMedia(PHONE_Q).matches ? 'sheet' : 'wide'; }
   /**
-   * The dialog is as wide as its content up to its max (CSS: fit-content, then 1000 px or the window), then trimmed to its widest line. Two columns re-wrap as the width
+   * Put the pieces where the layout wants them (once per change: the same nodes move, none is rebuilt, so a focused button keeps its focus). Wide: the copy column (kicker, title,
+   * tagline, the facts, the buttons, the home's line) and the family column (the person buttons, the fine print). A sheet or a side panel: kicker, title, tagline, the buttons, the
+   * family's row of chips, and the disclosure that holds the facts, the home's line and the fine print.
+   */
+  private layout(): StartLayout {
+    const m = StartCard.layoutFor();
+    if (m === this.layoutNow) return m;
+    this.layoutNow = m;
+    // (moving a focused node blurs it: the control that had focus gets it back, so a turn of the phone does not drop a keyboard or a switch user's place)
+    const act = document.activeElement as HTMLElement | null, keep = act && this.card.contains(act) ? act : null;
+    this.card.dataset.layout = m; this.el.dataset.layout = m;
+    if (m === 'wide') {
+      this.copy.replaceChildren(this.kick, this.h, this.p, this.meta, this.acts);
+      if (this.home) this.copy.append(this.home);
+      this.more.replaceChildren(); if (this.members) this.more.append(this.members); this.more.append(this.fine);
+      this.card.replaceChildren(this.copy, this.more);
+    } else {
+      this.aboutBody.replaceChildren(this.meta); if (this.home) this.aboutBody.append(this.home); this.aboutBody.append(this.fine);
+      // (the action bar is first reached after the tagline; with the disclosure open it is the last thing in the sheet, see the toggle in the constructor)
+      this.card.replaceChildren(this.kick, this.h, this.p);
+      if (!this.about.open) this.card.append(this.acts);
+      if (this.members) this.card.append(this.members);
+      this.card.append(this.about);
+      if (this.about.open) this.card.append(this.acts);
+    }
+    if (keep && keep.isConnected) { try { keep.focus({ preventScroll: true }); } catch { /* gone */ } }
+    return m;
+  }
+  /** a sheet scrolls when its words are taller than its room (the action bar stays at its bottom edge: portal/story.css); `data-scroll` says whether it does and where it is */
+  private markScroll(): void {
+    const b = this.card, more = b.scrollHeight > b.clientHeight + 1, end = b.scrollTop + b.clientHeight >= b.scrollHeight - 2;
+    this.card.dataset.scroll = more ? (end ? 'end' : 'more') : '0';
+    // (the family's row of chips fades at its right edge while there are more chips beyond it)
+    const row = this.members?.querySelector<HTMLElement>('.st-members-list');
+    if (row) this.card.dataset.row = row.scrollWidth > row.clientWidth + 1 && row.scrollLeft + row.clientWidth < row.scrollWidth - 2 ? 'more' : '0';
+  }
+  /**
+   * A wide dialog is as wide as its content up to its max (CSS: fit-content, then 1000 px or the window), then trimmed to its widest line. Two columns re-wrap as the width
    * goes, so it is measured again (up to three times) until the slack is under a pixel; a trim that makes it taller is undone (fitWidth). Called on mount, when the fonts
-   * arrive, and by the director on a resize.
+   * arrive, and by the director on a resize. A phone's sheet and a side panel are full width by contract and are not trimmed.
    */
   fit(): void {
+    const mode = this.layout();
     const c = this.card; c.style.width = '';
+    if (mode !== 'wide') { const w = Math.round(c.getBoundingClientRect().width); if (w > 0) c.dataset.solvedW = String(w); this.markScroll(); return; }
     whileLaidOut(this.el, () => {
       const max = Math.round(c.getBoundingClientRect().width);
       if (max < 1) return;                       // not laid out (the player is not showing yet): the director fits it again when it is
@@ -492,7 +612,7 @@ export class StartCard {
   }
   focus(): void { this.primary.focus({ preventScroll: true }); }
   contains(n: Node | null): boolean { return !!n && this.el.contains(n); }
-  destroy(): void { this.gone = true; this.el.remove(); }
+  destroy(): void { this.gone = true; for (const m of this.mqs) { try { m.removeEventListener('change', this.onMq); } catch { /* gone */ } } this.el.remove(); }
 }
 
 // ---- the end card -------------------------------------------------------------------------------------------------------------------------
@@ -500,6 +620,8 @@ export class EndCard {
   readonly el: HTMLElement;
   readonly body: HTMLElement;
   private karaoke: Karaoke;
+  // (a phone on its side: the story's call to action is moved out of the row of buttons into `go`, a bar at the end of the card that sticks to the bottom edge of the panel: setSide)
+  private cta!: HTMLElement; private acts!: HTMLElement; private go = el('div', 'st-go');
   constructor(host: HTMLElement, rs: RuntimeStory, opts: { timings: [string, number, number][] | null; durMs: number; onReplay: () => void; onNext: () => void; onShare: () => void; hasNext: boolean }) {
     const c = (this.el = el('div', 'st-end'));
     c.hidden = true;
@@ -511,6 +633,7 @@ export class EndCard {
     const acts = el('div', 'st-actions');
     const link = (label: string, href: string, cls: string) => { const a = el('a', cls, label) as HTMLAnchorElement; a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; };
     const cta = link(rs.closing.cta.label, rs.closing.cta.url, 'st-btn st-primary');
+    this.cta = cta; this.acts = acts;
     const mk = (label: string, fn: () => void) => { const b = el('button', 'st-btn', label); b.type = 'button'; b.addEventListener('click', fn); return b; };
     // (the one story call to action, the one download link, then the ways on inside the site. At this size the buttons are tall, so they come before the closing words: a card
     // that scrolls shows the way on first and the words, which the voice also says, after them)
@@ -523,6 +646,22 @@ export class EndCard {
   setNarration(ms: number | null): void { this.karaoke.set(ms); }
   /** the card with its padding and gaps tighter (the type is never touched): for a window too short for the card at its full padding */
   setTight(on: boolean): void { this.el.classList.toggle('st-tight', on); }
+  /**
+   * A phone on its side: the panel is at most 45 % of the width and 250 px or so tall, which the heading alone (three lines at the heading's size) all but fills, so the story's call to
+   * action, which is the point of the card, may not be left to the end of a scroll. It is moved out of the row of buttons into a bar at the END of the card (`.st-go`), which sticks to
+   * the bottom edge of the panel for as long as the words above it are read, as a sheet's action bar does on the start sheet; the other buttons (Download Companion, Replay, Next family,
+   * Share this family) are the stack above it, reached by scrolling. In every other window it is the first button of the row, as it always was. The same node moves: a focused call to
+   * action keeps its focus, and nothing is rebuilt.
+   */
+  setSide(on: boolean): void {
+    const c = this.el;
+    if ((c.dataset.side === '1') === on) return;
+    const act = document.activeElement as HTMLElement | null, keep = act && c.contains(act) ? act : null;
+    c.dataset.side = on ? '1' : '0';
+    if (on) { this.go.append(this.cta); c.append(this.go); }
+    else { this.acts.prepend(this.cta); this.go.remove(); }
+    if (keep && keep.isConnected) { try { keep.focus({ preventScroll: true }); } catch { /* gone */ } }
+  }
   /** place the card; a wide window's panel is then trimmed to its widest line (a phone's sheet is full width by contract) */
   put(r: Rect, mode: 'card' | 'sheet' = 'card'): void {
     const c = this.el;

@@ -420,7 +420,8 @@ on your own hardware. The contract for the writers, the validator and the film i
 - **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a
   modal (card, start and end cards, About, failure card, the family page's screenshot dialog) **1.5rem = 25.5 px at 768 px and wider, `clamp(20px, 5.4vw, 25.5px)` on a phone**, a card's title 2.25rem, the start and end cards'
   heading 2.6rem; Manrope 400 body, 500 controls, 600 chips, 700 titles and names (no 800), 0.2pt tracking. The tokens are `--st-min`, `--st-title` and `--st-hook` in `portal/viewer.css`; every size in the tour's CSS is one of them.
-  A card is `clamp(420px, 32vw, 560px)` wide, a phone's sheet up to 55 % of the height; the placement solver (`assets/story/place.ts`) may shrink padding, choose another slot or a narrower and taller card, and never shrinks type.
+  A card is `clamp(420px, 32vw, 560px)` wide; the placement solver (`assets/story/place.ts`) may shrink padding, choose another slot or a narrower and taller card, and never shrinks type. **On a phone** (`player.md`, "On a phone"; `phone.mts`):
+  the start card is a bottom sheet of at most half the window with the home above it ("About this family" holds the long copy, the action bar sticks to its bottom edge), the beat sheet at most 40 percent and as tall as its words (the picture is shifted up so the subject stands over it; `?no=shift`), the hour chips go while a tour runs, and a phone on its side gets a side panel of at most 45 percent of the width.
   **A person's name is a kicker** on every card, dialog and family-page label: all capitals by CSS (the text and aria-labels stay as written), 700, 0.2em of tracking, in the accent; "THE BRENNAN FAMILY" the same. Film and ad
   canvases keep 36 design px (a canvas is shown scaled down). Details and the table: `reference/story/player.md`, "Type and size". Tests: `scripts/test-story-place.mts`, `scripts/test-story-pages.mts`, `typography.mts`
   (`pnpm run portal:test -- --only hooks`).
@@ -602,6 +603,13 @@ through a route (`content/houses/` is not touched), and a fixture id from `test/
 `--query` is appended to the player's URL, so a live-only feature with a `?no=<feature>` kill switch can be timed
 on and off with the same tool. The player rewrites the address bar once it is up, so check that the query arrived
 with `performance.getEntriesByType('navigation')[0].name`, not `page.url()`.
+
+**Time to ready** (the mobile pass, 2026-10): on the heaviest home (`mediterranean`) a CPU profile of the load put about 75 % of the main thread's time in `getUniforms` inside three's `renderer.render`, which is the first
+frame the page's own `animate()` draws before the player has mounted: it links every shader program (about 70) one after another and blocks on the driver for each, and it holds the thread so that the player's module, which
+compiles them with `compileAsync` on the driver's own threads, cannot even start. A one-line guard in `animate()` that drew nothing until the viewer had mounted was tried and is not in the tree: it was not a win everywhere on the loaded machine it was measured on (median of interleaved pairs, load average 14 to 17): mediterranean 39.7 s to 10.0 s, cutestarter 22.2 s to 7.6 s, aurora
+30.5 s to 44.5 s, seraphine 34.5 s to 36.6 s (noisy), so the cost it moves, not removes, is probably the extra programs `compileAsync` links (it compiles every mesh's material, hidden wall and roof states included, where the first
+frame links only what it draws). If it is tried again, time it with `pnpm run perf:player -- --mode load --query <flag>`, interleaved with and without, and on the device that matters, before making it the default. The numbers are in
+`reference/story/player.md`, "On a phone".
 
 How to take a number that means something:
 

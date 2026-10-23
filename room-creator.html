@@ -36,6 +36,13 @@
         return;
       }
       d.dataset.mode = 'view';
+      // The player draws edge to edge, under a notch and a home bar, and keeps its own bars and sheets out of them (every edge element honours env(safe-area-inset-*): portal/viewer.css,
+      // portal/story.css, assets/story/director.ts). A page only gets non-zero insets if it asks for the whole screen with viewport-fit=cover; the editor does not (this branch is the
+      // player's), and ?no=cover leaves the viewport as it was.
+      if (!/(^|,)cover(,|$)/.test(q.get('no') || '')) {
+        var vp = document.querySelector('meta[name="viewport"]');
+        if (vp && !/viewport-fit/.test(vp.content)) vp.setAttribute('content', vp.content + ', viewport-fit=cover');
+      }
       // the player's own title from the start (the static one above is the editor's), then the home's
       document.title = 'Virtual homes · Companion Intelligence';
       if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
