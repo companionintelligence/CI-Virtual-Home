@@ -259,6 +259,17 @@
       "name": "Code Server",
       "shot": null
     },
+    "collabora-online": {
+      "logo": {
+        "alt": "Collabora Online logo",
+        "file": "portal/apps/collabora-online/logo.68a1f14c6f.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/collabora-online/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Collabora Online",
+      "shot": null
+    },
     "comfyui": {
       "logo": {
         "alt": "ComfyUI logo",
@@ -481,6 +492,17 @@
       "name": "FreeCut",
       "shot": null
     },
+    "freshrss": {
+      "logo": {
+        "alt": "FreshRSS logo",
+        "file": "portal/apps/freshrss/logo.87414c8740.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/freshrss/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "FreshRSS",
+      "shot": null
+    },
     "frigate": {
       "logo": {
         "alt": "Frigate logo",
@@ -570,6 +592,39 @@
         "w": 128
       },
       "name": "Habitica",
+      "shot": null
+    },
+    "heimdall": {
+      "logo": {
+        "alt": "Heimdall logo",
+        "file": "portal/apps/heimdall/logo.ecbf2fb5ed.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/heimdall/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Heimdall",
+      "shot": null
+    },
+    "hi-events": {
+      "logo": {
+        "alt": "Hi.Events logo",
+        "file": "portal/apps/hi-events/logo.34afee4800.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/hi-events/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Hi.Events",
+      "shot": null
+    },
+    "homarr": {
+      "logo": {
+        "alt": "Homarr logo",
+        "file": "portal/apps/homarr/logo.383ef017af.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/homarr/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Homarr",
       "shot": null
     },
     "home-assistant": {
@@ -710,6 +765,17 @@
       "name": "Joplin Server",
       "shot": null
     },
+    "jotty": {
+      "logo": {
+        "alt": "Jotty logo",
+        "file": "portal/apps/jotty/logo.0d1eff7bf8.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/jotty/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Jotty",
+      "shot": null
+    },
     "jupyterlab": {
       "logo": {
         "alt": "JupyterLab logo",
@@ -719,6 +785,17 @@
         "w": 128
       },
       "name": "JupyterLab",
+      "shot": null
+    },
+    "keila": {
+      "logo": {
+        "alt": "Keila logo",
+        "file": "portal/apps/keila/logo.78246d01c5.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/keila/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Keila",
       "shot": null
     },
     "kimai": {
@@ -814,6 +891,17 @@
         "w": 128
       },
       "name": "LibreTranslate",
+      "shot": null
+    },
+    "linkstack": {
+      "logo": {
+        "alt": "LinkStack logo",
+        "file": "portal/apps/linkstack/logo.1eb686be2a.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/linkstack/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "LinkStack",
       "shot": null
     },
     "linkwarden": {
@@ -1178,6 +1266,17 @@
       "name": "Plausible Analytics",
       "shot": null
     },
+    "postiz": {
+      "logo": {
+        "alt": "Postiz logo",
+        "file": "portal/apps/postiz/logo.83805ee191.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/postiz/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Postiz",
+      "shot": null
+    },
     "radicale": {
       "logo": {
         "alt": "Radicale logo",
@@ -1244,6 +1343,17 @@
       "name": "Stirling-PDF",
       "shot": null
     },
+    "super-productivity": {
+      "logo": {
+        "alt": "Super Productivity logo",
+        "file": "portal/apps/super-productivity/logo.1d43c8f2d1.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/super-productivity/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Super Productivity",
+      "shot": null
+    },
     "syncthing": {
       "logo": {
         "alt": "Syncthing logo",
@@ -1286,6 +1396,17 @@
         "w": 128
       },
       "name": "Twenty",
+      "shot": null
+    },
+    "umami": {
+      "logo": {
+        "alt": "Umami logo",
+        "file": "portal/apps/umami/logo.d958bbdf10.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/umami/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Umami",
       "shot": null
     },
     "uptime-kuma": {
@@ -3967,6 +4088,12 @@
       "source": "CI-Marketplace e2e/screenshots/code-server.png@e94772196695"
     },
     {
+      "id": "collabora-online",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/collabora-online.png@e94772196695"
+    },
+    {
       "id": "cryptgeon",
       "kind": "shot",
       "reason": "A clean empty note form, but its first line reads \"Easily send fully encrypted, secure notes or files\": a vendor security claim the site does not make (the Nextcloud precedent), above an empty text box.",
@@ -4039,6 +4166,12 @@
       "source": "CI-Marketplace e2e/screenshots/freecut.png@e94772196695"
     },
     {
+      "id": "freshrss",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/freshrss.png@e94772196695"
+    },
+    {
       "id": "frigate",
       "kind": "shot",
       "reason": "An error state: \"No frames have been received, check error logs\".",
@@ -4073,6 +4206,12 @@
       "kind": "shot",
       "reason": "An empty dashboard (\"There are currently no pinned applications\") over a stock photograph of a hot air balloon: an empty state and a stock photograph.",
       "source": "CI-Marketplace e2e/screenshots/heimdall.png@e94772196695"
+    },
+    {
+      "id": "hi-events",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/hi-events.png@e94772196695"
     },
     {
       "id": "homarr",
@@ -4117,10 +4256,22 @@
       "source": "CI-Marketplace e2e/screenshots/joplin.png@e94772196695"
     },
     {
+      "id": "jotty",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/jotty.png@e94772196695"
+    },
+    {
       "id": "jupyterlab",
       "kind": "shot",
       "reason": "Shows a localhost address, an example token and a local path in its help text.",
       "source": "CI-Marketplace e2e/screenshots/jupyterlab.png@e94772196695"
+    },
+    {
+      "id": "keila",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/keila.png@e94772196695"
     },
     {
       "id": "kimai",
@@ -4169,6 +4320,12 @@
       "kind": "shot",
       "reason": "Not a QA run capture: its size (1399 x 576) and rendering are not the harness's, so the \"Companion Hub QA run\" caption would not be true.",
       "source": "CI-Marketplace e2e/screenshots/libretranslate.png@e94772196695"
+    },
+    {
+      "id": "linkstack",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/linkstack.png@e94772196695"
     },
     {
       "id": "linkwarden",
@@ -4351,6 +4508,12 @@
       "source": "CI-Marketplace e2e/screenshots/plausible.png@e94772196695"
     },
     {
+      "id": "postiz",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/postiz.png@e94772196695"
+    },
+    {
       "id": "prestashop",
       "kind": "shot",
       "reason": "A demo storefront with stock photographs, lorem ipsum text and discount tags (-20%): stock photography, placeholder text and prices.",
@@ -4451,6 +4614,12 @@
       "kind": "shot",
       "reason": "Shows third-party company brands and street addresses in its demo rows.",
       "source": "CI-Marketplace e2e/screenshots/twenty.png@e94772196695"
+    },
+    {
+      "id": "umami",
+      "kind": "shot",
+      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "source": "CI-Marketplace e2e/screenshots/umami.png@e94772196695"
     },
     {
       "id": "uptime-kuma",
