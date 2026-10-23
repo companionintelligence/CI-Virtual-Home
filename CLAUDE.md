@@ -28,7 +28,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `content/families/<slug>.voice.json`, `content/families/<slug>/audio/*.m4a` | `pnpm run story:voice -- <slug>` (local Kokoro; after the story text changed: `--stale`) |
 | `content/families/<slug>.bake.json` | `pnpm run story:bake -- <slug>` (after the voice, after a story or a role-table change) |
 | `portal/og/*.jpg`, `portal/og/manifest.json` | `pnpm run portal:og` (after a family's text or its preview picture changed) |
-| `portal/apps/<id>/*.webp`, `portal/ci/*.webp`, `content/story/app-media.json` | `pnpm run story:media` (real logos and screenshots, from the sibling repos' git objects at the manifest's pinned commits; `-- --check` fails when stale) |
+| `portal/apps/<id>/*.webp`, `portal/ci/*.webp`, `content/story/app-media.json` | `pnpm run story:media` (real logos and screenshots, from the sibling repos' (CI-Marketplace, CI-Hub, CI-Portal, CI-Docs) git objects at the manifest's pinned commits; `-- --check` fails when stale; `story:media:test` fails when an app a story names has no entry) |
 | `content/story/services.json` (the derived columns: `apps`, `storyApps`, `storyStatus`, `incumbentNameList`, `fleetHomes`, `rank`, `top80`) | `pnpm run story:services` (from `catalog-apps.json`, `claims.json` and `content/families`; the facts in the file are authored; `story:services:check` fails when stale and is part of `pnpm run test`; [`reference/story/story-v3.md`](reference/story/story-v3.md)) |
 | `content/families/films.json`, `content/families/<slug>/film/` | `pnpm run story:film -- <slug>` |
 | the `CLAIMS_SNAPSHOT` block in `assets/story/fine-print.ts` (the player's mirror of `content/story/claims.json`'s disclosures; the fine print each page owes is `reference/story/fine-print.md`) | `node --experimental-strip-types scripts/story/lib/fine-print.mts --write` after a change to `claims.json`; `scripts/test-fine-print.mts` fails until it is done |
@@ -230,17 +230,25 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - **App media** (`pnpm run story:media`, `scripts/story/build-app-media.mts`, `scripts/story/lib/media.mts`, contract `reference/story/story-v2.md` "App media"): real logos and real
   screenshots of the apps the families use, of Companion Hub and of the Companion account page, as content-hashed WebP under `portal/apps/<id>/` and `portal/ci/` and the manifest
   `content/story/app-media.json` (sorted keys, no timestamps; all generated and committed, never hand-edited). The rule: a **logo identifies the app named beside it** (alt text
-  "<Name> logo"; 128 px, at most 12 KB; also allowed inside a chip of an ad cut, never alone); a **screenshot is real, unedited, whole and labelled** ("Real screenshot of <Name> from a
-  Companion Hub QA run. Not a recording of this family."; 960 px wide, at most 90 KB) and is never composited into a scene, the tour or a cut (a cut inset stays off unless the owner says so).
-  Sources are read with `git cat-file` from the sibling repos at the commits the manifest pins, never from a working tree; each screenshot that ships was looked at by eye and its git
-  blob id is in `VETTED` (a changed source stops the build until someone looks again), and every candidate left out is in `rejected` with its reason (a person's name, an email, a login
-  secret, a token, an internal host or address, a payment detail, an error page, a blank page, a different product, a claim the site does not make). Only ffmpeg with libwebp makes the
-  files (no image library, none may be added); a rerun on the same ffmpeg gives the same bytes. Page generators read the manifest through `scripts/story/lib/media.mts` (`logoImg`,
-  `shotFigure`: lazy, width and height set, alt text, the caption; the front page shows none). `portal:build` (the `app media` blocks of `scripts/build-portal.mts`)
-  ships only the files the manifest names, fails on a manifest or page that names a missing file, an image without alt text, size or loading, or a screenshot without its caption,
-  warns with the list of apps a family uses that have no entry, and scans the manifest's words with the credit guard; `portal/_headers` keeps `/portal/apps/*` and `/portal/ci/*`
-  for a year. `pnpm run story:media:test` (quick, in `test:node`) holds all of it. Each source is a THIRD_PARTY.md row. A new app a family uses: `story:media`; a screenshot that
-  should ship is added to `SHOT_SHOWS` and `VETTED` only after looking at it.
+  "<Name> logo"; 128 px, at most 12 KB; also allowed on the chip that names its app in an ad cut or a film, never alone); a **screenshot is real, unedited, whole and labelled**
+  ("Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family."; for a first-party app's screen from CI-Docs, which is captured with sample data,
+  "Real screenshot of <Name> with sample data. Not a recording of this family."; 960 px wide, at most 90 KB) and is never composited into a scene (the 3D frame, a home's TV or
+  monitor) or the tour. **Owner's ruling, 2026-10-22:** logos and labelled screenshots are wanted on family pages, in ad cuts and in films as **inserts** (a logo on the chip that names
+  its app, a screenshot inset or a full-frame proof beat with its whole caption, a row of logos on the end card), never inside the 3D tour or a scene; the renderers of the cuts and the
+  films draw none of them yet (a later track), and the lander stays text only. Sources are read with `git cat-file` from the sibling repos (CI-Marketplace, CI-Hub, CI-Portal and
+  CI-Docs) at the commits the manifest pins, never from a working tree; each QA screenshot that ships was looked at by eye and its git blob id is in `VETTED` (a changed source stops
+  the build until someone looks again), a first-party app's screen from CI-Docs is chosen in `DOCS_SHOTS` (`scripts/story/lib/media-docs.mts`, which also gives a reason for every other
+  file of `public/screenshots/`: a file no rule names stops the build), and every candidate left out is in `rejected` with its reason (a person's name, an email, a login
+  secret, a token, an internal host or address, a payment detail, an error page, a blank page, a different product, a claim the site does not make, a third-party brand mark). A logo
+  that does not identify its app (the store's mark is another company's, a character, a photograph, a screenshot) is held back in `REJECT_LOGO` and the app is shown by name. Only
+  ffmpeg with libwebp makes the files (no image library, none may be added); a rerun on the same ffmpeg gives the same bytes. Page generators read the manifest through
+  `scripts/story/lib/media.mts` (`logoImg`, `shotFigure`: lazy, width and height set, alt text, the caption; the front page shows none). `portal:build` (the `app media` blocks of
+  `scripts/build-portal.mts`) ships only the files the manifest names, fails on a manifest or page that names a missing file, an image without alt text, size or loading, or a
+  screenshot without its caption, and scans the manifest's words with the credit guard; `portal/_headers` keeps `/portal/apps/*` and `/portal/ci/*` for a year. **The manifest cannot
+  fall behind the stories unnoticed:** an app a family, a persona pool or the cast plan names (or `PREPARED_APPS`) with no entry in the manifest (a logo, or `noMedia` with the reason its
+  logo is held back) FAILS `pnpm run story:media:test` (quick, in `test:node`; it reads the committed manifest only, so it holds in CI with no sibling repo, and where the sibling repos
+  are it also runs `story:media -- --check`) and fails `portal:build` under `--strict-families`. Each source is a THIRD_PARTY.md row. A new app a family uses: `story:media`, then look
+  at what it made; a screenshot that should ship is added to `SHOT_SHOWS` and `VETTED` (or `DOCS_SHOTS`) only after looking at it at full size.
 <!-- ---- end app media ---- -->
 <!-- ---- layout (story v2) ---- -->
 - **The layout of the story pages** (`scripts/story/pages.mts`, `scripts/story/lib/plan-map.mts`, `scripts/portal-front.mts`, `portal/family.css`, `portal/media.css`, `portal/gallery.css`; `assets/story/popup.ts` for the card): everything
@@ -251,7 +259,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   area, rooms and the floor plan, one SVG for each storey in one shared view box with a 44 px pin for each person as an HTML link laid over it by percentage; a room's name is the spec's in sentence case, "Master" is "Primary",
   "Portal" is "Archway", and a name that does not fit its room at 7 units is a tooltip only), the apps with their logos, "How it runs" and how the Core starts. The **plan is a diagram** (it says so): never a plan of walls, doors or
   stairs, and the pin is where the casting puts the person. Real media is lazy and sized (`checkPageImages` in the build); the front page carries none. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
-  subject. Never put a screenshot in the tour, a scene or an ad cut; never an app's logo without its name beside it. Tests: `pnpm run test:node` (`test-story-pages.mts`) and `portal:test -- --only hooks`.
+  subject. Never put a screenshot in the tour or a scene (an ad cut or a film may carry one only as a labelled insert: App media above); never an app's logo without its name beside it. Tests: `pnpm run test:node` (`test-story-pages.mts`) and `portal:test -- --only hooks`.
 <!-- ---- end layout (story v2) ---- -->
 <!-- ---- type scale (live pass 3) ---- -->
 - **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a

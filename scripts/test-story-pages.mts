@@ -28,7 +28,7 @@ import { displayName } from '../assets/home-names.js';
 import { builderHandles, guardTerms, scanText } from './portal-redact.mts';
 import { FICTIONAL_LINE } from '../assets/story/types.ts';
 import type { Story } from '../assets/story/types.ts';
-import { readMedia, appCaption, appMedia, checkPageImages, MANIFEST } from './story/lib/media.mts';
+import { readMedia, shotCaption, appMedia, checkPageImages, MANIFEST } from './story/lib/media.mts';
 import type { MediaManifest } from './story/lib/media.mts';
 import { readPlan, placePins, levelSvg, roomLabel, roomNames, labelFor, aspect, levelLabel } from './story/lib/plan-map.mts';
 import { readFamilies, readStories, landerFamilies, frontCards, cardPairs, appsNamed } from './portal-front.mts';
@@ -318,7 +318,9 @@ test('the Brennan page, with its media: the sticky nav, the card, the logos, the
     for (const r of new Set(mine.flatMap(b => b.app!.replaces))) assert.ok(swap.includes(`<li>${r}</li>`), `${m.id}: ${r} in "Rented before"`);
     const right = (swap.match(/<div class="swap-col swap-now">[\s\S]*$/) || [''])[0];
     for (const id of new Set(mine.map(b => b.app!.id))) {
-      const a = appMedia(media, id)!;
+      const a = appMedia(media, id);
+      // the frozen fixture may name an app no shipped story uses any more (kiwix): with no entry the page shows the app by name alone, which is the rule
+      if (!a || !a.logo) { assert.ok(!right.includes(`alt="${id} logo"`), `${m.id}: an app with no logo is shown by name alone`); continue; }
       assert.ok(right.includes(`alt="${a.logo!.alt}"`) && right.includes(`<span>${a.name}</span>`), `${m.id}: ${a.name} with its logo in "On the Core now"`);
     }
     // the moments' details: a native disclosure with before, after, the steps as an ordered list and the fact
@@ -348,7 +350,7 @@ test('the Brennan page, with its media: the sticky nav, the card, the logos, the
     for (const id of wantApps) {
       const a = appMedia(media, id)!, sh = a.shot!;
       assert.ok(strip.includes(`<a class="shot-open" href="../${sh.file}" data-shot aria-label="Open a larger screenshot, ${a.name}"><img src="../${sh.file}" alt="${sh.alt}" width="${sh.w}" height="${sh.h}" loading="lazy" decoding="async"></a>`), `${m.id}/${id}: a link to the picture, lazy, with its size and alt text`);
-      assert.ok(strip.includes(`<figcaption>${appCaption(a.name)}</figcaption>`), `${m.id}/${id}: the exact caption under it`);
+      assert.ok(strip.includes(`<figcaption>${shotCaption(a.name, sh.source)}</figcaption>`), `${m.id}/${id}: the exact caption under it`);
     }
   }
   // ---- every image on the page is a real file the manifest names, with alt, size and loading; every screenshot has its caption
