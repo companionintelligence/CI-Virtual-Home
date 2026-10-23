@@ -185,6 +185,12 @@ export interface BaseHouseSpec {
   lighting?: string;
   areaSqm?: number;
   /**
+   * What the building is for: a home (absent, or `'home'`) or an office (`'office'`; reference/office/office-contract-m0.md). An office is a HouseSpec like
+   * any other, but it is listed under `offices` in content/houses/index.json and never under `houses`, so no page, count or fleet metric that counts the
+   * homes sees it. Read it through `specUse` (scripts/lib/list-specs.mts), never directly. The engine ignores it until an office's own programs land.
+   */
+  use?: 'home' | 'office';
+  /**
    * Which generation of look-changing defaults the house opts into (plan §2.0). 1 (or absent): today's look,
    * exactly. 2: every stream's new defaults (door colour, fans, lamps, gutters, gable windows, lanterns, world
    * variety, restraint). Read it through specDefaults(spec), never directly.

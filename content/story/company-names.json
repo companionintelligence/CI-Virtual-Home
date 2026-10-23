@@ -1,0 +1,84 @@
+{
+  "v": 1,
+  "$comment": "Company names (reference/office/office-contract-m0.md, decision O6). `deny` is a deny-list, NOT a clearance: the stock company names of examples and sample data, which a fictional company must not use (rule co-names). The names of the services the store's `replaces` rows name (content/story/services.json, names and aliases) and the family surnames (content/story/casting.json) are denied too, read from those files. `proposals` are the eight names the 2026-10-19 design proposed: proposals only, a web search for each exact name found no company of that name (weak evidence, recorded in reference/office/office-plan.md Appendix A), and counsel has cleared none; a rename costs a day at most before a story exists.",
+  "deny": [
+    "Acme",
+    "Contoso",
+    "Fabrikam",
+    "Globex",
+    "Initech",
+    "Northwind",
+    "Umbrella",
+    "Hooli",
+    "Pied Piper",
+    "Dunder Mifflin",
+    "Wayne Enterprises",
+    "Stark Industries",
+    "Wonka",
+    "Cyberdyne",
+    "Soylent",
+    "Tyrell",
+    "Massive Dynamic",
+    "Vandelay",
+    "Oscorp",
+    "Aperture",
+    "Aviato",
+    "Bluth",
+    "Gringotts",
+    "Monsters Inc",
+    "Prestige Worldwide",
+    "Sterling Cooper",
+    "Pearson Hardman",
+    "Wernham Hogg"
+  ],
+  "proposals": [
+    {
+      "slug": "reelwick",
+      "name": "Reelwick",
+      "size": "startup",
+      "building": "startup-loft"
+    },
+    {
+      "slug": "pannierwell",
+      "name": "Pannierwell",
+      "size": "startup",
+      "building": "garage-lab"
+    },
+    {
+      "slug": "curatory",
+      "name": "Curatory",
+      "size": "startup",
+      "building": "dev-shop-unit"
+    },
+    {
+      "slug": "gutterfold",
+      "name": "Gutterfold",
+      "size": "small",
+      "building": "agency-printworks"
+    },
+    {
+      "slug": "lintel-and-sill",
+      "name": "Lintel & Sill",
+      "size": "small",
+      "building": "practice-townhouse"
+    },
+    {
+      "slug": "posy-and-pail",
+      "name": "Posy & Pail",
+      "size": "small",
+      "building": "shop-backoffice"
+    },
+    {
+      "slug": "hartnoll-joinery",
+      "name": "Hartnoll Joinery",
+      "size": "medium",
+      "building": "contractor-yard"
+    },
+    {
+      "slug": "loamfield",
+      "name": "Loamfield",
+      "size": "medium",
+      "building": "hub-courtyard"
+    }
+  ]
+}

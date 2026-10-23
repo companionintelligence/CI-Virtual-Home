@@ -1,6 +1,6 @@
 # /office: the parked design
 
-> **Status: design only, stale versus main, not shipped.** Nothing in this folder is a contract for the tree. Main has no `/office` page, no `company/v1` schema, no `use: "office"` spec field and no company stories. Owner decisions **O2**, **O4**, **O6** and **O7** (below) gate any public showing, and counsel has cleared none of the company names, licence readings or naming of rented services.
+> **Status: M0 is being built on a branch, off by default and nothing public; the design below is stale versus main.** The one file here that is a contract for the tree is [`office-contract-m0.md`](office-contract-m0.md) (2026-10-23: the four gating decisions answered, what changed on main, what M0 is and how it stays off the public site). The other files are the design record of 2026-10-19 and 2026-10-20. Main still has no `/office` page, no company stories and no office building. Counsel has cleared none of the company names, licence readings or naming of rented services.
 
 ## What it was
 
@@ -12,6 +12,7 @@ The design was written on 2026-10-19 by a team of agents against PR #35's head (
 
 | File | What it is |
 |---|---|
+| [`office-contract-m0.md`](office-contract-m0.md) | **The contract for the tree, refreshed 2026-10-23.** Decisions O1 to O15 with their date and source, what changed on main since the design, the M0 scope, the "nothing public" mechanics, the invariants, the open items. Read it first; it wins over everything below where it speaks. |
 | [`OFFICE-BRIEF.md`](OFFICE-BRIEF.md) | One page: what it is, the eight companies, what the skeptic pass fixed, the owner decisions, the milestones, the next step. Start here. |
 | [`office-plan.md`](office-plan.md) | The plan: the skeptic pass up top, the product on one page, the eight offices (cast, stack by function, bring-your-data-home beats, beat outline, honest edge, counts), the fleet checks, work packages WP0 to WP7, risks and the owner decisions O1 to O15, the schedule, and Appendix C (the skeptic change log). |
 | [`office-build-contract.md`](office-build-contract.md) | The exact delta the work packages were to build from: invariants I1 to I9, the `company/v1` schema, roles and rooms, the buildings, claims, the validator, the cast, the pipeline, the site, tour/film/ads, tests, owned files per package. **Section 16 (the skeptic amendments) wins** over anything older in this folder. |
@@ -20,6 +21,8 @@ The design was written on 2026-10-19 by a team of agents against PR #35's head (
 Where two of these disagree, the order of precedence is the one the contract states in section 16.1: the skeptic amendments, then the briefs as amended, then everything older.
 
 ## The four decisions that gate a first public showing
+
+Answered by the user in chat on 2026-10-23 with the defaults below ([`office-contract-m0.md`](office-contract-m0.md) section 1 records them). Counsel has still cleared none of them.
 
 | # | Decision | Default if nobody answers |
 |---|---|---|

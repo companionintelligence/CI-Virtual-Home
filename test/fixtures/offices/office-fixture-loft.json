@@ -1,0 +1,424 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "office-fixture-loft",
+  "name": "Fixture Loft",
+  "author": "Companion Intelligence",
+  "source": "original piece: CI offices",
+  "use": "office",
+  "office": {
+    "headcount": 6,
+    "company": "fixture-works"
+  },
+  "style": "A one-storey brick bay with a flat roof, used to test the office validator and the index. It is not a building anyone draws, and it is never rendered.",
+  "emoji": "🏢",
+  "defaults": 2,
+  "lot": {
+    "w": 22,
+    "d": 16,
+    "ground": "urban",
+    "context": "city",
+    "street": "S",
+    "sidewalk": {
+      "material": "brick",
+      "width": 2.2
+    }
+  },
+  "palette": {
+    "wall": "#9a5a46",
+    "trim": "#2a2f33",
+    "roof": "#4b4947",
+    "accent": "#c9772e",
+    "material": "brick",
+    "interior": "#e9e3d8"
+  },
+  "lighting": {
+    "preset": "day",
+    "sunBearing": 200
+  },
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 3.2,
+      "floor": "concrete",
+      "interior": "#e9e3d8",
+      "footprint": [
+        {
+          "x": 0,
+          "z": 0,
+          "w": 12,
+          "d": 8,
+          "material": "brick",
+          "color": "#9a5a46"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": 10.2,
+          "type": "door",
+          "w": 1.4,
+          "h": 2.3,
+          "style": "entry",
+          "leaf": "double",
+          "transom": 0.4,
+          "frame": "#2a2f33",
+          "color": "#2a2f33",
+          "id": "front"
+        },
+        {
+          "side": "S",
+          "at": 2,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.8,
+          "sill": 0.9,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "S",
+          "at": 4.8,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.8,
+          "sill": 0.9,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "S",
+          "at": 7.2,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.8,
+          "sill": 0.9,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "W",
+          "at": 5.8,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.8,
+          "sill": 0.9,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "N",
+          "at": 5.7,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.2,
+          "sill": 1.2,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "N",
+          "at": 9.9,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.8,
+          "sill": 0.9,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "E",
+          "at": 1.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.8,
+          "sill": 0.9,
+          "frame": "#2a2f33"
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            3.6,
+            0
+          ],
+          "to": [
+            3.6,
+            3.6
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            0,
+            3.6
+          ],
+          "to": [
+            3.6,
+            3.6
+          ],
+          "door": 1.8,
+          "doorW": 0.9,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            7.8,
+            0
+          ],
+          "to": [
+            7.8,
+            3.6
+          ],
+          "door": 1.8,
+          "doorW": 0.9,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            3.6,
+            3.6
+          ],
+          "to": [
+            7.8,
+            3.6
+          ],
+          "door": 2.1,
+          "doorW": 0.9,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            7.8,
+            3.6
+          ],
+          "to": [
+            12,
+            3.6
+          ],
+          "door": 1.2,
+          "doorW": 0.9,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            8.4,
+            3.6
+          ],
+          "to": [
+            8.4,
+            8
+          ],
+          "door": 2,
+          "doorW": 1.2,
+          "color": "#e9e3d8"
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Comms Room",
+          "bounds": {
+            "x": 0,
+            "z": 0,
+            "w": 3.6,
+            "d": 3.6
+          },
+          "items": [
+            {
+              "type": "server-rack",
+              "at": [
+                3,
+                2.9
+              ],
+              "rot": 90
+            }
+          ]
+        },
+        {
+          "no": "02",
+          "name": "Kitchenette",
+          "bounds": {
+            "x": 3.6,
+            "z": 0,
+            "w": 4.2,
+            "d": 3.6
+          },
+          "items": [
+            {
+              "type": "counter-run",
+              "at": [
+                5.4,
+                0.4
+              ],
+              "w": 2.4
+            },
+            {
+              "type": "fridge",
+              "at": [
+                7.3,
+                0.5
+              ]
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Meeting Room",
+          "bounds": {
+            "x": 7.8,
+            "z": 0,
+            "w": 4.2,
+            "d": 3.6
+          },
+          "items": [
+            {
+              "type": "trestle-table",
+              "at": [
+                9.9,
+                1.8
+              ]
+            },
+            {
+              "type": "whiteboard",
+              "at": [
+                10,
+                0.2
+              ]
+            }
+          ]
+        },
+        {
+          "no": "04",
+          "name": "Open Office",
+          "bounds": {
+            "x": 0,
+            "z": 3.6,
+            "w": 8.4,
+            "d": 4.4
+          },
+          "items": [
+            {
+              "type": "standing-desk",
+              "at": [
+                1.4,
+                4.4
+              ]
+            },
+            {
+              "type": "standing-desk",
+              "at": [
+                3.4,
+                4.4
+              ]
+            },
+            {
+              "type": "standing-desk",
+              "at": [
+                5.4,
+                4.4
+              ]
+            },
+            {
+              "type": "standing-desk",
+              "at": [
+                1.4,
+                6.6
+              ]
+            },
+            {
+              "type": "standing-desk",
+              "at": [
+                3.4,
+                6.6
+              ]
+            },
+            {
+              "type": "standing-desk",
+              "at": [
+                5.4,
+                6.6
+              ]
+            },
+            {
+              "type": "task-chair",
+              "at": [
+                1.4,
+                5
+              ]
+            },
+            {
+              "type": "task-chair",
+              "at": [
+                3.4,
+                5
+              ]
+            },
+            {
+              "type": "task-chair",
+              "at": [
+                5.4,
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "no": "05",
+          "name": "Entry Lobby",
+          "bounds": {
+            "x": 8.4,
+            "z": 3.6,
+            "w": 3.6,
+            "d": 4.4
+          },
+          "items": [
+            {
+              "type": "console-table",
+              "at": [
+                11.5,
+                4.4
+              ]
+            },
+            {
+              "type": "coat-rack",
+              "at": [
+                11.5,
+                7.4
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": 0,
+        "z": 0,
+        "w": 12,
+        "d": 8
+      },
+      "y": 3.2,
+      "type": "flat",
+      "parapet": 0.5,
+      "color": "#4b4947"
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      1.8,
+      0.45
+    ],
+    "rot": 0,
+    "device": "chalk",
+    "pose": "upright",
+    "surface": "shelf",
+    "shelfHeight": 1.1
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": 10.2
+  },
+  "areaSqm": 96
+}

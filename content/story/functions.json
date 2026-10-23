@@ -1,0 +1,234 @@
+{
+  "v": 1,
+  "$comment": "The twelve functions a person of a fictional company has (company/v1 member.function; reference/office/office-contract-m0.md). `label` is the word the /office filter shows; `rooms` are the room roles (content/story/roles-office.json) where that function works, most at home first; `pool` is the apps a person of the function may be given in a story: the apps the plan (reference/office/office-plan.md section 2, the stack by function of the eight offices) gives that function, sorted. The pools are the starting ones: the writers widen them from the company briefs in M1, and rule co-functions will hold each person to a beat in a room of the function and a beat whose app is in the pool. Kiwix is in no pool (the owner removed it from every story on 2026-10-19).",
+  "functions": [
+    {
+      "id": "owner",
+      "label": "Run the company",
+      "rooms": [
+        "office",
+        "workfloor",
+        "server"
+      ],
+      "pool": [
+        "akaunting",
+        "anything-llm",
+        "bookstack",
+        "ci-memory",
+        "ci-openclaw",
+        "ci-planning",
+        "documenso",
+        "docuseal",
+        "espocrm",
+        "libreoffice",
+        "mattermost",
+        "open-webui",
+        "papra",
+        "planka",
+        "wallos"
+      ]
+    },
+    {
+      "id": "operations",
+      "label": "Operations",
+      "rooms": [
+        "workfloor",
+        "reception",
+        "kitchen",
+        "store",
+        "workshop"
+      ],
+      "pool": [
+        "baikal",
+        "ci-hermes",
+        "grist",
+        "nextcloud",
+        "papra",
+        "pi-hole",
+        "vaultwarden",
+        "vikunja"
+      ]
+    },
+    {
+      "id": "finance",
+      "label": "Money",
+      "rooms": [
+        "office",
+        "workfloor"
+      ],
+      "pool": [
+        "akaunting",
+        "ci-hermes",
+        "invoice-ninja",
+        "kimai",
+        "nextcloud",
+        "paperless",
+        "papra",
+        "wallos"
+      ]
+    },
+    {
+      "id": "sales",
+      "label": "Sell",
+      "rooms": [
+        "workfloor",
+        "meeting",
+        "office"
+      ],
+      "pool": [
+        "anything-llm",
+        "baikal",
+        "docuseal",
+        "espocrm",
+        "grist",
+        "invoice-ninja",
+        "libreoffice",
+        "n8n",
+        "open-webui",
+        "papra",
+        "twenty"
+      ]
+    },
+    {
+      "id": "marketing",
+      "label": "Market",
+      "rooms": [
+        "workfloor",
+        "meeting"
+      ],
+      "pool": [
+        "ci-hermes",
+        "ci-planning",
+        "listmonk",
+        "mattermost",
+        "open-webui",
+        "pi-hole"
+      ]
+    },
+    {
+      "id": "support",
+      "label": "Support",
+      "rooms": [
+        "workfloor",
+        "reception"
+      ],
+      "pool": [
+        "baikal",
+        "bookstack",
+        "ci-hermes",
+        "vaultwarden",
+        "vikunja"
+      ]
+    },
+    {
+      "id": "engineering",
+      "label": "Build",
+      "rooms": [
+        "workfloor",
+        "server",
+        "office",
+        "workshop"
+      ],
+      "pool": [
+        "baserow",
+        "ci-hermes",
+        "drawio",
+        "forgejo",
+        "gitea",
+        "jupyterlab",
+        "libretranslate",
+        "n8n",
+        "open-webui",
+        "planka",
+        "rocketchat",
+        "uptime-kuma",
+        "vaultwarden"
+      ]
+    },
+    {
+      "id": "design",
+      "label": "Design",
+      "rooms": [
+        "workfloor",
+        "meeting"
+      ],
+      "pool": [
+        "docmost",
+        "drawio",
+        "excalidraw",
+        "immich",
+        "inkscape",
+        "libretranslate",
+        "nextcloud",
+        "penpot",
+        "stirling-pdf"
+      ]
+    },
+    {
+      "id": "projects",
+      "label": "Projects",
+      "rooms": [
+        "meeting",
+        "workfloor",
+        "workshop"
+      ],
+      "pool": [
+        "excalidraw",
+        "kimai",
+        "libreoffice",
+        "mattermost",
+        "paperless",
+        "planka",
+        "vikunja",
+        "wallos"
+      ]
+    },
+    {
+      "id": "people",
+      "label": "People",
+      "rooms": [
+        "meeting",
+        "reception",
+        "kitchen"
+      ],
+      "pool": [
+        "baikal",
+        "bookstack",
+        "campfire",
+        "docmost",
+        "nextcloud",
+        "paperless"
+      ]
+    },
+    {
+      "id": "legal",
+      "label": "Contracts",
+      "rooms": [
+        "office",
+        "meeting"
+      ],
+      "pool": [
+        "anything-llm",
+        "bentopdf",
+        "cryptgeon",
+        "docmost",
+        "paperless"
+      ]
+    },
+    {
+      "id": "it",
+      "label": "IT",
+      "rooms": [
+        "server",
+        "workfloor"
+      ],
+      "pool": [
+        "ci-openclaw",
+        "docmost",
+        "ntfy",
+        "pi-hole",
+        "uptime-kuma"
+      ]
+    }
+  ]
+}

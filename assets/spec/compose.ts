@@ -71,6 +71,9 @@ export interface ComposeSpec {
   /** the house's furniture style (assets/house-styles.ts); a room's `style` overrides it. Default: read off the
    *  spec's free-text `style` ("farmhouse", "mid-century" …), else modern */
   styleKey?: StyleKey;
+  /** `use: 'office'` only (reference/office/office-contract-m0.md): `headcount`, the people on the floor the building is drawn for (the office
+   *  validator holds the desks to it); `company`, the slug of the fictional company that works there. Not a story word: nothing prints either. */
+  office?: { headcount?: number; company?: string };
 }
 export interface ComposeLot {}
 export interface ComposePalette {}
@@ -100,6 +103,8 @@ export interface ComposeRoom {
   bath?: BathPlan;
   /** composition baked into `items` and hand-tuned: do not compose again (the program stays the room's type) */
   lock?: boolean;
+  /** `use: 'office'` only: how many people work in this room (a desk or a bench position each); the office validator sums them against `office.headcount` */
+  seats?: number;
   /** the dress phase (assets/room-dress.ts, plan 5.6): after the layout is frozen it adds small goods, lamps and towels (`src: 'dress@1'` items) to
    *  the room's surfaces. ABSENT: the build does not dress the room (so every shipped house builds as it always did; a `dress@1` item already baked
    *  into `items` is a plain item and builds either way). `false`: never dressed, not even by `compose-house.mts --dress`. `{ level }`: opts the

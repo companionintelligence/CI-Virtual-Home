@@ -55,10 +55,11 @@ export function missingFinePrint(html: string, surface: Surface, facts: Facts = 
   return finePrintItems(surface, facts, claims).filter(i => !text.includes(i.text)).map(i => i.id);
 }
 
-/** the fields of claims.json the player needs, in the order the file has them */
+/** the fields of claims.json the player needs, in the order the file has them. A disclosure of another `collection` (the office's `fictional-company`, reference/office/office-contract-m0.md)
+ *  is not the player's yet: the snapshot is shipped, and a build without the office ships the same bytes as before. */
 export function snapshotOf(claims: ClaimsDoc): ClaimsDoc {
   return {
-    disclosures: claims.disclosures.map(d => ({ id: d.id, text: d.text, ...(d.required ? { required: true } : {}) })),
+    disclosures: claims.disclosures.filter(d => !(d as { collection?: string }).collection).map(d => ({ id: d.id, text: d.text, ...(d.required ? { required: true } : {}) })),
     allowedClaims: (claims.allowedClaims || []).filter(a => (QUOTED_CLAIMS as readonly string[]).includes(a.id)).map(a => ({ id: a.id, text: a.text })),
   };
 }
