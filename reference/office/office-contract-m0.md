@@ -86,3 +86,26 @@ The 22 scripts that glob `content/houses/` count every spec as a home. Before th
 ## 7. Open items
 
 Counsel: the eight company names (and a trademark search), the label under ADS.md 9.1, the licences of Elastic 2.0, BSL 1.1, Sustainable Use and AGPL-plus-commercial apps against "an office uses the app", comparative naming of business incumbents (O7, O13). Owner or Hub team: **(1)** a capacity statement for one Core and a floor of 22 to 24 people (none exists; so no figure is printed and no medium company ships a floor figure); **(2)** whether Hub's per-app backup deserves one sentence in the fact sheet (until then `owner-backups` stays out); the free-edition limits of Mattermost and Rocket.Chat; EspoCRM's persistence; ntfy on a local HTTP address; Cloudflare's precedence for `office.html` against `/office`; the Kokoro install before any voiced tour; macOS goldens for every building. The page copy and the fixtures' people, titles, taglines and sectors are placeholders written for M0.
+
+## 8. What M0 added, how to look at it, how it is checked
+
+| Where | What |
+|---|---|
+| `assets/spec/base.ts`, `compose.ts` | `use`, `office`, `rooms[].seats` (types only: the compiled files are empty before and after) |
+| `scripts/lib/list-specs.mts` | `listSpecs({ kind })`, `allHouses(index)`, `specUse(spec)` |
+| `scripts/build-house-index.mts` | an `offices` array beside `houses`, no key when there is none; `--dir` and `--out` for the tests |
+| `scripts/validate/office.mts`, `test/fixtures/offices/` | the office plugin (silent for a home), a fixture office (never rendered) and the room-name oracle of the eight planned buildings |
+| `content/story/` | `schema/company.schema.json`, `functions.json`, `roles-office.json`, `company-names.json`, and one disclosure in `claims.json` |
+| `scripts/story/lib/kinds.mts`, `co/` | the merged role table; the company gate (`context`, `validate`, `strings`, `consts`, `types`, `exemplar`, `cli`) behind `pnpm run story:validate -- --kind office` |
+| `scripts/office/` | the draft page: `data.mts` (the cards), `pages.mts`, `site.mts` (the build, the switcher, the checks), `fine-print.mts`, `assets/office.css|js`, `browser-check.mts` |
+| `test/fixtures/site/offices/` | the two fixture companies (placeholders: see section 1, O6) |
+| `scripts/build-portal.mts` | 17 lines: the flag, the early refusal, `office.html` and `company` in `OWNED`, one call |
+| `scripts/story/lib/site-copy.mts`, `fine-print.mts` | the copy lint reads the office pages; the player's mirror of the claims skips the office disclosure |
+| `scripts/validate-stories.mts` | 12 lines: `--kind office` hands over to the company gate before anything of the family gate loads |
+| tests (`@check-house quick`, so `pnpm run test:node` runs them) | `test-office-spec.mts`, `test-company-contract.mts`, `test-company-validator.mts`, `test-office-front.mts` |
+| docs | this file, `reference/HOUSE-SPEC.md`, `reference/story/validator.md`, `CLAUDE.md` (the office block), `THIRD_PARTY.md` (one more file inlines three Lucide icons) |
+
+**To look at it:** `pnpm run portal:preview -- --offices` builds the site with the draft office and serves it at `http://127.0.0.1:8081/ci-virtual-home/` (the office is `/office`, a company `/company/reelwick`; add `--port` if 8081 is taken). The default `pnpm run portal:preview` has no office. **To check it:** `pnpm run test:node` (the four tests above), `pnpm run story:validate -- --kind office`, and by hand, with a browser, `node --experimental-strip-types scripts/office/browser-check.mts`.
+
+**Not in M0 and not pretended:** a building, a tour, a story, a film, an ad, a company page's plan or "Rented before" panel, a logo or a screenshot, a count that is not the fixtures', the `portal:test` browser leg for the office (the by-hand script stands in until the pinned Chromium is installed), `claims-office.json`.
+
