@@ -1,0 +1,1420 @@
+{
+  "schema": "family/v1",
+  "slug": "valdivia",
+  "house": "studio-loft",
+  "fictional": true,
+  "family": {
+    "surname": "Valdivia",
+    "tagline": "One partner writes campaigns, one pulls prints, and one Core serves both.",
+    "household": "solo-or-couple",
+    "business": false,
+    "story": "Zaid is a freelance marketing consultant who works from the sofa end of a converted brick warehouse. Ximena photographs and pulls screen prints at the bench beside the Core. A sleeping platform up a ladder-stair and a walled court out back make up the rest.",
+    "address": {
+      "line": "6 Hoist Yard",
+      "place": "Foundry Reach"
+    },
+    "narrator": "v-light-m",
+    "home": {
+      "lede": "A converted brick warehouse on a city street, with tall steel-framed windows under a deep parapet. The loft takes the west bay: one tall room, a kitchen along the back wall and a sleeping platform up a ladder-stair. A walled court lies behind.",
+      "spots": [
+        {
+          "room": "Desk & Workshop",
+          "line": "A workbench, a ladder shelf and the Core on the desk."
+        },
+        {
+          "room": "Living Loft",
+          "line": "A mid-century sofa, an ottoman, a hide rug and the bookshelf."
+        },
+        {
+          "room": "Kitchen",
+          "line": "A cooking run along the back wall and a breakfast bar with three stools."
+        },
+        {
+          "room": "Sleeping Platform",
+          "line": "A sleigh bed, a dresser and a record player, up the ladder-stair."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "studio-lines",
+        "line": "Ximena draws the next print at the bench."
+      },
+      {
+        "at": "morning",
+        "beat": "couch-list",
+        "line": "Zaid writes a client issue from the sofa."
+      },
+      {
+        "at": "midday",
+        "beat": "bar-plan",
+        "line": "Zaid lines up every client's launches at the bar."
+      },
+      {
+        "at": "midday",
+        "beat": "fridge-list",
+        "line": "The pantry list gets its last item."
+      },
+      {
+        "at": "afternoon",
+        "beat": "studio-form",
+        "line": "Cacao checks paper stock after lunch."
+      },
+      {
+        "at": "afternoon",
+        "beat": "court-reading",
+        "line": "Zaid takes his reading out to the court."
+      },
+      {
+        "at": "weekend",
+        "beat": "platform-weekend",
+        "line": "The open weekend checklist gets its last ticks."
+      },
+      {
+        "at": "weekend",
+        "beat": "court-prints",
+        "line": "Ximena props the finished set against the brick."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "zaid",
+      "name": "Zaid",
+      "age": 34,
+      "role": "partner",
+      "work": "freelance marketing consultant",
+      "colour": "chart-1",
+      "archetype": "marketer",
+      "companion": {
+        "name": "Pomelo",
+        "runtime": "Hermes",
+        "job": "Drafts client briefs and replies from the context Zaid connected.",
+        "personality": [
+          "brisk",
+          "tidy",
+          "candid"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Zaid reads and sends every message."
+      },
+      "profile": {
+        "bio": "Zaid advises small brands on their campaigns from the sofa end of the loft. His client lists, briefs and posting plans sit on the Core, and Pomelo drafts the replies that he reads before he sends them."
+      }
+    },
+    {
+      "id": "ximena",
+      "name": "Ximena",
+      "age": 37,
+      "role": "partner",
+      "work": "photographer and printmaker",
+      "colour": "chart-2",
+      "archetype": "creative",
+      "companion": {
+        "name": "Cacao",
+        "runtime": "OpenClaw",
+        "job": "Checks supplier stock pages for the paper Ximena names and lists what it finds.",
+        "personality": [
+          "calm",
+          "dry",
+          "careful"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "One page at a time. Ximena reads the list and places the order herself."
+      },
+      "profile": {
+        "bio": "Ximena photographs for clients and pulls screen prints at the bench beside the Core. Her shoots, line art and press papers sit on the Core, and Cacao checks supplier stock pages for the paper she names."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "studio",
+      "kind": "room",
+      "room": "office",
+      "title": "Ximena's studio bench"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen and its bar"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The sofa and the shelves"
+    },
+    {
+      "id": "platform",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Up the ladder-stair"
+    },
+    {
+      "id": "court",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the back court"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the street door",
+        "body": "The courier leaves a parcel at the loft's street door. Ximena carries it past the sofa to the desk by the ladder shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "What is inside the parcel",
+        "body": "Zaid cuts the tape. Ximena lifts out the Companion Core, a power cable, a quick-start guide and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plugged in on the desk",
+        "body": "Ximena plugs the cable in beside the monitor. The Core wakes and opens its own Wi-Fi network."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from Zaid's phone",
+        "body": "Zaid joins the Core's own network from his phone, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "ghost",
+        "baserow",
+        "penpot",
+        "photoprism"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Zaid and Ximena choose their agents",
+        "body": "In the Companion Hub store, Zaid picks Hermes and Ximena picks OpenClaw. Companion Memory comes along, with Ghost, Baserow, Penpot and PhotoPrism. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory",
+            "Apps: Ghost, Baserow, Penpot, PhotoPrism"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "zaid",
+      "agent": "zaid",
+      "approval": "zaid",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Pomelo says hello",
+        "body": "Zaid messages the agent he named Pomelo from the sofa. The reply comes from the Core, across the loft.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "zaid",
+        "text": "Hello, Zaid. I am Pomelo. What should we start with?"
+      },
+      "film": true,
+      "detail": {
+        "before": "Without an agent, Zaid wrote every client reply and reminder himself, one app at a time.",
+        "after": "Pomelo runs in a sandbox on the Core and replies through the messaging app Zaid picked. Those messages travel through that chat service.",
+        "steps": [
+          "Pick Hermes in the Companion Hub store",
+          "Give the agent a name",
+          "Send it a first message"
+        ],
+        "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+      }
+    },
+    {
+      "id": "studio-lines",
+      "chapter": "studio",
+      "member": "ximena",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "service": "adobe-illustrator",
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Three screens from one drawing",
+        "body": "Ximena draws the line art for a three-colour print in Inkscape on the Core. Each colour gets its own layer, saved beside the shoot.",
+        "chips": [
+          "Inkscape",
+          "alternative to Adobe Illustrator"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "The line art lived in Adobe Illustrator, and every revision became another file on one laptop.",
+        "after": "Inkscape runs in the browser on the Core, so the drawing and every layer sit in one folder that either of them can open.",
+        "steps": [
+          "Trace the shoot's outline",
+          "Give each colour its own layer",
+          "Save the file beside the shoot"
+        ],
+        "fact": "Inkscape draws logos, diagrams and line art as vector graphics, in your browser."
+      }
+    },
+    {
+      "id": "studio-poster",
+      "chapter": "studio",
+      "member": "ximena",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "service": "figma",
+      "capability": "design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The open weekend poster",
+        "body": "Ximena lays out the open-studios poster in Penpot, the photograph and the type side by side. Zaid reads the copy over her shoulder before it goes to print.",
+        "chips": [
+          "Penpot",
+          "alternative to Figma"
+        ]
+      },
+      "detail": {
+        "before": "The poster lived in Figma, and each proof went to the printer as an export from that one file.",
+        "after": "Penpot holds the layout on the Core, so the type, the photograph and the print file are set in the same place.",
+        "steps": [
+          "Rebuild last year's layout in Penpot",
+          "Set the photograph and the type",
+          "Export the print file"
+        ],
+        "fact": "Penpot is a web-based design tool that you host yourself, for design and prototyping."
+      }
+    },
+    {
+      "id": "studio-reel",
+      "chapter": "studio",
+      "member": "ximena",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "freecut",
+        "replaces": []
+      },
+      "capability": "edit multi-track video in your browser",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A reel of the press run",
+        "body": "Ximena cuts a short reel of the press run in FreeCut, in the browser on her laptop. The clips come from the shoot folder on the Core.",
+        "chips": [
+          "FreeCut"
+        ],
+        "note": "FreeCut runs in the browser of the device Ximena edits on."
+      },
+      "detail": {
+        "before": "A reel meant a desktop editor and a project folder that lived on one laptop.",
+        "after": "FreeCut edits multi-track video in the browser of the laptop she works on, with the clips pulled from the shoot folder on the Core.",
+        "steps": [
+          "Pull the press clips from the shoot folder",
+          "Cut them to a short reel",
+          "Export the reel"
+        ],
+        "fact": "FreeCut edits multi-track video in your browser and uses WebGPU on the device you edit on."
+      }
+    },
+    {
+      "id": "studio-form",
+      "chapter": "studio",
+      "member": "ximena",
+      "agent": "ximena",
+      "approval": "ximena",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Cacao finds the paper in stock",
+        "body": "Cacao opens three paper suppliers' stock pages and lists which have the sheet size Ximena wants. Ximena reads the list and places the order herself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "ximena",
+        "text": "Two suppliers have the sheets in stock. Please choose which one before I go on."
+      },
+      "detail": {
+        "before": "Comparing paper suppliers meant opening each website in turn and keeping the sizes and prices in her head.",
+        "after": "Cacao opens each supplier's page in its browser and lists what is in stock. Ximena compares the list and orders herself.",
+        "steps": [
+          "Type the sheet size she wants",
+          "Let Cacao check each supplier's page",
+          "Read the list, then order herself"
+        ],
+        "fact": "OpenClaw is an agent with browser automation and tool use, running in a sandboxed app on your Core."
+      }
+    },
+    {
+      "id": "studio-warranty",
+      "chapter": "studio",
+      "member": "ximena",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "service": "miro",
+      "capability": "a shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Paper samples on one board",
+        "body": "Ximena pins photos of paper samples and ink swatches onto one board in tldraw on the Core. The autumn run's palette takes shape beside the files.",
+        "chips": [
+          "tldraw",
+          "alternative to Miro"
+        ]
+      },
+      "detail": {
+        "before": "The samples lived on a Miro board that held the pictures but none of the files they came from.",
+        "after": "tldraw runs as a shared whiteboard on the Core, so the board sits beside the sample photos and both of them can add to it.",
+        "steps": [
+          "Drop in a picture of each sample",
+          "Group the samples by paper",
+          "Pick the palette and note its name"
+        ],
+        "fact": "tldraw is a shared whiteboard on an infinite canvas."
+      }
+    },
+    {
+      "id": "fridge-list",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "OurGroceries"
+        ]
+      },
+      "service": "ourgroceries",
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The pantry list by the fridge",
+        "body": "The loft's shopping list sits in Grocy on the Core, built from what the pantry is running low on. Whoever passes the shop checks it first.",
+        "chips": [
+          "Grocy",
+          "alternative to OurGroceries"
+        ]
+      },
+      "detail": {
+        "before": "The shopping list lived in OurGroceries on two phones, and the pantry lived in nobody in particular.",
+        "after": "Grocy keeps the pantry stock, the shopping list and the recipes together on the Core.",
+        "steps": [
+          "Count the pantry shelf",
+          "Set the level that puts an item on the list",
+          "Read the list at the shop"
+        ],
+        "fact": "Grocy tracks the pantry, shopping lists, recipes, chores and household habits in one place."
+      }
+    },
+    {
+      "id": "bar-plan",
+      "chapter": "kitchen",
+      "member": "zaid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "service": "airtable",
+      "capability": "build a no-code database for orders, inventory or projects",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Every client's launches in one table",
+        "body": "At the breakfast bar, Zaid keeps every client's launches in one Baserow table on the Core. A filter picks out the weeks with nothing booked.",
+        "chips": [
+          "Baserow",
+          "alternative to Airtable"
+        ]
+      },
+      "detail": {
+        "before": "Each client's launches sat in its own Airtable base, so one empty week took four tabs to find.",
+        "after": "Baserow holds every client's launches in one table on the Core, and a filter on the table lists the weeks with nothing booked.",
+        "steps": [
+          "Add a row for each planned launch",
+          "Add a filter for the empty weeks",
+          "Share the table with Ximena"
+        ],
+        "fact": "Baserow lets you build a no-code database for orders, inventory or projects."
+      }
+    },
+    {
+      "id": "bar-report",
+      "chapter": "kitchen",
+      "member": "zaid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "service": "zapier",
+      "capability": "connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The weekly report assembles itself",
+        "body": "An n8n workflow gathers the week's numbers into a draft report every Thursday morning. Zaid reads the draft before anything goes to the client.",
+        "chips": [
+          "n8n",
+          "alternative to Zapier"
+        ]
+      },
+      "detail": {
+        "before": "The weekly report was stitched together by a chain of Zapier steps, one for each tool.",
+        "after": "n8n runs the whole workflow on the Core, so the draft is built where the client's numbers already sit.",
+        "steps": [
+          "Pick the week's numbers",
+          "Build the draft report",
+          "Read it before it goes anywhere"
+        ],
+        "fact": "n8n connects your apps with workflows, and the data stays on your Core."
+      }
+    },
+    {
+      "id": "bar-posts",
+      "chapter": "kitchen",
+      "member": "zaid",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "postiz",
+        "replaces": [
+          "Buffer"
+        ]
+      },
+      "service": "buffer",
+      "capability": "plan and schedule posts across your social accounts",
+      "anchor": {
+        "role": "kitchen-island",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Friday's posts wait as drafts",
+        "body": "Zaid lines up a client's week of posts in Postiz on the Core. Each one stays a draft until he approves it.",
+        "chips": [
+          "Postiz",
+          "alternative to Buffer"
+        ],
+        "note": "Posts publish to outside social platforms by design."
+      },
+      "film": true,
+      "detail": {
+        "before": "The week's posts were queued inside Buffer, apart from the briefs they came from.",
+        "after": "Postiz keeps the queue on the Core, next to the briefs. The posts go out to the platforms only when Zaid approves them.",
+        "steps": [
+          "Write each post from the brief",
+          "Set the day for each draft",
+          "Approve the week on Friday"
+        ],
+        "fact": "Postiz plans and schedules posts across your social accounts."
+      }
+    },
+    {
+      "id": "counter-invoice",
+      "chapter": "kitchen",
+      "member": "ximena",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "FreshBooks"
+        ]
+      },
+      "service": "freshbooks",
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "counter",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "counter",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "above",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The gallery's invoice goes out",
+        "body": "Ximena invoices the gallery for the framed set at the kitchen counter. The quote, the invoice and the expenses sit in Invoice Ninja on the Core.",
+        "chips": [
+          "Invoice Ninja",
+          "alternative to FreshBooks"
+        ]
+      },
+      "detail": {
+        "before": "Each invoice was rebuilt from the last one in FreshBooks, and the sale lived in a separate spreadsheet.",
+        "after": "Invoice Ninja keeps the quote, the invoice and the expenses for each sale together on the Core.",
+        "steps": [
+          "Start from the quote",
+          "Add the framing costs",
+          "Send the invoice to the gallery"
+        ],
+        "fact": "Invoice Ninja sends invoices and quotes and tracks expenses and time."
+      }
+    },
+    {
+      "id": "bar-signing",
+      "chapter": "kitchen",
+      "member": "ximena",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "service": "docusign",
+      "capability": "fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "kitchen-island",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The framer signs at the bar",
+        "body": "The framer from the next bay signs Ximena's commission on a tablet at the breakfast bar. The signed copy lands in a folder on the Core.",
+        "chips": [
+          "Docuseal",
+          "alternative to DocuSign"
+        ]
+      },
+      "detail": {
+        "before": "Each commission went out through DocuSign, and the signed copy waited in an email to be saved.",
+        "after": "Docuseal fills and signs the PDF on the tablet at the bar, and the signed copy goes into a folder on the Core.",
+        "steps": [
+          "Fill in the commission PDF",
+          "Hand over the tablet",
+          "Find the signed copy in the folder"
+        ],
+        "fact": "Docuseal fills and signs PDF forms on any device, from your own Core."
+      }
+    },
+    {
+      "id": "counter-pipeline",
+      "chapter": "kitchen",
+      "member": "zaid",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "service": "salesforce",
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "room",
+        "room": "kitchen",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Every client in one pipeline",
+        "body": "Zaid keeps each client, deal and contact note in Twenty on the Core. The kitchen laptop shows the whole pipeline at once.",
+        "chips": [
+          "Twenty",
+          "alternative to Salesforce"
+        ]
+      },
+      "detail": {
+        "before": "Client contacts sat in Salesforce, and the notes from each call sat somewhere else.",
+        "after": "Twenty keeps customers, deals and custom fields together on the Core, so a client's notes sit beside its deal.",
+        "steps": [
+          "Add the client and the deal",
+          "Paste in the notes from the call",
+          "Move the deal along the pipeline"
+        ],
+        "fact": "Twenty keeps customers, deals and custom fields in a CRM you host yourself."
+      }
+    },
+    {
+      "id": "couch-list",
+      "chapter": "living",
+      "member": "zaid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ghost",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "service": "mailchimp",
+      "capability": "publish a site, a blog or a newsletter you own",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The client's list comes home",
+        "body": "A client's newsletter list now sits in Ghost on the Core, beside the drafts. Zaid writes the issue on the sofa and sends it through an outside mailer.",
+        "chips": [
+          "Ghost",
+          "alternative to Mailchimp"
+        ],
+        "note": "Sending needs an outside mailer."
+      },
+      "detail": {
+        "before": "The list and its history sat in Mailchimp, apart from the briefs and the drafts they came from.",
+        "after": "Ghost holds the subscriber list and the issue drafts on the Core. Sending goes through the outside mailer that Zaid connects.",
+        "steps": [
+          "Import the client list into Ghost",
+          "Write the issue beside its brief",
+          "Send it through the connected mailer"
+        ],
+        "fact": "Ghost publishes a site, a blog or a newsletter you own."
+      }
+    },
+    {
+      "id": "couch-draft",
+      "chapter": "living",
+      "member": "zaid",
+      "agent": "zaid",
+      "approval": "zaid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk and gives your agents individual context",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Pomelo drafts the quarterly brief",
+        "body": "Pomelo drafts the quarterly brief from last quarter's thread, which Zaid connected to Companion Memory. Zaid checks every figure, then sends it himself.",
+        "chips": [
+          "Companion Memory"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "film": true,
+      "detail": {
+        "before": "A quarterly brief meant digging out last quarter's thread and rebuilding the figures by hand.",
+        "after": "Pomelo drafts the brief on the Core from the thread Zaid connected in Companion Memory. He checks every figure, then sends it himself.",
+        "steps": [
+          "Ask Pomelo for the quarterly brief",
+          "Check each figure against the thread",
+          "Send the brief himself"
+        ],
+        "fact": "Companion Memory keeps your digital life on your disk, so your agents know your context."
+      }
+    },
+    {
+      "id": "shelf-playbook",
+      "chapter": "living",
+      "member": "zaid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "service": "confluence",
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The client playbook gets chapters",
+        "body": "Zaid writes each client's playbook in BookStack on the Core, in books, chapters and pages. Search finds last year's launch notes by their words.",
+        "chips": [
+          "BookStack",
+          "alternative to Confluence"
+        ]
+      },
+      "detail": {
+        "before": "Playbooks lived in a Confluence space, one page for each client, with the history of every change kept there.",
+        "after": "BookStack keeps each playbook as a book of chapters and pages on the Core, with search and a history of every edit.",
+        "steps": [
+          "Make a book for each client",
+          "Write the launch notes as chapters",
+          "Search for last year's launch"
+        ],
+        "fact": "BookStack writes a wiki or a set of manuals in books, chapters and pages, with search and history."
+      }
+    },
+    {
+      "id": "shelf-bundle",
+      "chapter": "living",
+      "member": "zaid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "logseq",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "service": "notion",
+      "capability": "write notes and a daily journal in plain Markdown files",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "right",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Notes that find their book",
+        "body": "Zaid keeps his reading notes in Logseq on the Core, one page for each book on the shelf. A link in a client brief jumps to the passage.",
+        "chips": [
+          "Logseq",
+          "alternative to Notion"
+        ]
+      },
+      "detail": {
+        "before": "His reading notes lived in a Notion workspace, away from the Markdown files he kept for client work.",
+        "after": "Logseq writes each page as a Markdown file on the Core, with a daily journal and links between the pages.",
+        "steps": [
+          "Open a page for each book",
+          "Link a passage from a client brief",
+          "Find it again from the journal"
+        ],
+        "fact": "Logseq lets you write notes and a daily journal in plain Markdown files."
+      }
+    },
+    {
+      "id": "couch-audio",
+      "chapter": "living",
+      "member": "zaid",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "service": "kindle",
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A chapter and its highlights",
+        "body": "Between calls Zaid reads a chapter of a marketing book on the sofa in Koodo Reader. The highlights he marks are kept with the book on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "alternative to Kindle"
+        ]
+      },
+      "detail": {
+        "before": "His ebooks and highlights lived in the Kindle app, and the notes stayed inside it.",
+        "after": "Koodo Reader opens the family's own ebooks in a browser and keeps the notes and highlights with them. The library sits on the Core.",
+        "steps": [
+          "Add the book to the Core library",
+          "Highlight a passage as he reads",
+          "Open the highlights from his notes"
+        ],
+        "fact": "Koodo Reader reads ebooks in your browser, with notes, highlights and text-to-speech."
+      }
+    },
+    {
+      "id": "loft-wall",
+      "chapter": "living",
+      "member": "ximena",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "comfyui",
+        "replaces": [
+          "Midjourney"
+        ]
+      },
+      "service": "midjourney",
+      "capability": "generate images with node-based pipelines on your own AMD GPU",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A paper texture, tried three ways",
+        "body": "Ximena builds a node pipeline in ComfyUI on the Core and tries a paper texture for the poster. She keeps the texture she likes and drops the rest.",
+        "chips": [
+          "ComfyUI",
+          "alternative to Midjourney"
+        ]
+      },
+      "detail": {
+        "before": "Textures came from Midjourney, one prompt at a time, and the results stayed in that service.",
+        "after": "ComfyUI runs the node pipeline on the Core and saves each result beside the poster files.",
+        "steps": [
+          "Wire a texture pipeline from nodes",
+          "Run it and compare the results",
+          "Save the best beside the poster files"
+        ],
+        "fact": "ComfyUI generates images with node-based pipelines on your own AMD GPU."
+      }
+    },
+    {
+      "id": "loft-lamps",
+      "chapter": "living",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "glasshome",
+        "replaces": []
+      },
+      "capability": "design a dashboard by dragging widgets, with no YAML",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A lamp dashboard for the loft",
+        "body": "The loft's lamps get one dashboard, built by dragging widgets into place. It stays on the home network, beside the Core.",
+        "chips": [
+          "GlassHome"
+        ]
+      },
+      "detail": {
+        "before": "Each lamp was switched on at the lamp, one after another.",
+        "after": "GlassHome puts the lamps on one dashboard that was built by dragging widgets, with no YAML to write.",
+        "steps": [
+          "Drag a widget for each lamp",
+          "Group them by room",
+          "Open the dashboard on a phone"
+        ],
+        "fact": "GlassHome designs a dashboard by dragging widgets, with no YAML. Your entity data stays on your network."
+      }
+    },
+    {
+      "id": "platform-records",
+      "chapter": "platform",
+      "member": "ximena",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "mstream",
+        "replaces": [
+          "Apple Music"
+        ]
+      },
+      "service": "apple-music",
+      "capability": "stream your own music from your Core to a browser or an app",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Weekday playlists, weekend records",
+        "body": "The record player is for Sundays. On weekdays Ximena plays her music files from the Core through mStream, on a phone beside the turntable.",
+        "chips": [
+          "mStream",
+          "alternative to Apple Music"
+        ]
+      },
+      "detail": {
+        "before": "Her weekday playlists lived in Apple Music, apart from the music files she had collected herself.",
+        "after": "mStream plays the music files she keeps on the Core, in the browser on her phone, with no playlist service in between.",
+        "steps": [
+          "Point mStream at the music folder",
+          "Open it on the phone",
+          "Press play at the bench"
+        ],
+        "fact": "mStream streams your own music from your Core to a browser or an app."
+      }
+    },
+    {
+      "id": "platform-weekend",
+      "chapter": "platform",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "jotty",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "service": "trello",
+      "capability": "lightweight checklists and notes with Kanban boards and sharing",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The open weekend checklist",
+        "body": "The checklist for the open weekend sits on a Jotty board on the Core. Chairs, posters and sweeping are columns, and both of them move the cards.",
+        "chips": [
+          "Jotty",
+          "alternative to Trello"
+        ]
+      },
+      "detail": {
+        "before": "The weekend jobs lived on a Trello board that only one of them had set up, so the other asked what was left.",
+        "after": "Jotty keeps the checklist and the board on the Core, shared between both of them.",
+        "steps": [
+          "Make a column for each kind of job",
+          "Share the board with both phones",
+          "Move a card when the job is done"
+        ],
+        "fact": "Jotty is a lightweight checklist and notes app with Kanban boards and sharing."
+      }
+    },
+    {
+      "id": "court-reading",
+      "chapter": "court",
+      "member": "zaid",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Raindrop.io"
+        ]
+      },
+      "service": "raindrop-io",
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The rival's page, saved in time",
+        "body": "On the court bench Zaid reads a rival's launch page that Linkwarden saved on the Core. By Friday the live page had changed, and the saved copy had not.",
+        "chips": [
+          "Linkwarden",
+          "alternative to Raindrop.io"
+        ]
+      },
+      "detail": {
+        "before": "Saved links sat in Raindrop.io, and a page that changed or vanished left only its address behind.",
+        "after": "Linkwarden saves a screenshot and a PDF of each page on the Core, so the page Zaid read is still the page he reads.",
+        "steps": [
+          "Save the rival's launch page",
+          "Let Linkwarden keep a copy",
+          "Read the saved copy later"
+        ],
+        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+      }
+    },
+    {
+      "id": "court-prints",
+      "chapter": "court",
+      "member": "ximena",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "iCloud Photos"
+        ]
+      },
+      "service": "icloud-photos",
+      "capability": "browse and share your photo library, with automatic tagging, without uploading it anywhere",
+      "anchor": {
+        "role": "garden",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "patio-seat"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Prints against the brick, in daylight",
+        "body": "Ximena props the finished prints against the court wall by the planter and photographs them in daylight. PhotoPrism sorts the set on the Core by the date it was taken.",
+        "chips": [
+          "PhotoPrism",
+          "alternative to iCloud Photos"
+        ],
+        "note": "A photo library is not a backup. Keep the originals."
+      },
+      "film": true,
+      "detail": {
+        "before": "The shoots sat in iCloud Photos, mixed in with everything else on the phone.",
+        "after": "PhotoPrism browses the shoot library on the Core and tags it automatically, so the finished prints sort by the day they were taken.",
+        "steps": [
+          "Prop the prints against the wall",
+          "Add the pictures to the library",
+          "Browse the set by date"
+        ],
+        "fact": "PhotoPrism browses and shares your photo library, with automatic tagging, without uploading it anywhere."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial",
+        "from": "front"
+      },
+      "popup": {
+        "title": "One Core, two kinds of work",
+        "body": "A press bench, a sofa, a breakfast bar and a court out back, on one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your clients' lists, your drafts and your finished prints can sit on a Companion Core. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Told in the v3 shape: 19 of 23 room beats are pair beats naming a service from content/story/services.json; the four pair-less ones are Companion Memory, OpenClaw, FreeCut and GlassHome.",
+    "Every app is a production-store catalog app with a QA screenshot. No third-party app is in more than two of the six apartments, and none is in more than 14 of the 36 families.",
+    "Immich and KitchenOwl are left out (near the 40 percent cap): the plan lists PhotoPrism and Grocy. New here: Vikunja, Baserow, Logseq, Koodo Reader, tldraw and ComfyUI (AMD build, no speed claim).",
+    "Honest edges carried: Ghost sends through an outside mailer; Postiz posts to outside platforms and Zaid approves each draft; FreeCut runs in the editing device browser; a photo library is not a backup.",
+    "Docuseal makes no claim about signatures. The signer sits at the breakfast bar on the home network: the next bay is a neighbour, not a remote signer.",
+    "Camera: no cuts and no tier 2 pose in story:spline. The back court is walked to round the west side of the lot; the platform is one flight up the ladder-stair. One room anchor per room, so no two beats share a shot.",
+    "The home has no TV and no desk but the Core desk: the media beat sits at the sofa, and the studio beats stand at the Core desk, the ladder shelf and the room.",
+    "Age rule 16: both adults, so Pomelo and Cacao work in their own beats; each agent prepares and Zaid or Ximena approves."
+  ]
+}

@@ -8,23 +8,28 @@
 //   shape        slugs, surnames, names, ages, roles, archetypes, rooms by exact name, schema patterns and enums
 //   fit          who can sleep where, a nursery means a baby, a baby means a crib, nobody under 16 has a companion (age rule 16),
 //                a couple has an adult with a job archetype (organiser, builder, one of the eight story v3 archetypes or one of researcher, seller, translator, shift-worker), the household type matches the ages
+//   words        the plan's text (reason, household_text, care, work ...) has no em or en dash and names no home, builder or internal id
+//                (check-leaks.mts: "warehouse loft" is a display name, so the brief says "converted warehouse")
 //   flagship     Sally, John, Steve and Jean (Brennan) in seraphine, bgfamily and familyhouse-nora only
-//   fleet        at least 70 distinct apps, no third-party app in more than 12 of 30 families, the 14 story-rich apps in at
-//                least three, each of the ten topics possible in at least ten, small-business share reachable, gamer in at
-//                most 12, organiser, builder and learner in at least 8, narrator counts equal voices.json
+//   fleet        at least 70 distinct apps, no third-party app in more than 40 percent of the families (12 of 30, 14 of 36: the cap
+//                follows the plan's size, see N below), the 14 story-rich apps in at least three, each of the ten topics possible
+//                in at least ten, small-business share reachable, gamer in at most 12, organiser, builder and learner in at
+//                least 8, narrator counts equal voices.json (whose quotas add up to the number of families)
 //   uniqueness   surname, place, companion name, first name (at most twice); none of it repeated outside the flagship
 //   apps         every signature app is in the catalog, story-safe, boot-tested and has a QA screenshot (else it is listed
 //                in the family's reviewNeeded, which the owner must then clear in reviewed.json)
 //   sync         content/story/casting.json and reference/story/cast.md equal what build-casting.mts produces
 //
 // The signature apps are a proxy for the stories: the real fleet metrics are the validator's (`story:validate --complete`),
-// which count the apps the beats show. The margins here (a cap of 12 with a warning from 11) leave the writers room.
+// which count the apps the beats show. The margins here (a warning from two below the cap) leave the writers room.
 import fs from 'node:fs';
 import path from 'node:path';
 import {
   ARCHETYPES, APP_TOPICS, ROLE_GAPS, TOPICS, allApps, ROOT, build, deriveAnchors, findRoom, hasCrib, loadHouse, loadRoles, sleepCapacity, topicsPossible,
   type Archetype, type HouseInfo, type Plan, type PlanFamily, type PlanMember,
 } from './build-casting.mts';
+import { appCap } from './lib/fleet.mts';
+import { needles, scanText } from './check-leaks.mts';
 
 const J = (...p: string[]): any => JSON.parse(fs.readFileSync(path.join(ROOT, ...p), 'utf8'));
 const quiet = process.argv.includes('--quiet');
@@ -45,7 +50,13 @@ const AGENT_APPS = ['ci-hermes', 'ci-openclaw', 'ci-memory'];
 const storyRich: string[] = (catalog.meta?.top15 ?? []).filter((a: any) => a.qa === 'screenshot').map((a: any) => a.id);
 
 // the numbers
-const N = 30, APPS_MIN = 70, SHARE_MAX = 12, SHARE_WARN = 10, TOPIC_MIN = 10, RICH_MIN = 3, GAMER_MAX = 12, ARCH_MIN = 8;
+// N, the size of the fleet, is not typed here: it is what the plan says it casts. A home of the gallery has a family in the plan or is declared in
+// the plan's `homesWithoutFamily` with a reason (checked below), so the plan casts every home but the declared ones: 30 families while the six
+// apartments had none, 36 now that they have. The 40 percent app cap follows N the way the validator's does (appCap in lib/fleet.mts: 12 of 30,
+// 14 of 36), and voices.json's narrator quotas must add up to N. A home added to the gallery without a family changes none of this until it is cast.
+const declaredHomes = plan.homesWithoutFamily ?? {};
+const N = index.filter((h) => !(h.id in declaredHomes)).length;
+const APPS_MIN = 70, SHARE_MAX = appCap(N), SHARE_WARN = SHARE_MAX - 2, TOPIC_MIN = 10, RICH_MIN = 3, GAMER_MAX = 12, ARCH_MIN = 8;
 const SB_SHARE = 0.18, BEATS = 26, SB_MAX_SHARE = 0.45, FIRST_NAME_MAX = 2;
 const FLAGSHIP_HOUSES = ['seraphine', 'bgfamily', 'familyhouse-nora'];
 const FLAG = {
@@ -95,9 +106,12 @@ const BAD_COPY: [RegExp, string][] = [
   [/\b(seamless(ly)?|leverage|revolutionary|democratize|for everyone)\b/i, 'a banned buzzword'],
   [/\b(chatbot|degoogle|log in)\b/i, 'a banned product word'],
 ];
+/** a home's name, a builder, an internal id: the words a family's story may never contain (check-leaks.mts). The plan's text is the writers' brief, so it keeps to the same rule (the apartments' briefs said "warehouse loft" and "garden flat", which are display names). */
+const LEAKS = needles(ROOT);
 function copy(at: string, s: unknown): void {
   if (typeof s !== 'string') return;
   for (const [re, what] of BAD_COPY) if (re.test(s)) E(at, `${what} in "${s.slice(0, 60)}"`);
+  for (const hit of scanText(s, at, LEAKS)) E(at, `${hit.slice(at.length + 2)} (a family's words name no home and no builder)`);
 }
 
 // ---- creator fragments (the test's own list, plus every author in the specs) --------------------------------------------------------
@@ -112,13 +126,14 @@ const houseInfo = new Map<string, HouseInfo>();
 for (const h of index) houseInfo.set(h.id, loadHouse(h.id, roles));
 
 const fams = plan.families;
-if (fams.length !== N) E('plan', `${fams.length} families (need ${N})`);
+if (fams.length !== N) E('plan', `${fams.length} families for ${index.length} homes, ${index.length - N} declared without one (need ${N})`);
 const dup = (xs: string[]): string[] => xs.filter((x, i) => xs.indexOf(x) !== i);
 for (const d of dup(fams.map((f) => f.slug))) E('slug', `${d} appears twice`);
 for (const d of dup(fams.map((f) => f.house))) E('house', `${d} appears twice`);
-// A home has a family, or the plan says it has none yet (`homesWithoutFamily`: the apartments). A home that is in neither is an error, so a
-// new spec cannot ship family-less by accident; a home that is in both is an error, so the list cannot go stale when a family moves in.
-const without = plan.homesWithoutFamily ?? {};
+// A home has a family, or the plan says it has none yet (`homesWithoutFamily`: empty today; a new kind of home, such as the offices of
+// reference/office/, would list itself there). A home that is in neither is an error, so a new spec cannot ship family-less by accident;
+// a home that is in both is an error, so the list cannot go stale when a family moves in.
+const without = declaredHomes;
 for (const h of index) if (!fams.some((f) => f.house === h.id) && !(h.id in without)) E('house', `${h.id} has no family and is not listed in the plan's homesWithoutFamily`);
 for (const [id, why] of Object.entries(without)) {
   if (!index.some((h) => h.id === id)) E('homesWithoutFamily', `${id} is not a home in content/houses/index.json`);
@@ -323,7 +338,7 @@ if (distinct < APPS_MIN) E('fleet', `${distinct} distinct apps in the plan (need
 for (const [id, owners] of appFamilies) {
   if (FIRST_PARTY.has(id)) continue;
   if (owners.length > SHARE_MAX) E('fleet', `${id} is in the plan of ${owners.length} of ${N} families (at most ${SHARE_MAX}, 40 percent)`);
-  else if (owners.length > SHARE_WARN) W('fleet', `${id} is in the plan of ${owners.length} families: the stories may add more, and 12 is the limit`);
+  else if (owners.length > SHARE_WARN) W('fleet', `${id} is in the plan of ${owners.length} families: the stories may add more, and ${SHARE_MAX} is the limit`);
 }
 for (const id of storyRich) if ((appFamilies.get(id)?.length ?? 0) < RICH_MIN) E('fleet', `story-rich app ${id} is in ${appFamilies.get(id)?.length ?? 0} families (at least ${RICH_MIN})`);
 if (storyRich.length !== 14) W('fleet', `the catalog has ${storyRich.length} story-rich apps with a screenshot (the validator expects 14)`);
@@ -404,7 +419,7 @@ if (!quiet) {
   console.log(`\nPlan apps (signature plus beat apps): ${distinct} distinct in ${fams.reduce((n, f) => n + allApps(f).length, 0)} slots. Per app (families):`);
   const rows = top.map(([id, o]) => `${id} ${o.length}${FIRST_PARTY.has(id) ? '*' : ''}`);
   for (let i = 0; i < rows.length; i += 6) console.log('  ' + rows.slice(i, i + 6).map((r) => pad(r, 24)).join(''));
-  console.log('  (* first-party: exempt from the 40 percent cap)');
+  console.log(`  (* first-party: exempt from the 40 percent cap, which is ${SHARE_MAX} of ${N} families; a warning from ${SHARE_WARN + 1})`);
   console.log('Story-rich apps: ' + storyRich.map((id) => `${id} ${appFamilies.get(id)?.length ?? 0}`).join(', '));
   console.log('Apps per family (signature+beat): ' + fams.map((f) => `${f.slug} ${f.signatureApps.length}+${allApps(f).length - f.signatureApps.length}`).join(', '));
   console.log('');

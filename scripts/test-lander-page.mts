@@ -40,7 +40,7 @@ function page(): string {
   const cards = frontCards(houses as any, front, data, galleryCards);
   const h = data.plan.hero;
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${esc(msg.text.replace(/\.$/, ''))} · Companion Core</title>
-<meta name="description" content="A Companion Core is a small personal server that runs local AI and your household's apps. ${esc(heroCount(families.length).split(' show')[0])} show how. Fictional family. Real software."></head>
+<meta name="description" content="A Companion Core is a small personal server for local AI and your household's apps. ${esc(heroCount(families.length).split(' show')[0])} show how. Fictional family. Real software."></head>
 <body><header class="site-head"><a href="${LINKS.site}">Companion Intelligence</a><nav><a href="${LINKS.docs}">Docs</a><a href="${LINKS.download}">Download Companion</a><a href="${LINKS.core}">Buy Companion Core</a></nav></header>
 <main>
 <section class="hero" aria-labelledby="hero-title"><div class="hero-copy"><div class="hero-chips">${finePrint('lander-hero').html}</div><h1 id="hero-title" data-claim="rent-line">${esc(msg.text)}</h1>

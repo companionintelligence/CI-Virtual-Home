@@ -85,7 +85,7 @@ export const FIRST_PARTY = ['ci-hermes', 'ci-memory', 'ci-openclaw'];
  */
 export const PREPARED_APPS = ['comfyui', 'convert'];
 
-/** Every app id the 30 families use (`beat.app.id` and `beat.with`), the persona pools, the plan's signature apps, the first-party trio and the prepared apps: the apps that should have media. */
+/** Every app id the families use (`beat.app.id` and `beat.with`), the persona pools, the plan's signature apps, the first-party trio and the prepared apps: the apps that should have media. */
 export function usedAppIds(root: string = ROOT): string[] {
   const ids = new Set<string>([...FIRST_PARTY, ...PREPARED_APPS]);
   const dir = path.join(root, 'content', 'families');

@@ -239,6 +239,10 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
     // carries a query and so could never be served from that request. They are ordinary fetches (a prefetch is refused with
     // a 503 by the live zone), and the engine's modules are asked for by the hash the player will use
     // a family's card goes to its page, a light one: hovering it warms nothing; the link that opens the player (the hero's tour) warms the engine and that home's spec
+    // park the pointer on the sticky header first: hover() scrolls the card into view, and a pointer left over the hero's picture (where the page layout puts it
+    // depends on how long the lander is) would meet the tour link as the page moves under it and warm the engine, which is not what a card does
+    await page.mouse.move(2, 2);
+    await sleep(150);
     const before = requests.length;
     await page.hover('#grid .card:nth-child(5) h3 a');
     await sleep(800);

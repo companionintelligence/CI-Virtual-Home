@@ -196,7 +196,7 @@ The hero's second line and the description take the families word from the same 
 
 **Copy.**
 - `<title>`, `og:title`, `twitter:title`: `Stop renting your intelligence · Companion Core` (47 characters)
-- `<meta name="description">` and `og:description`: `A Companion Core is a small personal server that runs local AI and your household's apps. Thirty fictional families show how. Fictional family. Real software.` (158 characters; the families word is written by the build)
+- `<meta name="description">` and `og:description`: `A Companion Core is a small personal server for local AI and your household's apps. Thirty fictional families show how. Fictional family. Real software.` (152 characters with "Thirty", 156 with "Thirty-six", which the check's 160 allows; the families word is written by the build)
 - `og:image`: new card `portal/og/front.jpg` (1200x630, made by `portal:og`, committed): the hero home in daylight, the H1 in Manrope, the fiction pill, no price, no logo; absolute in the build. `og:image:alt` and `twitter:image:alt`: `The words Stop renting your intelligence over a daylit view of the Brennan family's lakeside home. Fictional family. Real software.`
 - JSON-LD: `CollectionPage` with an `ItemList` of the featured family pages (absolute, extensionless); `WebSite` and `Organization` unchanged. No `SearchAction`, `Product`, `Review`, `AggregateRating` or `FAQPage`.
 - `portal/site.webmanifest` `description`: the same sentence as the page description.

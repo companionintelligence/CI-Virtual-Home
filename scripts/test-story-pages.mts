@@ -57,7 +57,7 @@ const tag = (t: string, re: RegExp): string => (t.match(re) || [])[1] || '';
 
 test('the test families exist', () => {
   assert.ok(storyFiles(FIXTURES).length >= 1, 'test/fixtures/site/families has no family');
-  assert.ok(houses.length >= 30 && new Set(houses.map(h => h.id)).size === houses.length, `${houses.length} homes in index.json`);   // (the gallery's homes: more than the families, since the apartments have none yet)
+  assert.ok(houses.length >= 30 && new Set(houses.map(h => h.id)).size === houses.length, `${houses.length} homes in index.json`);   // (the gallery's homes: the 30 houses and the six apartments, each with its family)
 });
 
 test('a title fits a search result and a description fits its snippet, however long the name and the tagline', () => {

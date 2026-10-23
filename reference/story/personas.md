@@ -1,6 +1,6 @@
 # Persona homes (the contract)
 
-Every one of the 30 homes is lived in by a fictional family. Each member has an **archetype**: the job they do on the
+Every home is lived in by a fictional family: the 30 houses, and, since 2026-10-22, the six apartments (cast in `content/story/cast-plan.json`, and told: `valdivia`, `tehrani`, `steyn`, `voss`, `penhallow` and `rademaker` in `content/families/`). Each member has an **archetype**: the job they do on the
 family's one Companion Core. A room tells that member's story: what they do there, which Companion Hub store app does
 it, and which cloud service it replaces. The tour is the argument for uncloud: the same life, on your own hardware.
 

@@ -1,10 +1,10 @@
 {
  "v": 1,
- "generated": "2026-10-15",
- "note": "Authored casting for the 30 persona homes (reference/story/personas.md). Names, places and companion names are invented and reserved here so the fleet's uniqueness rules hold by design; a writer may change one if it stays unique (cast-lint keeps the reservation). Everything derived from the house files (rooms, roles, Core room, anchors) is produced by scripts/story/build-casting.mts into content/story/casting.json: never edit that file by hand.",
+ "generated": "2026-10-22",
+ "note": "Authored casting for the persona homes: the 30 houses, and since 2026-10-22 the six apartments, cast in the story v3 rules (reference/story/personas.md). Names, places and companion names are invented and reserved here so the fleet's uniqueness rules hold by design; a writer may change one if it stays unique (cast-lint keeps the reservation). Everything derived from the house files (rooms, roles, Core room, anchors) is produced by scripts/story/build-casting.mts into content/story/casting.json: never edit that file by hand.",
  "households": {"solo-or-couple": "Solo, couple, no children at home", "young-family": "Young family (children under 13)", "older-kids": "Teens or adult children at home", "grandparents": "Grandparents and grandchildren"},
  "retiredSlugs": ["lindqvist-abara", "vance-takahashi", "nowak-pillai", "dufresne", "oyelaran-brandt", "castellanos", "whitlock-mensah", "eriksen-bautista", "kowalczyk-ferreira", "ashworth", "nakamura-oduya", "ibarra-holm", "karimi-santos", "delgado-park", "chowdhury-osei", "aguirre-lund", "okonkwo-reid", "tran-mcallister", "papadakis-roy", "vasquez-nilsen", "bellamy-nwosu", "ferrante-oyelowo", "adeyemi-castro", "keane", "mbeki-fontaine", "lacroix-adebayo", "ramos-whitfield", "yilmaz-hartmann", "mahlangu-engstrom", "ochieng-sorensen"],
- "homesWithoutFamily": {"city-one-bed": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "corner-penthouse": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "garden-flat": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "studio-loft": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "two-bed-flat": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.", "walkup-duplex": "An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet."},
+ "homesWithoutFamily": {},
  "families": [
   {
    "slug": "brennan",
@@ -626,6 +626,128 @@
    "members": [
     {"id": "thandi", "name": "Thandi", "age": 44, "role": "partner", "archetype": "host", "work": "grows and sells plants", "room": "Greenhouse", "sleepsIn": "Primary Bedroom", "companion": "Fern"},
     {"id": "sipho", "name": "Sipho", "age": 46, "role": "partner", "archetype": "builder", "work": "backend engineer", "room": "Library", "sleepsIn": "Primary Bedroom", "companion": "Acorn"}
+   ]
+  },
+  {
+   "slug": "valdivia",
+   "house": "studio-loft",
+   "surname": "Valdivia",
+   "place": "Foundry Reach",
+   "household": "solo-or-couple",
+   "business": false,
+   "tenure": "renter",
+   "narrator": "v-light-m",
+   "reason": "A brick loft in a converted warehouse for two: the Desk and Workshop (workbench, the Core on the desk) is the studio, the Living Loft holds the sofa and the shelves, and the record player stands on the Sleeping Platform.",
+   "household_text": "A couple in a converted warehouse: one markets, one makes.",
+   "care": "Client briefs and finished work stay on the Core.",
+   "signatureApps": ["ci-memory", "penpot", "photoprism", "ghost", "baserow", "invoice-ninja", "postiz"],
+   "beatApps": {"home": "jotty", "food": "grocy", "iot": "glasshome"},
+   "members": [
+    {"id": "zaid", "name": "Zaid", "age": 34, "role": "partner", "archetype": "marketer", "work": "freelance marketing consultant", "room": "Living Loft", "sleepsIn": "Sleeping Platform", "companion": "Pomelo"},
+    {"id": "ximena", "name": "Ximena", "age": 37, "role": "partner", "archetype": "creative", "work": "photographer and printmaker", "room": "Desk & Workshop", "sleepsIn": "Sleeping Platform", "companion": "Cacao"}
+   ]
+  },
+  {
+   "slug": "tehrani",
+   "house": "city-one-bed",
+   "surname": "Tehrani",
+   "place": "Linton Square",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "stationery shop with online orders",
+   "tenure": "owner",
+   "narrator": "v-young-f",
+   "reason": "A one-bedroom flat above the shops: the Desk Nook with the Core is the reporter's, the Living Room sofa is where the shop owner does the books, and the shop itself is downstairs.",
+   "household_text": "A couple above the shops: one runs a stationery shop, one reports.",
+   "care": "The shop's orders and the reporter's notes stay on the Core.",
+   "signatureApps": ["ci-hermes", "invoice-ninja", "obsidian", "umami", "hi-events", "twenty", "archivebox"],
+   "beatApps": {"food": "homehub", "iot": "homarr", "privacy": "duplicati"},
+   "members": [
+    {"id": "nasrin", "name": "Nasrin", "age": 41, "role": "partner", "archetype": "business-owner", "work": "runs a stationery shop in the building", "room": "Living Room", "sleepsIn": "Bedroom", "companion": "Sumac"},
+    {"id": "saeed", "name": "Saeed", "age": 37, "role": "partner", "archetype": "journalist", "work": "freelance reporter", "room": "Desk Nook", "sleepsIn": "Bedroom", "companion": "Barberry"}
+   ]
+  },
+  {
+   "slug": "steyn",
+   "house": "two-bed-flat",
+   "surname": "Steyn",
+   "place": "Coldharbour",
+   "household": "young-family",
+   "business": false,
+   "tenure": "renter",
+   "narrator": "v-bright-f",
+   "reason": "A walk-up flat with a Study Alcove, a Dining Room and a Kids' Room with an easel: a marketer at the alcove desk, a writer at the dining table and a six-year-old who paints.",
+   "household_text": "Two parents and a six-year-old in the tenement flat with the easel.",
+   "care": "A six-year-old's paintings and two parents' drafts stay on the Core.",
+   "signatureApps": ["ci-openclaw", "linkwarden", "foldergram", "listmonk", "linkstack", "papra", "grist"],
+   "beatApps": {"food": "homehub", "iot": "pi-hole"},
+   "members": [
+    {"id": "lindiwe", "name": "Lindiwe", "age": 36, "role": "parent", "archetype": "marketer", "work": "marketing lead for a housing charity, remote", "room": "Study Alcove", "sleepsIn": "Primary Bedroom", "companion": "Rooibos"},
+    {"id": "matthias", "name": "Matthias", "age": 38, "role": "parent", "archetype": "journalist", "work": "feature writer", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Caraway"},
+    {"id": "tamsin", "name": "Tamsin", "age": 6, "role": "child", "archetype": "maker", "work": "primary school", "room": "Kids' Room", "sleepsIn": "Kids' Room"}
+   ]
+  },
+  {
+   "slug": "voss",
+   "house": "corner-penthouse",
+   "surname": "Voss",
+   "place": "Sable Court",
+   "household": "older-kids",
+   "business": true,
+   "businessText": "bike shop in the building",
+   "tenure": "owner",
+   "narrator": "v-deep-m",
+   "reason": "A penthouse with an Office, a Library Nook and a 33 m2 Living Room: a lawyer at the standing desk, a shop owner at the writing desk, a gamer in the big room and a learner with a bedroom of her own.",
+   "household_text": "Two parents and two teens in the glass penthouse above the corner shop.",
+   "care": "The shop's accounts and a client file stay on separate shelves of one Core.",
+   "signatureApps": ["ci-hermes", "nextcloud", "grist", "steam-headless", "libretranslate", "papra", "stirling-pdf"],
+   "beatApps": {"home": "bookstack", "food": "kitchenowl", "iot": "uptime-kuma"},
+   "members": [
+    {"id": "esperanza", "name": "Esperanza", "age": 47, "role": "parent", "archetype": "lawyer", "work": "family-law solicitor with her own practice", "room": "Office", "sleepsIn": "Primary Suite", "companion": "Paprika"},
+    {"id": "takumi", "name": "Takumi", "age": 45, "role": "parent", "archetype": "business-owner", "work": "runs the bike shop in the building", "room": "Library Nook", "sleepsIn": "Primary Suite", "companion": "Matcha"},
+    {"id": "anouk", "name": "Anouk", "age": 16, "role": "teen", "archetype": "gamer", "work": "sixth form", "room": "Living Room", "sleepsIn": "Bedroom Two"},
+    {"id": "yara", "name": "Yara", "age": 14, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Bedroom Three", "sleepsIn": "Bedroom Three"}
+   ]
+  },
+  {
+   "slug": "penhallow",
+   "house": "garden-flat",
+   "surname": "Penhallow",
+   "place": "Quayside Mews",
+   "household": "grandparents",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-storyteller-m",
+   "reason": "A level ground-floor flat with a terrace: the Study holds the Core and the retired solicitor, the Kitchen and the Garden Terrace belong to the cook, and a nine-year-old has the Grandchild's Bedroom with a desk.",
+   "household_text": "Two grandparents and their nine-year-old grandchild in the ground-floor flat.",
+   "care": "A retired solicitor's papers and a child's drawings stay on the Core.",
+   "signatureApps": ["ci-memory", "nextcloud", "koodo-reader", "kitchenowl", "docuseal", "cryptgeon", "vaultwarden"],
+   "beatApps": {"iot": "frigate"},
+   "members": [
+    {"id": "wilfred", "name": "Wilfred", "age": 67, "role": "grandparent", "archetype": "lawyer", "work": "retired solicitor, still advises two clients", "room": "Study", "sleepsIn": "Primary Bedroom", "companion": "Tamarind"},
+    {"id": "anwen", "name": "Anwen", "age": 65, "role": "grandparent", "archetype": "host", "work": "cooks and keeps the terrace", "room": "Kitchen", "sleepsIn": "Primary Bedroom", "companion": "Fenugreek"},
+    {"id": "petra", "name": "Petra", "age": 9, "role": "child", "archetype": "learner", "work": "primary school", "room": "Grandchild's Bedroom", "sleepsIn": "Grandchild's Bedroom"}
+   ]
+  },
+  {
+   "slug": "rademaker",
+   "house": "walkup-duplex",
+   "surname": "Rademaker",
+   "place": "Ironbridge Row",
+   "household": "older-kids",
+   "business": false,
+   "tenure": "renter",
+   "narrator": "v-steady-m",
+   "reason": "A two-storey flat up its own stair with a 28 m2 Kitchen and Dining room and a Study Landing desk: a teacher at the long table, a developer at the landing desk, a gamer in the Living Room and a learner in Bedroom Two.",
+   "household_text": "Two parents and two teens in the two-storey flat with the long table.",
+   "care": "A teacher's lesson folders and two teenagers' schoolwork stay on the Core.",
+   "signatureApps": ["ci-openclaw", "libretranslate", "n8n", "steam-headless", "forgejo", "libreoffice", "readeck"],
+   "beatApps": {"home": "donetick", "food": "grocy", "iot": "pi-hole"},
+   "members": [
+    {"id": "fernanda", "name": "Fernanda", "age": 44, "role": "parent", "archetype": "educator", "work": "secondary school teacher", "room": "Kitchen & Dining", "sleepsIn": "Primary Bedroom", "companion": "Clove"},
+    {"id": "chike", "name": "Chike", "age": 42, "role": "parent", "archetype": "builder", "work": "backend developer, remote", "room": "Study Landing", "sleepsIn": "Primary Bedroom", "companion": "Cassia"},
+    {"id": "ayaan", "name": "Ayaan", "age": 13, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Bedroom Two", "sleepsIn": "Bedroom Two"},
+    {"id": "dmitri", "name": "Dmitri", "age": 16, "role": "teen", "archetype": "gamer", "work": "sixth form", "room": "Living Room", "sleepsIn": "Bedroom Three"}
    ]
   }
  ]

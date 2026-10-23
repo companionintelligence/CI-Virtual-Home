@@ -1,0 +1,1421 @@
+{
+  "schema": "family/v1",
+  "slug": "voss",
+  "house": "corner-penthouse",
+  "fictional": true,
+  "family": {
+    "surname": "Voss",
+    "tagline": "One Companion Core for a solicitor, a bike shop owner and two teens.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Esperanza runs her family-law practice from a standing desk. Takumi keeps the bike shop's books in the library nook, two floors above the shop. Anouk games in the long living room, and Yara has a bedroom of her own. One Companion Core stands on the living room console.",
+    "address": {
+      "line": "5 Pedlar's Corner",
+      "place": "Sable Court"
+    },
+    "narrator": "v-deep-m",
+    "home": {
+      "lede": "A white glass pavilion sits on the stone roof of a corner building, above two shops. A long stair climbs from the pavement to the terrace and the front door. Inside, a long living room with a hearth opens onto a library nook and the kitchen.",
+      "spots": [
+        {
+          "room": "Living Room",
+          "line": "The Core on its console, a hearth, a long sofa and a lounge chair."
+        },
+        {
+          "room": "Library Nook",
+          "line": "A writing desk, two ladder shelves and a lounge chair by the entry."
+        },
+        {
+          "room": "Office",
+          "line": "A standing desk, a ladder shelf and a shell chair."
+        },
+        {
+          "room": "Kitchen",
+          "line": "A breakfast bar with three stools, and the range along the wall."
+        },
+        {
+          "room": "Bedroom Three",
+          "line": "A bed under a wall hanging, with a rubber plant in the corner."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "office-letter",
+        "line": "Esperanza redrafts the shop's supplier letter at the standing desk."
+      },
+      {
+        "at": "morning",
+        "beat": "nook-invoice",
+        "line": "Takumi turns the repair tags into invoices."
+      },
+      {
+        "at": "afternoon",
+        "beat": "office-bundle",
+        "line": "The exhibits go into one bundle before tomorrow's filing."
+      },
+      {
+        "at": "after-school",
+        "beat": "kitchen-translate",
+        "line": "Yara checks her Spanish paragraph at the counter."
+      },
+      {
+        "at": "after-school",
+        "beat": "living-game",
+        "line": "Anouk starts a session from the sofa."
+      },
+      {
+        "at": "after-school",
+        "beat": "room-quests",
+        "line": "Anouk ticks off tonight's revision quest."
+      },
+      {
+        "at": "weekend",
+        "beat": "terrace-read",
+        "line": "Yara takes her book club novel out to the terrace."
+      },
+      {
+        "at": "weekend",
+        "beat": "living-sunday",
+        "line": "Takumi writes the shop's spring note."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "esperanza",
+      "name": "Esperanza",
+      "age": 47,
+      "role": "parent",
+      "work": "family-law solicitor with her own practice",
+      "colour": "chart-1",
+      "archetype": "lawyer",
+      "companion": {
+        "name": "Paprika",
+        "runtime": "Hermes",
+        "job": "Drafts first summaries of a client's letters from the folder Esperanza connected.",
+        "personality": [
+          "precise",
+          "calm",
+          "brisk"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Esperanza checks every line and signs herself."
+      },
+      "profile": {
+        "bio": "Esperanza runs her family-law practice from a standing desk. Her client folders sit in Nextcloud on the Core, and Paprika drafts first summaries that she checks line by line."
+      }
+    },
+    {
+      "id": "takumi",
+      "name": "Takumi",
+      "age": 45,
+      "role": "parent",
+      "work": "runs the bike shop in the building",
+      "colour": "chart-2",
+      "archetype": "business-owner",
+      "companion": {
+        "name": "Matcha",
+        "runtime": "OpenClaw",
+        "job": "Renames and sorts the shop's product photos from the part numbers Takumi types.",
+        "personality": [
+          "steady",
+          "patient",
+          "practical"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "One folder at a time. Takumi checks each folder before anything goes up."
+      },
+      "profile": {
+        "bio": "Takumi runs the bike shop in the building and keeps its books at the writing desk in the library nook. Matcha sorts the shop's product photos by part number, and he checks the folders himself."
+      }
+    },
+    {
+      "id": "anouk",
+      "name": "Anouk",
+      "age": 16,
+      "role": "teen",
+      "work": "sixth form",
+      "colour": "chart-3",
+      "archetype": "gamer",
+      "profile": {
+        "bio": "Anouk plays from the sofa in the long living room, on a laptop in her lap. She turns her revision into quests and builds her playlists from the family's music files."
+      }
+    },
+    {
+      "id": "yara",
+      "name": "Yara",
+      "age": 14,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-4",
+      "archetype": "learner",
+      "profile": {
+        "bio": "Yara has the bedroom at the end of the hall. She checks her Spanish, plans her essays and reads her book club novel with tools that each do one job on the Core."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The long living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "nook",
+      "kind": "room",
+      "room": "office",
+      "title": "Takumi's writing desk"
+    },
+    {
+      "id": "anouk-room",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Anouk's room"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Esperanza's standing desk"
+    },
+    {
+      "id": "yara-room",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Yara's room"
+    },
+    {
+      "id": "terrace",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the terrace"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel below the long stair",
+        "body": "The courier leaves a parcel at the foot of the long stair. Takumi carries it up to the terrace and through the front door."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "What the parcel holds",
+        "body": "Anouk slits the tape. Yara lifts out the Companion Core, a power cable, a quick-start guide and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plugged in on the console",
+        "body": "Esperanza plugs the cable in beside the shelf. The Core wakes and opens its own Wi-Fi network."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Takumi joins from his phone",
+        "body": "Takumi joins the Core's own network from his phone, then picks the family's home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nextcloud",
+        "bookstack",
+        "grist"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Esperanza and Takumi pick agents",
+        "body": "In the Companion Hub store, Esperanza picks Hermes and Takumi picks OpenClaw. Companion Memory comes along, with Nextcloud, BookStack and Grist. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory",
+            "Apps: Nextcloud, BookStack, Grist"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "esperanza",
+      "agent": "esperanza",
+      "approval": "esperanza",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Paprika says hello",
+        "body": "Esperanza messages the agent she named Paprika. The reply comes from the Core, along the hall from her standing desk.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "esperanza",
+        "text": "Hello, Esperanza. This is Paprika. Where shall we begin?"
+      },
+      "film": true,
+      "detail": {
+        "before": "Without an agent, Esperanza typed each reminder and reply into a different app herself.",
+        "after": "Paprika runs in a sandbox on the Core and replies through the messaging app Esperanza picked. Those messages travel through that chat service.",
+        "steps": [
+          "Pick Hermes in the Companion Hub store",
+          "Give the agent a name",
+          "Send it a first message"
+        ],
+        "fact": "Hermes is an agent built for messaging: it connects to chat apps, email and more from one self-hosted app."
+      }
+    },
+    {
+      "id": "living-start",
+      "chapter": "living",
+      "category": "iot",
+      "segment": "small-business",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": [
+          "Datadog"
+        ]
+      },
+      "capability": "watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "An alert before a customer notices",
+        "body": "Uptime Kuma on the Core checks the shop's website every few minutes. If it goes down, an alert reaches the family before a customer notices.",
+        "chips": [
+          "Uptime Kuma",
+          "alternative to Datadog"
+        ]
+      },
+      "detail": {
+        "before": "When the shop's website went down, the family found out from a customer's message.",
+        "after": "Uptime Kuma checks the website from the Core on a schedule and raises an alert the moment it stops answering.",
+        "steps": [
+          "Add the shop's website as a check",
+          "Set how often the Core looks",
+          "Choose who gets the alert"
+        ],
+        "fact": "Uptime Kuma watches your sites and services and sends an alert when one goes down."
+      },
+      "service": "datadog"
+    },
+    {
+      "id": "living-house-book",
+      "chapter": "living",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "service": "confluence",
+      "capability": "write a wiki or a set of manuals in books, chapters and pages",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The building's manual, in one book",
+        "body": "The bin store key, the boiler service and the plumber's number sit in one BookStack book. Whoever is home opens it by the shelf.",
+        "chips": [
+          "BookStack",
+          "alternative to Confluence"
+        ]
+      },
+      "detail": {
+        "before": "The building's practical facts were scattered across sticky notes and one old Confluence page nobody updated.",
+        "after": "BookStack keeps them as one book with a chapter for the flat and a chapter for the shop. The Core serves it to every phone at home.",
+        "steps": [
+          "Add a chapter for the bin store and the boiler",
+          "Write the numbers on a page",
+          "Open the book from any phone"
+        ],
+        "fact": "BookStack writes a wiki or a set of manuals in books, chapters and pages, with search and history."
+      }
+    },
+    {
+      "id": "living-playlist",
+      "chapter": "living",
+      "member": "anouk",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "comfyui",
+        "replaces": [
+          "Midjourney"
+        ]
+      },
+      "service": "midjourney",
+      "capability": "generate images with node-based pipelines on your own AMD GPU",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          },
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Concept art by the hearth",
+        "body": "By the hearth, Anouk feeds a character description into a ComfyUI pipeline on the Core. Three sketches come back, and she redraws the best one in her game notes.",
+        "chips": [
+          "ComfyUI",
+          "alternative to Midjourney"
+        ]
+      },
+      "detail": {
+        "before": "Anouk's character sketches came from Midjourney prompts, and each result stayed in that service.",
+        "after": "ComfyUI turns the description into sketches on the Core, and she keeps them in a folder beside her game notes.",
+        "steps": [
+          "Write the character description",
+          "Run the pipeline and look at the sketches",
+          "Keep the best one in her folder"
+        ],
+        "fact": "ComfyUI generates images with node-based pipelines on your own AMD GPU."
+      }
+    },
+    {
+      "id": "living-game",
+      "chapter": "living",
+      "member": "anouk",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": []
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The match starts on the sofa",
+        "body": "Anouk's game runs on the Core, and her laptop shows it in a browser tab. She signs in with her own Valve account.",
+        "chips": [
+          "Steam Headless"
+        ],
+        "note": "Steam needs a Valve account. A Core may lack the graphics power a game wants."
+      },
+      "film": true,
+      "detail": {
+        "before": "Steam lived on the laptop on Anouk's knees, and so did every download.",
+        "after": "Steam Headless runs her Steam session on the Core. The laptop only opens it in a browser tab, and Valve still keeps the account and the library.",
+        "steps": [
+          "Sign in with her own Valve account",
+          "Open the session in a browser tab",
+          "Pick a game from her library"
+        ],
+        "fact": "Steam Headless runs Steam on your Core and plays it in a browser on a screen in the house."
+      }
+    },
+    {
+      "id": "living-sunday",
+      "chapter": "living",
+      "member": "takumi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "keila",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "service": "mailchimp",
+      "capability": "send newsletters and email campaigns from your own Core",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A spring reminder for bikes due",
+        "body": "Takumi picks the customers whose bikes are due a service and writes them a spring reminder in Keila. An outside mail provider delivers it.",
+        "chips": [
+          "Keila",
+          "alternative to Mailchimp"
+        ],
+        "note": "Delivery depends on the mail provider."
+      },
+      "detail": {
+        "before": "Every customer got the same shop note, whether their bike was due a service or not.",
+        "after": "Keila holds the list on the Core, and Takumi sends the reminder only to the customers whose bikes are due. An outside mail provider delivers it.",
+        "steps": [
+          "Pick the customers with bikes due",
+          "Write the spring reminder",
+          "Send it through the mail provider"
+        ],
+        "fact": "Keila sends newsletters and email campaigns from your own Core."
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "kitchen-island"
+          },
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dinner chosen in turn",
+        "body": "In KitchenOwl on the Core, each night has a name beside it, and that person picks the dish. The shopping list follows the plan.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "detail": {
+        "before": "Dinner was decided at six each evening, and the shopping list was written for a plan that did not exist.",
+        "after": "KitchenOwl plans the week's dinners on the Core, and the shopping list is built from the plan.",
+        "steps": [
+          "Put a name beside each night",
+          "Let that person pick the dish",
+          "Read the shopping list before the run"
+        ],
+        "fact": "KitchenOwl is a shared grocery list, recipe book, meal planner and expense tracker for the household."
+      }
+    },
+    {
+      "id": "kitchen-stock",
+      "chapter": "kitchen",
+      "member": "takumi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "service": "airtable",
+      "capability": "a spreadsheet-database stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "range",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Friday's count decides the order",
+        "body": "On Friday Takumi counts the shop's inner tubes and brake pads beside the range. He types the stock into a Grist table before Saturday's order.",
+        "chips": [
+          "Grist",
+          "alternative to Airtable"
+        ]
+      },
+      "detail": {
+        "before": "The shop's stock count sat in an Airtable base, apart from the order list.",
+        "after": "Grist keeps the stock in a table stored as a SQLite file on the Core. Takumi's counts and the order sit side by side.",
+        "steps": [
+          "Count the tubes, chains and pads",
+          "Type the counts into the stock table",
+          "Write the order from what is low"
+        ],
+        "fact": "Grist is a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+      }
+    },
+    {
+      "id": "kitchen-translate",
+      "chapter": "kitchen",
+      "member": "yara",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "DeepL"
+        ]
+      },
+      "service": "deepl",
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Homework checked on the Core",
+        "body": "At the breakfast bar Yara writes her Spanish paragraph by hand, then checks it in LibreTranslate on the Core. She fixes the two lines that say something else.",
+        "chips": [
+          "LibreTranslate",
+          "alternative to DeepL"
+        ]
+      },
+      "detail": {
+        "before": "Yara pasted her homework into DeepL to see whether it said what she meant.",
+        "after": "LibreTranslate translates text on the Core. Yara writes the Spanish herself and reads the English back to check it.",
+        "steps": [
+          "Write the paragraph by hand",
+          "Paste it into LibreTranslate",
+          "Fix the lines that read differently"
+        ],
+        "fact": "LibreTranslate translates text and documents on your own Core."
+      }
+    },
+    {
+      "id": "kitchen-draft",
+      "chapter": "kitchen",
+      "member": "esperanza",
+      "agent": "esperanza",
+      "approval": "esperanza",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk and gives your agents individual context",
+      "anchor": {
+        "role": "counter",
+        "fallback": [
+          {
+            "role": "kitchen-island"
+          },
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Paprika drafts, Esperanza checks",
+        "body": "At the counter, Paprika drafts a first summary of a client's letters from the folder Esperanza connected in Companion Memory. She checks it line by line against the letters.",
+        "chips": [
+          "Companion Memory"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "film": true,
+      "detail": {
+        "before": "A first summary of a long letter file meant reading every page twice before drafting a line.",
+        "after": "Paprika drafts the summary on the Core from the folder Esperanza connected. She checks every line against the letters before it goes anywhere.",
+        "steps": [
+          "Connect the client folder to Companion Memory",
+          "Ask Paprika for a first summary",
+          "Check each line against the letters"
+        ],
+        "fact": "Companion Memory keeps your digital life on your disk, so your agents know your context."
+      }
+    },
+    {
+      "id": "nook-invoice",
+      "chapter": "nook",
+      "member": "takumi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "invio",
+        "replaces": [
+          "FreshBooks"
+        ]
+      },
+      "service": "freshbooks",
+      "capability": "create and share invoices with client links",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Repair invoices, printed at the desk",
+        "body": "Takumi turns the day's repair tags into invoices in Invio. He prints each one to hand over at the shop counter.",
+        "chips": [
+          "Invio",
+          "alternative to FreshBooks"
+        ],
+        "note": "Client links only work for people who can reach the Core."
+      },
+      "film": true,
+      "detail": {
+        "before": "Repair invoices were built in FreshBooks, and each bike's history lived in a separate notebook.",
+        "after": "Invio keeps the invoices on the Core. Takumi prints each one for the customer at the counter.",
+        "steps": [
+          "Open the day's repair tags",
+          "Raise one invoice for each bike",
+          "Print it for the customer"
+        ],
+        "fact": "Invio creates and shares invoices, with client links for people who can reach your Core."
+      }
+    },
+    {
+      "id": "nook-tags",
+      "chapter": "nook",
+      "member": "takumi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "service": "todoist",
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A due date on every repair",
+        "body": "Each repair gets a task in Vikunja on the Core with the pick-up date. When a customer calls, Takumi reads the date from the list.",
+        "chips": [
+          "Vikunja",
+          "alternative to Todoist"
+        ]
+      },
+      "detail": {
+        "before": "Repair dates lived on paper tags and in Takumi's head, and a late bike was noticed when the customer called.",
+        "after": "Vikunja keeps each repair as a task with a due date and a reminder on the Core.",
+        "steps": [
+          "Add a task for each bike",
+          "Set the pick-up date as the due date",
+          "Tick it off when the bike goes home"
+        ],
+        "fact": "Vikunja gives you lists, boards and calendars for tasks, with reminders and recurring jobs."
+      }
+    },
+    {
+      "id": "nook-warranty",
+      "chapter": "nook",
+      "member": "takumi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "service": "evernote",
+      "capability": "archive the receipts, warranties and contracts you rarely look at",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A frame card found in Papra",
+        "body": "A customer calls about a frame's warranty card. Takumi finds the scan in Papra, filed beside the receipt.",
+        "chips": [
+          "Papra",
+          "alternative to Evernote"
+        ]
+      },
+      "detail": {
+        "before": "Warranty cards went into a shoebox, and the scans of them sat in Evernote under no heading anyone remembered.",
+        "after": "Papra archives each card with its receipt on the Core, so the right one turns up while the customer is still on the line.",
+        "steps": [
+          "Scan the card when the bike is sold",
+          "File it beside the receipt in Papra",
+          "Find it when the customer calls"
+        ],
+        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+      }
+    },
+    {
+      "id": "nook-order",
+      "chapter": "nook",
+      "member": "takumi",
+      "agent": "takumi",
+      "approval": "takumi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "right",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Matcha names the product photos",
+        "body": "Matcha renames the week's product photos by part number, using the list Takumi typed. Takumi checks the folders before the shop's listing goes up.",
+        "chips": [
+          "OpenClaw"
+        ]
+      },
+      "say": {
+        "speaker": "takumi",
+        "text": "The photos are renamed and sorted. Please check a few before you list them."
+      },
+      "detail": {
+        "before": "Photos from the shop's phone arrived with camera numbers for names, and each one was renamed by hand.",
+        "after": "Matcha renames each photo from Takumi's list and moves it to the right folder. He checks the folders before anything goes online.",
+        "steps": [
+          "Type the list of part numbers",
+          "Let Matcha rename and sort the photos",
+          "Check the folders, then list the parts"
+        ],
+        "fact": "OpenClaw is an agent with browser automation and tool use, running in a sandboxed app on your Core."
+      }
+    },
+    {
+      "id": "room-quests",
+      "chapter": "anouk-room",
+      "member": "anouk",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "service": "habitify",
+      "capability": "turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Revision turns into quests",
+        "body": "Anouk sets her mock-exam topics as quests in Habitica and ticks them off from her bed. Each finished topic earns a level.",
+        "chips": [
+          "Habitica",
+          "alternative to Habitify"
+        ]
+      },
+      "detail": {
+        "before": "Anouk logged her revision habits in Habitify.",
+        "after": "Habitica turns each topic into a quest on the Core. Finishing the work gives her levels.",
+        "steps": [
+          "Add a quest for each mock-exam topic",
+          "Tick the topic off when it is done",
+          "Check the level on Sunday"
+        ],
+        "fact": "Habitica turns habits and chores into a game with levels and quests."
+      }
+    },
+    {
+      "id": "room-subscriptions",
+      "chapter": "anouk-room",
+      "member": "anouk",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "service": "rocket-money",
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Reminders before each renewal",
+        "body": "Anouk lists her game and music subscriptions in Wallos. A reminder arrives before each renewal, and she decides whether to keep it.",
+        "chips": [
+          "Wallos",
+          "alternative to Rocket Money"
+        ]
+      },
+      "detail": {
+        "before": "Rocket Money listed Anouk's subscriptions, and each renewal still came as a surprise.",
+        "after": "Wallos lists every subscription Anouk pays for on the Core and reminds her before each one renews.",
+        "steps": [
+          "Add each subscription and its date",
+          "Read the reminder before the date",
+          "Decide whether to keep it"
+        ],
+        "fact": "Wallos tracks every subscription you pay for and sends a reminder before it renews."
+      }
+    },
+    {
+      "id": "office-letter",
+      "chapter": "office",
+      "member": "esperanza",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "onlyoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "service": "microsoft-office",
+      "capability": "write documents, spreadsheets and slides with a full office suite in your browser",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "The supplier letter, redrafted",
+        "body": "Esperanza redrafts the shop's supplier letter in ONLYOFFICE Desktop Editors on the Core, at the standing desk. Takumi reads the final copy there before it goes.",
+        "chips": [
+          "ONLYOFFICE Desktop Editors",
+          "alternative to Microsoft Office"
+        ]
+      },
+      "detail": {
+        "before": "Letters were redrafted in Microsoft Office on two laptops, and the latest version was whichever one was saved last.",
+        "after": "ONLYOFFICE Desktop Editors opens the letter in a browser session from the Core, so there is one copy to redraft.",
+        "steps": [
+          "Open the letter in the browser session",
+          "Redraft the paragraphs she wants changed",
+          "Save it for Takumi to read"
+        ],
+        "fact": "ONLYOFFICE Desktop Editors writes documents, spreadsheets and slides with a full office suite in your browser."
+      }
+    },
+    {
+      "id": "office-bundle",
+      "chapter": "office",
+      "member": "esperanza",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Smallpdf"
+        ]
+      },
+      "service": "smallpdf",
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "The exhibits go in her order",
+        "body": "The evening before a filing, Esperanza lays the paper index on the standing desk. She merges the exhibit PDFs in Stirling-PDF in the order she set.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Smallpdf"
+        ]
+      },
+      "detail": {
+        "before": "Loose exhibit PDFs went through Smallpdf to become one bundle, in whatever order they were uploaded.",
+        "after": "Stirling-PDF merges the exhibits on the Core, in the order of the paper index laid beside the keyboard.",
+        "steps": [
+          "Lay the paper index on the desk",
+          "Add each PDF in the index order",
+          "Merge them into one bundle"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+      }
+    },
+    {
+      "id": "office-folders",
+      "chapter": "office",
+      "member": "esperanza",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "service": "dropbox",
+      "capability": "keep your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 1
+          },
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "One Nextcloud, two folders",
+        "body": "The practice keeps its client folders in Nextcloud on the Core, and the shop keeps its papers in another folder. Esperanza opens hers beside the ladder shelf.",
+        "chips": [
+          "Nextcloud",
+          "alternative to Dropbox"
+        ]
+      },
+      "detail": {
+        "before": "The practice's client folders sat in Dropbox, and the shop's papers shared the same sign-in.",
+        "after": "Nextcloud keeps the client folders on the Core, and the shop's papers sit in a folder of their own.",
+        "steps": [
+          "Create a folder for each client",
+          "Keep the shop's papers in their own folder",
+          "Open a client's folder beside the shelf"
+        ],
+        "fact": "Nextcloud keeps your files, calendar and contacts on your own Core, synced to your devices."
+      }
+    },
+    {
+      "id": "yara-essay",
+      "chapter": "yara-room",
+      "member": "yara",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "service": "miro",
+      "capability": "a shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Causes laid out on one board",
+        "body": "Yara lays out the causes of her history essay as notes on one tldraw board on the Core. She drags them into order, and the order becomes her plan.",
+        "chips": [
+          "tldraw",
+          "alternative to Miro"
+        ]
+      },
+      "detail": {
+        "before": "Yara planned her essays on sticky notes that curled and fell off the wall.",
+        "after": "tldraw keeps the notes on an infinite board on the Core, so she can drag them into a new order.",
+        "steps": [
+          "Add a note for each cause",
+          "Drag the notes into order",
+          "Write the essay from the board"
+        ],
+        "fact": "tldraw is a shared whiteboard on an infinite canvas."
+      }
+    },
+    {
+      "id": "yara-slides",
+      "chapter": "yara-room",
+      "member": "yara",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "collabora-online",
+        "replaces": [
+          "Google Workspace"
+        ]
+      },
+      "service": "google-workspace",
+      "capability": "edit documents, spreadsheets and presentations together in the browser",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Two laptops, one set of slides",
+        "body": "Yara and Anouk open the same slides in Collabora Online from two laptops. Each edit shows in the other's tab as it happens.",
+        "chips": [
+          "Collabora Online",
+          "alternative to Google Workspace"
+        ]
+      },
+      "detail": {
+        "before": "The class talk's slides were built in Google Workspace and passed back and forth by message.",
+        "after": "Collabora Online opens one file from the Core in both browsers. Yara and Anouk edit the same slides together.",
+        "steps": [
+          "Open the slides from the Core",
+          "Split the talk between the two laptops",
+          "Read it through before Monday"
+        ],
+        "fact": "Collabora Online edits documents, spreadsheets and presentations together in the browser."
+      }
+    },
+    {
+      "id": "terrace-read",
+      "chapter": "terrace",
+      "member": "yara",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Apple Books"
+        ]
+      },
+      "service": "apple-books",
+      "capability": "manage and read books, comics and PDFs with automatic covers and metadata",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Book club out on the terrace",
+        "body": "Yara's book club picks a novel as an ebook. She keeps it in BookLore on the Core and reads it on the terrace.",
+        "chips": [
+          "BookLore",
+          "alternative to Apple Books"
+        ],
+        "note": "BookLore fetches covers and details from outside."
+      },
+      "film": true,
+      "detail": {
+        "before": "Yara's book club reads were bought in Apple Books, and the library stayed inside that one app.",
+        "after": "BookLore keeps the ebook in a library on the Core and opens it in a browser, so Yara reads wherever the home Wi-Fi reaches.",
+        "steps": [
+          "Add the ebook to the family library",
+          "Open it in a browser on her laptop",
+          "Read it out on the terrace"
+        ],
+        "fact": "BookLore manages and reads books, comics and PDFs, with automatic covers and metadata."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A shop, a practice, one Core",
+        "body": "A standing desk, a writing desk, a long sofa and a bedroom of her own. One glass roof, one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "A practice, a shop and two sets of homework can live on one Companion Core. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Told in the v3 shape: 17 of 21 room beats are pairs. The four pair-less ones are Anouk's Steam Headless session, the KitchenOwl dinner plan, Paprika's Companion Memory draft and Matcha's photo sorting.",
+    "Steam Headless is pair-less on purpose: geforce-now|steam-headless is on the content/story/lander.json hold list, and no cloud gaming service is named. The persona-replaces warning on living-game is that choice.",
+    "The home has no TV: Anouk plays in a browser tab on a laptop from the sofa, which is also the media beat at the couch the validator asks for.",
+    "Age rule 16: Anouk (sixteen) and Yara (fourteen) use no chat model or agent; Paprika and Matcha work only for Esperanza and Takumi, who approve every result.",
+    "Honest edges carried: Steam needs a Valve account; Keila sends through an outside mail provider; Invio client links reach only people who can reach the Core; BookLore fetches covers from outside.",
+    "Camera, for the geometry stream: room-quests is a cut (no walkable leg on l3): the gallery, office and bedrooms are closed bays the camera cannot reach from the open plan. The terrace (entry above ground) and the outro are the other cuts.",
+    "Small rooms have one standing place each, so the bedroom and office beats carry no from or side hint. The terrace beat is told from the roof terrace loungers (patio-seat), because no deck of this home can be framed.",
+    "Apps chosen clear of the fleet cap (no immich, hortusfox, paperless, open-webui, yuvomi, home-assistant or jellyfin), and none is in more than two of the six apartments. LibreTranslate sits at the cap of fourteen."
+  ]
+}

@@ -179,7 +179,7 @@ test('on the tree: what the page shows holds every rule of the spec', () => {
   assert.ok(d.proof && !d.plan.hold.includes(`${d.proof.service.id}|${d.proof.app.id}`), 'the proof is a pair that may show');
   assert.ok(d.strip.length >= 6 && d.strip.length <= 10);
   assert.ok(!/\d/.test(d.count), d.count);
-  assert.match(d.count, /^Thirty fictional families in thirty-six homes\.$|^Thirty homes, each with a fictional family\.$|^[A-Z][a-z-]+ fictional families in [a-z-]+ homes\.$/);
+  assert.match(d.count, /^[A-Z][a-z-]+ homes, each with a fictional family\.$|^[A-Z][a-z-]+ fictional families in [a-z-]+ homes\.$/);
   assert.deepEqual(d.types.present, d.types.counts.apartment ? ['home', 'apartment'] : ['home']);
   assert.ok(d.messages.rent && d.messages.rent.text === 'Stop renting your intelligence.', 'the H1 is the claim\'s text');
   assert.ok(d.log.length >= 5);

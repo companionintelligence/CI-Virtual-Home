@@ -7,12 +7,17 @@
 //   pnpm run story:validate -- vance-takahashi      one family by slug
 //   pnpm run story:validate -- path/to/family.json  one file by path (fixtures, work in progress)
 //   pnpm run story:validate -- --fleet              also the cross-family metrics (uniqueness gates; counts are informational)
-//   pnpm run story:validate -- --complete           all 30 casting slugs must exist and the fleet counts gate (implies --fleet)
+//   pnpm run story:validate -- --complete           every casting slug must have a family file and the fleet counts gate (implies --fleet)
+//   pnpm run story:validate -- --strict-families    a casting family without a content/families/<slug>.json is an error, not a note
+//                                                   (CI_STORY_STRICT=1 does the same; the same switch as portal:build's, scripts/story/site.mts)
 //   ... --json                                      the same result as JSON on stdout (no other output)
 //   ... --world <dir>                               read casting.json and houses/ from <dir> instead of content/story and content/houses
 //                                                   (a file inside test/fixtures/stories picks that folder's `world/` by itself)
 //
 // Exit 1 on any error, and on any `review` finding that is not on content/story/reviewed.json. Warnings print and never fail.
+// A family the casting plan names that has no file yet (the plan is ahead of the writers: the six apartments were cast before their stories were
+// written) is a NOTE on a whole-set run, because that is the ordinary state of a re-cast; it is an error under --strict-families, which is
+// where the whole cast must be there (the production deploy). Validating one family or one file by name says nothing about the others.
 // The rule catalogue, the fixes and how to add a rule: reference/story/validator.md. Needs no GPU and no network.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,11 +35,12 @@ const flag = (n: string): boolean => argv.includes(`--${n}`);
 const JSON_OUT = flag('json');
 const COMPLETE = flag('complete');
 const FLEET = flag('fleet') || COMPLETE;
+const STRICT = flag('strict-families') || process.env.CI_STORY_STRICT === '1';
 const worldAt = argv.indexOf('--world');
 const worldArg = worldAt >= 0 ? argv[worldAt + 1] : undefined;
 if (worldAt >= 0 && (!worldArg || worldArg.startsWith('--'))) { console.error('--world needs a directory'); process.exit(2); }
 const positional = argv.filter((a, i) => !a.startsWith('--') && !(worldAt >= 0 && i === worldAt + 1));
-for (const a of argv) if (a.startsWith('--') && !['--json', '--complete', '--fleet', '--world'].includes(a)) { console.error(`unknown flag ${a}\nusage: story:validate [-- <slug|file>...] [--json] [--complete] [--fleet] [--world <dir>]`); process.exit(2); }
+for (const a of argv) if (a.startsWith('--') && !['--json', '--complete', '--fleet', '--strict-families', '--world'].includes(a)) { console.error(`unknown flag ${a}\nusage: story:validate [-- <slug|file>...] [--json] [--complete] [--fleet] [--strict-families] [--world <dir>]`); process.exit(2); }
 
 const FAMILIES = path.join(ROOT, 'content', 'families');
 // content/families also holds generated files (<slug>.voice.json, <slug>.bake.json) and films.json; an authored file is <slug>.json
@@ -75,6 +81,17 @@ const results: { file: string; report: Report | null; parseError?: string }[] = 
   return item.parseError ? { file, report: null, parseError: item.parseError } : { file, report: validateStory(item.data, ctx) };
 });
 
+// ---- the casting's families that have no file yet. Only a whole-set run says it: naming a family or a file asks about that one.
+// A note by default, an error under --strict-families (see the header): the plan is allowed to be ahead of the writers.
+const castSlugs = ctx.casting.families.map((f) => f.slug);
+const castingWithoutFile: string[] = positional.length ? [] : (() => {
+  const have = new Set(results.map((r) => r.report?.slug ?? path.basename(r.file, '.json')));
+  return castSlugs.filter((s) => !have.has(s));
+})();
+const castingNote = castingWithoutFile.length
+  ? `casting family without a file: ${castingWithoutFile.join(', ')} (${castingWithoutFile.length} of ${castSlugs.length} in casting.json have no content/families/<slug>.json yet; --strict-families makes this an error)`
+  : '';
+
 // ---- the fleet: every authored file in content/families that has the right shape
 let fleet: FleetResult | null = null;
 if (FLEET) {
@@ -97,6 +114,7 @@ const problems: string[] = [
   ...categoryProblems(),
   ...notFound.map((f) => `no such family file: ${rel(f)}`),
   ...results.filter((r) => r.parseError).map((r) => `${rel(r.file)} is not valid JSON: ${r.parseError}`),
+  ...(STRICT ? castingWithoutFile.map((s) => `casting family without a file: ${s} is in casting.json but has no content/families/${s}.json`) : []),
   ...(fleet ? fleet.findings.filter((f) => f.severity === 'error').map((f) => `${f.rule} ${f.message}`) : []),
 ];
 const fleetWarnings: Finding[] = fleet ? fleet.findings.filter((f) => f.severity === 'warn') : [];
@@ -113,6 +131,7 @@ if (JSON_OUT) {
       stats: r.report?.stats ?? null,
     })),
     problems,
+    casting: { families: castSlugs.length, withoutFile: castingWithoutFile, strict: STRICT },
     fleet: fleet ? { families: fleet.families, complete: fleet.complete, metrics: fleet.metrics, warnings: fleetWarnings.map(finding) } : undefined,
   }, null, 2));
   process.exit(ok ? 0 : 1);
@@ -130,6 +149,7 @@ for (const r of results) {
   console.log(`  ${rep.errors.length || rep.review.length ? 'FAIL' : 'OK'}: ${rep.errors.length} errors, ${rep.review.length} review, ${rep.warn.length} warnings` + (rep.stats.filmSec ? `   [${rep.stats.beats} beats, film ~${rep.stats.filmSec} s, ${rep.stats.filmWords} spoken words]` : ''));
 }
 for (const p of problems) console.log(`ERROR  ${p}`);
+if (castingNote && !STRICT) console.log(`note   ${castingNote}`);
 for (const f of fleetWarnings) console.log(`warn   ${f.rule} ${f.message}`);
 if (fleet) console.log(`\n${renderFleet(fleet)}`);
 console.log(`\n${ok ? 'story:validate OK' : 'story:validate FAILED'}: ${results.length} family file${results.length === 1 ? '' : 's'}, ${count('errors') + problems.length} errors, ${count('review')} review, ${count('warn')} warnings, ${count('allowed')} allow-listed`);

@@ -16,7 +16,7 @@ and what was measured. Everything below was tried in the engine; "measured" mean
 | `walkup-duplex` | Walk-up Duplex | two levels in a dark-brick deck-access block | 110 (both levels) | 4 |
 
 All six are built, baked, in the gallery (`Apartment` tag) and recorded (plans, isometrics, CAD sheets, planner tracks, thumbnails and
-link previews). None has a family yet (`homesWithoutFamily` in `content/story/cast-plan.json`); none has a golden baseline yet
+link previews). Each has a family in the cast plan (`content/story/cast-plan.json`, cast on 2026-10-22: valdivia in studio-loft, tehrani in city-one-bed, steyn in two-bed-flat, voss in corner-penthouse, penhallow in garden-flat, rademaker in walkup-duplex) and a story each (`content/families/<slug>.json`, in the v3 shape); none has a golden baseline yet
 (section 8). `studio-loft` is the exemplar: build the next one the way it is built.
 
 ---
@@ -302,6 +302,19 @@ A layout change means: regenerate, `--write` (a re-bake replaces `compose@1` and
 --write` again, strip the newline again. Bake at the default dress level (no `--level`): `test-dress-phase` S proves a baked
 house is what `--dress` writes today. Never put a `dress` field on a room.
 
+### 2.10 The flat's facts: what a page may count
+
+The spec draws the block, so `levels.length` and the number of `rooms[]` are the block's (the one-bedroom flat has six levels and twenty-seven rooms; seven rooms are the flat). `areaSqm` is the
+unit's already (2.1 step 7). A page that prints "N storeys, N m², N rooms" must print the flat's, so `content/houses/index.json` carries the unit's `storeys` for an apartment (which the gallery, a
+home's page, a plain card and the player's facts line read), a family's page counts the unit's rooms, and its floor plan draws only the unit's storeys and rooms in one outline.
+
+The unit is read, not marked (a mark in a baked spec would move the bake): `scripts/apartment-unit.mts`. On each storey the flat's own rooms are the ones with a `program` that is not `hall`; a storey with
+none of them is the block's (the podium, the floors above, the roof); and a room belongs to the flat when its centre lies inside the box those rooms span, which takes in the flat's own halls (an entry
+hall, a passage, the family's stair) and leaves out the neighbours, the core and the podium's shops. So the recipe above has a consequence the rule needs: give every room of the flat a program that is
+not `hall` or put it inside the flat's box; leave a neighbour's, a shop's and the roof's rooms without a program; and make the core's room a `hall` that lies beside the flat, not inside it.
+An apartment is one that `content/story/lander.json` lists under `types.apartment`; any other home is read whole. `scripts/test-apartment-unit.mts` pins the unit of each of the six, room by room:
+add a new apartment to that list and to that table in the same commit, and look at what it says.
+
 ---
 
 ## 3. Pitfalls met, and what fixed them
@@ -410,7 +423,7 @@ there. Both ran clean on the loft (the only notices are catalog footprints missi
 - [ ] Stills: every room from two corners, the exterior, the orbit, the film strip: nothing floating, no blocked door, no empty
       room, no wall through a window, the Core visible in the last frame, no room too dark, reads as an apartment.
 - [ ] `test-floorplan-graph` and `test-spec-types` pass; `test-dress-phase` K's lamp-less census for the apartments (31 today) moves by what you add.
-- [ ] The derived files are the integration's (section 7): `<id>.plan.json`, `index.json`, `scenes/`, thumbs, the cast plan's `homesWithoutFamily`,
+- [ ] The derived files are the integration's (section 7): `<id>.plan.json`, `index.json`, `scenes/`, thumbs, the cast plan (a family, or a line in `homesWithoutFamily`),
       the planner track, the compose baseline, the goldens (macOS).
 
 ---
@@ -509,7 +522,7 @@ needed except for the CAD sheets' PNGs.
 | the composer's baseline | `node --experimental-strip-types scripts/compose-baseline.mts --write` | `test/fixtures/hashes/compose-baseline.json`; the 30 houses' hashes must not move, only the fleet totals and the new rows |
 | the names | `assets/home-names.ts` | the home's public name, pinned; **not a name any family's words contain** (`check-leaks.mts`) |
 | the picture | `pnpm run portal:thumbs -- --house <id> --no-hero [--gl default]` | `portal/thumbs/<id>.webp`, `portal/previews/<id>.jpg`; a tall block needs a line in `FRAME` (`scripts/build-thumbs.mts`) |
-| the story's side | `content/story/cast-plan.json` `homesWithoutFamily` (or a family), then `pnpm run story:cast` | `reference/story/cast.md`; `casting.json` stays the families' |
+| the story's side | `content/story/cast-plan.json` (a family, or a `homesWithoutFamily` line), then `pnpm run story:cast` | `reference/story/cast.md`; `casting.json` stays the families' |
 | the goldens | `pnpm run goldens:update --house <id>` **on the Mac** (`macos-metal`), then look at the frames | `test/goldens/macos-metal/<id>/` (five frames) |
 
 Fleet constants that count homes, and what changed for the six: `test-portal-redact` (the list is read from the specs, no number),

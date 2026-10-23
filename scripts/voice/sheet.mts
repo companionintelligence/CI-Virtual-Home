@@ -1,7 +1,7 @@
 // `pnpm run story:voice -- --sheet`: a listening sample sheet, written OUTSIDE the repo.
 //
 // No agent can judge a voice. Four of the eight British voices are graded D by Kokoro's own model card and the engine has no
-// emotion control, so before 30 families are recorded a person should listen to every voice say the same lines and say yes or no.
+// emotion control, so before the families are recorded a person should listen to every voice say the same lines and say yes or no.
 // Each voice reads three lines: the first-run (FTUE) line, one agent line, and a "names" line with the hard product names from
 // the lexicon, so the owner can also hear whether the pronunciations are right.
 import fs from 'node:fs';
@@ -48,7 +48,7 @@ export async function buildSheet(env: EngineEnv, reg: VoiceRegistry, lex: Lexico
     const html = `<!doctype html><meta charset="utf-8"><title>Voice sample sheet</title>
 <style>body{font:15px/1.5 system-ui,sans-serif;margin:24px;max-width:1200px;color:#1b1b1f}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:10px;vertical-align:top;text-align:left}th{width:260px;background:#f4f4f6}.meta{font-size:12px;color:#555;margin-top:4px}.line{font-size:12px;font-weight:600;margin-bottom:4px}.bad{color:#b00020}audio{width:100%;min-width:220px}</style>
 <h1>Voice sample sheet</h1>
-<p>Eight voices, three lines each. Synthetic voices, made locally with Kokoro-82M. <b>An agent cannot judge these. A person should listen before 30 families are recorded.</b></p>
+<p>Eight voices, three lines each. Synthetic voices, made locally with Kokoro-82M. <b>An agent cannot judge these. A person should listen before the families are recorded.</b></p>
 <ol><li>Is every voice clear at normal volume on a phone speaker, with no clipping, buzz or swallowed word?</li>
 <li>Does the pace feel unhurried (about 150 words a minute) and does the end of each sentence fall?</li>
 <li>On the names line: Odoo as <i>oo-doo</i>, Koodo as <i>koo-doh</i>, Spliit as <i>split</i>, SearXNG as <i>searks en-jee</i>, Keila as <i>kay-la</i>, Affine as <i>a-fine</i>, n8n as <i>en-eight-en</i>?</li>

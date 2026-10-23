@@ -18,8 +18,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT as REPO, parseArgs, loadPlaywright } from '../portal-lib.mts';
-import { loadAll, storyFiles, ogKey, ogText } from './site-lib.mts';
+import { loadAll, storyFiles, ogKey, ogText, type OgText } from './site-lib.mts';
 import { FICTIONAL_LINE } from '../../assets/story/types.ts';
+import { capital, numberWord } from '../portal-pages.mts';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(REPO, args.out && args.out !== 'true' ? args.out : path.join('portal', 'og'));
@@ -36,7 +37,7 @@ const fonts = {
   mark: `data:image/svg+xml;base64,${b64(path.join(REPO, 'assets', 'brand', 'ci-logo-mark.svg'))}`,
 };
 
-type Job = { name: string; base: string; text: ReturnType<typeof ogText> };
+type Job = { name: string; base: string; text: OgText };
 const jobs: Job[] = [];
 for (const s of L.stories) {
   if (only && !only.has(s.slug)) continue;
@@ -45,7 +46,7 @@ for (const s of L.stories) {
   if (!house || !fs.existsSync(base)) { console.error(`${s.slug}: no preview picture (pnpm run portal:thumbs)`); process.exitCode = 1; continue; }
   jobs.push({ name: s.slug, base, text: ogText('family', s) });
 }
-if (!only || only.has('home')) jobs.push({ name: 'home', base: path.join(REPO, 'portal', 'hero.jpg'), text: ogText('home') });
+if (!only || only.has('home')) jobs.push({ name: 'home', base: path.join(REPO, 'portal', 'hero.jpg'), text: ogText('home', capital(numberWord(L.stories.length))) });
 
 const pw = await loadPlaywright();
 const browser = await pw.chromium.launch({ headless: true });

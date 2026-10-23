@@ -12,7 +12,8 @@ pnpm run story:validate                          # every content/families/<slug>
 pnpm run story:validate -- vance-takahashi       # one family by slug
 pnpm run story:validate -- path/to/family.json   # one file by path (fixtures, work in progress)
 pnpm run story:validate -- --fleet               # also the cross-family metrics
-pnpm run story:validate -- --complete            # all 30 casting slugs present and the fleet counts gate (implies --fleet)
+pnpm run story:validate -- --complete            # every casting slug has a family file and the fleet counts gate (implies --fleet)
+pnpm run story:validate -- --strict-families     # a casting family without a file is an error (CI_STORY_STRICT=1 too); without it, a note
 pnpm run story:validate -- <slug> --json         # the same result as JSON on stdout
 pnpm run story:validate -- --world <dir> <file>  # casting.json and houses/ from <dir> instead of content/story and content/houses
 pnpm run test                                    # scripts/test-stories.mts runs the validator over the exemplar and the fixtures
@@ -299,9 +300,9 @@ Uniqueness metrics always gate, because a clash between two families is true for
 
 | Rule | Gate | Metric |
 |---|---|---|
-| `fleet-count` | complete | all 30 casting slugs present; a slug not in casting or in two files always fails |
+| `fleet-count` | complete | every casting slug has a family file (36 with the six apartments, whose stories are written: on a whole-set run a casting family without a file is a note, an error under `--strict-families`); a slug not in casting or in two files always fails |
 | `fleet-topics` | complete | each of the ten topics (categories except setup) in at least ten families |
-| `fleet-apps` | complete | at least 70 distinct apps; no third-party app in more than 40% of families (from ten families on; a flagship family is three homes and counts once per home, so Steam Headless in all three flagship homes is three of the twelve it may have); the story-rich apps (catalog `meta.top15`) each in at least three; an app with no QA screenshot (`mealie` today) is left out of that list, because placing it needs an owner entry in `reviewed.json` and the catalog names a screenshot-backed fallback (`kitchenowl`), so 14 of the 15 count |
+| `fleet-apps` | complete | at least 70 distinct apps; no third-party app in more than 40% of families (from ten families on; a flagship family is three homes and counts once per home, so Steam Headless in all three flagship homes is three of the twelve it may have in 30 families (fourteen in 36)); the story-rich apps (catalog `meta.top15`) each in at least three; an app with no QA screenshot (`mealie` today) is left out of that list, because placing it needs an owner entry in `reviewed.json` and the catalog names a screenshot-backed fallback (`kitchenowl`), so 14 of the 15 count |
 | `fleet-segments` | complete | small-business beats at least 18% of all beats |
 | `fleet-unique` | always | no repeated surname, address place, companion name, beat title outside the ftue, or beat body; a first name used at most twice. **Flagship exemption:** families marked `flagship: true` in `casting.json` (Sally, John, Steve and Jean in three homes) do not clash with each other on surname, companion name or first name (the three homes are one use of a first name); a flagship name against any other family, and every other check (address place, beat titles, beat bodies), still fails |
 | `fleet-archetypes` | complete | how many families show each archetype (a family counts once per archetype; always reported). Gate: organiser, builder, gamer and learner each in at least 6 families, gamer in at most 12 (the 40% cap on Steam Headless). Maker and host are reported, not gated |

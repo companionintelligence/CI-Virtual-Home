@@ -19,7 +19,7 @@
     "plex|jellyfin",
     "geforce-now|steam-headless"
   ],
-  "primary": { "google-drive": "nextcloud" },
+  "primary": { "google-drive": "nextcloud", "zapier": "activepieces" },
   "strip": { "size": 10, "minFamilies": 2, "maxPerApp": 1, "maxPerRegistryCategory": 2, "maxPerBrand": 2, "pin": [] },
   "featured": { "count": 6, "override": null },
   "types": { "apartment": ["city-one-bed", "corner-penthouse", "garden-flat", "studio-loft", "two-bed-flat", "walkup-duplex"] }

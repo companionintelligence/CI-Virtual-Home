@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Tests for the story bake (assets/story/{roles,anchors,poses,route,track,place,runtime}.ts, scripts/story-bake.mts): pure Node, no GPU.
-//   * the role table is the contract (ROLE_IDS), every role resolves in the houses casting.json says have it, the universal ones in all 30
+//   * the role table is the contract (ROLE_IDS), every role resolves in the houses casting.json says have it, the universal ones in every home it casts
 //   * the pose solver gives the exemplar's beats a clear sight line, the whole anchor in frame, a free cell to stand on, the same answer twice
 //   * routes go through stairs and doors and fail (a cut) rather than cross a wall; the popup placer never covers the subject
 //   * the track is a pure function of (t, aspect): random access, continuous, no faster than the caps, the beats tile the tour
@@ -62,8 +62,8 @@ test('room kinds are read off names the way casting.json reads them', () => {
 });
 
 const ITEM_AND_ZONE_ROLES = [...Object.keys(table.items), ...Object.keys(table.zones)] as RoleId[];
-test('every role casting.json says a house has resolves there; the universal roles resolve in all 30 houses', () => {
-  assert.equal(casting.families.length, 30);
+test('every role casting.json says a house has resolves there; the universal roles resolve in every home it casts', () => {
+  assert.ok(casting.families.length >= 30, 'the 30 houses at least; the six apartments since their families were cast');   // (the size is the plan's, not a number typed here)
   const missing: string[] = [], extra: string[] = [];
   for (const f of casting.families) {
     const { aw } = house(f.house), counts = roleCounts(aw, ITEM_AND_ZONE_ROLES);
