@@ -308,7 +308,7 @@ for (const h of houses) {
     const msg = Object.values(lander.messages)[0];
     if (msg) {
       const title = `${msg.text.replace(/\.$/, '')} · Companion Core`;
-      const desc = `A Companion Core is a small personal server that runs local AI and your household's apps. ${familiesWord(front.length)} show how. Fictional family. Real software.`;
+      const desc = `A Companion Core is a small personal server for local AI and your household's apps. ${familiesWord(front.length)} show how. Fictional family. Real software.`;
       const swap = (re: RegExp, to: string, what: string): void => { if (!re.test(gallery)) problems.push(`index.html: no ${what} to write`); else gallery = gallery.replace(re, () => to); };
       swap(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`, '<title>');
       swap(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(desc)}">`, 'description');
