@@ -1,0 +1,1451 @@
+{
+  "schema": "family/v1",
+  "slug": "rademaker",
+  "house": "walkup-duplex",
+  "fictional": true,
+  "family": {
+    "surname": "Rademaker",
+    "tagline": "Four people, one long table, one stair and one Companion Core.",
+    "household": "older-kids",
+    "business": false,
+    "story": "Fernanda plans her lessons at the long table, and Chike works from the landing. Ayaan studies in Bedroom Two while Dmitri plays at the desk by the door. One Companion Core sits there too.",
+    "address": {
+      "line": "6 Kiln Gallery",
+      "place": "Ironbridge Row"
+    },
+    "narrator": "v-steady-m",
+    "home": {
+      "lede": "A dark brick block on a city street, with white-railed walkways and a long flight of steps up to the first. The family's flat takes two floors of the middle bay, with a balcony over the back court.",
+      "spots": [
+        {
+          "room": "Living Room",
+          "line": "A tuxedo sofa, open shelves and the Core on its desk by the door."
+        },
+        {
+          "room": "Kitchen & Dining",
+          "line": "A long oval table, a breakfast bar with stools and the balcony door."
+        },
+        {
+          "room": "Back Balcony",
+          "line": "A bistro table and two bentwood chairs over the back court."
+        },
+        {
+          "room": "Study Landing",
+          "line": "A writing desk, a laptop and open shelves at the top of the stair."
+        },
+        {
+          "room": "Bedroom Two",
+          "line": "A headboard bed and two lamps, with the stair a few paces away."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "kitchen-handout",
+        "line": "Fernanda writes the handout before the school run."
+      },
+      {
+        "at": "morning",
+        "beat": "study-flow",
+        "line": "Chike checks his automations at the landing desk."
+      },
+      {
+        "at": "midday",
+        "beat": "kitchen-shop",
+        "line": "Someone checks the pantry before the shop."
+      },
+      {
+        "at": "afternoon",
+        "beat": "kitchen-merge",
+        "line": "The trip pack goes to the office as one file."
+      },
+      {
+        "at": "after-school",
+        "beat": "bedroom-sources",
+        "line": "Ayaan saves sources for his history project."
+      },
+      {
+        "at": "after-school",
+        "beat": "living-session",
+        "line": "Dmitri starts a Steam session at the desk."
+      },
+      {
+        "at": "weekend",
+        "beat": "balcony-papers",
+        "line": "Chike files the tenancy papers on the balcony."
+      },
+      {
+        "at": "weekend",
+        "beat": "living-audiobook",
+        "line": "Dmitri catches up on his set text from the sofa."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "fernanda",
+      "name": "Fernanda",
+      "age": 44,
+      "role": "parent",
+      "work": "secondary school teacher",
+      "colour": "chart-1",
+      "archetype": "educator",
+      "companion": {
+        "name": "Clove",
+        "runtime": "Hermes",
+        "job": "Drafts reminders and letters for Fernanda's lessons from the context she connected.",
+        "personality": [
+          "warm",
+          "patient",
+          "careful"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Fernanda rewrites and sends every message."
+      },
+      "profile": {
+        "bio": "Fernanda teaches secondary school and plans her lessons at the long table. Her handouts, diagrams and notes are files on the Core, and Clove drafts the letters she rewrites and sends herself."
+      }
+    },
+    {
+      "id": "chike",
+      "name": "Chike",
+      "age": 42,
+      "role": "parent",
+      "work": "backend developer, works from home",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Cassia",
+        "runtime": "OpenClaw",
+        "job": "Opens the council's web forms and fills in the details Chike typed.",
+        "personality": [
+          "dry",
+          "calm",
+          "exact"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "One form at a time. Chike reads each field and submits it himself."
+      },
+      "profile": {
+        "bio": "Chike builds backend software for a team that works by video and keeps a weekend project on the landing desk. His repositories sit in Forgejo on the Core, and Cassia fills in the forms that he checks and submits himself."
+      }
+    },
+    {
+      "id": "ayaan",
+      "name": "Ayaan",
+      "age": 13,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-3",
+      "archetype": "learner",
+      "profile": {
+        "bio": "Ayaan studies in Bedroom Two. He saves sources for his history project, checks his German against the textbook and listens to his essays read back before he rewrites them."
+      }
+    },
+    {
+      "id": "dmitri",
+      "name": "Dmitri",
+      "age": 16,
+      "role": "teen",
+      "work": "sixth form",
+      "colour": "chart-4",
+      "archetype": "gamer",
+      "profile": {
+        "bio": "Dmitri is in sixth form, plays Steam from the desk by the door and models in his spare time. His games, his models and his audiobooks all run on the Core."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The desk by the door"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The long table"
+    },
+    {
+      "id": "balcony",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the back balcony"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "Chike's landing desk"
+    },
+    {
+      "id": "bedroom-two",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Ayaan's room"
+    },
+    {
+      "id": "bedroom-three",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Dmitri's room"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the gallery door",
+        "body": "The courier leaves the parcel on the gallery, at the top of a long flight of steps. Chike carries it in through the door."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Four things in the parcel",
+        "body": "Ayaan holds the parcel steady while Dmitri cuts the tape. Inside are the Companion Core, a power cable, a quick-start guide and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plugged in by the door",
+        "body": "Fernanda plugs the cable in at the desk by the front door. The Core wakes and opens its own Wi-Fi network."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Join it from Chike's phone",
+        "body": "Chike joins the Core's own network from his phone, then picks the home network.",
+        "kind": "phone",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "ci-memory",
+        "donetick",
+        "grocy",
+        "forgejo"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Fernanda and Chike choose their agents",
+        "body": "In the Companion Hub store, Fernanda picks Hermes and Chike picks OpenClaw. Companion Memory comes along, with Donetick, Grocy and Forgejo. Then they walk away.",
+        "kind": "phone",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory",
+            "Apps: Donetick, Grocy, Forgejo"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "fernanda",
+      "agent": "fernanda",
+      "approval": "fernanda",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Clove says hello",
+        "body": "Fernanda messages the agent she named Clove. The reply comes from the Core, on the desk by the door.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "fernanda",
+        "text": "Hello, Fernanda. I am Clove. What should we start with?"
+      },
+      "film": true,
+      "detail": {
+        "before": "Without an agent, Fernanda wrote every reminder and letter herself, one app at a time.",
+        "after": "Clove runs in a sandbox on the Core and replies through the messaging app Fernanda picked. Those messages travel through that chat service.",
+        "steps": [
+          "Pick Hermes in the Companion Hub store",
+          "Give the agent a name",
+          "Send it a first message"
+        ],
+        "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+      }
+    },
+    {
+      "id": "living-session",
+      "chapter": "living",
+      "member": "dmitri",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "Xbox Cloud Gaming"
+        ]
+      },
+      "service": "xbox-cloud-gaming",
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The game runs by the door",
+        "body": "Dmitri signs in with his own Valve account, and Steam runs on the Core by the front door. He plays in a browser tab on his laptop.",
+        "chips": [
+          "Steam Headless",
+          "alternative to Xbox Cloud Gaming"
+        ],
+        "note": "Steam needs a Valve account. A Core may lack the graphics power a game wants."
+      },
+      "film": true,
+      "detail": {
+        "before": "Dmitri played through Xbox Cloud Gaming, with every session running on someone else's hardware.",
+        "after": "Steam Headless runs his own Steam library on the Core, and he opens the session in a browser. Valve still keeps the account and the library.",
+        "steps": [
+          "Sign in with his own Valve account",
+          "Open the session in a browser tab",
+          "Pick a game from his library"
+        ],
+        "fact": "Steam Headless runs Steam on your Core and plays it in a browser on a screen in the house."
+      }
+    },
+    {
+      "id": "living-notes",
+      "chapter": "living",
+      "member": "fernanda",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "service": "evernote",
+      "capability": "take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Twelve years of lesson notes",
+        "body": "Twelve years of lesson notes now sit in Joplin Server on the Core. On Sunday Fernanda finds her first year's scheme of work and reuses it.",
+        "chips": [
+          "Joplin Server",
+          "alternative to Evernote"
+        ],
+        "note": "Joplin Server is the server. The Joplin apps are separate."
+      },
+      "detail": {
+        "before": "Twelve years of lesson notes sat in Evernote, one notebook for each year group.",
+        "after": "Joplin Server syncs the notes between her laptop and her phone through the server on the Core. The first year's scheme of work is still there.",
+        "steps": [
+          "Import the old notebooks",
+          "Search for the first year's scheme",
+          "Copy it into this term's plan"
+        ],
+        "fact": "Joplin Server lets you take notes and keep to-dos that sync across your devices through your own server."
+      }
+    },
+    {
+      "id": "living-audiobook",
+      "chapter": "living",
+      "member": "dmitri",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "service": "audible",
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The set text, read to him",
+        "body": "Dmitri listens to a chapter of his English set text on the sofa. Audiobookshelf holds the audiobook on the Core and keeps his place for any phone in the flat.",
+        "chips": [
+          "Audiobookshelf",
+          "alternative to Audible"
+        ]
+      },
+      "detail": {
+        "before": "Dmitri bought his set texts as audiobooks in Audible, and each one stayed in that library.",
+        "after": "Audiobookshelf keeps the audiobook on the Core and remembers the place. Any phone in the flat picks up where the last one stopped.",
+        "steps": [
+          "Add the audiobook folder",
+          "Start the chapter on the sofa",
+          "Pick it up on another phone"
+        ],
+        "fact": "Audiobookshelf lets you listen to your audiobooks and podcasts, and pick up where you left off on any device."
+      }
+    },
+    {
+      "id": "living-model",
+      "chapter": "living",
+      "member": "dmitri",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "blockbench",
+        "replaces": [
+          "MagicaVoxel"
+        ]
+      },
+      "service": "magicavoxel",
+      "capability": "model low-poly art in your browser",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A low-poly boat for coursework",
+        "body": "Dmitri models a low-poly boat for his design coursework in Blockbench, in a browser tab. The file sits in a folder on the Core.",
+        "chips": [
+          "Blockbench",
+          "alternative to MagicaVoxel"
+        ]
+      },
+      "detail": {
+        "before": "Dmitri's models lived in MagicaVoxel on one laptop, so each file stayed where he had made it.",
+        "after": "Blockbench opens in a browser tab served by the Core. He builds the boat there, and every laptop in the flat opens the same file.",
+        "steps": [
+          "Open Blockbench in a browser tab",
+          "Build the boat from blocks",
+          "Save the model to the coursework folder"
+        ],
+        "fact": "Blockbench models low-poly art in your browser."
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "chike",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "service": "nextdns",
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The new router asks the Core",
+        "body": "The provider swaps the flat's router on Tuesday. Chike points its DNS setting at the Core, and Pi-hole answers the flat's lookups again.",
+        "chips": [
+          "Pi-hole",
+          "alternative to NextDNS"
+        ],
+        "note": "Lookups it does not block still go to the DNS provider the family picked."
+      },
+      "detail": {
+        "before": "The flat's DNS filter was a NextDNS profile, and the new router did not carry it over.",
+        "after": "Pi-hole answers the flat's DNS from the Core. Chike sets the router to ask the Core, and every device follows it.",
+        "steps": [
+          "Open the new router's settings",
+          "Set its DNS to the Core",
+          "Check that a blocked ad domain stays blocked"
+        ],
+        "fact": "Pi-hole blocks ads, trackers and bad domains for every device on your network at the DNS level."
+      }
+    },
+    {
+      "id": "kitchen-handout",
+      "chapter": "kitchen",
+      "member": "fernanda",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Google Workspace"
+        ]
+      },
+      "service": "google-workspace",
+      "capability": "the LibreOffice suite, Writer, Calc and more, in your browser",
+      "anchor": {
+        "role": "dining-table",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "kitchen-island"
+          },
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Thursday's handout, written at the table",
+        "body": "Fernanda writes Thursday's handout at the long table. LibreOffice opens in a browser tab from the Core, and the file lands in her lesson folder there.",
+        "chips": [
+          "LibreOffice",
+          "alternative to Google Workspace"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "Fernanda wrote her handouts in Google Workspace, and each one lived in that account.",
+        "after": "LibreOffice runs in a browser tab from the Core. Her handouts are files in a lesson folder on the Core, one for each week.",
+        "steps": [
+          "Open LibreOffice in a browser tab",
+          "Write the handout at the table",
+          "Save it to the lesson folder"
+        ],
+        "fact": "The LibreOffice suite, Writer, Calc and more, runs in your browser."
+      }
+    },
+    {
+      "id": "kitchen-diagram",
+      "chapter": "kitchen",
+      "member": "fernanda",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "service": "miro",
+      "capability": "a whiteboard with a hand-drawn look to sketch ideas together",
+      "anchor": {
+        "role": "dining-table",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "kitchen-island"
+          },
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Friday's diagram, sketched at the table",
+        "body": "Fernanda sketches the water cycle for Friday's lesson in Excalidraw. The board opens in her browser from the Core, and she keeps the drawing beside the handout.",
+        "chips": [
+          "Excalidraw",
+          "alternative to Miro"
+        ]
+      },
+      "detail": {
+        "before": "Fernanda sketched her lesson diagrams on Miro boards, and the boards stayed there.",
+        "after": "Excalidraw opens in her browser from the Core. She sketches the diagram with its hand-drawn look and saves it in the lesson folder.",
+        "steps": [
+          "Open a fresh board in Excalidraw",
+          "Sketch the water cycle",
+          "Save the drawing beside the handout"
+        ],
+        "fact": "Excalidraw is a whiteboard with a hand-drawn look. Sketch ideas together."
+      }
+    },
+    {
+      "id": "kitchen-merge",
+      "chapter": "kitchen",
+      "member": "fernanda",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Smallpdf"
+        ]
+      },
+      "service": "smallpdf",
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "kitchen-island",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The trip pack becomes one file",
+        "body": "The museum trip needs one file for the school office. Fernanda merges the information sheet and the blank consent form in Stirling-PDF at the breakfast bar.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Smallpdf"
+        ]
+      },
+      "detail": {
+        "before": "Fernanda merged her PDFs on the Smallpdf website, one file at a time.",
+        "after": "Stirling-PDF merges the pages on the Core. She drags both files in, checks the order and saves one PDF to the trip folder.",
+        "steps": [
+          "Drag in the information sheet",
+          "Add the blank consent form",
+          "Merge them and save one PDF"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+      }
+    },
+    {
+      "id": "kitchen-draft",
+      "chapter": "kitchen",
+      "member": "fernanda",
+      "agent": "fernanda",
+      "approval": "fernanda",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk and gives your agents individual context",
+      "anchor": {
+        "role": "dining-table",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "kitchen-island"
+          },
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Clove drafts, Fernanda rewrites",
+        "body": "Clove drafts the trip reminder from last year's letter, which Fernanda connected to Companion Memory. She rewrites it in her own words, then sends it herself.",
+        "chips": [
+          "Companion Memory"
+        ]
+      },
+      "detail": {
+        "before": "A trip reminder meant digging out last year's letter and retyping the dates.",
+        "after": "Clove drafts the reminder on the Core from the letter Fernanda connected in Companion Memory. She rewrites it and sends it herself.",
+        "steps": [
+          "Ask Clove for the trip reminder",
+          "Check the dates against the trip sheet",
+          "Rewrite it and send it herself"
+        ],
+        "fact": "Companion Memory keeps your digital life on your disk, so your agents know your context."
+      }
+    },
+    {
+      "id": "kitchen-shop",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "OurGroceries"
+        ]
+      },
+      "service": "ourgroceries",
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "fridge",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sunday's shop starts at the fridge",
+        "body": "The pantry stock and the shopping list sit in Grocy on the Core. Before the Sunday shop, the family checks the fridge against the list.",
+        "chips": [
+          "Grocy",
+          "alternative to OurGroceries"
+        ]
+      },
+      "detail": {
+        "before": "The list lived in OurGroceries, with no record of what was already in the cupboards.",
+        "after": "Grocy keeps the pantry stock and the list on the Core, so the list shows only what is running low.",
+        "steps": [
+          "Count the tins and the rice",
+          "Add what is running low",
+          "Read the list at the shop"
+        ],
+        "fact": "Grocy tracks the pantry, shopping lists, recipes, chores and household habits in one place."
+      }
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "Tody"
+        ]
+      },
+      "service": "tody",
+      "capability": "assign and track household chores and recurring tasks",
+      "anchor": {
+        "role": "counter",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "range",
+            "nth": 0
+          },
+          {
+            "role": "counter",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The bins rota has four names",
+        "body": "Donetick sets the week for four people, from the bins to the balcony. Each chore is ticked off on the Core when it is done.",
+        "chips": [
+          "Donetick",
+          "alternative to Tody"
+        ],
+        "note": "Reminders pass through an outside notification service."
+      },
+      "detail": {
+        "before": "The week's chores lived in Tody, and whose turn it was depended on which phone you asked.",
+        "after": "Donetick keeps the rota on the Core. It assigns each chore, repeats it, and shows whose turn is next.",
+        "steps": [
+          "Add the weekly chores",
+          "Give each one a name and a day",
+          "Tick a chore off when it is done"
+        ],
+        "fact": "Donetick assigns and tracks household chores and recurring tasks."
+      }
+    },
+    {
+      "id": "balcony-papers",
+      "chapter": "balcony",
+      "member": "chike",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "service": "google-drive",
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "deck",
+            "nth": 0
+          },
+          {
+            "role": "garden",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The tenancy papers, filed",
+        "body": "At the bistro table on the balcony, Chike files the tenancy agreement and the boiler record in Papra. The landlord's paperwork now sits in one archive on the Core.",
+        "chips": [
+          "Papra",
+          "alternative to Google Drive"
+        ]
+      },
+      "detail": {
+        "before": "Chike kept the tenancy agreement and the receipts in one Google Drive folder.",
+        "after": "Papra archives each paper on the Core, so the agreement and the boiler record are there when the landlord asks.",
+        "steps": [
+          "Add the tenancy agreement",
+          "File the boiler record beside it",
+          "Open both when the landlord asks"
+        ],
+        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+      }
+    },
+    {
+      "id": "balcony-settext",
+      "chapter": "balcony",
+      "member": "ayaan",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Apple Books"
+        ]
+      },
+      "service": "apple-books",
+      "capability": "manage and read books, comics and PDFs with automatic covers and metadata",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The set text joins the library",
+        "body": "The school sends the set text as a file. Ayaan adds it to BookLore, which fetches the cover from outside, and reads it on the balcony.",
+        "chips": [
+          "BookLore",
+          "alternative to Apple Books"
+        ],
+        "note": "BookLore fetches covers and details from outside."
+      },
+      "detail": {
+        "before": "Ayaan read his set texts in Apple Books, with his place kept in that app.",
+        "after": "BookLore keeps the school's file in a library on the Core and remembers his page. Only the cover and book details come from outside.",
+        "steps": [
+          "Add the school's file to the library",
+          "Open it from the Core",
+          "Pick up at the page he left"
+        ],
+        "fact": "BookLore manages and reads books, comics and PDFs with automatic covers and metadata."
+      }
+    },
+    {
+      "id": "study-repos",
+      "chapter": "study",
+      "member": "chike",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitLab (SaaS)"
+        ]
+      },
+      "service": "gitlab",
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "desk",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A weekend project gets a home",
+        "body": "Chike pushes his weekend project, a bus-timetable board, to Forgejo on the Core. Its issues and pull requests sit beside the code.",
+        "chips": [
+          "Forgejo",
+          "alternative to GitLab"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "Chike kept his weekend projects on GitLab, with their issues and merge requests there too.",
+        "after": "Forgejo hosts the repository on the Core, with its issues and pull requests beside it.",
+        "steps": [
+          "Point the repository at Forgejo",
+          "Push the timetable branch",
+          "Open the pull request on the Core"
+        ],
+        "fact": "Forgejo hosts your own Git repositories, issues and pull requests on your Core."
+      }
+    },
+    {
+      "id": "study-flow",
+      "chapter": "study",
+      "member": "chike",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "service": "zapier",
+      "capability": "connect your apps with workflows",
+      "anchor": {
+        "role": "desk",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Three automations move to the Core",
+        "body": "Chike moves three small automations out of a rented service and into n8n. They run on the Core and pass data between the apps he installed.",
+        "chips": [
+          "n8n",
+          "alternative to Zapier"
+        ]
+      },
+      "detail": {
+        "before": "Chike built his small automations in Zapier, one rented step after another.",
+        "after": "n8n runs the same workflows on the Core. The data they pass between his installed apps stays on the Core.",
+        "steps": [
+          "Rebuild the first workflow in n8n",
+          "Connect it to an installed app",
+          "Run it once and read the result"
+        ],
+        "fact": "n8n connects your apps with workflows, with the data staying on your Core."
+      }
+    },
+    {
+      "id": "study-permit",
+      "chapter": "study",
+      "member": "chike",
+      "agent": "chike",
+      "approval": "chike",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "desk",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "auto",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "Cassia fills in the permit form",
+        "body": "Cassia opens the council's parking page and fills in the renewal form for the flat's bay. Chike checks every field, then submits it himself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "chike",
+        "text": "The renewal form is filled in. Please check the vehicle details before you submit it."
+      },
+      "detail": {
+        "before": "Renewing the parking permit meant typing the same details into the council's form each year.",
+        "after": "Cassia opens the council's page in its browser and fills in the form from what Chike typed. Chike reads every field and submits it himself.",
+        "steps": [
+          "Type the bay and the vehicle details",
+          "Let Cassia fill in the form",
+          "Read every field, then submit it"
+        ],
+        "fact": "OpenClaw is an agent with browser automation and tool use, running in a sandboxed app on your Core."
+      }
+    },
+    {
+      "id": "bedroom-sources",
+      "chapter": "bedroom-two",
+      "member": "ayaan",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Raindrop.io"
+        ]
+      },
+      "service": "raindrop-io",
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "bed",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A source that cannot vanish",
+        "body": "Ayaan saves each source for his history project in Linkwarden. It keeps a screenshot and a PDF of the page, so a page that disappears is still there.",
+        "chips": [
+          "Linkwarden",
+          "alternative to Raindrop.io"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "Ayaan bookmarked his sources in Raindrop.io, and a page that vanished left only the bookmark.",
+        "after": "Linkwarden saves each page with a screenshot and a PDF on the Core, so the source is still there when the site moves.",
+        "steps": [
+          "Save the page for the project",
+          "Tag it with the topic",
+          "Open the saved copy when the page is gone"
+        ],
+        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+      }
+    },
+    {
+      "id": "bedroom-german",
+      "chapter": "bedroom-two",
+      "member": "ayaan",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "DeepL"
+        ]
+      },
+      "service": "deepl",
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "bed",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "behind",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One sentence, checked twice",
+        "body": "Ayaan translates a German sentence both ways in LibreTranslate, then checks it against his textbook. The Core runs the translator, and the textbook has the last word.",
+        "chips": [
+          "LibreTranslate",
+          "alternative to DeepL"
+        ]
+      },
+      "detail": {
+        "before": "Ayaan checked his German sentences in DeepL, one pasted line at a time.",
+        "after": "LibreTranslate runs on the Core. Ayaan translates a sentence both ways, then checks it against his textbook before he writes it down.",
+        "steps": [
+          "Type the German sentence",
+          "Translate it both ways",
+          "Check the result against the textbook"
+        ],
+        "fact": "LibreTranslate translates text and documents on your own Core."
+      }
+    },
+    {
+      "id": "bedroom-aloud",
+      "chapter": "bedroom-two",
+      "member": "ayaan",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kokoro",
+        "replaces": []
+      },
+      "capability": "turn text into natural speech on your own Core",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The essay, read back to him",
+        "body": "Ayaan pastes his essay into Kokoro and listens to it read aloud. The sentences that drag stand out when he hears them, and he rewrites them himself.",
+        "chips": [
+          "Kokoro"
+        ]
+      },
+      "detail": {
+        "before": "Ayaan read his essay through once and never noticed where the sentences dragged.",
+        "after": "Kokoro turns the essay into speech on the Core. Ayaan hears the clumsy lines, marks them and rewrites them himself.",
+        "steps": [
+          "Paste the essay into Kokoro",
+          "Listen and mark the clumsy lines",
+          "Rewrite them by hand"
+        ],
+        "fact": "Kokoro turns text into speech on your own Core."
+      }
+    },
+    {
+      "id": "three-split",
+      "chapter": "bedroom-three",
+      "member": "dmitri",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "spliit",
+        "replaces": [
+          "Splitwise"
+        ]
+      },
+      "service": "splitwise",
+      "capability": "split shared costs and settle up with the fewest payments",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "bed",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Two brothers split a present",
+        "body": "Dmitri adds the cost of their mother's birthday present to Spliit, and Ayaan's share comes out. It works out who owes whom and does not move money.",
+        "chips": [
+          "Spliit",
+          "alternative to Splitwise"
+        ]
+      },
+      "detail": {
+        "before": "Dmitri and Ayaan kept their shared costs in Splitwise, and the tally lived with that service.",
+        "after": "Spliit keeps the tally on the Core. Each present is one entry, and the app works out who owes whom.",
+        "steps": [
+          "Add the present as one cost",
+          "Pick Ayaan's share",
+          "Settle up when they have paid"
+        ],
+        "fact": "Spliit splits shared costs and settles up with the fewest payments."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial",
+        "from": "left"
+      },
+      "popup": {
+        "title": "One flat, four different days",
+        "body": "A teacher's table, a developer's landing, two brothers' rooms and one Companion Core by the door."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "A teacher's lessons, a developer's repositories and two teenagers' schoolwork can live on a Companion Core. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Told in the v3 shape: 17 of 20 room beats are pair beats. The three pair-less ones are the Companion Memory draft, the OpenClaw permit form and Kokoro reading an essay back.",
+    "The file is rademaker.json because the slug is the family's (cast plan: rademaker lives in the home with the long table); the home is the walkup-duplex apartment.",
+    "Steam Headless is paired with Xbox Cloud Gaming, a pair the catalog lists and lander.json does not hold; the geforce-now pair on the hold list is not used.",
+    "Age rule 16: Ayaan (13) and Dmitri (16) use no chat model or agent in their own beats; Clove and Cassia work only for Fernanda and Chike, who approve every result.",
+    "Honest edges carried: Steam needs a Valve account; Pi-hole forwards unblocked lookups to the family DNS provider; Donetick reminders use an outside notification service; BookLore fetches covers from outside; Spliit does not move money.",
+    "The home has no TV: the media beat at the couch is the Audiobookshelf audiobook; Dmitri plays in a browser tab at the desk by the door."
+  ]
+}
