@@ -1,0 +1,432 @@
+{
+  "$comment": "The rooms of the eight office buildings of the 2026-10-19 plan (reference/office/office-plan.md section 2, the room tables) and the room role each is meant to play. scripts/test-company-contract.mts runs every name through the merged role table (roles.json + roles-office.json): the intended roles must all resolve, and no home room role may. A name that is not a role of a story (a closed neighbour bay, a quiet room) has roles []. A regression oracle for the role table; the buildings themselves arrive with M1.",
+  "buildings": {
+    "startup-loft": [
+      {
+        "name": "Entry Lobby",
+        "roles": [
+          "entry"
+        ]
+      },
+      {
+        "name": "Phone Booth",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Comms Room",
+        "roles": [
+          "server"
+        ]
+      },
+      {
+        "name": "Open Office",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Meeting Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Kitchenette",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Neighbour Workshop",
+        "roles": []
+      }
+    ],
+    "garage-lab": [
+      {
+        "name": "Workshop Bay",
+        "roles": [
+          "workshop"
+        ]
+      },
+      {
+        "name": "Desk Room",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Meeting Nook",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Back Room",
+        "roles": [
+          "server"
+        ]
+      },
+      {
+        "name": "Kitchenette",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Entry",
+        "roles": [
+          "entry"
+        ]
+      }
+    ],
+    "dev-shop-unit": [
+      {
+        "name": "Reception",
+        "roles": [
+          "reception"
+        ]
+      },
+      {
+        "name": "Open Office",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Meeting Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Huddle Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Phone Booth",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Kitchenette",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Device Lab",
+        "roles": [
+          "workshop"
+        ]
+      },
+      {
+        "name": "Comms Room",
+        "roles": [
+          "server"
+        ]
+      }
+    ],
+    "agency-printworks": [
+      {
+        "name": "Reception",
+        "roles": [
+          "reception"
+        ]
+      },
+      {
+        "name": "Studio Floor",
+        "roles": [
+          "workfloor"
+        ]
+      },
+      {
+        "name": "Pitch Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Studio Kitchen",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Print Room",
+        "roles": [
+          "workshop"
+        ]
+      },
+      {
+        "name": "Phone Booth",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Comms Room",
+        "roles": [
+          "server"
+        ]
+      },
+      {
+        "name": "Open Office Mezzanine",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Producer Office",
+        "roles": [
+          "office"
+        ]
+      }
+    ],
+    "practice-townhouse": [
+      {
+        "name": "Reception",
+        "roles": [
+          "reception"
+        ]
+      },
+      {
+        "name": "Waiting Room",
+        "roles": [
+          "reception"
+        ]
+      },
+      {
+        "name": "Meeting Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Kitchenette",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Comms Room",
+        "roles": [
+          "server"
+        ]
+      },
+      {
+        "name": "Partner Office North",
+        "roles": [
+          "office"
+        ]
+      },
+      {
+        "name": "Partner Office South",
+        "roles": [
+          "office"
+        ]
+      },
+      {
+        "name": "Open Office",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Archive Room",
+        "roles": [
+          "store"
+        ]
+      },
+      {
+        "name": "Quiet Room",
+        "roles": []
+      },
+      {
+        "name": "Supply Room",
+        "roles": [
+          "store"
+        ]
+      }
+    ],
+    "shop-backoffice": [
+      {
+        "name": "Shop Floor",
+        "roles": [
+          "workfloor"
+        ]
+      },
+      {
+        "name": "Consultation Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Back Office",
+        "roles": [
+          "server",
+          "office"
+        ]
+      },
+      {
+        "name": "Workroom",
+        "roles": [
+          "workshop"
+        ]
+      },
+      {
+        "name": "Stockroom",
+        "roles": [
+          "store"
+        ]
+      },
+      {
+        "name": "Staff Kitchenette",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Neighbour Unit",
+        "roles": []
+      }
+    ],
+    "contractor-yard": [
+      {
+        "name": "Reception",
+        "roles": [
+          "reception"
+        ]
+      },
+      {
+        "name": "Open Office",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Break Room",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Comms Room",
+        "roles": [
+          "server"
+        ]
+      },
+      {
+        "name": "Estimating Office",
+        "roles": [
+          "office"
+        ]
+      },
+      {
+        "name": "Meeting Room",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Supply Room",
+        "roles": [
+          "store"
+        ]
+      },
+      {
+        "name": "Workshop",
+        "roles": [
+          "workshop"
+        ]
+      },
+      {
+        "name": "Stockroom",
+        "roles": [
+          "store"
+        ]
+      }
+    ],
+    "hub-courtyard": [
+      {
+        "name": "Reception",
+        "roles": [
+          "reception"
+        ]
+      },
+      {
+        "name": "Open Office",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Meeting Room A",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Meeting Room B",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Test Lab",
+        "roles": [
+          "workshop"
+        ]
+      },
+      {
+        "name": "Kitchen",
+        "roles": [
+          "kitchen"
+        ]
+      },
+      {
+        "name": "Supply Room",
+        "roles": [
+          "store"
+        ]
+      },
+      {
+        "name": "Comms Room",
+        "roles": [
+          "server"
+        ]
+      },
+      {
+        "name": "Open Office Gallery",
+        "roles": [
+          "workfloor",
+          "office"
+        ]
+      },
+      {
+        "name": "Team Room One",
+        "roles": [
+          "meeting"
+        ]
+      },
+      {
+        "name": "Team Room Two",
+        "roles": [
+          "meeting"
+        ]
+      }
+    ]
+  }
+}

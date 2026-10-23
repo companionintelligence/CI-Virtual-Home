@@ -13,6 +13,7 @@
 //   ... --json                                      the same result as JSON on stdout (no other output)
 //   ... --world <dir>                               read casting.json and houses/ from <dir> instead of content/story and content/houses
 //                                                   (a file inside test/fixtures/stories picks that folder's `world/` by itself)
+//   pnpm run story:validate -- --kind office [<slug|file>...]   the fictional companies (content/offices/<slug>.json) against company/v1 instead (reference/office/office-contract-m0.md)
 //
 // Exit 1 on any error, and on any `review` finding that is not on content/story/reviewed.json. Warnings print and never fail.
 // A family the casting plan names that has no file yet (the plan is ahead of the writers: the six apartments were cast before their stories were
@@ -31,6 +32,17 @@ import type { Story } from '../assets/story/types.ts';
 
 // a bare `--` (from `pnpm run story:validate -- <file>`) is only the separator
 const argv = process.argv.slice(2).filter((a) => a !== '--');
+// `--kind office` hands the run to the company gate (content/offices/<slug>.json; scripts/story/lib/co/cli.mts) before anything of the family gate is loaded;
+// `--kind family` is the default
+{
+  const at = argv.indexOf('--kind');
+  if (at >= 0) {
+    const kind = argv[at + 1];
+    if (kind !== 'office' && kind !== 'family') { console.error('--kind needs office or family'); process.exit(2); }
+    argv.splice(at, 2);
+    if (kind === 'office') process.exit((await import('./story/lib/co/cli.mts')).runCompanyValidator(argv));
+  }
+}
 const flag = (n: string): boolean => argv.includes(`--${n}`);
 const JSON_OUT = flag('json');
 const COMPLETE = flag('complete');

@@ -31,7 +31,9 @@ const broken = (text: string): string[] => errorRules().filter(r => r.re.test(te
 
 test('the player\'s snapshot of claims.json is current (node --experimental-strip-types scripts/story/lib/fine-print.mts --write)', () => {
   assert.equal(snapshotProblem(), '');
-  for (const d of (claims as any).disclosures) assert.equal(CLAIMS_SNAPSHOT.disclosures.find(x => x.id === d.id)?.text, d.text, `${d.id} in the snapshot`);
+  for (const d of (claims as any).disclosures.filter((x: any) => !x.collection)) assert.equal(CLAIMS_SNAPSHOT.disclosures.find(x => x.id === d.id)?.text, d.text, `${d.id} in the snapshot`);
+  // a disclosure of another collection (the office's) is not in the shipped snapshot: a build without the office ships the same bytes
+  for (const d of (claims as any).disclosures.filter((x: any) => x.collection)) assert.equal(CLAIMS_SNAPSHOT.disclosures.find(x => x.id === d.id), undefined, `${d.id} (collection ${d.collection}) is not in the snapshot`);
 });
 
 test('every surface names disclosures claims.json has, and the table carries every disclosure claims.json requires', () => {

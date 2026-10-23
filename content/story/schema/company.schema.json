@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homes.ci.computer/schema/company-v1.json",
+  "title": "Company story v1 (authored source: content/offices/<slug>.json)",
+  "description": "The sibling of family/v1 for a fictional company in an office (reference/office/office-contract-m0.md). Authored by humans and agents; everything generated (voice clips, poses, timeline, track) lives beside the file, never in it. The shared definitions (id, appId, voiceKey, companion, camera, anchorLeaf, anchor, popup, detail, say, profile, closing, spot, chapter) are the family schema's, and scripts/test-company-contract.mts holds the two equal (descriptions apart). Only the JSON Schema keywords the zero-dependency checker (scripts/story/lib/schema-lite.mts) enforces are used. Rules a schema cannot say (word counts, dashes, banned phrases, app and anchor existence, disclosures, fleet rules) are enforced by scripts/validate-stories.mts --kind office. Enumerations are mirrored as constants in scripts/story/lib/co/consts.mts and a test keeps the two equal.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "slug", "house", "fictional", "company", "members", "chapters", "beats", "closing"],
+  "properties": {
+    "schema": { "const": "company/v1" },
+    "slug": { "type": "string", "pattern": "^[a-z]+(-[a-z]+){0,2}$", "maxLength": 32, "description": "Public URL slug (/company/<slug>), from the fictional name. Must equal the office casting's slug for this building. Never a family slug or a house id; never derived from the building id." },
+    "house": { "type": "string", "pattern": "^[a-z0-9-]+$", "maxLength": 32, "description": "INTERNAL HouseSpec id (content/houses/<id>.json, use: office). Build-time only. It never appears in a URL, a file name, a title, an og tag, alt text or any displayed string." },
+    "fictional": { "const": true },
+    "company": { "$ref": "#/$defs/company" },
+    "members": { "type": "array", "minItems": 3, "maxItems": 8, "items": { "$ref": "#/$defs/member" } },
+    "chapters": { "type": "array", "minItems": 7, "maxItems": 12, "items": { "$ref": "#/$defs/chapter" } },
+    "beats": { "type": "array", "minItems": 24, "maxItems": 40, "items": { "$ref": "#/$defs/beat" } },
+    "closing": { "$ref": "#/$defs/closing" },
+    "notes": { "type": "array", "maxItems": 8, "items": { "type": "string", "maxLength": 240 }, "description": "Build-only notes for reviewers and the owner (for example 'beat X needs owner sign-off'). Never shipped, never displayed." }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,31}$" },
+    "appId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,40}$", "description": "A Companion Hub store id from content/story/catalog-apps.json (r-catalog: live store AND manifest on main). Unknown ids fail." },
+    "voiceKey": { "enum": ["v-warm-f", "v-clear-f", "v-bright-f", "v-young-f", "v-steady-m", "v-storyteller-m", "v-deep-m", "v-light-m"], "description": "Key of content/story/voices.json. Never an engine voice name." },
+    "size": { "enum": ["startup", "small", "medium"], "description": "startup: headcount 3 to 12, scope company. small: headcount 10 to 30, scope company. medium: headcount 50 to 250, scope site or department, never company (rule co-size)." },
+    "scope": { "enum": ["company", "site", "department"], "description": "What the story is about: the whole company, one site of a larger firm, or one department of one. A medium business is only ever told as a site or a department, never as 'the company'." },
+    "function": { "enum": ["owner", "operations", "finance", "sales", "marketing", "support", "engineering", "design", "projects", "people", "legal", "it"], "description": "What the person does at work (content/story/functions.json: the room roles where the function works and the pool of apps a story may give it). The filter words of /office are the labels of these twelve." },
+    "category": { "enum": ["setup", "documents", "communication", "customers", "money", "projects", "engineering", "design", "marketing", "people", "it"], "description": "The beat's topic. setup = the first run; documents = papers, files, scans, the handbook; communication = chat, calendars, notes; customers = leads, contacts, appointments; money = invoices, hours, subscriptions; projects = boards and plans; engineering = code and builds; design = drawings and screens; marketing = lists and campaigns; people = starters, rotas, the office's own running; it = vaults, status, the network." },
+    "roomRole": { "enum": ["entry", "living", "kitchen", "dining", "office", "bedroom", "kids", "garage", "laundry", "bath", "garden", "patio", "street", "reception", "workfloor", "meeting", "server", "workshop", "store"], "description": "The room roles of content/story/roles.json plus the office's (content/story/roles-office.json). The home-only ones (living, dining, bedroom, kids, garage, laundry, bath, garden, patio) stay in the enum so one chapter shape serves both kinds; rule co-rooms refuses them in a company story." },
+    "roleId": { "enum": ["street", "front-door", "core", "room", "couch", "tv", "fireplace", "bookshelf", "fridge", "range", "kitchen-island", "counter", "dining-table", "desk", "bed", "crib", "toys", "music", "laundry", "bicycle", "easel", "telescope", "patio-seat", "garden", "driveway", "pool", "deck", "workstation", "meeting-table", "whiteboard", "server-rack", "reception-desk", "printer", "workbench"], "description": "Semantic anchor roles: content/story/roles.json plus the office's (roles-office.json). Closed set. The universal ones in an office are street, front-door, core, room and counter (a couch and a garden are not)." },
+    "company": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "tagline", "sector", "size", "scope", "headcount", "floor", "story", "address", "narrator"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Z][A-Za-z&'’ -]{2,38}[A-Za-z]$", "maxLength": 40, "description": "A fictional company name: a proposal until counsel clears it (content/story/company-names.json). No digit; not a stock sample name, not the name of a service the store pairs, not a family's surname. Shown as it is." },
+        "tagline": { "type": "string", "minLength": 20, "maxLength": 80, "description": "One sentence, sentence case, no dashes, ends with a full stop, no price, no guarantee, and no head count beside the word Core. Shown on the card and in the share title." },
+        "sector": { "type": "string", "minLength": 8, "maxLength": 48, "description": "What the company does, a short noun phrase: 'Architecture practice', 'Software for independent cinemas'." },
+        "size": { "$ref": "#/$defs/size" },
+        "scope": { "$ref": "#/$defs/scope" },
+        "headcount": { "type": "integer", "minimum": 3, "maximum": 250, "description": "People in the company, or in the site or department the story is about. Never printed beside a Core (rule co-size)." },
+        "floor": { "type": "integer", "minimum": 3, "maximum": 25, "description": "People who work in the building the story is told in: at most 25 and at most headcount (owner decision O3). The card says 'all in this office' when it equals headcount." },
+        "story": { "type": "string", "minLength": 80, "maxLength": 320, "description": "Two to three short sentences that open the company page. Third person. What it does and who works there. Never a testimonial: no quote, no 'says', no result claim, no customer." },
+        "address": {
+          "type": "object", "additionalProperties": false, "required": ["line", "place"],
+          "properties": {
+            "line": { "type": "string", "pattern": "^[0-9]{1,3} [A-Z][A-Za-z' ]{3,30}$", "description": "A number and an INVENTED street, for example '9 Tanyard Terrace'. No unit, ZIP, postal code or region." },
+            "place": { "type": "string", "pattern": "^[A-Z][A-Za-z' ]{3,30}$", "description": "An INVENTED town or neighbourhood. Not a real place. Unique across the fleet." }
+          }
+        },
+        "narrator": { "$ref": "#/$defs/voiceKey" },
+        "office": { "$ref": "#/$defs/office" },
+        "day": { "type": "array", "minItems": 5, "maxItems": 10, "items": { "$ref": "#/$defs/dayEntry" }, "description": "Optional. A day at work: 5 to 10 entries in time order, each pointing at an existing beat. Each featured member appears at least once (warning otherwise)." }
+      }
+    },
+    "office": {
+      "type": "object", "additionalProperties": false, "required": ["lede", "spots"],
+      "description": "Optional. The office, told true to its spec. No builder, no game, no real place, no address, no numbers: the page derives storeys, area and room count itself.",
+      "properties": {
+        "lede": { "type": "string", "minLength": 40, "maxLength": 420, "description": "At most 50 words (validator counts) in two or three sentences, each at most 22 words. True to the building spec: storeys, materials, rooms, light. Nothing the building lacks; no building name or id." },
+        "spots": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "#/$defs/spot" } }
+      }
+    },
+    "spot": {
+      "type": "object", "additionalProperties": false, "required": ["room", "line"],
+      "properties": {
+        "room": { "type": "string", "minLength": 2, "maxLength": 40, "description": "An exact room name of the house (the validator checks it against the spec)." },
+        "line": { "type": "string", "minLength": 8, "maxLength": 150, "description": "At most 16 words (validator counts), true to that room's furniture." }
+      }
+    },
+    "dayEntry": {
+      "type": "object", "additionalProperties": false, "required": ["at", "beat", "line"],
+      "properties": {
+        "at": { "enum": ["morning", "mid-morning", "midday", "afternoon", "late-afternoon"], "description": "Part of the working day, daylight only. Entries run in this order and never go back." },
+        "beat": { "$ref": "#/$defs/id", "description": "An existing beat id of this file." },
+        "line": { "type": "string", "minLength": 8, "maxLength": 130, "description": "At most 14 words (validator counts); a different sentence from the beat's own title and body." }
+      }
+    },
+    "detail": {
+      "type": "object", "additionalProperties": false, "required": ["before", "after", "steps", "fact"],
+      "description": "Optional (story v2). What a visitor who stays opens up: how it worked with the service it replaces, how it works now, the steps, one true fact. The popup's title and body (the narration, the film, the ads) are not touched.",
+      "properties": {
+        "before": { "type": "string", "minLength": 12, "maxLength": 240, "description": "At most 28 words (validator counts). How it works with the service it replaces: neutral and factual. Names a service only if it is in the beat's app.replaces or the catalog entry's replaces; never an attack on a company." },
+        "after": { "type": "string", "minLength": 12, "maxLength": 240, "description": "At most 28 words. What the person does now and where it lives (the mechanism), not an adjective." },
+        "steps": { "type": "array", "minItems": 2, "maxItems": 4, "items": { "type": "string", "minLength": 3, "maxLength": 110 }, "description": "What the person actually does, in order; each at most 12 words. No UI described as seen on a screen." },
+        "fact": { "type": "string", "minLength": 12, "maxLength": 240, "description": "At most 28 words. One true fact about the app in the words of its catalog description (the validator warns when it shares no word with it)." }
+      }
+    },
+    "profile": {
+      "type": "object", "additionalProperties": false, "required": ["bio"],
+      "properties": {
+        "bio": { "type": "string", "minLength": 20, "maxLength": 360, "description": "At most 45 words (validator counts). Who they are and how they use the Core: third person, present tense, no age (the page shows it), no health, legal or financial claim." }
+      }
+    },
+    "companion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "runtime", "job", "personality", "voice", "memory", "limits"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Z][a-z]{2,13}$", "description": "The name the member gave their agent. A story device, not a product setting. Unique across the fleet." },
+        "runtime": { "enum": ["Hermes", "OpenClaw"], "description": "Hermes = messaging gateway (text it); OpenClaw = browser automation and tool use. First-party store ids ci-hermes and ci-openclaw." },
+        "job": { "type": "string", "minLength": 20, "maxLength": 90, "description": "One sentence naming tasks the listed apps can really do. Third person, present tense." },
+        "personality": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "pattern": "^[a-z]{3,14}$" }, "description": "Three plain words. They colour the caption tone, never a capability." },
+        "voice": { "$ref": "#/$defs/voiceKey", "description": "The agent's voice for beat.say lines. Different from the narrator and from every other companion in the family." },
+        "memory": { "type": "boolean", "description": "True when this member has connected Companion Memory to the agent, opt-in." },
+        "limits": { "type": "string", "minLength": 12, "maxLength": 80, "description": "What it will not do alone, for example 'Drafts only. Dad sends every message.'" }
+      }
+    },
+    "member": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "function", "title", "colour", "ownsCore"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "pattern": "^[A-Z][a-zA-Z'’]{1,19}$" },
+        "function": { "$ref": "#/$defs/function" },
+        "title": { "type": "string", "minLength": 3, "maxLength": 40, "description": "The job title, a short noun phrase in sentence case: 'Chief technology officer', 'Practice manager'. The word 'assistant' is not used (write 'executive support' or 'office coordinator')." },
+        "colour": { "enum": ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"], "description": "CI-Common chart token for the monogram disc. Distinct within a company where possible. Never a hex. A person is a monogram, never a face." },
+        "ownsCore": { "type": "boolean", "description": "True for exactly one member: the person who looks after the one Companion Core and installs the apps (rule co-owner). The company's one companion is theirs." },
+        "profile": { "$ref": "#/$defs/profile" },
+        "companion": { "$ref": "#/$defs/companion", "description": "Optional. Exactly one member has one, the one who owns the Core (rule co-companions); an agent belongs to the person who approves its work." }
+      }
+    },
+    "chapter": {
+      "type": "object", "additionalProperties": false, "required": ["id", "kind", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["ftue", "room", "outside", "outro"] },
+        "room": { "$ref": "#/$defs/roomRole", "description": "Required for kind room and outside." },
+        "title": { "type": "string", "minLength": 3, "maxLength": 28, "description": "Sentence case. 'The kitchen', 'Out in the garden'." }
+      }
+    },
+    "anchorLeaf": {
+      "type": "object", "additionalProperties": false, "required": ["role"],
+      "properties": { "role": { "$ref": "#/$defs/roleId" }, "room": { "$ref": "#/$defs/roomRole" }, "nth": { "type": "integer", "minimum": 0, "maximum": 5 } }
+    },
+    "anchor": {
+      "type": "object", "additionalProperties": false, "required": ["role"],
+      "properties": {
+        "role": { "$ref": "#/$defs/roleId" },
+        "room": { "$ref": "#/$defs/roomRole", "description": "Narrow to this room when the house has several instances." },
+        "nth": { "type": "integer", "minimum": 0, "maximum": 5, "description": "Which instance, in the resolver's stable order." },
+        "fallback": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/anchorLeaf" }, "description": "Tried in order when the role is missing in this house. Required for every role that is not in roles.json universal. The validator FAILS when neither the role nor a fallback resolves in the beat's house." }
+      }
+    },
+    "camera": {
+      "type": "object", "additionalProperties": false,
+      "description": "Semantic hints only. The pose solver still picks a collision-free eye with a clear sight line.",
+      "properties": {
+        "framing": { "enum": ["wide", "medium", "close"] },
+        "from": { "enum": ["front", "left", "right", "behind", "above"] },
+        "side": { "enum": ["left", "right", "auto"], "description": "Which third of the frame the anchor sits on; the popup takes the other." },
+        "eye": { "enum": ["standing", "seated", "low", "aerial"] }
+      }
+    },
+    "popup": {
+      "type": "object", "additionalProperties": false, "required": ["title", "body"],
+      "properties": {
+        "kind": { "enum": ["card", "phone"], "description": "'phone' draws a stylised phone with the `phone` rows. Never a screenshot, never an SSID, a password or a pairing code." },
+        "title": { "type": "string", "minLength": 3, "maxLength": 48, "description": "At most 6 words (validator counts). Sentence case. A complete thought, not a label." },
+        "body": { "type": "string", "minLength": 30, "maxLength": 260, "description": "At most 30 words (validator counts), each sentence at most 20 words, no digits except inside an app name. THIS TEXT IS THE NARRATION: the voice tool reads it word for word and the caption shows it. Third person, present tense." },
+        "chips": { "type": "array", "maxItems": 3, "items": { "type": "string", "maxLength": 48 }, "description": "The app name, then (story v3) 'alternative to <Service>' for a beat that has `service`: exactly two items, the second naming the registry service (content/story/services.json) or the alias app.replaces[0] uses. The pass 1 form 'replaces <X>' (X one of the app's catalog `replaces` names) is accepted with a warning (chips-legacy). Nothing else." },
+        "note": { "type": "string", "maxLength": 90, "description": "A required disclosure line for this beat, see STORY-BIBLE section 8 (ftue-pick carries 'Installing apps uses the internet.')." },
+        "phone": {
+          "type": "object", "additionalProperties": false, "required": ["header", "rows"],
+          "properties": {
+            "header": { "type": "string", "maxLength": 24 },
+            "rows": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "type": "string", "maxLength": 44 } }
+          }
+        }
+      }
+    },
+    "say": {
+      "type": "object", "additionalProperties": false, "required": ["speaker", "text"],
+      "properties": {
+        "speaker": { "$ref": "#/$defs/id", "description": "A member id whose companion speaks. Must have a companion." },
+        "text": { "type": "string", "minLength": 8, "maxLength": 110, "description": "At most 16 words, first person, one or two short sentences. SCRIPTED: no claim about what the agent is or knows, no product fact, no number. Shown in the popup as a quote labelled 'Scripted'. At most 6 beats per family have one." }
+      }
+    },
+    "beat": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "chapter", "category", "anchor", "popup"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "chapter": { "$ref": "#/$defs/id" },
+        "member": { "$ref": "#/$defs/id", "description": "Whose work this beat is about. Omit for the whole company's beats (the first run, the outro)." },
+        "agent": { "$ref": "#/$defs/id", "description": "A member id whose companion acts in this beat. Requires `approval`." },
+        "approval": { "$ref": "#/$defs/id", "description": "The member who reads, decides or sends. Every beat with an `agent` has one: an agent prepares, a person approves." },
+        "category": { "$ref": "#/$defs/category" },
+        "app": {
+          "type": "object", "additionalProperties": false, "required": ["id", "replaces"],
+          "properties": {
+            "id": { "$ref": "#/$defs/appId" },
+            "replaces": { "type": "array", "maxItems": 3, "items": { "type": "string", "maxLength": 32 }, "description": "A subset of the catalog `replaces` of this app (empty for first-party apps and for apps that replace nothing). Names only the services the store's own rows name (owner decision O7)." }
+          }
+        },
+        "with": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/appId" }, "description": "Other store apps named in this beat's text. Every Hub app named in a beat must be `app.id` or listed here. Companion Memory, Hermes and OpenClaw are exempt (the first-party trio)." },
+        "capability": { "type": "string", "minLength": 10, "maxLength": 100, "description": "The ONE thing the app does in this scene, in the words of its catalog description. Build-only audit trail (never shipped). The validator warns when it shares no word with the app's catalog description." },
+        "service": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,38}$", "description": "The id of the replaced service this beat's app is the alternative to, from content/story/services.json. At most one. Present exactly when app.replaces is not empty; app.replaces[0] is then the service's name or one of its aliases. A company story is told in the v3 shape from the start (reference/story/story-v3.md); a pair on the plan's `hold` list is never used." },
+        "anchor": { "$ref": "#/$defs/anchor" },
+        "camera": { "$ref": "#/$defs/camera" },
+        "popup": { "$ref": "#/$defs/popup" },
+        "detail": { "$ref": "#/$defs/detail" },
+        "say": { "$ref": "#/$defs/say" },
+        "emphasis": { "type": "object", "additionalProperties": false, "properties": { "ring": { "type": "boolean" }, "wake": { "type": "boolean", "description": "FTUE plug-in beat only: the Core's LED, fan and screen wake." } } },
+        "film": { "type": "boolean", "description": "In the film (see STORY-BIBLE section 7 for the film quota)." },
+        "minSeconds": { "type": "number", "minimum": 3, "maximum": 20, "description": "Reading floor. The beat lasts max(voice + 0.6 s, popup read time, minSeconds)." }
+      }
+    },
+    "closing": {
+      "type": "object", "additionalProperties": false, "required": ["body", "cta"],
+      "properties": {
+        "body": { "type": "string", "minLength": 30, "maxLength": 220, "description": "At most 30 words. Second person to the viewer. Names Companion Core and one concrete thing the family now does at home. The sign-off 'UnCloud your life.' is added by the site and the film; never type it here." },
+        "cta": {
+          "type": "object", "additionalProperties": false, "required": ["label", "url"],
+          "properties": { "label": { "type": "string", "maxLength": 28 }, "url": { "const": "https://ci.computer/core" } }
+        }
+      }
+    }
+  }
+}

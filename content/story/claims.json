@@ -1161,6 +1161,19 @@
       "notes": "Owner-specified wording. Never styled as small print; contrast per canon (4.5:1)."
     },
     {
+      "id": "fictional-company",
+      "text": "Fictional company. Real software.",
+      "long": "{company} is a fictional company. The people in it are characters, not customers. The software is real.",
+      "where": [
+        "the /office page's hero, visible without scrolling",
+        "every company page's header, and the player chrome, the first 2 seconds and last card of a film or cut once a company has them",
+        "share pages and og:description of the office pages"
+      ],
+      "required": false,
+      "collection": "office",
+      "notes": "The office's label and its long line (owner decision O4), approved by the user in chat on 2026-10-23 (reference/office/office-contract-m0.md). Counsel has cleared neither; the office pages print them only in a build made with --offices. `collection: office` keeps it out of the player's snapshot (assets/story/fine-print.ts) and off every family surface until a company's tour needs it: `required` is false because no family surface owes it. The words of `long` outside the approved sentence (\"is a fictional company\", \"The software is real\") follow fictional-family's own pattern and still need the owner's sign-off."
+    },
+    {
       "id": "scripted-scenes",
       "text": "Scenes are written for this site. They show what the listed apps do. They are not recordings of a real session.",
       "where": [
