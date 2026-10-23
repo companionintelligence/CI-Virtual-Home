@@ -28,7 +28,7 @@ export type AppMedia = { name: string; logo: MediaImage | null; shot: MediaShot 
 export type Rejected = { kind: 'logo' | 'shot' | 'ci'; id: string; source: string; reason: string };
 export type MediaManifest = {
   v: 1;
-  sources: { marketplace: string; hub: string; portal: string };
+  sources: { marketplace: string; hub: string; portal: string; docs: string };
   apps: Record<string, AppMedia>;
   ci: { hub: CiShot[]; portal: CiShot[] };
   /** apps a family uses that have neither a logo nor a screenshot, on purpose (empty while every app has a logo) */
@@ -64,6 +64,10 @@ export const CAPTION_TAIL = 'Not a recording of this family.';
 export const UNLOOKED = 'Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).';
 /** The caption of an app's screenshot, exactly (story-v2.md): the owner's wording, never edited per app. */
 export const appCaption = (name: string): string => `Real screenshot of ${name} from a Companion Hub QA run. ${CAPTION_TAIL}`;
+/** The caption of a first-party app's screenshot taken from the product's own documentation (CI-Docs): the capture is of sample data, not of a QA run. */
+export const docsCaption = (name: string): string => `Real screenshot of ${name} with sample data. ${CAPTION_TAIL}`;
+/** The caption an app's screenshot must carry, by where it came from (its `source`): the QA run's wording, or the documentation's for a CI-Docs capture. */
+export const shotCaption = (name: string, source: string): string => (/^CI-Docs /.test(source) ? docsCaption(name) : appCaption(name));
 export const HUB_CAPTION_HEAD = 'Real screenshot of Companion Hub';
 export const PORTAL_CAPTION_HEAD = 'Real screenshot of the Companion account page';
 
@@ -220,7 +224,7 @@ export function checkManifest(m: MediaManifest, root: string = ROOT): string[] {
   const out: string[] = [];
   const bad = (msg: string): void => { out.push(msg); };
   if (!m || m.v !== 1) return ['app-media.json: v is not 1'];
-  for (const k of ['marketplace', 'hub', 'portal'] as const) if (!/^[0-9a-f]{40}$/.test(m.sources?.[k] || '')) bad(`sources.${k} is not a full commit sha`);
+  for (const k of ['marketplace', 'hub', 'portal', 'docs'] as const) if (!/^[0-9a-f]{40}$/.test(m.sources?.[k] || '')) bad(`sources.${k} is not a full commit sha`);
   const shaOk = (src: string): boolean => { const at = src.lastIndexOf('@'); const sha = at < 0 ? '' : src.slice(at + 1); return /^[0-9a-f]{12}$/.test(sha) && Object.values(m.sources || {}).some(s => s.startsWith(sha)); };
   const seen = new Set<string>();
   const image = (where: string, img: MediaImage | null, kind: 'logo' | 'shot', budget: number, withId = false): void => {
@@ -243,7 +247,7 @@ export function checkManifest(m: MediaManifest, root: string = ROOT): string[] {
     if (kind === 'shot' && img.w !== SHOT_PX) bad(`${where}: a screenshot is ${SHOT_PX} px wide`);
     if (!img.alt || !img.alt.trim()) bad(`${where}: no alt text`);
     else if (DASH.test(img.alt) || /[!]/.test(img.alt)) bad(`${where}: the alt text has a dash or an exclamation mark`);
-    if (!img.source || !/^CI-(Marketplace|Hub|Portal) \S+@[0-9a-f]{12}$/.test(img.source) || !shaOk(img.source)) bad(`${where}: source ${JSON.stringify(img.source)} is not "<repo> <path>@<sha12>" of one of the pinned commits`);
+    if (!img.source || !/^CI-(Marketplace|Hub|Portal|Docs) \S+@[0-9a-f]{12}$/.test(img.source) || !shaOk(img.source)) bad(`${where}: source ${JSON.stringify(img.source)} is not "<repo> <path>@<sha12>" of one of the pinned commits`);
   };
   const caption = (where: string, s: MediaShot, want: (c: string) => boolean, what: string): void => {
     if (!s.caption || !want(s.caption)) bad(`${where}: the caption is not ${what}`);
@@ -258,7 +262,12 @@ export function checkManifest(m: MediaManifest, root: string = ROOT): string[] {
     image(`${where}.shot`, a.shot, 'shot', SHOT_BUDGET);
     if (a.logo && !a.logo.file.startsWith(`portal/apps/${id}/logo.`)) bad(`${where}.logo: file is not under portal/apps/${id}/`);
     if (a.shot && !a.shot.file.startsWith(`portal/apps/${id}/shot.`)) bad(`${where}.shot: file is not under portal/apps/${id}/`);
-    if (a.shot) caption(`${where}.shot`, a.shot, c => c === appCaption(a.name), `exactly "${appCaption(a.name)}"`);
+    if (a.shot) {
+      const want = shotCaption(a.name, a.shot.source || '');
+      caption(`${where}.shot`, a.shot, c => c === want, `exactly "${want}"`);
+      // the documentation's own captures are the first-party apps' screens (sample data), never a third-party app's
+      if (/^CI-Docs /.test(a.shot.source || '') && !/^ci-/.test(id)) bad(`${where}.shot: a CI-Docs capture is for a first-party app (ci-...), not ${id}`);
+    }
     if (!a.logo && !a.shot) bad(`${where}: neither a logo nor a screenshot: list it in noMedia instead`);
   }
   for (const id of m.noMedia || []) if (m.apps?.[id]) bad(`noMedia lists ${id}, which has an entry`);

@@ -9,8 +9,10 @@
 //   portal/apps/<id>/shot.<hash10>.webp             960 px wide, quality about 72, at most 90 KB: a real capture, scaled and re-encoded, nothing else
 //   portal/ci/hub-<id>.<hash10>.webp, portal-<id>   Companion Hub and Companion account page screenshots, the same treatment
 //
-// WHERE THE BYTES COME FROM. The sibling repos CI-Marketplace, CI-Hub and CI-Portal (beside this one; CI_SIBLINGS or --marketplace-dir, --hub-dir,
-// --portal-dir say otherwise), read with `git cat-file blob <sha>:<path>` at a PINNED commit, never from a working tree (theirs are behind origin).
+// WHERE THE BYTES COME FROM. The sibling repos CI-Marketplace, CI-Hub, CI-Portal and CI-Docs (beside this one; CI_SIBLINGS or --marketplace-dir, --hub-dir,
+// --portal-dir, --docs-dir say otherwise), read with `git cat-file blob <sha>:<path>` at a PINNED commit, never from a working tree (theirs are behind origin
+// or carry other people's edits). CI-Docs `public/screenshots/` holds real captures of our own apps with sample data: a first-party app's screen comes from
+// there (scripts/story/lib/media-docs.mts: what ships, and a rule with a reason for every other file), with its own caption, "with sample data".
 // The pin is the `sources` of the existing manifest, so a rerun is the same bytes; `--update-sources` moves it to each repo's origin/main (and
 // `--fetch` runs `git fetch origin` first, which only updates remote refs). A moved pin is not trusted: see VETTED below.
 //
@@ -28,23 +30,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from '../portal-lib.mts';
 import {
-  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, UNLOOKED, appCaption, hash10, imageSize, webpHasAlpha, usedAppIds, checkManifest, stable,
+  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, UNLOOKED, appCaption, docsCaption, hash10, imageSize, webpHasAlpha, usedAppIds, checkManifest, stable,
   type MediaManifest, type MediaImage, type MediaShot, type CiShot, type Rejected, type AppMedia,
 } from './lib/media.mts';
+import { DOCS_SHOTS, SUPERSEDED_QA, DOCS_APP_REJECT, docsRejections } from './lib/media-docs.mts';
 
 // ------------------------------------------------------------------------------------------------------------ the choices (vetted by eye)
 
-type Repo = 'marketplace' | 'hub' | 'portal';
-const REPO_NAME: Record<Repo, string> = { marketplace: 'CI-Marketplace', hub: 'CI-Hub', portal: 'CI-Portal' };
+type Repo = 'marketplace' | 'hub' | 'portal' | 'docs';
+const REPO_NAME: Record<Repo, string> = { marketplace: 'CI-Marketplace', hub: 'CI-Hub', portal: 'CI-Portal', docs: 'CI-Docs' };
+const REPOS: Repo[] = ['marketplace', 'hub', 'portal', 'docs'];
 
 /** The commits the choices below were looked at on (a rejection cites these, whatever the pin is now). */
-const REVIEWED = { marketplace: 'e947721966952d762deec382e64fd55a8f2db3fb', hub: '860b47a7a84c53d305be8b7696fc390463fcbb96', portal: 'ff8777c623760ca471ebd89a7881b0aa0f6018e7', docs: '98b6ae3be36dc6de9de081079cb6a72b96499c12' };
+const REVIEWED = { marketplace: 'e947721966952d762deec382e64fd55a8f2db3fb', hub: '860b47a7a84c53d305be8b7696fc390463fcbb96', portal: 'ff8777c623760ca471ebd89a7881b0aa0f6018e7', docs: '6773705a5754e506c3f5d0e8a004ca2b0e616f17' };
 
-/** What an app's screenshot shows, for its alt text ("<Name> <what> in a browser"): every one of these is a first-run or sign-in page of the real app. */
+/**
+ * What an app's QA-run screenshot shows, for its alt text ("<Name> <what> in a browser"): every one of these is a first-run or sign-in page of the real app.
+ * (A first-party app's screen from the product's own documentation is chosen in scripts/story/lib/media-docs.mts, DOCS_SHOTS, and takes the slot first.)
+ */
 const SHOT_SHOWS: Record<string, string> = {
   'activepieces': 'sign-up page', 'airtrail': 'owner account setup page', 'akaunting': 'sign-in page', 'anything-llm': 'empty chat page', 'audiobookshelf': 'initial server setup page',
   'audiomass': 'waveform editor with its welcome dialog', 'baikal': 'initialization wizard', 'booklore': 'admin account setup page', 'bookstack': 'sign-in page',
-  'ci-memory': 'welcome page', 'ci-planning': 'Today view', 'ci-spellbook': 'prompt library home', 'donetick': 'sign-in page', 'drawio': 'empty diagram editor',
+  'ci-spellbook': 'prompt library home', 'donetick': 'sign-in page', 'drawio': 'empty diagram editor',
   'duplicati': 'sign-in page', 'espocrm': 'sign-in page', 'excalidraw': 'empty whiteboard', 'firefly-iii': 'registration page', 'foldergram': 'photo library start page',
   'forgejo': 'home page', 'glasshome': 'dashboard welcome screen', 'grist': 'welcome page', 'grocy': 'sign-in page', 'home-assistant': 'welcome page',
   'hortusfox': 'dashboard', 'immich': 'photo library welcome page', 'inkscape': 'welcome dialog', 'joplin': 'sign-in page', 'kimai': 'sign-in page',
@@ -59,7 +66,7 @@ const VETTED: Record<string, string> = {
   'activepieces': '64dcc3ed38c1', 'airtrail': 'd61060ac696d', 'akaunting': '8cd356b171bb',
   'anything-llm': '49b40b6cff72', 'audiobookshelf': 'ed992477f135', 'audiomass': '7fc4298c4661',
   'baikal': 'df9b4184c7a5', 'booklore': '490c7d4915b5', 'bookstack': '33dd72817842',
-  'ci-memory': '1631f887e521', 'ci-planning': '7349824855c0', 'ci-spellbook': '1fd18e2d9466',
+  'ci-spellbook': '1fd18e2d9466',
   'donetick': 'db7411cc9354', 'drawio': '02bb35b443b9', 'duplicati': '7e438facd6ce',
   'espocrm': '17fb561972fc', 'excalidraw': 'c973046321fd', 'firefly-iii': 'ca2c0f16507e',
   'foldergram': 'b6f37a310412', 'forgejo': '6ce0f2738350', 'glasshome': 'b56ac0881d40',
@@ -303,17 +310,18 @@ const hasBlob = (r: Repo, sha: string, p: string): boolean => spawnSync('git', [
 const blob = (r: Repo, sha: string, p: string): Buffer => git(r, ['cat-file', 'blob', `${sha}:${p}`]);
 const oid12 = (r: Repo, sha: string, p: string): string => git(r, ['rev-parse', `${sha}:${p}`]).toString().trim().slice(0, 12);
 
-for (const r of ['marketplace', 'hub', 'portal'] as Repo[]) if (!fs.existsSync(path.join(repoDir(r), '.git'))) die(`${REPO_NAME[r]} is not at ${repoDir(r)} (set CI_SIBLINGS, or --${r}-dir)`);
-if (args.fetch === 'true') for (const r of ['marketplace', 'hub', 'portal'] as Repo[]) { console.log(`git fetch origin (${REPO_NAME[r]}): updates remote refs only`); git(r, ['fetch', 'origin']); }
+for (const r of REPOS) if (!fs.existsSync(path.join(repoDir(r), '.git'))) die(`${REPO_NAME[r]} is not at ${repoDir(r)} (set CI_SIBLINGS, or --${r}-dir)`);
+if (args.fetch === 'true') for (const r of REPOS) { console.log(`git fetch origin (${REPO_NAME[r]}): updates remote refs only`); git(r, ['fetch', 'origin']); }
 
 const manifestFile = path.join(ROOT, MANIFEST);
 const existing: MediaManifest | null = fs.existsSync(manifestFile) ? JSON.parse(fs.readFileSync(manifestFile, 'utf8')) : null;
 const SOURCES = ((): MediaManifest['sources'] => {
-  if (existing && args['update-sources'] !== 'true') return existing.sources;
   const pin = (r: Repo): string => git(r, ['rev-parse', 'origin/main']).toString().trim();
-  return { marketplace: pin('marketplace'), hub: pin('hub'), portal: pin('portal') };
+  // a manifest from before the Docs source has no pin for it: the first pin is the commit the Docs captures were looked at on
+  if (existing && args['update-sources'] !== 'true') return { ...existing.sources, docs: existing.sources.docs || REVIEWED.docs };
+  return { marketplace: pin('marketplace'), hub: pin('hub'), portal: pin('portal'), docs: pin('docs') };
 })();
-for (const r of ['marketplace', 'hub', 'portal'] as Repo[]) if (spawnSync('git', ['-C', repoDir(r), 'cat-file', '-e', `${SOURCES[r]}^{commit}`], { stdio: 'ignore' }).status !== 0) die(`${REPO_NAME[r]} has no commit ${SOURCES[r]} (git -C ${repoDir(r)} fetch origin)`);
+for (const r of REPOS) if (spawnSync('git', ['-C', repoDir(r), 'cat-file', '-e', `${SOURCES[r]}^{commit}`], { stdio: 'ignore' }).status !== 0) die(`${REPO_NAME[r]} has no commit ${SOURCES[r]} (git -C ${repoDir(r)} fetch origin)`);
 const sha12 = (r: Repo): string => SOURCES[r].slice(0, 12);
 
 // ------------------------------------------------------------------------------------------------------------ the build
@@ -353,7 +361,20 @@ function build(): Built {
     let shot: MediaShot | null = null;
     const shotPath = `e2e/screenshots/${id}.png`;
     const source = `CI-Marketplace ${shotPath}@${sha12('marketplace')}`;
-    if (REJECT_SHOT[id]) rejected.push({ kind: 'shot', id, source, reason: REJECT_SHOT[id] });
+    const docs = DOCS_SHOTS[id];
+    if (docs) {
+      // a first-party app's screen from the product's own documentation (CI-Docs, sample data): it takes the slot, and the QA run's capture, if any, is left out for it
+      const seen = oid12('docs', SOURCES.docs, docs.path);
+      if (seen !== docs.oid) die(`${id}: ${docs.path} is blob ${seen} at ${sha12('docs')}, not the ${docs.oid} that was looked at: look at it again, then update DOCS_SHOTS (scripts/story/lib/media-docs.mts)`);
+      const { bytes, quality } = encodeShot(blob('docs', SOURCES.docs, docs.path));
+      const size = imageSize(bytes)!;
+      const rel = named(`portal/apps/${id}`, 'shot', bytes);
+      put(rel, bytes);
+      shot = { file: rel, w: size.w, h: size.h, alt: `${name} ${docs.shows} in a browser`, caption: docsCaption(name), source: `CI-Docs ${docs.path}@${sha12('docs')}` };
+      note(`  ${id} shot ${(bytes.length / 1024).toFixed(1)} KB q${quality} (CI-Docs)`);
+      if (hasBlob('marketplace', SOURCES.marketplace, shotPath)) rejected.push({ kind: 'shot', id, source, reason: REJECT_SHOT[id] || SUPERSEDED_QA[id] || 'Replaced by the CI-Docs capture of the same app.' });
+    }
+    else if (REJECT_SHOT[id]) rejected.push({ kind: 'shot', id, source, reason: REJECT_SHOT[id] });
     else if (!hasBlob('marketplace', SOURCES.marketplace, shotPath)) rejected.push({ kind: 'shot', id, source, reason: `The source has none: ${shotPath} does not exist.` });
     else if (!SHOT_SHOWS[id] || !VETTED[id]) {
       // a capture nobody has looked at is never shipped, and the manifest says so (the test notes it as a warning: someone should look)
@@ -398,6 +419,16 @@ function build(): Built {
     for (const r of CI_REJECT) {
       if (chosen.has(`${r.repo}:${r.path}`)) die(`${r.path} is both chosen and rejected`);
       rejected.push({ kind: 'ci', id: `${r.repo}/${path.basename(r.path, path.extname(r.path))}`, source: `CI-${r.repo === 'docs' ? 'Docs' : REPO_NAME[r.repo].slice(3)} ${r.path}@${REVIEWED[r.repo].slice(0, 12)}`, reason: r.reason });
+    }
+    // CI-Docs `public/screenshots/`: every file of the folder at the pin that does not ship is accounted for (a file no rule names stops the build)
+    const prefix = 'public/screenshots/';
+    const rels = git('docs', ['ls-tree', '-r', '--name-only', SOURCES.docs, '--', prefix]).toString().split('\n').filter(Boolean).map(p => p.slice(prefix.length));
+    const appPaths = Object.fromEntries(Object.entries(DOCS_APP_REJECT).map(([id, v]) => [id, v.path]));
+    let left: ReturnType<typeof docsRejections>;
+    try { left = docsRejections(rels, new Set(Object.values(DOCS_SHOTS).map(d => d.path)), appPaths); } catch (e) { return die((e as Error).message); }
+    for (const r of left) {
+      const src = `CI-Docs ${prefix}${r.rel}@${sha12('docs')}`;
+      rejected.push(r.app ? { kind: 'shot', id: r.app, source: src, reason: r.reason } : { kind: 'ci', id: `docs/${r.rel.replace(/\.[a-z0-9]+$/, '')}`, source: src, reason: r.reason });
     }
   }
   rejected.sort((a, b) => a.kind.localeCompare(b.kind) || a.id.localeCompare(b.id) || a.source.localeCompare(b.source));
@@ -449,5 +480,5 @@ const total = [...built.files.values()].reduce((a, b) => a + b.length, 0);
 const biggest = [...built.files].sort((a, b) => b[1].length - a[1].length).slice(0, 3).map(([rel, b]) => `${rel} ${(b.length / 1024).toFixed(1)} KB`);
 console.log(`story:media: ${apps.filter(a => a.logo).length} logos, ${apps.filter(a => a.shot).length} app screenshots, ${built.manifest.ci.hub.length} Companion Hub and ${built.manifest.ci.portal.length} account page screenshots; ${built.manifest.rejected.length} rejected with their reasons${built.manifest.noMedia.length ? `; no media at all: ${built.manifest.noMedia.join(', ')}` : ''}`);
 console.log(`story:media: ${built.files.size} files, ${(total / 1024).toFixed(0)} KB (${(total / 1024 / 1024).toFixed(2)} MB)${removed ? `, ${removed} old file${removed === 1 ? '' : 's'} removed` : ''}; biggest: ${biggest.join('; ')}`);
-console.log(`story:media: pinned ${(['marketplace', 'hub', 'portal'] as Repo[]).map(r => `${REPO_NAME[r]} ${sha12(r)}`).join(', ')}; ${ffmpegLine}; wrote ${path.relative(process.cwd(), path.join(OUT, MANIFEST)) || MANIFEST}`);
+console.log(`story:media: pinned ${REPOS.map(r => `${REPO_NAME[r]} ${sha12(r)}`).join(', ')}; ${ffmpegLine}; wrote ${path.relative(process.cwd(), path.join(OUT, MANIFEST)) || MANIFEST}`);
 if (problems.length) { console.error(problems.map(p => `  x ${p}`).join('\n')); process.exit(1); }

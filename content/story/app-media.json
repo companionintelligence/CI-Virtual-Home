@@ -192,7 +192,14 @@
         "w": 128
       },
       "name": "Companion Memory",
-      "shot": null
+      "shot": {
+        "alt": "Companion Memory file gallery with sample pictures in a browser",
+        "caption": "Real screenshot of Companion Memory with sample data. Not a recording of this family.",
+        "file": "portal/apps/ci-memory/shot.c0b8b0b018.webp",
+        "h": 600,
+        "source": "CI-Docs public/screenshots/memory-2026-10/explorer-gallery-light.webp@6773705a5754",
+        "w": 960
+      }
     },
     "ci-openclaw": {
       "logo": {
@@ -215,11 +222,11 @@
       },
       "name": "Companion Planning",
       "shot": {
-        "alt": "Companion Planning Today view in a browser",
-        "caption": "Real screenshot of Companion Planning from a Companion Hub QA run. Not a recording of this family.",
-        "file": "portal/apps/ci-planning/shot.38ce72ab43.webp",
+        "alt": "Companion Planning Today view with a sample day in a browser",
+        "caption": "Real screenshot of Companion Planning with sample data. Not a recording of this family.",
+        "file": "portal/apps/ci-planning/shot.1168124a1c.webp",
         "h": 600,
-        "source": "CI-Marketplace e2e/screenshots/ci-planning.png@e94772196695",
+        "source": "CI-Docs public/screenshots/planning/planning-today-light.webp@6773705a5754",
         "w": 960
       }
     },
@@ -1419,19 +1426,2143 @@
       "id": "docs/app",
       "kind": "ci",
       "reason": "A Runtipi page for Nextcloud: a different product, not Companion Hub.",
-      "source": "CI-Docs public/images/app.webp@98b6ae3be36d"
+      "source": "CI-Docs public/images/app.webp@6773705a5754"
     },
     {
       "id": "docs/appstore",
       "kind": "ci",
       "reason": "Shows broken image icons with their alt text where app icons should be.",
-      "source": "CI-Docs public/images/appstore.webp@98b6ae3be36d"
+      "source": "CI-Docs public/images/appstore.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-composer-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-composer-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-composer-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-composer-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-composer-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-for-you-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-for-you-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-for-you-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-for-you-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-for-you-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-grants-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-grants-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-grants-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-grants-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-grants-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-history-person-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-history-person-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-history-person-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-history-person-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-history-person-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-lock-detail-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-lock-detail-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-lock-detail-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-lock-detail-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-lock-detail-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-sent-answered-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-sent-answered-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-sent-answered-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-sent-answered-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-sent-answered-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-sent-waiting-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of asks-sent-waiting-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/asks/asks-sent-waiting-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/asks/asks-sent-waiting-light",
+      "kind": "ci",
+      "reason": "Companion Memory's Asks page, which no story names: peer identifiers (key fragments such as \"Peer ..EzNWU=\") and questions between two Companions, such as where a person lives.",
+      "source": "CI-Docs public/screenshots/asks/asks-sent-waiting-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/avatar-companion/avatar-companion-chat-only",
+      "kind": "ci",
+      "reason": "A rendered 3D head with glasses on a dark page: a person-like face, not an app screen, in an app no story names.",
+      "source": "CI-Docs public/screenshots/avatar-companion/avatar-companion-chat-only.webp@6773705a5754"
+    },
+    {
+      "id": "docs/avatar-companion/avatar-companion-mic-permission",
+      "kind": "ci",
+      "reason": "A dark dialog of the avatar app (microphone permission, connection check, model and proxy fields), an app no story names.",
+      "source": "CI-Docs public/screenshots/avatar-companion/avatar-companion-mic-permission.webp@6773705a5754"
+    },
+    {
+      "id": "docs/avatar-companion/avatar-companion-settings-connection",
+      "kind": "ci",
+      "reason": "A dark dialog of the avatar app (microphone permission, connection check, model and proxy fields), an app no story names.",
+      "source": "CI-Docs public/screenshots/avatar-companion/avatar-companion-settings-connection.webp@6773705a5754"
+    },
+    {
+      "id": "docs/avatar-companion/avatar-companion-start-dialog",
+      "kind": "ci",
+      "reason": "A dark dialog of the avatar app (microphone permission, connection check, model and proxy fields), an app no story names.",
+      "source": "CI-Docs public/screenshots/avatar-companion/avatar-companion-start-dialog.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-ignored-sites-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of popup-ignored-sites-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-ignored-sites-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-ignored-sites-light",
+      "kind": "ci",
+      "reason": "The browser extension's small popup on a plain page: its words (the old \"CI-Portal\" product name, \"Remember everything you browse\") or its placeholder example.com addresses are not wording the site uses, and no story names the extension.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-ignored-sites-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-no-memory-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of popup-no-memory-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-no-memory-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-no-memory-light",
+      "kind": "ci",
+      "reason": "The browser extension's small popup on a plain page: its words (the old \"CI-Portal\" product name, \"Remember everything you browse\") or its placeholder example.com addresses are not wording the site uses, and no story names the extension.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-no-memory-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-settings-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of popup-settings-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-settings-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-settings-light",
+      "kind": "ci",
+      "reason": "The browser extension's small popup on a plain page: its words (the old \"CI-Portal\" product name, \"Remember everything you browse\") or its placeholder example.com addresses are not wording the site uses, and no story names the extension.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-settings-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-synced-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of popup-synced-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-synced-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-synced-light",
+      "kind": "ci",
+      "reason": "The browser extension's small popup on a plain page: its words (the old \"CI-Portal\" product name, \"Remember everything you browse\") or its placeholder example.com addresses are not wording the site uses, and no story names the extension.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-synced-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-syncing-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of popup-syncing-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-syncing-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-syncing-light",
+      "kind": "ci",
+      "reason": "The browser extension's small popup on a plain page: its words (the old \"CI-Portal\" product name, \"Remember everything you browse\") or its placeholder example.com addresses are not wording the site uses, and no story names the extension.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-syncing-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-welcome-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of popup-welcome-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-welcome-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/browser-extensions/popup-welcome-light",
+      "kind": "ci",
+      "reason": "The browser extension's small popup on a plain page: its words (the old \"CI-Portal\" product name, \"Remember everything you browse\") or its placeholder example.com addresses are not wording the site uses, and no story names the extension.",
+      "source": "CI-Docs public/screenshots/browser-extensions/popup-welcome-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/01-desktop-overview",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/01-desktop-overview.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/02-desktop-search",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/02-desktop-search.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/03-desktop-map-layers",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/03-desktop-map-layers.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/04-desktop-time-machine",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/04-desktop-time-machine.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/05-desktop-day-night",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/05-desktop-day-night.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/06-desktop-people",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/06-desktop-people.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/07-desktop-scrapbook-empty",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/07-desktop-scrapbook-empty.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/08-desktop-scrapbook-populated",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/08-desktop-scrapbook-populated.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/09-desktop-scrapbook-configured",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/09-desktop-scrapbook-configured.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/10-desktop-curated-journey",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/10-desktop-curated-journey.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/11-desktop-share-link",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/11-desktop-share-link.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/12-desktop-named-places",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/12-desktop-named-places.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/13-desktop-lightbox",
+      "kind": "ci",
+      "reason": "Companion Atlas with a full-screen photograph of a desert road of unknown origin; the app is dark, shows real satellite imagery, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-atlas/13-desktop-lightbox.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/14-mobile-overview",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/14-mobile-overview.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/15-mobile-search",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/15-mobile-search.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/16-mobile-map-layers",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/16-mobile-map-layers.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/17-mobile-people",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/17-mobile-people.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/18-mobile-scrapbook",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/18-mobile-scrapbook.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/19-mobile-time-machine",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/19-mobile-time-machine.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/20-mobile-lightbox",
+      "kind": "ci",
+      "reason": "Companion Atlas with a full-screen photograph of a desert road of unknown origin; the app is dark, shows real satellite imagery, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-atlas/20-mobile-lightbox.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/21-mobile-fly-here",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/21-mobile-fly-here.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/22-mobile-collect",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/22-mobile-collect.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/23-mobile-named-places",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/23-mobile-named-places.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/24-mobile-share-link",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/24-mobile-share-link.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/25-vr-overview",
+      "kind": "ci",
+      "reason": "A dark VR view of the Atlas globe with floating photo panels (a hand controller in one); no story names Companion Atlas.",
+      "source": "CI-Docs public/screenshots/companion-atlas/25-vr-overview.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/26-vr-entered",
+      "kind": "ci",
+      "reason": "A dark VR view of the Atlas globe with floating photo panels (a hand controller in one); no story names Companion Atlas.",
+      "source": "CI-Docs public/screenshots/companion-atlas/26-vr-entered.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/27-vr-controller",
+      "kind": "ci",
+      "reason": "A dark VR view of the Atlas globe with floating photo panels (a hand controller in one); no story names Companion Atlas.",
+      "source": "CI-Docs public/screenshots/companion-atlas/27-vr-controller.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/28-desktop-fit-all",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/28-desktop-fit-all.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-atlas/29-desktop-basemap-switch",
+      "kind": "ci",
+      "reason": "Companion Atlas, a dark map app with satellite imagery of real places and a street photograph under a journey title; no story names it (the catalog's Companion Earth has no story and no logo in the manifest yet).",
+      "source": "CI-Docs public/screenshots/companion-atlas/29-desktop-basemap-switch.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/companion-memory-arch",
+      "kind": "ci",
+      "reason": "A drawn architecture diagram of boxes, with a row of third-party brand logos (Google, Microsoft, Amazon), not a capture.",
+      "source": "CI-Docs public/screenshots/companion-memory/companion-memory-arch.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/companion-memory-knowledge-graph-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of companion-memory-knowledge-graph-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/companion-memory/companion-memory-knowledge-graph-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/companion-memory-knowledge-graph-light",
+      "kind": "ci",
+      "reason": "Clean (a dot graph of sample data, no text and no names), not chosen: an app has one screenshot slot, and the file gallery shows more of the product.",
+      "source": "CI-Docs public/screenshots/companion-memory/companion-memory-knowledge-graph-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/companion-memory-main-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of companion-memory-main-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/companion-memory/companion-memory-main-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/companion-memory-main-light",
+      "kind": "ci",
+      "reason": "Clean (a list of sample events), not chosen: an app has one screenshot slot, the file gallery was chosen, and the list reads small at 960 px.",
+      "source": "CI-Docs public/screenshots/companion-memory/companion-memory-main-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/graphiql-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of graphiql-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/companion-memory/graphiql-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-memory/graphiql-light",
+      "kind": "ci",
+      "reason": "GraphiQL, a developer tool, with an empty API key field: not the app.",
+      "source": "CI-Docs public/screenshots/companion-memory/graphiql-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/ci-os-info",
+      "kind": "ci",
+      "reason": "A terminal or password prompt of the operating system: host names, IP addresses and a password field.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/ci-os-info.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/forced-password",
+      "kind": "ci",
+      "reason": "A terminal or password prompt of the operating system: host names, IP addresses and a password field.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/forced-password.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/grub-menu",
+      "kind": "ci",
+      "reason": "The operating system's boot menu, installer (\"will ERASE EVERYTHING\", a one-time password line) or desktop: not an app, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/grub-menu.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/hub-pairing",
+      "kind": "ci",
+      "reason": "A pairing code and device id, or a browser window on the documentation site: not an app screen.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/hub-pairing.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/installed-desktop",
+      "kind": "ci",
+      "reason": "The operating system's boot menu, installer (\"will ERASE EVERYTHING\", a one-time password line) or desktop: not an app, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/installed-desktop.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/live-desktop",
+      "kind": "ci",
+      "reason": "The operating system's boot menu, installer (\"will ERASE EVERYTHING\", a one-time password line) or desktop: not an app, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/live-desktop.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/one-click-confirm",
+      "kind": "ci",
+      "reason": "The operating system's boot menu, installer (\"will ERASE EVERYTHING\", a one-time password line) or desktop: not an app, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/one-click-confirm.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/one-click-language",
+      "kind": "ci",
+      "reason": "The operating system's boot menu, installer (\"will ERASE EVERYTHING\", a one-time password line) or desktop: not an app, and no story names it.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/one-click-language.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/setup-notification-ready",
+      "kind": "ci",
+      "reason": "A desktop notification toast with a German timestamp (\"Gerade eben\"): a toast, not an app.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/setup-notification-ready.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/setup-notification-step",
+      "kind": "ci",
+      "reason": "A desktop notification toast with a German timestamp (\"Gerade eben\"): a toast, not an app.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/setup-notification-step.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/setup-notification-waiting",
+      "kind": "ci",
+      "reason": "A desktop notification toast with a German timestamp (\"Gerade eben\"): a toast, not an app.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/setup-notification-waiting.webp@6773705a5754"
+    },
+    {
+      "id": "docs/companion-os-2026-10/welcome-page",
+      "kind": "ci",
+      "reason": "A pairing code and device id, or a browser window on the documentation site: not an app screen.",
+      "source": "CI-Docs public/screenshots/companion-os-2026-10/welcome-page.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/hub-settings-security-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of hub-settings-security-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/connect/hub-settings-security-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/hub-settings-security-light",
+      "kind": "ci",
+      "reason": "An API key screen (Hub or Memory settings): a created key, its reveal, a key list, or an approval card carrying a token-like string and an example email address: credentials are never shown, even sample ones.",
+      "source": "CI-Docs public/screenshots/connect/hub-settings-security-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-api-key-create-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of memory-api-key-create-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/connect/memory-api-key-create-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-api-key-create-light",
+      "kind": "ci",
+      "reason": "An API key screen (Hub or Memory settings): a created key, its reveal, a key list, or an approval card carrying a token-like string and an example email address: credentials are never shown, even sample ones.",
+      "source": "CI-Docs public/screenshots/connect/memory-api-key-create-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-api-key-reveal-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of memory-api-key-reveal-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/connect/memory-api-key-reveal-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-api-key-reveal-light",
+      "kind": "ci",
+      "reason": "An API key screen (Hub or Memory settings): a created key, its reveal, a key list, or an approval card carrying a token-like string and an example email address: credentials are never shown, even sample ones.",
+      "source": "CI-Docs public/screenshots/connect/memory-api-key-reveal-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-api-keys-list-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of memory-api-keys-list-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/connect/memory-api-keys-list-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-api-keys-list-light",
+      "kind": "ci",
+      "reason": "An API key screen (Hub or Memory settings): a created key, its reveal, a key list, or an approval card carrying a token-like string and an example email address: credentials are never shown, even sample ones.",
+      "source": "CI-Docs public/screenshots/connect/memory-api-keys-list-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-approval-card-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of memory-approval-card-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/connect/memory-approval-card-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/connect/memory-approval-card-light",
+      "kind": "ci",
+      "reason": "An API key screen (Hub or Memory settings): a created key, its reveal, a key list, or an approval card carrying a token-like string and an example email address: credentials are never shown, even sample ones.",
+      "source": "CI-Docs public/screenshots/connect/memory-approval-card-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-banner",
+      "kind": "ci",
+      "reason": "A drawn banner or diagram (an SVG), not a capture of a running app.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-banner.svg@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-check-server",
+      "kind": "ci",
+      "reason": "A drawn banner or diagram (an SVG), not a capture of a running app.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-check-server.svg@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-settings-connection-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of companion-capture-settings-connection-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-settings-connection-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-settings-connection-light",
+      "kind": "ci",
+      "reason": "Capture applet settings with a server address (memory.example.com), a sample user (an example email address) and a device id: addresses, emails and ids are not shown.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-settings-connection-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-settings-find-memory-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of companion-capture-settings-find-memory-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-settings-find-memory-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-settings-find-memory-light",
+      "kind": "ci",
+      "reason": "Capture applet settings with a server address (memory.example.com), a sample user (an example email address) and a device id: addresses, emails and ids are not shown.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-settings-find-memory-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-setup-connect-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of companion-capture-setup-connect-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-setup-connect-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-setup-connect-light",
+      "kind": "ci",
+      "reason": "A setup dialog of the capture applet, which \"records what you see and edit on this computer\": a claim the site does not make, and no story names the applet.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-setup-connect-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/desktop-applet/companion-capture-setup-welcome",
+      "kind": "ci",
+      "reason": "A setup dialog of the capture applet, which \"records what you see and edit on this computer\": a claim the site does not make, and no story names the applet.",
+      "source": "CI-Docs public/screenshots/desktop-applet/companion-capture-setup-welcome.webp@6773705a5754"
+    },
+    {
+      "id": "docs/earth/earth-collections",
+      "kind": "ci",
+      "reason": "Companion Earth: a dark globe with a list of real cities (San Francisco, Paris, Tokyo, Cape Town) or a place search; no story names Companion Earth yet and its manifest entry has no logo, so there is no slot for it. A candidate to look at again when one does.",
+      "source": "CI-Docs public/screenshots/earth/earth-collections.webp@6773705a5754"
+    },
+    {
+      "id": "docs/earth/earth-globe",
+      "kind": "ci",
+      "reason": "Companion Earth: a dark globe with a list of real cities (San Francisco, Paris, Tokyo, Cape Town) or a place search; no story names Companion Earth yet and its manifest entry has no logo, so there is no slot for it. A candidate to look at again when one does.",
+      "source": "CI-Docs public/screenshots/earth/earth-globe.webp@6773705a5754"
+    },
+    {
+      "id": "docs/earth/earth-search",
+      "kind": "ci",
+      "reason": "Companion Earth: a dark globe with a list of real cities (San Francisco, Paris, Tokyo, Cape Town) or a place search; no story names Companion Earth yet and its manifest entry has no logo, so there is no slot for it. A candidate to look at again when one does.",
+      "source": "CI-Docs public/screenshots/earth/earth-search.webp@6773705a5754"
+    },
+    {
+      "id": "docs/even-realities/answer-hud",
+      "kind": "ci",
+      "reason": "A smart-glasses display: green text on black, an answer about Bluetooth Low Energy; no story names the product.",
+      "source": "CI-Docs public/screenshots/even-realities/answer-hud.webp@6773705a5754"
+    },
+    {
+      "id": "docs/even-realities/demo",
+      "kind": "ci",
+      "reason": "An animated capture (a GIF), not a still: the page shows one real still at a time, whole and labelled.",
+      "source": "CI-Docs public/screenshots/even-realities/demo.gif@6773705a5754"
+    },
+    {
+      "id": "docs/even-realities/even-realities-main-dark",
+      "kind": "ci",
+      "reason": "A dark chat or settings panel of the smart-glasses app, with a localhost backend URL and an API key field; no story names it.",
+      "source": "CI-Docs public/screenshots/even-realities/even-realities-main-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/even-realities/even-realities-settings-dark",
+      "kind": "ci",
+      "reason": "A dark chat or settings panel of the smart-glasses app, with a localhost backend URL and an API key field; no story names it.",
+      "source": "CI-Docs public/screenshots/even-realities/even-realities-settings-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/even-realities/hud-permission-prompt",
+      "kind": "ci",
+      "reason": "A smart-glasses approval prompt to run \"git push origin main\" from a repository path: a developer approval, not a product screen.",
+      "source": "CI-Docs public/screenshots/even-realities/hud-permission-prompt.webp@6773705a5754"
+    },
+    {
+      "id": "docs/even-realities/hud-streamed-answer",
+      "kind": "ci",
+      "reason": "A smart-glasses display: green text on black, an answer about Bluetooth Low Energy; no story names the product.",
+      "source": "CI-Docs public/screenshots/even-realities/hud-streamed-answer.webp@6773705a5754"
+    },
+    {
+      "id": "docs/headless-setup/first-boot-form",
+      "kind": "ci",
+      "reason": "Setting up a box with no screen: a list of Wi-Fi network names (Companion-Home, Studio-5G, CoffeeShop Free WiFi, NETGEAR-24) and a pairing code: neighbours' network names and codes are not shown.",
+      "source": "CI-Docs public/screenshots/headless-setup/first-boot-form.webp@6773705a5754"
+    },
+    {
+      "id": "docs/headless-setup/network-scan",
+      "kind": "ci",
+      "reason": "Setting up a box with no screen: a list of Wi-Fi network names (Companion-Home, Studio-5G, CoffeeShop Free WiFi, NETGEAR-24) and a pairing code: neighbours' network names and codes are not shown.",
+      "source": "CI-Docs public/screenshots/headless-setup/network-scan.webp@6773705a5754"
+    },
+    {
+      "id": "docs/headless-setup/success",
+      "kind": "ci",
+      "reason": "Setting up a box with no screen: a list of Wi-Fi network names (Companion-Home, Studio-5G, CoffeeShop Free WiFi, NETGEAR-24) and a pairing code: neighbours' network names and codes are not shown.",
+      "source": "CI-Docs public/screenshots/headless-setup/success.webp@6773705a5754"
+    },
+    {
+      "id": "docs/headless-setup/walkthrough",
+      "kind": "ci",
+      "reason": "A video, not a still capture.",
+      "source": "CI-Docs public/screenshots/headless-setup/walkthrough.mp4@6773705a5754"
     },
     {
       "id": "docs/home-hub-store-light",
       "kind": "ci",
       "reason": "A phone held in a hand over a coloured background: a composite, not a capture.",
-      "source": "CI-Docs public/images/social-core/home-hub-store-light.webp@98b6ae3be36d"
+      "source": "CI-Docs public/images/social-core/home-hub-store-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-backups-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-backups-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-backups-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-backups-light",
+      "kind": "ci",
+      "reason": "A backup list with generated archive file names and sizes over the Companion Memory store page.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-backups-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-not-responding-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-not-responding-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-not-responding-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-not-responding-light",
+      "kind": "ci",
+      "reason": "An error, loading or start-up state (\"isn't responding\", \"is starting\", \"couldn't start\"), not a working screen.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-not-responding-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-restore-dialog-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-restore-dialog-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-restore-dialog-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-restore-dialog-light",
+      "kind": "ci",
+      "reason": "A destructive confirmation dialog (restore a backup, uninstall) over a third-party app's store page.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-restore-dialog-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-starting-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-starting-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-starting-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-starting-light",
+      "kind": "ci",
+      "reason": "An error, loading or start-up state (\"isn't responding\", \"is starting\", \"couldn't start\"), not a working screen.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-starting-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-uninstall-dialog-kept-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-uninstall-dialog-kept-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-uninstall-dialog-kept-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/app-uninstall-dialog-kept-light",
+      "kind": "ci",
+      "reason": "A destructive confirmation dialog (restore a backup, uninstall) over a third-party app's store page.",
+      "source": "CI-Docs public/screenshots/hub-0-3/app-uninstall-dialog-kept-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/dashboard-batch-actions-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of dashboard-batch-actions-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/dashboard-batch-actions-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/dashboard-batch-actions-light",
+      "kind": "ci",
+      "reason": "The Hub home with a batch-actions menu open (start, stop, restart, update all): a menu over the home, not the home.",
+      "source": "CI-Docs public/screenshots/hub-0-3/dashboard-batch-actions-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-network-tailscale-refused-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-network-tailscale-refused-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-network-tailscale-refused-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-network-tailscale-refused-light",
+      "kind": "ci",
+      "reason": "A Tailscale \"refused\" fault state with a shell command (sudo tailscale ...): remote access and an error.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-network-tailscale-refused-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-security-api-keys-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-security-api-keys-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-security-api-keys-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-security-api-keys-light",
+      "kind": "ci",
+      "reason": "A Hub security page with an example email address (owner@example.com) and a list of API keys.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-security-api-keys-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-system-desktop-restart-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-system-desktop-restart-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-system-desktop-restart-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-system-desktop-restart-light",
+      "kind": "ci",
+      "reason": "A Hub update or restart settings page with version numbers and download steps: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-system-desktop-restart-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-system-desktop-update-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-system-desktop-update-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-system-desktop-update-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/settings-system-desktop-update-light",
+      "kind": "ci",
+      "reason": "A Hub update or restart settings page with version numbers and download steps: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-0-3/settings-system-desktop-update-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/startup-compose-too-old-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of startup-compose-too-old-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/startup-compose-too-old-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/startup-compose-too-old-light",
+      "kind": "ci",
+      "reason": "An error, loading or start-up state (\"isn't responding\", \"is starting\", \"couldn't start\"), not a working screen.",
+      "source": "CI-Docs public/screenshots/hub-0-3/startup-compose-too-old-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/startup-starting-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of startup-starting-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-0-3/startup-starting-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-0-3/startup-starting-light",
+      "kind": "ci",
+      "reason": "An error, loading or start-up state (\"isn't responding\", \"is starting\", \"couldn't start\"), not a working screen.",
+      "source": "CI-Docs public/screenshots/hub-0-3/startup-starting-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-detail-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-detail-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-detail-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-detail-light",
+      "kind": "ci",
+      "reason": "The store page for Hermes: \"messaging AI assistant\", a 0.0 rating, an unknown download size and \"Memory not connected\", beside an unreadable dark screenshot of the app.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-detail-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-install-advanced-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-install-advanced-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-install-advanced-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-install-advanced-light",
+      "kind": "ci",
+      "reason": "An install form with \"Public Web\" exposure (remote access, which the site does not claim), host.docker.internal and an authorised messaging user id.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-install-advanced-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-install-form-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-install-form-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-install-form-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-install-form-light",
+      "kind": "ci",
+      "reason": "An install form with \"Public Web\" exposure (remote access, which the site does not claim), host.docker.internal and an authorised messaging user id.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-install-form-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-store-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-store-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-store-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-store-light",
+      "kind": "ci",
+      "reason": "Clean and current (the light store with the first-party row), held back: the Hub section already carries four real captures and swapping one in puts a light page beside the dark ones; every tile also reads \"Free\", a price word the site does not print. A candidate for the owner to swap in.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-store-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-store-mobile-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-store-mobile-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-store-mobile-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/app-store-mobile-light",
+      "kind": "ci",
+      "reason": "Clean and current (the light store with the first-party row), held back: the Hub section already carries four real captures and swapping one in puts a light page beside the dark ones; every tile also reads \"Free\", a price word the site does not print. A candidate for the owner to swap in.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/app-store-mobile-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/dashboard-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of dashboard-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/dashboard-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/dashboard-light",
+      "kind": "ci",
+      "reason": "Clean and current (the home with five apps), held back with the store capture above; its disk, CPU and memory figures are the capture machine's, not a Companion Core spec.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/dashboard-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/dashboard-mobile-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of dashboard-mobile-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/dashboard-mobile-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/dashboard-mobile-light",
+      "kind": "ci",
+      "reason": "Clean and current (the home with five apps), held back with the store capture above; its disk, CPU and memory figures are the capture machine's, not a Companion Core spec.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/dashboard-mobile-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/device-registration-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of device-registration-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/device-registration-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/device-registration-light",
+      "kind": "ci",
+      "reason": "A pairing code and a device id, or a provisioning step that says the Hub is being made reachable.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/device-registration-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/device-registration-provisioning-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of device-registration-provisioning-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/device-registration-provisioning-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/device-registration-provisioning-light",
+      "kind": "ci",
+      "reason": "A pairing code and a device id, or a provisioning step that says the Hub is being made reachable.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/device-registration-provisioning-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/device-registration-setting-up-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of device-registration-setting-up-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/device-registration-setting-up-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/device-registration-setting-up-light",
+      "kind": "ci",
+      "reason": "A pairing code and a device id, or a provisioning step that says the Hub is being made reachable.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/device-registration-setting-up-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/login-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of login-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/login-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/login-light",
+      "kind": "ci",
+      "reason": "A sign-in or sign-up page (a login wall) with an example email address.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/login-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-1-access-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-1-access-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-1-access-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-1-access-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-1-access-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-2-agent-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-2-agent-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-2-agent-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-2-agent-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-2-agent-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-3-backend-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-3-backend-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-3-backend-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-3-backend-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-3-backend-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-4-models-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-4-models-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-4-models-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-4-models-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-4-models-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-5-memory-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-5-memory-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-5-memory-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-5-memory-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-5-memory-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-6-apps-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-6-apps-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-6-apps-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-6-apps-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-6-apps-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-7-advanced-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-7-advanced-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-7-advanced-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-7-advanced-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-7-advanced-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-install-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of onboarding-install-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-install-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/onboarding-install-light",
+      "kind": "ci",
+      "reason": "A step of the Hub setup wizard: localhost and host.docker.internal addresses, \"Public Web\" exposure, cloud API key fields, a hardware list and recommended third-party apps with their logos.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/onboarding-install-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/register-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of register-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/register-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/register-light",
+      "kind": "ci",
+      "reason": "A sign-in or sign-up page (a login wall) with an example email address.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/register-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-ai-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-ai-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-ai-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-ai-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-ai-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-general-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-general-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-general-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-general-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-general-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-mcp-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-mcp-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-mcp-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-mcp-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-mcp-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-network-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-network-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-network-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-network-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-network-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-network-remote-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-network-remote-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-network-remote-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-network-remote-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-network-remote-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-system-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-system-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-system-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-system-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-system-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-system-reset-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-system-reset-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-system-reset-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/settings-system-reset-light",
+      "kind": "ci",
+      "reason": "A Hub settings page: addresses, \"Public Web\" and Tailscale remote access, MCP and cloud API key fields, or a reset prompt: configuration, not the product at work.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/settings-system-reset-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/system-inspector-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of system-inspector-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/system-inspector-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-2026-09/system-inspector-light",
+      "kind": "ci",
+      "reason": "A system inspector page with host names, port allocations and machine figures.",
+      "source": "CI-Docs public/screenshots/hub-2026-09/system-inspector-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/controls-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of controls-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/controls-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/controls-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/controls-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/discoverable-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of discoverable-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/discoverable-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/discoverable-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/discoverable-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/models-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of models-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/models-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/models-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/models-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/paired-hubs-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of paired-hubs-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/paired-hubs-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/paired-hubs-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/paired-hubs-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/peer-states-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of peer-states-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/peer-states-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/peer-states-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/peer-states-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/pending-no-pin-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of pending-no-pin-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/pending-no-pin-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/pending-no-pin-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/pending-no-pin-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/pending-with-pin-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of pending-with-pin-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/pending-with-pin-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/pending-with-pin-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/pending-with-pin-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/pin-generated-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of pin-generated-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/pin-generated-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/pin-generated-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/pin-generated-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/recent-routing-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of recent-routing-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/recent-routing-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/recent-routing-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/recent-routing-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/request-waiting-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of request-waiting-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/request-waiting-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/request-waiting-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/request-waiting-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/tailscale-off-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of tailscale-off-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/tailscale-off-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/hub-pool-2026-10/tailscale-off-light",
+      "kind": "ci",
+      "reason": "Hub Pool (sharing models between Hubs over a Tailscale network): tailnet host names (hub-b.example-tailnet.ts.net), key fingerprints, pairing PINs and per-request timings: remote access and performance figures the site does not claim, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/hub-pool-2026-10/tailscale-off-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-detailed-results-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of local-bench-detailed-results-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-detailed-results-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-detailed-results-light",
+      "kind": "ci",
+      "reason": "Local LLM benchmark pages: tokens per second and an intelligence index are performance numbers the site does not print (none is on the fact sheet).",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-detailed-results-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-overview-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of local-bench-overview-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-overview-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-overview-light",
+      "kind": "ci",
+      "reason": "Local LLM benchmark pages: tokens per second and an intelligence index are performance numbers the site does not print (none is on the fact sheet).",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-overview-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-run-a-benchmark-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of local-bench-run-a-benchmark-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-run-a-benchmark-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-run-a-benchmark-light",
+      "kind": "ci",
+      "reason": "Local LLM benchmark pages: tokens per second and an intelligence index are performance numbers the site does not print (none is on the fact sheet).",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-run-a-benchmark-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-throughput",
+      "kind": "ci",
+      "reason": "Local LLM benchmark pages: tokens per second and an intelligence index are performance numbers the site does not print (none is on the fact sheet).",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-throughput.webp@6773705a5754"
+    },
+    {
+      "id": "docs/local-bench/local-bench-throughput-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of local-bench-throughput.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/local-bench/local-bench-throughput-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/chat-conversation-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of chat-conversation-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/chat-conversation-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/chat-conversation-light",
+      "kind": "ci",
+      "reason": "Clean but not chosen: an app has one screenshot slot, and the chat shows a thread id and a model name (\"docs-demo-model\") that mean little to a visitor.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/chat-conversation-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/explorer-gallery-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of explorer-gallery-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/explorer-gallery-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/explorer-map-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of explorer-map-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/explorer-map-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/explorer-map-light",
+      "kind": "ci",
+      "reason": "A satellite map of a real region (third-party imagery with its credit line) beside events at \"Smith Family Home\": a real place and a family name, where the file gallery has neither.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/explorer-map-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/first-run-empty-explorer-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of first-run-empty-explorer-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/first-run-empty-explorer-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/first-run-empty-explorer-light",
+      "kind": "ci",
+      "reason": "An empty state (\"Your memory is empty\"), not the app at work.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/first-run-empty-explorer-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/first-run-login-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of first-run-login-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/first-run-login-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/first-run-login-light",
+      "kind": "ci",
+      "reason": "A sign-in page (a login wall).",
+      "source": "CI-Docs public/screenshots/memory-2026-10/first-run-login-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/first-run-trust-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of first-run-trust-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/first-run-trust-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/first-run-trust-light",
+      "kind": "ci",
+      "reason": "A page that offers \"Hands-off\" autonomy (deleting, sending and using tools without asking): an autonomy claim the site does not make.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/first-run-trust-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-export-guide-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of import-export-guide-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-export-guide-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-export-guide-light",
+      "kind": "ci",
+      "reason": "Steps to export from a named third-party service, with its logo and a red \"Can take weeks\" tag.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-export-guide-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-history-detail-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of import-history-detail-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-history-detail-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-history-detail-light",
+      "kind": "ci",
+      "reason": "Shows an export file named for a person (\"john-smith-export.zip\") and third-party service names.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-history-detail-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-inbox-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of import-inbox-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-inbox-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-inbox-light",
+      "kind": "ci",
+      "reason": "Shows an export file named for a person (\"john-smith-export.zip\") and a server folder path.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-inbox-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-pipeline-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of import-pipeline-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-pipeline-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-pipeline-light",
+      "kind": "ci",
+      "reason": "Shows an export file named for a person (\"john-smith-export.zip\") and the services it came from.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-pipeline-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-sync-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of import-sync-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-sync-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/import-sync-light",
+      "kind": "ci",
+      "reason": "Shows an export file named for a person (\"john-smith-export.zip\") and counts of imported messages.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/import-sync-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/settings-your-data-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of settings-your-data-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/settings-your-data-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/settings-your-data-light",
+      "kind": "ci",
+      "reason": "Settings pages (export and import of all data) with no sign of the app at work.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/settings-your-data-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/sources-services-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of sources-services-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/memory-2026-10/sources-services-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/memory-2026-10/sources-services-light",
+      "kind": "ci",
+      "reason": "A grid of third-party service brands with their logos (Microsoft, Google, Meta, Spotify, Steam, GitHub, Signal, Slack, Reddit).",
+      "source": "CI-Docs public/screenshots/memory-2026-10/sources-services-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/mobile-app/mobile-advanced-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of mobile-advanced-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/mobile-app/mobile-advanced-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/mobile-app/mobile-advanced-light",
+      "kind": "ci",
+      "reason": "The mobile app's sign-in, server picker (memory.example.com, an example email address) or advanced connection settings: connection screens, not the app at work.",
+      "source": "CI-Docs public/screenshots/mobile-app/mobile-advanced-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/mobile-app/mobile-log-in-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of mobile-log-in-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/mobile-app/mobile-log-in-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/mobile-app/mobile-log-in-light",
+      "kind": "ci",
+      "reason": "The mobile app's sign-in, server picker (memory.example.com, an example email address) or advanced connection settings: connection screens, not the app at work.",
+      "source": "CI-Docs public/screenshots/mobile-app/mobile-log-in-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/mobile-app/mobile-pick-server-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of mobile-pick-server-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/mobile-app/mobile-pick-server-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/mobile-app/mobile-pick-server-light",
+      "kind": "ci",
+      "reason": "The mobile app's sign-in, server picker (memory.example.com, an example email address) or advanced connection settings: connection screens, not the app at work.",
+      "source": "CI-Docs public/screenshots/mobile-app/mobile-pick-server-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/onboarding/onboarding-vllm-setup-dark",
+      "kind": "ci",
+      "reason": "A Hub setup page for vLLM: host.docker.internal addresses and an engine panel on a dark page.",
+      "source": "CI-Docs public/screenshots/onboarding/onboarding-vllm-setup-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pebble/pebble-basalt-menu-ask-answer",
+      "kind": "ci",
+      "reason": "A strip of three smartwatch screens (a menu, a prompt, a note list) naming a person (Ada Lovelace) and \"Team standup notes\"; no story names the watch app.",
+      "source": "CI-Docs public/screenshots/pebble/pebble-basalt-menu-ask-answer.webp@6773705a5754"
+    },
+    {
+      "id": "docs/photogram/photogram-landing",
+      "kind": "ci",
+      "reason": "A dark globe landing page for a product no story names.",
+      "source": "CI-Docs public/screenshots/photogram/photogram-landing.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-connections-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of planning-connections-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/planning/planning-connections-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-connections-light",
+      "kind": "ci",
+      "reason": "Settings with Ollama shown as unavailable at localhost:11434, Companion Memory as not connected and a Google Calendar connection: localhost and a fault state.",
+      "source": "CI-Docs public/screenshots/planning/planning-connections-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-first-run-source-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of planning-first-run-source-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/planning/planning-first-run-source-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-first-run-source-light",
+      "kind": "ci",
+      "reason": "A first-run dialog offering to connect Google (a third-party brand) over a blurred page.",
+      "source": "CI-Docs public/screenshots/planning/planning-first-run-source-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-sign-in-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of planning-sign-in-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/planning/planning-sign-in-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-sign-in-light",
+      "kind": "ci",
+      "reason": "A sign-in page (a login wall).",
+      "source": "CI-Docs public/screenshots/planning/planning-sign-in-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-tasks-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of planning-tasks-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/planning/planning-tasks-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-tasks-light",
+      "kind": "ci",
+      "reason": "Clean (sample tasks, no names), not chosen: an app has one screenshot slot, and the Today view was chosen.",
+      "source": "CI-Docs public/screenshots/planning/planning-tasks-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/planning/planning-today-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of planning-today-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/planning/planning-today-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-approve-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of setup-approve-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/pool/setup-approve-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-approve-light",
+      "kind": "ci",
+      "reason": "The Hub Pool setup wizard: tailnet host names (beta-red.example-tailnet.ts.net) and model counts: remote access, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/pool/setup-approve-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-approve-mobile-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of setup-approve-mobile-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/pool/setup-approve-mobile-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-approve-mobile-light",
+      "kind": "ci",
+      "reason": "The Hub Pool setup wizard: tailnet host names (beta-red.example-tailnet.ts.net) and model counts: remote access, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/pool/setup-approve-mobile-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-find-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of setup-find-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/pool/setup-find-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-find-light",
+      "kind": "ci",
+      "reason": "The Hub Pool setup wizard: tailnet host names (beta-red.example-tailnet.ts.net) and model counts: remote access, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/pool/setup-find-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-home-card-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of setup-home-card-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/pool/setup-home-card-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/pool/setup-home-card-light",
+      "kind": "ci",
+      "reason": "The Hub Pool setup wizard: tailnet host names (beta-red.example-tailnet.ts.net) and model counts: remote access, and no story names Hub Pool.",
+      "source": "CI-Docs public/screenshots/pool/setup-home-card-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/app-drawer-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-drawer-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/app-drawer-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/app-drawer-light",
+      "kind": "ci",
+      "reason": "An installed app's panel in the account, with \"Routing: Cloudflare Tunnel\" and a device name (remote access), or the Hermes listing with messaging claims.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/app-drawer-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/app-page-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of app-page-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/app-page-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/app-page-light",
+      "kind": "ci",
+      "reason": "An installed app's panel in the account, with \"Routing: Cloudflare Tunnel\" and a device name (remote access), or the Hermes listing with messaging claims.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/app-page-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-cancelling-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of billing-cancelling-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-cancelling-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-cancelling-light",
+      "kind": "ci",
+      "reason": "A billing page: it shows prices or plan names (Free, Pro, $9.00 a month) or a billing state, which the site never prints.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-cancelling-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-free-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of billing-free-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-free-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-free-light",
+      "kind": "ci",
+      "reason": "A billing page: it shows prices or plan names (Free, Pro, $9.00 a month) or a billing state, which the site never prints.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-free-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-payment-failed-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of billing-payment-failed-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-payment-failed-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-payment-failed-light",
+      "kind": "ci",
+      "reason": "A billing page: it shows prices or plan names (Free, Pro, $9.00 a month) or a billing state, which the site never prints.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-payment-failed-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-pro-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of billing-pro-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-pro-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-pro-light",
+      "kind": "ci",
+      "reason": "A billing page: it shows prices or plan names (Free, Pro, $9.00 a month) or a billing state, which the site never prints.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-pro-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-quantity-dialog-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of billing-quantity-dialog-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-quantity-dialog-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/billing-quantity-dialog-light",
+      "kind": "ci",
+      "reason": "A billing page: it shows prices or plan names (Free, Pro, $9.00 a month) or a billing state, which the site never prints.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/billing-quantity-dialog-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/check-your-email-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of check-your-email-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/check-your-email-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/check-your-email-light",
+      "kind": "ci",
+      "reason": "A sign-in, sign-up or verification page (a login wall), with an example email address on the last.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/check-your-email-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/create-org-dialog-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of create-org-dialog-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/create-org-dialog-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/create-org-dialog-light",
+      "kind": "ci",
+      "reason": "An organisation page or dialog with named members (Alex Rivera, Sam Taylor) and an example email address (alex@example.test).",
+      "source": "CI-Docs public/screenshots/portal-2026-10/create-org-dialog-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/delete-device-dialog-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of delete-device-dialog-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/delete-device-dialog-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/delete-device-dialog-light",
+      "kind": "ci",
+      "reason": "A device dialog or menu with a device id (a UUID) or a pairing code, which are not shown.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/delete-device-dialog-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/device-approve-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of device-approve-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/device-approve-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/device-approve-light",
+      "kind": "ci",
+      "reason": "A device dialog or menu with a device id (a UUID) or a pairing code, which are not shown.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/device-approve-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/device-menu-paired-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of device-menu-paired-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/device-menu-paired-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/device-menu-paired-light",
+      "kind": "ci",
+      "reason": "A device dialog or menu with a device id (a UUID) or a pairing code, which are not shown.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/device-menu-paired-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-connect-wizard-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of domains-connect-wizard-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-connect-wizard-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-connect-wizard-light",
+      "kind": "ci",
+      "reason": "A custom-domain page (grafana.example.com, a TLS certificate, DNS records): serving a Hub on a public domain is a remote access claim the site does not make.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-connect-wizard-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-detail-live-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of domains-detail-live-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-detail-live-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-detail-live-light",
+      "kind": "ci",
+      "reason": "A custom-domain page (grafana.example.com, a TLS certificate, DNS records): serving a Hub on a public domain is a remote access claim the site does not make.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-detail-live-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-disconnect-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of domains-disconnect-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-disconnect-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-disconnect-light",
+      "kind": "ci",
+      "reason": "A custom-domain page (grafana.example.com, a TLS certificate, DNS records): serving a Hub on a public domain is a remote access claim the site does not make.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-disconnect-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-list-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of domains-list-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-list-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-list-light",
+      "kind": "ci",
+      "reason": "A custom-domain page (grafana.example.com, a TLS certificate, DNS records): serving a Hub on a public domain is a remote access claim the site does not make.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-list-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-repair-drifted-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of domains-repair-drifted-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-repair-drifted-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-repair-drifted-light",
+      "kind": "ci",
+      "reason": "A custom-domain page (grafana.example.com, a TLS certificate, DNS records): serving a Hub on a public domain is a remote access claim the site does not make.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-repair-drifted-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-restart-dialog-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of domains-restart-dialog-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-restart-dialog-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/domains-restart-dialog-light",
+      "kind": "ci",
+      "reason": "A custom-domain page (grafana.example.com, a TLS certificate, DNS records): serving a Hub on a public domain is a remote access claim the site does not make.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/domains-restart-dialog-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-device-offline-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of home-device-offline-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-device-offline-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-device-offline-light",
+      "kind": "ci",
+      "reason": "The account home for a made-up household (\"Example Household\"): a device named kitchen-hub, public subdomain addresses (remote access) or an offline fault state (\"No check-in for over 3h\"), not the product at work.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-device-offline-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-device-status-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of home-device-status-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-device-status-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-device-status-light",
+      "kind": "ci",
+      "reason": "The account home for a made-up household (\"Example Household\"): a device named kitchen-hub, public subdomain addresses (remote access) or an offline fault state (\"No check-in for over 3h\"), not the product at work.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-device-status-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-fleet-card-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of home-fleet-card-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-fleet-card-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-fleet-card-light",
+      "kind": "ci",
+      "reason": "The account home for a made-up household (\"Example Household\"): a device named kitchen-hub, public subdomain addresses (remote access) or an offline fault state (\"No check-in for over 3h\"), not the product at work.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-fleet-card-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-fleet-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of home-fleet-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-fleet-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-fleet-light",
+      "kind": "ci",
+      "reason": "The account home for a made-up household (\"Example Household\"): a device named kitchen-hub, public subdomain addresses (remote access) or an offline fault state (\"No check-in for over 3h\"), not the product at work.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-fleet-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-fleet-thumb-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of home-fleet-thumb-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-fleet-thumb-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-fleet-thumb-light",
+      "kind": "ci",
+      "reason": "The account home for a made-up household (\"Example Household\"): a device named kitchen-hub, public subdomain addresses (remote access) or an offline fault state (\"No check-in for over 3h\"), not the product at work.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-fleet-thumb-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-no-org-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of home-no-org-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-no-org-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/home-no-org-light",
+      "kind": "ci",
+      "reason": "An empty account home (\"Set up an organization\"): an empty state.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/home-no-org-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/hub-already-device-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of hub-already-device-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/hub-already-device-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/hub-already-device-light",
+      "kind": "ci",
+      "reason": "A device dialog or menu with a device id (a UUID) or a pairing code, which are not shown.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/hub-already-device-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/install-dialog-device-selected-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of install-dialog-device-selected-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/install-dialog-device-selected-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/install-dialog-device-selected-light",
+      "kind": "ci",
+      "reason": "A store dialog or page with \"Public Web\" exposure (remote access) and a device id, or an agents list whose Hermes and OpenClaw blurbs make messaging claims.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/install-dialog-device-selected-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/install-dialog-signed-out-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of install-dialog-signed-out-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/install-dialog-signed-out-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/install-dialog-signed-out-light",
+      "kind": "ci",
+      "reason": "A store dialog or page with \"Public Web\" exposure (remote access) and a device id, or an agents list whose Hermes and OpenClaw blurbs make messaging claims.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/install-dialog-signed-out-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/invite-member-dialog-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of invite-member-dialog-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/invite-member-dialog-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/invite-member-dialog-light",
+      "kind": "ci",
+      "reason": "An organisation page or dialog with named members (Alex Rivera, Sam Taylor) and an example email address (alex@example.test).",
+      "source": "CI-Docs public/screenshots/portal-2026-10/invite-member-dialog-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/org-general-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of org-general-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/org-general-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/org-general-light",
+      "kind": "ci",
+      "reason": "An organisation page or dialog with named members (Alex Rivera, Sam Taylor) and an example email address (alex@example.test).",
+      "source": "CI-Docs public/screenshots/portal-2026-10/org-general-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/org-members-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of org-members-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/org-members-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/org-members-light",
+      "kind": "ci",
+      "reason": "An organisation page or dialog with named members (Alex Rivera, Sam Taylor) and an example email address (alex@example.test).",
+      "source": "CI-Docs public/screenshots/portal-2026-10/org-members-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/pairing-code-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of pairing-code-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/pairing-code-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/pairing-code-light",
+      "kind": "ci",
+      "reason": "A device dialog or menu with a device id (a UUID) or a pairing code, which are not shown.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/pairing-code-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/sign-in-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of sign-in-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/sign-in-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/sign-in-light",
+      "kind": "ci",
+      "reason": "A sign-in, sign-up or verification page (a login wall), with an example email address on the last.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/sign-in-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/sign-up-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of sign-up-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/sign-up-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/sign-up-light",
+      "kind": "ci",
+      "reason": "A sign-in, sign-up or verification page (a login wall), with an example email address on the last.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/sign-up-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/store-agents-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of store-agents-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/store-agents-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/store-agents-light",
+      "kind": "ci",
+      "reason": "A store dialog or page with \"Public Web\" exposure (remote access) and a device id, or an agents list whose Hermes and OpenClaw blurbs make messaging claims.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/store-agents-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/user-settings-security-dark",
+      "kind": "ci",
+      "reason": "The dark-theme twin of user-settings-security-light.webp: the light capture is the one looked at (the family pages are light); see its entry for what was found.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/user-settings-security-dark.webp@6773705a5754"
+    },
+    {
+      "id": "docs/portal-2026-10/user-settings-security-light",
+      "kind": "ci",
+      "reason": "A security settings page (passkeys, two-factor authentication): not the product at work, and passkey wording the site does not repeat.",
+      "source": "CI-Docs public/screenshots/portal-2026-10/user-settings-security-light.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-scan/01-editor-overview",
+      "kind": "ci",
+      "reason": "Companion Scan: a dark room-scan editor and phone scanning screens with named scans (\"One-Bedroom C\", \"Studio Apartment A\") and point clouds of rooms; no story names Companion Scan and its manifest entry has no logo.",
+      "source": "CI-Docs public/screenshots/spatial-scan/01-editor-overview.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-scan/01-start-screen",
+      "kind": "ci",
+      "reason": "Companion Scan: a dark room-scan editor and phone scanning screens with named scans (\"One-Bedroom C\", \"Studio Apartment A\") and point clouds of rooms; no story names Companion Scan and its manifest entry has no logo.",
+      "source": "CI-Docs public/screenshots/spatial-scan/01-start-screen.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-scan/03-world-tab",
+      "kind": "ci",
+      "reason": "Companion Scan: a dark room-scan editor and phone scanning screens with named scans (\"One-Bedroom C\", \"Studio Apartment A\") and point clouds of rooms; no story names Companion Scan and its manifest entry has no logo.",
+      "source": "CI-Docs public/screenshots/spatial-scan/03-world-tab.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-scan/05-scanning-hud",
+      "kind": "ci",
+      "reason": "Companion Scan: a dark room-scan editor and phone scanning screens with named scans (\"One-Bedroom C\", \"Studio Apartment A\") and point clouds of rooms; no story names Companion Scan and its manifest entry has no logo.",
+      "source": "CI-Docs public/screenshots/spatial-scan/05-scanning-hud.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-scan/07-detections-panel",
+      "kind": "ci",
+      "reason": "Companion Scan: a dark room-scan editor and phone scanning screens with named scans (\"One-Bedroom C\", \"Studio Apartment A\") and point clouds of rooms; no story names Companion Scan and its manifest entry has no logo.",
+      "source": "CI-Docs public/screenshots/spatial-scan/07-detections-panel.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-time-machine/companion-spatial-ar-view",
+      "kind": "ci",
+      "reason": "Companion Spatial: dark map and AR screens naming real places (a school in California, a venue called The Matrix); no story names the app.",
+      "source": "CI-Docs public/screenshots/spatial-time-machine/companion-spatial-ar-view.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-time-machine/companion-spatial-categories",
+      "kind": "ci",
+      "reason": "Companion Spatial: dark map and AR screens naming real places (a school in California, a venue called The Matrix); no story names the app.",
+      "source": "CI-Docs public/screenshots/spatial-time-machine/companion-spatial-categories.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-time-machine/companion-spatial-map",
+      "kind": "ci",
+      "reason": "Companion Spatial: dark map and AR screens naming real places (a school in California, a venue called The Matrix); no story names the app.",
+      "source": "CI-Docs public/screenshots/spatial-time-machine/companion-spatial-map.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-time-machine/companion-spatial-poi-card",
+      "kind": "ci",
+      "reason": "Companion Spatial: dark map and AR screens naming real places (a school in California, a venue called The Matrix); no story names the app.",
+      "source": "CI-Docs public/screenshots/spatial-time-machine/companion-spatial-poi-card.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spatial-time-machine/spatial-time-machine-landing",
+      "kind": "ci",
+      "reason": "Companion Spatial: dark map and AR screens naming real places (a school in California, a venue called The Matrix); no story names the app.",
+      "source": "CI-Docs public/screenshots/spatial-time-machine/spatial-time-machine-landing.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spellbook/spellbook-search",
+      "kind": "ci",
+      "reason": "Not better than the Spellbook capture already shipped (the same search and category cards in the same dark interface): nothing is gained by replacing it.",
+      "source": "CI-Docs public/screenshots/spellbook/spellbook-search.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spellbook/spellbook-shelf",
+      "kind": "ci",
+      "reason": "A shelf of third-party tools with a vendor price (\"$20/mo\") and a free-tier number in its notes: prices and numbers the site does not print.",
+      "source": "CI-Docs public/screenshots/spellbook/spellbook-shelf.webp@6773705a5754"
+    },
+    {
+      "id": "docs/spellbook/spellbook-shelves",
+      "kind": "ci",
+      "reason": "The same category cards as the Spellbook capture already shipped: a duplicate of the vetted QA capture.",
+      "source": "CI-Docs public/screenshots/spellbook/spellbook-shelves.webp@6773705a5754"
     },
     {
       "id": "hub/01-signin",
@@ -1754,6 +3885,12 @@
     {
       "id": "ci-hermes",
       "kind": "shot",
+      "reason": "A dark setup page that names Telegram, Discord and WhatsApp (outside services the site does not claim the app uses), a \"Hermex for iOS\" link and the old \"CI marketplace\" product name, above an empty terminal, with an illustrated woman's face as its mark: not usable, and it shows little of the app.",
+      "source": "CI-Docs public/screenshots/hermes/hermes-terminal-dashboard.webp@6773705a5754"
+    },
+    {
+      "id": "ci-hermes",
+      "kind": "shot",
       "reason": "The upstream project's own website, with an install command for another machine: not the app running on a Core.",
       "source": "CI-Marketplace e2e/screenshots/ci-hermes.png@e94772196695"
     },
@@ -1766,8 +3903,20 @@
     {
       "id": "ci-openclaw",
       "kind": "shot",
+      "reason": "A dark setup page that says \"Your personal AI assistant\" (a banned phrase), asks for an AI provider API key (a cloud model) and names Telegram, with iOS and Android links, above an empty terminal: not usable.",
+      "source": "CI-Docs public/screenshots/openclaw/openclaw-setup.webp@6773705a5754"
+    },
+    {
+      "id": "ci-openclaw",
+      "kind": "shot",
       "reason": "The upstream project's own website, with install commands for another machine: not the app running on a Core.",
       "source": "CI-Marketplace e2e/screenshots/ci-openclaw.png@e94772196695"
+    },
+    {
+      "id": "ci-planning",
+      "kind": "shot",
+      "reason": "Replaced by the CI-Docs capture of the current interface: this QA capture is the empty Today view of an older, dark interface (\"a clear day\", no tasks), which shows little of what the app does.",
+      "source": "CI-Marketplace e2e/screenshots/ci-planning.png@e94772196695"
     },
     {
       "id": "code-server",
@@ -2245,6 +4394,7 @@
     }
   ],
   "sources": {
+    "docs": "6773705a5754e506c3f5d0e8a004ca2b0e616f17",
     "hub": "860b47a7a84c53d305be8b7696fc390463fcbb96",
     "marketplace": "e947721966952d762deec382e64fd55a8f2db3fb",
     "portal": "ff8777c623760ca471ebd89a7881b0aa0f6018e7"
