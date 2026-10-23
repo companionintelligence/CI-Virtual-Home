@@ -62,6 +62,19 @@ gutters, gable windows, lanterns, world variety, restraint) apply only under `"d
 keeps its look exactly. Code reads it through `specDefaults(spec)` in `assets/spec/index.ts`; the validator refuses
 any value but 1 or 2.
 
+`use` says what the building is for: absent (or `"home"`) is a home, `"office"` is a building for a fictional company
+(reference/office/office-contract-m0.md). An office is a HouseSpec like any other, but `pnpm run index` lists it under
+`offices` in `content/houses/index.json`, beside `houses` and never in it, so no page, count or fleet metric that counts the
+homes sees it (`scripts/lib/list-specs.mts`: `listSpecs({ kind })`, `allHouses(index)`); with no office in the folder the index has
+no `offices` key. Two optional fields belong to an office and to nothing else (the validator refuses them on a home):
+`office: { headcount, company }`, the people on its floor (1 to 60; the desks are held to them) and the slug of the company that works
+there, and `rooms[].seats`, the people a room seats (a desk or a bench position each; a count of the room's desk items stands in
+when it is absent). The office rules are `scripts/validate/office.mts`: Companion Intelligence is the author and
+`original piece: CI offices` the source, the light is `day`, the building has a work floor, a meeting room with a table and a
+whiteboard, a kitchen with a counter and a comms room (`server`: Comms Room, Back Room, Back Office) that holds the Core on a desk or a
+shelf, is at least 3.6 x 3.6 m and has no window or door on a perimeter wall, and 0.7 to 1.6 work positions for each person on the floor.
+A home is not touched by any of it.
+
 ## Level
 
 ```jsonc

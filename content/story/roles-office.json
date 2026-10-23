@@ -1,0 +1,34 @@
+{
+  "v": 1,
+  "$comment": "The office extension of roles.json (reference/office/office-build-contract.md section 4.1; reference/office/office-contract-m0.md), merged over it by mergeRoles in scripts/story/lib/kinds.mts for a company story and for an office building, never for a family: roles.json is hashed whole into every family's lock, so it is not edited. The merge: `items`, `home`, `rooms`, `kindNames` and `universal` of this file replace or add to the base's by key; the room roles in `dropRooms` are dropped for an office (a workshop is `workshop`, and not also `garage`; a home word never resolves to a home room). The role NAMES here are the contract (OFFICE_ROLE_IDS and OFFICE_ROOM_ROLES in scripts/story/lib/co/consts.mts); the type lists are ours and change without one. Every type listed exists in content/house-catalog.json today; the office's own props (a conference table, an office desk, a reception desk) are added at the front of their lists when they land.",
+  "dropRooms": ["living", "dining", "bedroom", "kids", "garage", "laundry", "bath", "garden", "patio"],
+  "items": {
+    "workstation": ["standing-desk", "walnut-desk", "writing-desk", "dual-monitor-arm", "curved-monitor", "laptop"],
+    "meeting-table": ["trestle-table", "glass-dining-table", "farmhouse-table"],
+    "whiteboard": ["whiteboard", "pin-board"],
+    "server-rack": ["server-rack"],
+    "reception-desk": ["counter-run", "bar-table", "console-table"],
+    "printer": ["printer"],
+    "workbench": ["workbench"],
+    "bookshelf": ["bookshelf", "low-bookshelf", "ladder-shelf", "open-shelving", "filing-cabinet"]
+  },
+  "home": {
+    "workstation": ["workfloor", "office", "workshop"],
+    "meeting-table": ["meeting"],
+    "whiteboard": ["meeting", "workfloor"],
+    "server-rack": ["server"],
+    "reception-desk": ["reception"],
+    "printer": ["workfloor", "store", "office"],
+    "workbench": ["workshop"]
+  },
+  "rooms": {
+    "reception": { "names": "reception|front desk|welcome|waiting" },
+    "workfloor": { "names": "open[- ]office|open[- ]plan|work[- ]?floor|studio floor|team floor|bullpen|desk room|shop floor|sales floor" },
+    "meeting": { "names": "meeting|conference|board ?room|huddle|phone booth|focus room|pitch room|consultation|team room" },
+    "kitchen": { "kinds": ["kitchen"], "names": "break room" },
+    "server": { "names": "server|comms|network room|\\bit room\\b|patch|back (room|office)" },
+    "workshop": { "names": "workshop|print room|test lab|device lab|workroom|bench bay" },
+    "store": { "names": "stock ?room|supply room|archive room|store ?room" }
+  },
+  "universal": ["street", "front-door", "core", "room", "counter"]
+}
