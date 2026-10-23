@@ -14,6 +14,7 @@ import path from 'node:path';
 import { validate } from './validate-house-spec.mts';
 import { allHouses, listSpecs, specFileNames, specIds, specUse, type SpecError } from './lib/list-specs.mts';
 import { apartmentIds, unitStoreys } from './apartment-unit.mts';
+import { redactIndex } from './portal-redact.mts';
 import { rectArea } from '../assets/house-geometry.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -168,3 +169,13 @@ test('the index: the homes\' rows are the ones the builder always wrote; the off
   assert.deepEqual(allHouses(both).map((h: any) => h.id), [...alone.houses.map((h: any) => h.id), 'office-fixture-loft']);
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+test('the index a build ships has no offices array: a public build must not tell the world the first office exists, and the homes\' rows are as they were', () => {
+  const index = JSON.parse(fs.readFileSync(path.join(HOUSES, 'index.json'), 'utf8'));
+  const withOffice = { ...index, offices: [{ id: 'office-fixture-loft', name: 'Fixture Loft', author: 'Companion Intelligence', source: 'original piece: CI offices', headcount: 6 }] };
+  assert.ok(!('offices' in redactIndex(withOffice)), 'redactIndex drops `offices`');
+  assert.equal(JSON.stringify(redactIndex(withOffice)), JSON.stringify(redactIndex(index)), 'an index that lists an office ships the same bytes as one that does not');
+  assert.deepEqual(Object.keys(redactIndex(index)), Object.keys(index).filter((k) => k !== 'offices'), 'and the keys keep their order');
+  assert.ok(redactIndex(index).houses.every((h: any) => !('author' in h) && !('source' in h)), 'the homes are redacted as before');
+});
+

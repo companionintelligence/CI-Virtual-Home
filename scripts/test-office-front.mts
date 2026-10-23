@@ -15,12 +15,13 @@ import os from 'node:os';
 import path from 'node:path';
 import vm from 'node:vm';
 import { loadCompanyContext } from './story/lib/co/context.mts';
-import { CARD_LIMITS, cardProblems, companiesLine, loadCards, officesWord, readFixtures, scopeLineOf, type CardFixture } from './office/data.mts';
+import { CARD_LIMITS, RESERVED_IDS, cardProblems, companiesLine, loadCards, officesWord, readFixtures, scopeLineOf, type CardFixture } from './office/data.mts';
 import { companyPage, officePage, SWITCH_CSS, companyTitle, companyDescription, officeDescription, OFFICE_TITLE } from './office/pages.mts';
 import { injectSwitcher } from './office/site.mts';
 import { homePage, LINKS, notFoundPage } from './portal-pages.mts';
 import { officeFinePrint, owedIds } from './office/fine-print.mts';
 import { FICTIONAL_COMPANY_LINE } from './story/lib/co/consts.mts';
+import { siteCopy } from './story/lib/site-copy.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const ctx = loadCompanyContext(ROOT);
@@ -69,6 +70,7 @@ const BAD: [string, (f: CardFixture) => void, RegExp][] = [
   ['the word assistant in a title', (f) => { f.people[0].title = 'Executive assistant'; }, /vocab-assistant/],
   ['a compliance word in the story', (f) => { f.story = `${f.story} It keeps the company GDPR compliant.`; }, /sec-compliance/],
   ['a limit that says replaces', (f) => { f.limits[0] = 'Forgejo replaces GitHub for the whole company, with nothing lost.'; }, /co-replaces/],
+  ['a person whose id is one the page uses for itself', (f) => { f.people[1].id = 'core'; }, /an id the company's page uses for itself/],
   ['a wrong schema', (f) => { (f as any).schema = 'family/v1'; }, /schema is/],
   ['an address with a unit', (f) => { f.address.line = 'Unit 2 Maltings Yard'; }, /address/],
 ];
@@ -122,6 +124,16 @@ test('a company\'s page: the label first, its long line, the people, the pairs a
   }
   assert.ok(companyPage(cards[0], undefined, cards[1]).includes('Next company: Lintel &amp; Sill'));
   assert.ok(companyPage(cards[1], cards[0], undefined).includes('Previous company: Reelwick'));
+});
+
+test('every id on a page is unique, and the ones that are not a person\'s are the ones a person may not take', () => {
+  const pages = [['office.html', officePage(cards)], ...cards.map((c, i) => [`company/${c.slug}.html`, companyPage(c, cards[i - 1], cards[i + 1])] as [string, string])];
+  for (const [name, html] of pages) {
+    const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+    assert.deepEqual(ids.filter((id, i) => ids.indexOf(id) !== i), [], `${name}: two elements of one id`);
+    const people = new Set(cards.flatMap((c) => c.people.map((p) => p.id)));
+    assert.deepEqual(ids.filter((id) => !people.has(id) && !RESERVED_IDS.includes(id)), [], `${name}: an id the page uses that RESERVED_IDS (scripts/office/data.mts) does not list`);
+  }
 });
 
 test('the fine print is claims.json\'s words, from a table of the office\'s own', () => {
@@ -187,22 +199,37 @@ test('the sheet is balanced and the script has no network, no storage and no wal
 });
 
 // ---- THE OFFICE IS NOT PUBLIC: the flag, the output of a build without it, and the output of a build with it
-const build = (out: string, ...flags: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'build-portal.mts'), '--out', out, ...flags], { encoding: 'utf8', cwd: ROOT });
+// (a build here is a local one: CI_STORY_STRICT, which a push to main sets, is taken out of the environment, so a strict shell cannot turn these builds strict)
+const cleanEnv = (extra: Record<string, string> = {}): NodeJS.ProcessEnv => ({ ...process.env, CI_STORY_STRICT: '', ...extra });
+const build = (out: string, ...flags: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'build-portal.mts'), '--out', out, ...flags], { encoding: 'utf8', cwd: ROOT, env: cleanEnv() });
 const files = (dir: string, rel = ''): string[] => fs.readdirSync(path.join(dir, rel)).flatMap((n) => { const r = rel ? `${rel}/${n}` : n; return fs.statSync(path.join(dir, r)).isDirectory() ? files(dir, r) : [r]; }).sort();
 const sha = (f: string): string => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 const OFFICE_FILES = ['office.html', 'company/reelwick.html', 'company/lintel-and-sill.html', 'portal/office.css', 'portal/office.js'];
 
-test('a build for the public site refuses the flag before it does any work (--strict-families, CI_STORY_STRICT=1), and a stray value switches nothing on', () => {
+test('a build for the public site refuses the flag before it does any work (--strict-families, CI_STORY_STRICT=1), whichever order, and the workflows do not know it', () => {
   const out = path.join(os.tmpdir(), `office-refused-${process.pid}`);
-  const strict = build(out, '--offices', '--strict-families');
-  assert.equal(strict.status, 1); assert.match(strict.stderr, /the office pages are not public/); assert.ok(!fs.existsSync(out), 'no output directory was made');
-  const env = spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'build-portal.mts'), '--out', out, '--offices'], { encoding: 'utf8', cwd: ROOT, env: { ...process.env, CI_STORY_STRICT: '1' } });
+  for (const flags of [['--offices', '--strict-families'], ['--strict-families', '--offices']]) {
+    const strict = build(out, ...flags);
+    assert.equal(strict.status, 1, flags.join(' ')); assert.match(strict.stderr, /the office pages are not public/); assert.ok(!fs.existsSync(out), 'no output directory was made');
+  }
+  const env = spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'build-portal.mts'), '--out', out, '--offices'], { encoding: 'utf8', cwd: ROOT, env: cleanEnv({ CI_STORY_STRICT: '1' }) });
   assert.equal(env.status, 1); assert.ok(!fs.existsSync(out));
-  const src = fs.readFileSync(path.join(ROOT, 'scripts', 'build-portal.mts'), 'utf8');
-  assert.ok(!/process\.env\.[A-Z_]*OFFICE/i.test(src), 'no environment variable turns the office on: only the flag does');
-  assert.ok(src.includes("args.offices === 'true'"), 'only the exact flag');
   // and the workflows build the public site without it
   for (const wf of ['ci.yml', 'deploy.yml']) assert.ok(!/--offices|offices/i.test(fs.readFileSync(path.join(ROOT, '.github', 'workflows', wf), 'utf8')), `${wf} does not know the office`);
+});
+
+test('no other spelling and no environment variable switches the office on: only the flag does', { timeout: 120000 }, () => {
+  const src = fs.readFileSync(path.join(ROOT, 'scripts', 'build-portal.mts'), 'utf8');
+  assert.ok(!/process\.env\.[A-Z_]*OFFICE/i.test(src), 'the build reads no environment variable for the office');
+  assert.ok(src.includes("args.offices === 'true'"), 'only the exact flag');
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'office-spellings-'));
+  // `--offices=true` is the key "offices=true", `--office` and `--OFFICES` other keys, and `--offices yes` the value "yes": none is the flag (a bare `--offices`, and `--offices true`, which parseArgs reads the same way, are)
+  const b = spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'build-portal.mts'), '--out', out, '--offices=true', '--office', '--OFFICES', '--offices', 'yes'], { encoding: 'utf8', cwd: ROOT, env: cleanEnv({ OFFICES: '1', OFFICE: '1', CI_OFFICES: 'true', npm_config_offices: 'true', PORTAL_OFFICES: '1' }) });
+  assert.equal(b.status, 0, b.stdout + b.stderr);
+  const got = files(out);
+  assert.ok(!got.includes('office.html') && !got.some((f) => f.startsWith('company/') || f.startsWith('portal/office.')), 'no office file');
+  assert.ok(!/offices:/.test(b.stdout), 'and the build says nothing of the office');
+  fs.rmSync(out, { recursive: true, force: true });
 });
 
 test('without --offices: no office file, no switcher; with it: five files more, the switcher in the pages of the homes and nothing else changed; a default build clears a flagged one', { timeout: 240000 }, () => {
@@ -241,6 +268,17 @@ test('without --offices: no office file, no switcher; with it: five files more, 
   const office = fs.readFileSync(path.join(on, 'office.html'), 'utf8');
   assert.match(office, /<link rel="stylesheet" href="\.\/portal\/gallery\.css\?v=[0-9a-f]{10}">/); assert.match(office, /<script src="\.\/portal\/office\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/);
   assert.match(fs.readFileSync(path.join(on, 'company', 'reelwick.html'), 'utf8'), /<script src="\.\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/);
+
+  // the copy lint reads the office's pages too, finds them clean, and stops a page that loses its label or its fine print or says what the claims forbid
+  const lintOn = siteCopy({ dir: on, root: ROOT }), lintOff = siteCopy({ dir: off, root: ROOT });
+  assert.deepEqual(lintOn.errors, [], 'story:copy over the flagged build'); assert.deepEqual(lintOff.errors, []);
+  assert.equal(lintOn.counts.pages - lintOff.counts.pages, 3, 'office.html and the two company pages are read');
+  assert.equal(lintOn.warnings.length, lintOff.warnings.length, 'and add no warning'); assert.deepEqual(lintOn.pending, lintOff.pending);
+  const doctored = (file: string, edit: (t: string) => string): string[] => { const f = path.join(on, file), keep = fs.readFileSync(f, 'utf8'); fs.writeFileSync(f, edit(keep)); try { return siteCopy({ dir: on, root: ROOT }).errors; } finally { fs.writeFileSync(f, keep); } };
+  assert.ok(doctored('company/reelwick.html', (t) => t.split(FICTIONAL_COMPANY_LINE).join('Fictional.')).some((e) => /the line is missing/.test(e) && /company\/reelwick/.test(e)), 'a company page without the label');
+  assert.ok(doctored('office.html', (t) => t.replace(/<p data-fine="launch-not-offer">[\s\S]*?<\/p>/, '')).some((e) => /launch-not-offer on office/.test(e)), 'the office page without its fine print');
+  assert.ok(doctored('office.html', (t) => t.replace('Each company here is made up.', 'Each company here is made up and GDPR compliant!')).some((e) => /sec-compliance/.test(e)), 'a banned phrase on the office page');
+  assert.ok(doctored('company/lintel-and-sill.html', (t) => t.replace('Meet the company', 'Meet The Company Today')).some((e) => /not sentence case/.test(e)), 'a heading that is not in sentence case');
 
   // a default build over a flagged one clears the office (OWNED)
   const c = build(on); assert.equal(c.status, 0, c.stdout + c.stderr);

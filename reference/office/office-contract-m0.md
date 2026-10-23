@@ -6,24 +6,24 @@
 
 ## 1. Decisions
 
-Confirmed by the user, in chat, on **2026-10-23**. Source for every row: *user, in chat, 2026-10-23*. The four marked ▲ gate any public showing; the user named the value of O2, O4, O6 and O7 in that chat, and told the build to take the plan's section 5.1 default for the others.
+Confirmed by the user, in chat, on **2026-10-23**. Source for every row: *user, in chat, 2026-10-23*. The four marked ▲ gate any public showing; the user named the value of O2, O4, O6 and O7 in that chat, and told the build to take the plan's section 5.1 default for the others. Three rows (marked ✎) are the plan's default **as the build reconciled it**, because of the nothing-public rule or because no story is written yet: that reconciliation is the author's, to be confirmed, not the user's words (O1: no `_redirects` line yet; O9: the switcher and the sitemap row are deferred; O14: "at most three stories" where the plan says "the three").
 
 | # | Decision | Value in force | Notes for the build |
 |---|---|---|---|
-| O1 | The URL | `/office`, and `/company/<slug>` for a company. In `dist/`: `office.html` and `company/<slug>.html`; no `office/` directory (the local server answers 404 for a file and a directory of one name) | no `_redirects` line yet |
+| O1 ✎ | The URL | `/office`, and `/company/<slug>` for a company. In `dist/`: `office.html` and `company/<slug>.html`; no `office/` directory (the local server answers 404 for a file and a directory of one name) | no `_redirects` line yet |
 | O2 ▲ | Per-person Companion accounts | **The claims canon wins.** Offices say only "each app keeps its own sign-ins". No page mentions Organizations or a Companion account per colleague; `cap-multi-user` of `claims.json` holds | the docs' Organizations page is not followed |
 | O3 | A medium business | Told as one site or one department of a larger firm, `floor` at most 25 | no medium company in M0 |
 | O4 ▲ | The label and fictional staff | The label is **"Fictional company. Real software."** and the long line is **"The people in it are characters, not customers."** ADS.md 9.1 is read as about Companion's own team, the reading the families already rely on | in `content/story/claims.json`, disclosure `fictional-company` (section 3). Characters are drawn as monograms, never faces |
 | O5 | Remote access, "share apps through a web link" | Every scene stays inside the building; writers say "at the office", never "from the office" | `cap-remote-access` is not touched |
 | O6 ▲ | The eight company names | **Proposals only.** Counsel clears each. M0 uses two of them (Reelwick, Lintel & Sill) as placeholder fixtures; `company-names.json` is a deny-list, never a clearance | a rename is a day's work at most before stories exist |
-| O7 ▲ | Naming real services | Only the services the store's own `replaces` rows name, in chips and "Rented before" panels, with `names-owners`; **never as text-only mentions** (the pay service, the mail provider). A pair reads "<app>, alternative to <service>", never "replaces" | in M0 the chips are checked against `content/story/services.json` and the `hold` list of `content/story/lander.json` |
+| O7 ▲ | Naming real services | Only the services the store's own `replaces` rows name, in chips and "Rented before" panels, with the owners-of-names line; **never as text-only mentions** (the pay service, the mail provider). A pair reads "<app>, alternative to <service>", never "replaces" | in M0 the chips are checked against `content/story/services.json` and the `hold` list of `content/story/lander.json`. The pages print `names-logos-owners` ("Product names, logos and brands are the property of their owners...", the front page's own line), not `names-owners`, whose words say "what each app replaces", which the house rule forbids; M1's "Rented before" panel prints the same |
 | O8 | Compliance wording, setting limits | None; the eight settings are the green ones | |
-| O9 | Sitemap and navigation | The plan's default (one sitemap, two header links) is **deferred by the nothing-public rule**: the Homes and Offices switcher exists only in a build made with `--offices`; there is no sitemap row, no `robots.txt` change and the pages are `noindex, nofollow` | the default build is byte for byte today's |
+| O9 ✎ | Sitemap and navigation | The plan's default (one sitemap, two header links) is **deferred by the nothing-public rule**: the Homes and Offices switcher exists only in a build made with `--offices`; there is no sitemap row, no `robots.txt` change and the pages are `noindex, nofollow` | the default build is byte for byte today's |
 | O10 | The team boundary | One Core, one owner, per-app sign-ins named as that app's own feature, one companion per company, on the owner | |
 | O11 | Backups | Not printed. `owner-backups` is **not** added to `claims.json`. The three shipped family backup beats are untouched | open question 2 below |
 | O12 | Merge order | Moot: the apartments, pass 2, story v3 and the lander are on main. The `author` of an office is **`Companion Intelligence`** through `scripts/own-authors.mts` (the design's token `ci-offices-internal` is dropped) | |
 | O13 | Stretched `replaces` pairs | The store's pair is kept on tours and cuts later, as the families do. The M0 cards do not use the two loose ones (Paperless-ngx with Evernote, with Google Drive) | counsel reads it with O7 |
-| O14 | Akaunting's cap | Keep it in at most three stories, one person each | no M0 impact |
+| O14 ✎ | Akaunting's cap | Keep it in at most three stories, one person each | no M0 impact |
 | O15 | Package gaps | The stories avoid every gap and say "on the Core" only where the package keeps data | no M0 impact |
 
 The smaller calls of plan 5.1 (Kenney K2 for seating, blank unlettered fascia signage, planner v2 with `duration: auto`, the first release at two, six or eight offices) are M1 and later.
@@ -64,9 +64,10 @@ Out of M0 (the user's rule and the plan's order): buildings, composer programs, 
 
 | Mechanism | Pinned by |
 |---|---|
-| `portal:build` writes no office file without `--offices`, and its output is byte for byte the base commit's (601 files, one fingerprint) | the independent inertness review; `scripts/test-office-front.mts` |
-| `--offices` together with `--strict-families` (what a push to main builds) or `CI_STORY_STRICT=1` **fails the build** | `scripts/test-office-front.mts` |
-| no env var enables it: a CLI flag only | the same |
+| `portal:build` writes no office file without `--offices`, and its output is byte for byte the base commit's (601 files, one fingerprint) | the independent inertness review pins it to `ec69acb` (nothing in the tree can); `scripts/test-office-front.mts` holds that a flagged build differs from a default one by the office's pieces only, and that a default build clears a flagged one |
+| `--offices` together with `--strict-families` (what a push to main builds) or `CI_STORY_STRICT=1` **fails the build**, before any work | `scripts/test-office-front.mts` |
+| the index a build ships has **no `offices` key** (`redactIndex` drops it), so the first office indexed in `content/houses/` is not named by a public build; only `index.houses` has specs, thumbnails and pages shipped | `scripts/test-office-spec.mts` |
+| no env var and no other spelling enables it: the exact flag only (`--offices`, which `parseArgs` also reads as `--offices true`) | `scripts/test-office-front.mts` |
 | `OWNED` in `build-portal.mts` lists `office.html` and `company`, so a default build clears what a flagged build left | the same |
 | the pages are `noindex, nofollow`, have no canonical, are not in `sitemap.xml` and `robots.txt` is the default's | the same |
 | no change to `.github/workflows/ci.yml` or `deploy.yml` | `git diff --stat` in the review |
@@ -81,7 +82,9 @@ I1 to I9 of the build contract stand. In particular: the 36 families stay byte f
 
 ## 6. The first job of M1
 
-The 22 scripts that glob `content/houses/` count every spec as a home. Before the first building is committed there, sweep them onto `listSpecs({ kind: 'home' })` or `allHouses()` (the inventory and the choice for each is in the status notes of the M0 hand-over), and add the office baselines (`compose`, `fleet`, `planner`) as separate files. Only then does `content/houses/<office>.json` land. The two Python twins loop every spec: always pass `--only <id>`.
+M0 already stops the shipped index from naming an office (`redactIndex` drops `offices`; the independent review found that a plain default build would otherwise have shipped the array as soon as one office was indexed). `scripts/lib/list-specs.mts` is imported by the index builder and by the office plugin (which every validator run loads; it reads the office's role table only when it meets an office).
+
+The scripts that glob `content/houses/` count every spec as a home (the design said 22; the inventory finds about 30, in the hand-over notes). Before the first building is committed there, sweep them onto `listSpecs({ kind: 'home' })` or `allHouses()` (the inventory and the choice for each is in the status notes of the M0 hand-over), and add the office baselines (`compose`, `fleet`, `planner`) as separate files. Only then does `content/houses/<office>.json` land. The two Python twins loop every spec: always pass `--only <id>`.
 
 ## 7. Open items
 

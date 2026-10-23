@@ -23,7 +23,9 @@ import { heroRoom } from '../../assets/kit-rules.js';
 import { lightingName } from '../../assets/environment.js';
 
 export const OFFICE_SOURCE = 'original piece: CI offices';
-const table = rolesFor('company');
+// (the merged role table is read when the first office is met, never at load: a home's validation does not depend on the office's data files)
+let merged: ReturnType<typeof rolesFor> | null = null;
+const roles = (): ReturnType<typeof rolesFor> => (merged ||= rolesFor('company'));
 const HOME_WORD = /\b(?:bed ?room|garage|suite|closet|lounge)\b/i;
 const CIRCULATION_WORD = /\b(?:hall|lobby|gallery|landing)\b/i;
 /** the Core's room is at least this on both sides (12.96 m2): the finale lens and the occluder need it */
@@ -70,10 +72,10 @@ const check: Check = (spec, ctx) => {
     if (seen.has(n.toLowerCase())) err('names', `two rooms are called "${n}"`);
     seen.add(n.toLowerCase());
     if (HOME_WORD.test(n)) err('names', `room "${n}" is named like a room of a home (bedroom, garage, suite, closet, lounge); an office has no such room`);
-    else if (CIRCULATION_WORD.test(n) && !(roomRoles(n, table) as string[]).some((r) => r === 'entry' || r === 'reception')) warn('names', `room "${n}" reads as a hall or a lobby: the role table takes it for circulation (an Entry Lobby is the entry, and is fine)`);
-    if (!roomRoles(n, table).length) warn('names', `room "${n}" resolves to no office role (content/story/roles-office.json): no story can be told in it`);
+    else if (CIRCULATION_WORD.test(n) && !(roomRoles(n, roles()) as string[]).some((r) => r === 'entry' || r === 'reception')) warn('names', `room "${n}" reads as a hall or a lobby: the role table takes it for circulation (an Entry Lobby is the entry, and is fine)`);
+    if (!roomRoles(n, roles()).length) warn('names', `room "${n}" resolves to no office role (content/story/roles-office.json): no story can be told in it`);
   }
-  const rolesOf = (name: string): string[] => roomRoles(String(name ?? ''), table) as string[];
+  const rolesOf = (name: string): string[] => roomRoles(String(name ?? ''), roles()) as string[];
   const withRole = (role: string): { lv: any; room: any }[] => rooms.filter((r) => rolesOf(r.room.name).includes(role));
   for (const [what, ok] of [
     ['a floor where the work happens (a "workfloor" or "workshop" room: Open Office, Studio Floor, Workshop)', withRole('workfloor').length + withRole('workshop').length > 0],
@@ -102,19 +104,19 @@ const check: Check = (spec, ctx) => {
 
   // ---- the meeting room and the counter
   const itemsOf = (r: { room: any }): string[] => (r.room.items || []).map((i: any) => String(i.type));
-  const MEETING_TABLES = table.items['meeting-table'] || [], BOARDS = [...(table.items['whiteboard'] || []), 'wall-tv', 'wall-screen'];
+  const MEETING_TABLES = roles().items['meeting-table'] || [], BOARDS = [...(roles().items['whiteboard'] || []), 'wall-tv', 'wall-screen'];
   for (const m of withRole('meeting')) {
     const types = itemsOf(m);
     if (!types.some((t) => MEETING_TABLES.includes(t))) err('meeting', `meeting room "${m.room.name}" has no table (${MEETING_TABLES.join(', ')})`);
     if (!types.some((t) => BOARDS.includes(t))) err('meeting', `meeting room "${m.room.name}" has no whiteboard, pin board or wall screen`);
   }
-  const COUNTERS = table.items['counter'] || [], DESKS = table.items['reception-desk'] || [];
+  const COUNTERS = roles().items['counter'] || [], DESKS = roles().items['reception-desk'] || [];
   if (!rooms.some((r) => (rolesOf(r.room.name).includes('kitchen') && itemsOf(r).some((t) => COUNTERS.includes(t))) || (rolesOf(r.room.name).includes('reception') && itemsOf(r).some((t) => DESKS.includes(t))))) err('counter', 'no counter run in the kitchen and no reception desk at reception');
 
   // ---- seats: the desks and benches against the people on the floor
   if (o && typeof o === 'object' && Number.isInteger(o.headcount)) {
     const work = rooms.filter((r) => rolesOf(r.room.name).some((x) => WORK_ROLES.has(x)));
-    const WORKSTATIONS = table.items['workstation'].filter((t) => !['dual-monitor-arm', 'curved-monitor', 'laptop'].includes(t));
+    const WORKSTATIONS = roles().items['workstation'].filter((t) => !['dual-monitor-arm', 'curved-monitor', 'laptop'].includes(t));
     const declared = work.reduce((n, r) => n + (Number.isInteger(r.room.seats) ? r.room.seats : 0), 0);
     const counted = work.reduce((n, r) => n + itemsOf(r).reduce((k, t) => k + (WORKSTATIONS.includes(t) ? 1 : t === 'workbench' ? 2 : 0), 0), 0);
     const seats = declared || counted;

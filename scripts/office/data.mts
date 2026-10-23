@@ -12,6 +12,11 @@ import { checkSchema } from '../story/lib/schema-lite.mts';
 import { numberWord, capital } from '../portal-pages.mts';
 
 export const CARD_SCHEMA = 'office-card/v0';
+/** The ids the office's own pages use (scripts/office/pages.mts). A person's id is an anchor on the company's page (company/<slug>#anselm), so it may not be one of these: two elements of one id. */
+export const RESERVED_IDS: readonly string[] = [
+  'main', 'core', 'cta-title', 'companies', 'companies-title', 'office-title', 'hero-companies', 'count', 'live', 'clear', 'q', 'jobs', 'sizes', 'grid', 'empty', 'clear-empty',
+  'company', 'company-title', 'meet-title', 'office', 'office-title2', 'runs', 'runs-title', 'limits', 'limits-title', 'i-search', 'i-down', 'i-arrow',
+];
 export const SIZE_LABELS: Record<Size, string> = { startup: 'Startup', small: 'Small business', medium: 'Medium business' };
 /** a card shows this many people and this many pairs; the company's page shows them all */
 export const CARD_LIMITS = { people: 6, pairs: 4 } as const;
@@ -69,6 +74,7 @@ export function cardProblems(f: CardFixture, ctx: CoCtx, held: Set<string> = hel
     const ids = new Set<string>(), names = new Set<string>();
     for (const p of f.people) {
       if (!/^[a-z][a-z0-9-]{1,31}$/.test(p.id) || ids.has(p.id)) P(`person id ${JSON.stringify(p.id)} is not a unique id`);
+      if (RESERVED_IDS.includes(p.id)) P(`person id ${JSON.stringify(p.id)} is an id the company's page uses for itself`);
       ids.add(p.id);
       if (!/^[A-Z][a-zA-Z'’]{1,19}$/.test(p.name) || names.has(p.name.toLowerCase())) P(`person name ${JSON.stringify(p.name)} is not a unique first name`);
       names.add(String(p.name).toLowerCase());

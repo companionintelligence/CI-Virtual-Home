@@ -34,7 +34,7 @@
 .homes-head #clear { margin-left: auto; }
 
 /* a company's card: gallery.css's family card, with a size and a line for how many people */
-.size-tag { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--link); }
+.size-tag { margin: 0 0 6px; font-size: var(--type-label); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--link); }
 .card-company .scope-line { margin: 6px 0 0; font-size: 14px; color: var(--foreground); }
 .card-company .who span { overflow-wrap: anywhere; }
 .card-company .cast { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }

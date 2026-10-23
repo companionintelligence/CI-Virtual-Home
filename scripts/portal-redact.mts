@@ -61,10 +61,14 @@ export function redactSpecText(text: string): { text: string; name: string; resh
   return { text: `${JSON.stringify(want, null, 2)}\n`, name, reshaped: true };
 }
 
-/** The list of homes as shipped: each entry without `author` and `source`, its `name` the display name. */
+/**
+ * The list of homes as shipped: each entry without `author` and `source`, its `name` the display name. An `offices` array (reference/office/office-contract-m0.md: an office is listed
+ * beside the homes, never among them) is not shipped: the public site has no office, and a list that is copied as it is would tell the world the first office exists.
+ */
 export function redactIndex(index: any): any {
+  const { offices: _offices, ...rest } = index;
   return {
-    ...index,
+    ...rest,
     houses: (index.houses || []).map((h: any) => {
       const out: any = { ...h, name: displayName({ id: h.id, name: h.name }) };
       for (const k of REDACTED_KEYS) delete out[k];

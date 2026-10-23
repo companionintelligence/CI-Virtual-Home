@@ -12,7 +12,7 @@ import path from 'node:path';
 import { schemaKeywordsUsed, SUPPORTED_KEYWORDS, checkSchema } from './story/lib/schema-lite.mts';
 import { rolesFor, mergeRoles, functionsFor } from './story/lib/kinds.mts';
 import { roomRoles } from '../assets/story/roles.js';
-import { CLAIMS_SNAPSHOT } from './story/lib/fine-print.mts';
+import { CLAIMS_SNAPSHOT, snapshotOf } from './story/lib/fine-print.mts';
 import { EXTRA_BANS } from './story/lib/extra-bans.mts';
 import { COLOURS, FICTIONAL_COMPANY_ID, FICTIONAL_COMPANY_LINE, FLOOR_MAX, FUNCTIONS, HOME_ONLY_ROOM_ROLES, OFFICE_ONLY_ROLE_IDS, OFFICE_ONLY_ROOM_ROLES, OFFICE_ROLE_IDS, OFFICE_ROOM_ROLES, SCOPES, SIZES, CO_CATEGORIES, CO_DAY_PARTS, VOICE_KEYS } from './story/lib/co/consts.mts';
 import { FICTIONAL_LINE } from '../assets/story/types.ts';
@@ -29,7 +29,9 @@ const stripDescriptions = (o: unknown): unknown => JSON.parse(JSON.stringify(o, 
 test('the schema stays inside the keywords the checker enforces, and is the family schema\'s sibling', () => {
   assert.equal(company.$id, 'https://homes.ci.computer/schema/company-v1.json');
   assert.deepEqual([...schemaKeywordsUsed(company)].filter((k) => !SUPPORTED_KEYWORDS.has(k)), [], 'a keyword no checker here enforces would silently weaken the contract');
-  assert.deepEqual(Object.keys(company.$defs).sort(), [...new Set(Object.keys(company.$defs))].sort());
+  // no definition is left over: every one is referenced from the document or from another definition
+  const referenced = new Set([...JSON.stringify(company).matchAll(/"\$ref":\s*"#\/\$defs\/([A-Za-z]+)"/g)].map((m) => m[1]));
+  assert.deepEqual(Object.keys(company.$defs).filter((k) => !referenced.has(k)), [], 'a definition nothing refers to');
   assert.equal(company.properties.schema.const, 'company/v1');
   assert.equal(company.properties.members.minItems, 3); assert.equal(company.properties.members.maxItems, 8);
   assert.equal(company.properties.chapters.minItems, 7); assert.equal(company.properties.beats.minItems, 24); assert.equal(company.properties.beats.maxItems, 40);
@@ -152,6 +154,8 @@ test('the label: a disclosure of claims.json (owner decision O4), approved words
   assert.equal(d.collection, 'office');
   assert.match(d.notes, /2026-10-23/);
   assert.equal(CLAIMS_SNAPSHOT.disclosures.find((x) => x.id === FICTIONAL_COMPANY_ID), undefined, 'the snapshot is shipped; the office\'s disclosure is not in it');
+  assert.equal(snapshotOf(claims).disclosures.find((x) => x.id === FICTIONAL_COMPANY_ID), undefined, 'and the function that writes it leaves the office\'s disclosure out (the committed constant is not the only witness)');
+  assert.equal(JSON.stringify(snapshotOf(claims)), JSON.stringify(CLAIMS_SNAPSHOT), 'so the snapshot is what it was');
   // the family label is as it was, and the two are siblings
   assert.equal(claims.disclosures.find((x: any) => x.id === 'fictional-family').text, FICTIONAL_LINE);
   assert.equal(claims.disclosures.filter((x: any) => x.collection).length, 1, 'the office adds one disclosure and no more');

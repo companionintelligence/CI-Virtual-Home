@@ -323,7 +323,8 @@ companies in offices, told like the families, labelled "Fictional company. Real 
 and these rules keep it that way:
 
 - It exists only in a build made with `pnpm run portal:build -- --offices` (`pnpm run portal:preview -- --offices` serves it). No environment variable turns it on, `--strict-families` and
-  `CI_STORY_STRICT=1` refuse it before any work, `ci.yml` and `deploy.yml` do not know it, and without the flag `dist/` is byte for byte what it was (`scripts/test-office-front.mts` holds it). Its pages
+  `CI_STORY_STRICT=1` refuse it before any work, `ci.yml` and `deploy.yml` do not know it, and without the flag `dist/` is byte for byte what it was at `ec69acb` (the review pinned it; `scripts/test-office-front.mts` holds
+  that a flagged build differs from a default one by the office's pieces only, and `redactIndex` never ships an `offices` key). Its pages
   are `noindex, nofollow`, have no canonical and are not in `sitemap.xml` or `robots.txt`; the Homes and Offices switcher is injected into the built pages of a flagged build only.
 - Its code is `scripts/office/` (the cards, the pages, the build, the fine print) and `scripts/office/assets/office.css|js`, which are **not** in `portal/` (step 3 of the build copies every file of
   `portal/`, so a file there would ship). The page's data is the fixtures in `test/fixtures/site/offices/`; M1 derives it from a company's story. M0 adds no file under `assets/` or `portal/` and moves
