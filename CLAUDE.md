@@ -122,8 +122,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   never one `claims.json` stops or the plan holds (`hold`: pairs counsel has not cleared; releasing one is deleting its entry). A card names a family by the place of its address ("The Brennan family of Wrenfield"). The featured
   families must pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day): the page is the destination of paid traffic, so a family that fails is never put in a slot. Counts are words, always
   beside "fictional" and never a digit ("Thirty fictional families in thirty-six homes."), written by the build from the data; `portal:build` fails on a count typed in `index.html` (step 5b) and runs
-  `scripts/story/lib/lander-check.mts` on the built page (step 7). A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). A home with no current family (the six apartments, whose families are cast in
-  `content/story/cast-plan.json` but whose stories are still to be written; a home the plan declares in `homesWithoutFamily` would be the same) keeps a plain card: `portal:build` names it, `story:cast-lint` holds the declared list to the homes, `--strict-families` errors on a home that is neither current nor declared, so the copy never says
+  `scripts/story/lib/lander-check.mts` on the built page (step 7). A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). A home with no current family (every one of the 36 homes has one today, the six apartments' families written on 2026-10-22; a home the plan declares in `homesWithoutFamily`, or one whose family has gone stale, would be the same) keeps a plain card: `portal:build` names it, `story:cast-lint` holds the declared list to the homes, `--strict-families` errors on a home that is neither current nor declared, so the copy never says
   every home has a family. The H1's claim `rent-line` is the owner's own wording (approved 2026-10-20, `status: ok-verbatim`; it is not in CAMPAIGN.md or COPY.md). A claim the plan names that is on `hold` still builds with a warning and fails a strict build (a push to main), so an unsanctioned line cannot go live.
 - The homes' own pages are linked by the footer's "Every home, on its own page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in
   `index.html` and `gallery.js` leaves alone, so the rendered DOM links them and not only the sitemap does. A home's page carries "Meet the family" when a
@@ -190,7 +189,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   a family written for a house that has since been re-laid is the ordinary state of a re-cast. `--strict-families` (or `CI_STORY_STRICT=1`)
   makes every stale family, every casting family without a file and every ship-step note an error: use it where the whole cast must be
   there (the production deploy). `--stale-report` prints every reason. `story:validate` reads the same switch: a casting family without a file
-  is a note on its whole-set run and an error under `--strict-families` (the six apartments are cast but their stories are still to be written).
+  is a note on its whole-set run and an error under `--strict-families` (every cast family has a file today).
 - Copy on the site follows the Uncloud voice (CI-Common `uncloud-voice`): no em or en dashes, sentence case, no price or performance number
   that is not on the fact sheet, "Fictional family. Real software." wherever a family is.
   `scripts/story/check-copy.mts` (`pnpm run story:copy -- dist`, in CI after `portal:build` and in `portal:test`'s `gallery` and `hooks` legs) lints every built page and data file a visitor reads

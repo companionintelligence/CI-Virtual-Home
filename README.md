@@ -19,7 +19,7 @@ compiled from it:
 (a unit in a block, [`reference/APARTMENTS.md`](reference/APARTMENTS.md)). The specs' `author` and `source` fields are internal records
 of where each one came from: they stay in the repository and are never shown or shipped (see [Credits](#credits-none-on-the-site)); the
 apartments' author is the company's own name, which the credit guard knows is not a builder (`scripts/own-authors.mts`).
-Every home is also the home of a fictional family (see [The family stories](#the-family-stories)): the 30 houses have their stories, and the six apartments are cast (the cast plan names a family for each) with their stories still to be written.
+Every home is also the home of a fictional family (see [The family stories](#the-family-stories)): the 30 houses and the six apartments each have their story (the cast plan names a family for each).
 
 ## Quickstart
 
@@ -360,7 +360,7 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 36 specs.
 
 ### The family stories
 
-<a id="the-family-stories"></a>Each of the thirty-six homes is lived in by a **fictional family** in the cast plan (the thirty houses have their stories; the six apartments are cast since 2026-10-22 and their stories are still to be written, so until then each keeps a plain card that opens the player and a page of its own, and `portal:build` reports a casting family without a file, an error in a strict build; a home that has neither a family in the plan nor a line in its `homesWithoutFamily`, which is empty today, is `story:cast-lint`'s error): two to six people, each with an archetype, the job they
+<a id="the-family-stories"></a>Each of the thirty-six homes is lived in by a **fictional family** in the cast plan (the thirty houses and the six apartments, cast on 2026-10-22, have their stories; a home whose family has no current story keeps a plain card that opens the player and a page of its own, and `portal:build` reports a casting family without a file, an error in a strict build; a home that has neither a family in the plan nor a line in its `homesWithoutFamily`, which is empty today, is `story:cast-lint`'s error): two to six people, each with an archetype, the job they
 do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator, and twelve more; the list and the eight front-page categories that group them are in [`reference/story/personas/index.md`](reference/story/personas/index.md)). A room tells that member's story: what they
 
 do there, which Companion Hub store app does it and which cloud service it replaces. The tour is the argument for uncloud: the same life,
