@@ -134,7 +134,11 @@ scripts/film/{lib,mux,qa}.mts  families and films.json (and the silent caption c
 scripts/film/canvas-fit.mts    the type floor and the fit of every family's film and ad cuts (browser, no house, no GPU): `node --experimental-strip-types scripts/film/canvas-fit.mts`
 scripts/story/ship/films.mts   the site build's step: registers posters and captions, links the hosted films
 scripts/test-film.mts          28 tests, no GPU (the sound and silent-encode tests need ffmpeg and skip without it)
-scripts/film-bookends.mts      optional CI-Common bookends (off; see below)
+scripts/story-film.mts         the door: `story:film` runs the film script, or the plates with --plates (the film script is not edited and does not know the plates)
+scripts/film/wrap.mts          the compliance wrap around CI-Common's video-kit (the one file of scripts/film/ the film's pin skips: NOT_FRAME_CODE)
+scripts/film/plates/           lib.mts (segments, keys, the manifest, the words), cli.mts (`--plates`), render.mts (the browser and ffmpeg), fleet.mts (the queue), schema.mts and the kit's schema (a copy)
+assets/story/film/plates/      index.ts (the page: frame i with no overlay), format.ts (sizes), compose.ts (the tilt that clears the kit's text)
+scripts/test-film-plates.mts, scripts/test-film-wrap.mts   the plates' and the wrap's tests (no GPU; the kit's own contract test runs when $CI_COMMON_KIT is set)
 ```
 
 Outputs:
@@ -193,15 +197,190 @@ FILM_BASE_URL=https://films.example.com/f pnpm run portal:build
 `scripts/story/ship/films.mts` then links `FILM_BASE_URL/<file>` for each family that has an entry in `films.json`; with the variable unset no family page shows a film. The captions (a few KB) and the 16:9 poster
 ship with the site and are same-origin, so the `<track>` needs no CORS. If the films are hosted on another origin the site's Content-Security-Policy must allow `media-src` for it (landing-site's `portal/_headers`).
 
+## Plates and the home-tour wrap
+
+A film made by `story:film` is one picture with its words drawn on it. CI-Common's video-kit (`ci-video`, 0.35.0, CI-Common #429) composes films from **plates** instead: a clip of the 3D picture with nothing drawn on it, one
+per beat and aspect, and a JSON file, `plates.json`, with the words. The GPU pass (about 0.4 s a 1080 p frame, three quarters of an hour a family for both aspects) is then done once, and the words, the captions, the end
+card, the cuts for a feed and the style change in minutes on the CPU. The two programs share nothing but the file: this repository never imports the kit and the kit never loads this repository's code.
+
+```bash
+pnpm run story:film -- brennan --plates                # one family: plates/<aspect>/<beat>.<key>.mp4 and plates.json, under video/plates/brennan/
+pnpm run story:film -- garden-flat --plates            # a home with no family (the six apartments): its own shots, see "A home with no family"
+pnpm run story:film -- brennan --plates --res 540 --gl nvidia   # a draft at a quarter of the pixels, on the discrete GPU
+pnpm run story:film -- brennan --plates --dry-run      # the plan: every plate, its key and whether the disk has it; no browser
+pnpm run story:film -- brennan --plates --only ftue-join --res 360   # one plate, to look at it (no plates.json)
+pnpm run story:film -- brennan --plates --probe 2 --gl default,nvidia --res 540   # what a frame costs on each GL path
+pnpm run story:film:wrap -- brennan --quality draft    # the kit: import-home, build, check, render, then the checks of this repository
+pnpm run story:film:fleet                              # every family and home: the 540 p draft pass, then the 1080 p final one
+```
+
+`story:film` without `--plates` is `scripts/render-family-film.mts`, run as it was (`scripts/story-film.mts` is the door and sends `--plates` elsewhere). Nothing in this section is a video in git: `video/plates/`, `video/plates-draft/`,
+`video/kit/`, `video/kit-draft/`, `video/queue.json` and its logs and report are under the ignored `/video/*`.
+
+### What a plate is, and the one rule that keeps the films safe
+
+Plate frame *i* is film frame *i* without the overlay: the same camera (`presetFromFilm`, imported from `assets/story/film/index.ts` and not changed), the same clock (`filmClock`), the same `__houseRenderFrames(i)`, the same draw
+onto a 2D canvas and the same JPEG, so a plate is a function of the tree and of *i* (as a picture: see "Limits that stay", 3, for what the GPU does to its bytes), random access, and a crashed run resumes at the next beat. The page module is `assets/story/film/plates/index.ts`. A plate is H.264 yuv420p BT.709,
+CRF 15, one thread and bit-exact (the same frames make the same bytes: tested), no audio, no metadata.
+
+**The plates never move a film on record.** The film's pin (`toolSha`, `films.json` `inputsSha`) hashes `assets/story/film/*.ts`, `scripts/film/*.mts`, the film script, `track.ts` and `place.ts`. The plates' code is in two
+subfolders that list never walks (`scripts/film/plates/`, `assets/story/film/plates/`), the door `scripts/story-film.mts` is outside it, and `scripts/film/wrap.mts`, which runs after the plates on the kit's output, is the one file of
+`scripts/film/` that `NOT_FRAME_CODE` (lib.mts) tells the pin to skip. `scripts/test-film-plates.mts` holds all of it: every entry of `films.json` is still current under the pin, the pin reads no plates code, no film module
+names the plates, and `story:film` without `--plates` is the film script. (Adding `NOT_FRAME_CODE` edited `lib.mts`, which holds the pin, so the three `inputsSha` values were rewritten once, in their own commit, with the proof:
+every other file the pin hashes is byte-identical to the base, and each stored pin equals what the base code made of the film's inputs. No film was re-rendered.)
+
+### Segments, keys and the cache
+
+A family's plates are the **approach** (the title card's picture, the first 4 s of the film's clock: the tour's move to the front door) and one plate per beat the film plays (`film: true`), each its span of the film's frames
+`[f0, f1)`, so the dips between scenes, the end card's pull-back and every card are the kit's to make. For each plate and aspect the key is a hash of the house spec, the engine (`assets/**/*.ts` except the story player, the editor chrome, the
+scene checks, the plan export and the viewer, the vendored three.js and `room-creator.html`), the film modules a frame passes through and the encode, the GL path and the Chromium build, the size, the frame rate, the light, the frame count, the camera of every
+frame of the span (eye, target, field of view and roof, to 0.1 mm, after the tilt below) and when the Core powers on. **No word is in a key**: a rewritten caption, chip, title or disclosure is a manifest change, and `story:film -- <slug> --plates`
+then draws nothing (about a second, no browser) and writes a new `plates.json`. `video/plates/<id>/cache.json` records what each file was made from; a plate is current when its file is the bytes recorded and its key is the plan's. A door opens once, at
+the first crossing of the *whole* path, so a segment is also current only if the door angles the path plans for its frames are the ones it was drawn with (compared when the camera path moved). Files whose key has gone are removed when the
+manifest is written. `plates.json` is written last, atomically; every plate is hashed as it is written.
+
+### The cap: a kit film is at most 110 s
+
+`FILM.maxS` (layout.ts) is 110 s, "a film is never longer (the page it sits on, and a platform's patience)", and `scripts/film/qa.mts` refuses a longer file. It is a limit on **the finished film**, so it applies to the kit's film as it
+applied to the film before it. (Measured: the films on record are 104.5, 106.1 and 106.2 s with their own end card; the kit's own contract says its film targets 90 to 110 s.) The kit adds to the plates a 3 s title card, the apps (six chips a
+scene, 4 s at least), the end card (4 s) and the disclosure card held long enough to read (5 s at least, 14.2 s for four lines), less the 0.5 s dissolves and plus the 0.4 s holds between people: 21 to 28 s over the plates, over the 30 families. That is why the
+pilot's Hollins and Merrows ran 112.5 and 114.4 s when every flagged beat was played. **The cap is not widened for the kit** (the first version of the wrap passed such a film up to 120 s with a warning; that is gone, and no flag turns the
+cap off). It is met where it is caused, in the choice of beats:
+
+* `kitFilmLength` (plates/lib.mts) counts the kit's film exactly as the kit lays it out (`filmScenes`, `overlapsOf`, `layout` of video-kit 0.35.0). The tests hold it to the kit's own `build` figure for the three pilot films (109.567, 112.532 and
+  114.433 s) and, when a kit is at hand, to what `ci-video import-home` says for a real manifest of the Brennans and the Hollins.
+* `selectBeats` plays **every flagged beat while the film fits**. When it does not, beats are given up in a fixed order until it does, the latest of a rank first: **the closing** (the outro chapter: the street at the end, which the kit's
+  end card follows), then **the rooms that show no pair**, then **the pairs**. **Never given up:** the first-run beats (the `ftue` chapter: the Core arrives, joins, a person names their companion; the film's hook) and **one beat for each person**
+  (their first room or outside beat). So the order of keeping is: the hook, one beat per person, the pairs, the other rooms, the closing. A family that does not fit even then is **refused**, with the longest beats to unflag, as the film
+  does; none of the 30 is.
+* A screenshot (6 s) is the last thing added, only while the film stays under the cap (the story comes first).
+* Nothing is drawn for a beat that is given up; the keys of the others do not move; the camera path the doors are a function of is still the whole film's.
+* Measured over the 30 families: 19 are over 110 s with every flagged beat (110.5 to 114.4 s), and in all 19 giving up the closing beat (5.5 to 10.0 s) is enough (the kit's film is then 102.2 to 107.2 s); the other 11 are untouched
+  (the Brennans, 109.6 s, play all eight beats). What a film loses is its closing exterior; the end card is the kit's and says the same sign-off. The disclosures a film prints are still those its flagged beats owe, so a family whose only
+  agent-naming beat was the closing prints the agents' attribution all the same (more, never fewer).
+* The wrap holds the cap twice, both as errors with no override: from the kit's own `build` figure before anything is rendered (`kitCapProblem`), and from the length of every film file it wrote (`gateOutput`, qa.mts's gate). The planner
+  writes no manifest whose film would be over (`writeFamilyManifest` stops), whatever chose its beats.
+
+### Composed for the kit's text
+
+The tour's camera was composed against the tour's own cards. The kit lays its caption, its burned subtitles and its label over a plate from its own numbers and **refuses a film whose text covers more than 2 percent of the
+rectangle the plate declares it is about** (no override). Measured on the Brennans' first plates, in 16:9, the kit's subtitles alone covered 22 to 28 percent of the subject in six of eight beats (a person at a phone and a desk reach the bottom
+of the frame in the film's own camera, where the film's karaoke strip also sits). Three things fix it without touching the bake, the tour or the film: the plate's **cues are cut to one line** (42 characters, the kit's width in 16:9, so
+its subtitle box is one line tall instead of two; a long sentence is broken at the end of a phrase, never after "no" or "the": the pilot's subtitles were cut at the middle word and the break now looks for the pause); the plate's **camera is turned down** just far enough to carry the subject up the frame, clear of the band (`assets/story/film/plates/compose.ts`, `composeBeat` in lib.mts; at most 14 degrees, the picture looks tipped
+past it); and where the anchor cannot be carried clear (its box fills the frame: the camera stands in the room the beat is about) the plate is **about the point the tour looks at**, a third of the frame about the beat's focus, which the plate's `camera` record says (`subjectKind: "focus"`).
+The declared `subject` is the rectangle after the tilt, the tilt is in the plate's `camera` record and in its key, and the table of where the kit's text begins (`KIT_BAND`) is held to the kit's own numbers by a test that runs when a kit is at hand. Portrait
+needed little or no tilt (the bake leaves 340 px at the bottom). Over the 30 families (723 plates in the three aspects) 273 are tilted and **16 cannot clear the band**, all of them the `ftue-delivery` beat (a box at the front door beside the camera) of
+the pass-1 families: the kit will refuse those films until that beat is re-composed. Every plate of the three Brennan films clears it, and the kit's own gate finds none of its text on a subject in any of them.
+
+**Not yet composed for the cuts.** The 15 s and 30 s cuts use the platform-safe band in portrait (the kit lifts the caption 672 px up), which begins far higher than the film's; the plates are composed for the film's band. The kit's static gate found
+one scene of one cut over it (`brennan-hollin-30`, `living-session`, 3 percent). Composing the portrait plates for the higher band is the next step, once the kit's cuts render (next section).
+
+### plates.json (v1) and what goes in it
+
+The contract is CI-Common's `packages/video-kit/PLATES.md`; `scripts/film/plates/virtual-home-plates.schema.json` is a copy of its schema (CI-Common 86b0a69b) and `scripts/film/plates/schema.mts` a zero-dependency checker for it, so a manifest is held
+to the closed contract without the kit installed. Per family film: `id` the slug, `displayName` "The Brennan family of Wrenfield", `lighting` `day` (the owner's ruling of 2026-10-22: films are lit as day), `fps` 30, `profile` (Chromium, the GL
+renderer string, ffmpeg), `text` (the label "Fictional family. Real software.", the end card's "UnCloud your life.", "See Companion Core", `ci.computer/core`, and the disclosures of the *silent* film resolved from claims.json through the film's own
+`filmText`: the fictional line, scripted scenes, the stylised Core, and the agents' attribution when a film beat names Hermes or OpenClaw; **no beta line anywhere**, and no synthetic-voice line because a plate film has no voice),
+the hook "Stop renting your intelligence." (claims.json `rent-line`, only while it is not on hold, `renting` in the accent), and per beat: the member (their name is the kicker; the set-up beats belong to no one), the popup's title and body, the cues on the plate's
+clock (an agent's line marked "(scripted)" on its first cue), the chips and for each plate its file, hash, length, size, subject rectangle and camera (a home tour's plate: the subject as measured, or none, see "A home with no family"). A **chip** is an app of the beat (`app` then `with`) by its catalog name, with the real logo
+from `content/story/app-media.json` copied beside the manifest under its own hash (an app with no logo is shown by its name alone, never a stand-in; a logo is only ever beside the name) and the pair "<app>, alternative to <service>" only when
+`scripts/story/lib/pairs.mts` lets a page show that pair for this family (never "replaces", never a pair on `hold`, one description per app across the film). An app that is not in the live store is left out, with a note. **Labelled
+screenshots** (`inserts`) come only from the manifest's shipped shots, with the manifest's exact caption for where the picture came from, whole and unedited (the file's name is checked against its bytes). The caption is
+`shotCaption(name, source)` of `scripts/story/lib/media.mts`, **never a wording written in the plates**: "Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family." for a QA capture, and "Real screenshot of
+<Name> with sample data. Not a recording of this family." for a first-party app's screen from CI-Docs (Companion Memory, Companion Planning; story-v2.md "App media"). A shot whose caption is not that wording is left out, with a note. At most
+`--inserts` of them (default 2), each only while the kit's film, counted exactly before it is rendered, stays under the cap (next section). `cuts` names the editorial picks for the 30 s and 15 s cuts: one beat per person that shows an app.
+
+The renderer's own checks run first and fail the write: the copy rules of `claims.json` and the extra ones (`scripts/story/lib/extra-bans.mts`, the word "beta" among them), no dash or exclamation mark, no credit (the guard's
+builder handles, "Sims", "Base Game"), the label, the link, day light, every pair written as an alternative. The kit then checks every byte again (`ci-video import-home`).
+
+### A home with no family
+
+The six apartments (`homesWithoutFamily` in cast-plan.json) and, later, offices have no story, so there is nothing to caption and no claim to make. Their plates are the house's own shots at 30 fps, lit as day: **door-to-core**, **orbit** and **hero-reveal**
+(the presets the page builds for every home, the ones `pnpm run shots` films), in 16:9 and 9:16 (and 1:1). The only words are the home's display name (`assets/home-names.ts`; the film is `garden-flat`, and the loft is `warehouse-loft`: never the title a spec was filed under), its
+kind of place ("Apartment": the lander plan's types) and the sanctioned end card ("UnCloud your life.", "See Companion Core", `ci.computer/core`) with the one disclosure such a film can make, that the Core is drawn as a stylised illustration. No hook, no cuts, no apps, no
+screenshots, no family line.
+
+**What a home tour's plate is about is measured, never chosen** (`measureSubject`, plates/lib.mts). The kit wants the rectangle a plate is about, and a home has no beat to say so. Every one of its shots is a picture of the Companion Core (door-to-core ends on it, hero-reveal lands on it, the orbit circles it), so the
+renderer reads back the camera that drew the plate at 12 frames across the shot (`sampleShot`, render.mts: the page's own `__houseRenderFrames(i)`, after the plate is drawn, so no pixel depends on it), projects the Core's box (the house's `hero.core`) through it, and declares **the place the Core sits in a
+typical frame**: the median of its edges over the sampled frames where it is in view, with how much it moves (`subjectUnion`) and in how many frames it is in view (`coreInView`) in the plate's `camera` record. Where it is in view in fewer than half of the frames nothing true can be said, and **no subject is declared** (the kit then has
+none to protect; the record says why). The measurement is kept in the plate's cache entry (`measured`, versioned by `SUBJECT_V`), so a plate that is current is measured again, not drawn again, when the measurement changes. This replaces the fixed rectangle (`DEFAULT_SUBJECT`) a home tour used to declare, which did not contain the Core in the middle of
+a door-to-core. Measured on the Warehouse Loft (540 p): door-to-core is about a Core 0.14 of the frame wide in the lower right (in view in 11 of 12 frames in 16:9, 10 in 9:16), hero-reveal about a Core 0.06 wide at the centre, the orbit a Core 0.01 wide (it is a small thing seen from across the home); the kit's check
+passes all six. The family plates keep the beat's anchor, tilted clear of the kit's text, as above.
+
+**Owner decision still open (C8/O4):** the kit demands a label on every frame, and claims.json has no wording for a home with no family ("Fictional family. Real software." would be false), so the label is the home's display name until the
+owner rules (a "fictional team" line for offices is also not yet in claims.json).
+
+### The wrap (`scripts/film/wrap.mts`, replaces `film-bookends.mts`)
+
+`story:film:wrap -- <id>` finds the kit (`--kit`, `$CI_COMMON_KIT`, else `video/kit/ci-common`, which `--setup-kit` makes as a detached worktree of `$CI_COMMON_REF`, default `consolidate/virtual-home-source` until #429 is on main, with the
+kit's dependencies installed and no script run; it refuses a kit under 0.35.0 or without `import-home`), then runs `ci-video import-home`, `build`, `check` (the film first, then each short cut by itself: a cut the kit's own gate refuses is left out of
+the render and said, `--strict-cuts` makes it an error) and `render --format all --quality draft|high`, with `CI_VIDEO_RENDER_JOBS=1` while a GPU job may be running. Then, as errors with no override: the disclosures the kit prints equal claims.json's words
+in the order the film prints them and are the ones this film owes (read from this repository, not from the manifest); each cut's disclosure card is held at least 5 s; the label is the fictional line (a home: its display name); the lighting is day; every end card is
+"UnCloud your life." / "See Companion Core" / `ci.computer/core` and **no other address is printed** anywhere (a URL, a www name, any other page of ci.computer); the copy lint over the storyboard's every readable string and every WebVTT; no price or
+figure that is not on the fact sheet; the credit scan over the storyboard, the manifest, the subtitles and each file's metadata; and the picture gates of `scripts/film/qa.mts` over every MP4 (one H.264 yuv420p stream, no audio, 30 fps, the frames and
+the length the kit's own `build` said, at most 110 s, `freezedetect`, a blank first or last frame, the aspect the format asks for). The 110 s is checked twice and is the film's own (see "The cap"): from the kit's `build` figure before anything is rendered, and from every
+file written. Results: `<project>/wrap-report.json` and a log of every kit step. The kit's output is the owner's to host (`video/kit/<id>/out/`); none of it is committed.
+
+**The one picture gate the wrap reads differently from the film's: a still picture.** The film refuses a frozen picture of 2 s (qa.mts `FREEZE_S`); the wrap refuses 4 s and says anything from 1.5 s. The reason is measured, not assumed: the film's karaoke highlight moves on every
+frame, so for the film a stopped picture can only be a stuck render; the kit's subtitles change once a cue (about 2 s), and the bake rests the camera while a caption is read, so a captioned room at rest holds still for a cue. Of the 222 film plates of the 30 families, 10
+(in the Hollins, the Merrows, adeniran, adler, gill, hovsepian, kamau, mbatha, rahimi and tuala) hold the camera dead still for 7.8 to 10.2 s. The film on record holds it as long, under a highlight that hides it. On the pilot: the Brennans none, the Hollins three spans of 1.7 to 1.9 s,
+the Merrows 2.0, 2.8 and 3.0 s. This is an owner call (an editor's, not a renderer's: a slow drift of the camera in a rest would be a change to the bake); the wrap's `KIT_FREEZE_MAX_S` is the one place the number lives.
+
+### The fleet (`scripts/film/plates/fleet.mts`)
+
+`story:film:fleet` queues every family with a bake lock and every home with no family (the Brennans first, the other families, the homes last; `--order` moves items to the front, `--only` names them: a family by its slug, a home by its house id or by its film id, `studio-loft` or `warehouse-loft`; the plates CLI takes both too), and runs, for the draft mode (540 p plates in `video/plates-draft/`, the
+kit's draft quality) and then the final mode (1080 p, high quality), one item at a time under `nice -n 10`: the plates, then the wrap. State is `video/queue.json` (pending, plates, wrapped, failed, with the seconds each step took and the reason it failed); a rerun skips
+nothing it has to do (the plates step is itself cached, the wrap step is skipped when it already wrapped this very manifest at this quality) and `--retry-failed` tries the failures again. `--gl auto` (the default) probes the first family on the Intel and the NVIDIA GL
+paths (`story:film -- <slug> --plates --probe --res <the mode's>`) **at the size of the mode about to run**, 540 p for the drafts and 1080 p for the finals just before the finals start, and keeps the faster for that mode, recorded in the queue so a resume does not change it (a GL path is in every
+plate's key; the probe file is `<slug>.probe.<res>.json`). The two paths swap places between the sizes (measured on this machine: at 540 p the NVIDIA 0.152 s a frame and the Intel 0.278; at 1080 p 0.761 and 0.747, a tie), so one probe at 540 p would send the finals to a GPU that is no faster and is the one
+other jobs fill. A queue of homes alone has no family to probe and uses the default path. The report is `video/queue-report.md` and `.json`; it says the GL path of each mode and, plainly, which short cuts the kit refused (see "Limits that stay"). One GPU process at a time: `--jobs` above 1 is refused.
+
+### The pilot (2026-10-22): the three Brennan homes and a home with no family, at 540 p
+
+Plates drawn with `--res 540 --gl nvidia`, then `story:film:wrap -- <id> --quality draft` (video-kit 0.35.0, CI-Common #429): the Brennan trio is 5,044 to 5,192 plate frames each, about 10 to 14 minutes a family on the shared machine; the Garden Flat's three shots are 1,185 frames
+an aspect and took 260 s. I looked at three frames of each output at identical timestamps in 16:9 and 9:16, the end card and the disclosure card. **The first pilot played every flagged beat and the Hollins and the Merrows ran past the cap (112.5 and 114.4 s) and were passed with a warning.**
+After the fix ("The cap", above) the same plates, not drawn again (their keys have not moved: the beat that is given up is simply not in the manifest), were wrapped again on the merge with #50:
+
+| Film | Length (the kit's own figure) | Landscape / portrait | Result |
+|---|---|---|---|
+| brennan | 109.6 s (109.567) | 32.7 / 31.9 MiB | passes, all eight flagged beats; the 15 s and 30 s cuts are refused by the kit's own gate (below) |
+| brennan-hollin | **104.6 s** (112.5 with every beat) | 27.4 / 24.8 MiB | passes under the cap; the closing is given up; three still holds of 1.7 to 1.9 s (below) |
+| brennan-merrow | **107.2 s** (114.4 with every beat) | 28.5 / 26.7 MiB | passes under the cap; the closing is given up; still holds of 2.0, 2.8 and 3.0 s |
+| warehouse-loft | 49.5 s | 26.2 / 23.6 MiB | passes; no cuts (a home with no family has no hook); its plates declare the Core as measured (above) |
+
+What the frames showed, and what was fixed: **the first run failed the kit's own gate.** In 16:9, six of the Brennans' eight beats had the kit's subtitles over 24 to 42 percent of their subject (Hollin and Merrow: a whole-room anchor the same), which
+the plates now answer as above. Seen after the fix: the Core, the desk and the laptop are clear of the caption and the subtitles in both aspects; the subtitle is one line on a dark box, the name kicker ("01 · SALLY") sits over the caption, the label is in the
+corner; the apps scene prints "Stirling-PDF, alternative to Smallpdf" with the real logo beside the name (small: the kit sizes it, about 16 px at 720 p; Linkwarden now has its logo, #50); the end card is
+"UnCloud your life." / "See Companion Core" / `ci.computer/core`; the disclosure card prints claims.json's four lines in order. A home's frames carry only its display name (the label), "Apartment" (the caption), the end card and the stylised-Core line.
+
+### Limits that stay (said plainly)
+
+1. **The 15 s and 30 s cuts are refused for 29 of the 30 families.** The kit's own gate refuses every short cut whose disclosure card carries four lines (any family whose film names an agent; hwang has three): the card's heading is covered by its own boxes (`text_occluded` in the HyperFrames layout
+   gate), and the 15 s cut runs 24 s against its 16 s target because the card is held for reading. That is the coda layout of CI-Common #429, and a disclosure is not shortened to make a cut fit. The wrap leaves such a cut out and keeps the film (`--strict-cuts` makes it an error), so these families have the two
+   film shapes and no short cut; the fleet's report says so in its own section.
+2. **16 `ftue-delivery` plates in 5 families (banerjee, cardoso, gill, nguyen, whitaker) cannot clear the kit's 2 percent rule**: the beat is a box at the front door beside the camera, and no tilt of at most 14 degrees carries it above the kit's band. The beat is a first-run beat (never given up), so the kit
+   refuses those five films at `check` and the fleet reports them as failed at the wrap until the beat is re-composed (the bake's, not the plates') or unflagged in the family's file.
+3. **A plate is the same picture, not the same bytes.** The NVIDIA path draws some plates differently on a second run with identical inputs (13 of 18 byte-identical, the rest 45 to 105 dB PSNR from each other, visually the same); the encode itself is bit-exact (the same frames make the same bytes: tested). So a plate is verified by
+   **its inputs**, the key recorded in the cache and in the plate's `camera.segmentKey`, and by its hash as written, never by comparing two renders' bytes. A redraw changes `platesSha` and the manifest and so makes the wrap run again; nothing else.
+4. **A still picture** (see "The wrap"): the wrap says a captioned room at rest from 1.5 s and refuses 4 s. Ten plates hold the camera still for 7.8 to 10.2 s. An owner call, an editor's.
+5. **Subjects that are not measured.** A family plate whose anchor is not in view falls back to the default rectangle (the approach and 51 others) and one whose anchor fills the frame is about a third of the frame at the beat's focus (50): each says so in its `camera` record (`subjectDeclared`, `subjectKind`). A home tour's plate is measured or has none.
+6. **The film's portrait caption sits in the bottom 340 px that a phone's interface covers**, as the kit's default band does (200 px up); only the cuts use its platform-safe band. Fine on a family page, wrong for a feed: the film's portrait wants `captionBand: "platform-safe"` in the kit's recipe.
+7. **Text the kit sets is under the repository's 36 design px floor** in places (the link line and the logos are small at 1080 p) and is held to the kit's canon, not to `CANVAS_TYPE_MIN` (owner call 8 of the audit).
+8. **The kit films are 17 to 33 MiB** at the draft quality, over the 24 MiB web guard of the repository's own films (they are not hosted on Pages; the host is still the owner's choice).
+9. **The kit's films show app logos on their chips and print no names-logos-owners line.** claims.json's `names-logos-owners` is placed "on any page that shows a service logo or an app logo"; a film is not a page and the kit's end card has no footer. The films are a new logo surface: whether the line goes on the disclosure card is the owner's.
+
+### Which GL path
+
+`--gl default` lets ANGLE pick the machine's GPU (the Intel iGPU here), `--gl nvidia` is the discrete GPU through ANGLE's GL backend (`--use-angle=gl` with the PRIME offload variables; **never `--use-angle=vulkan`**, which draws blank frames), `--gl software` is SwiftShader. On this
+machine (shared with other sessions, load average 5 to 9, the NVIDIA's memory 11 of 12 GB used by another job) the probe measured a Brennan plate at 540 p: Intel 0.296 s a frame, NVIDIA 0.189 (the verifier's rerun: 0.278 and 0.152); at 1080 p: Intel 0.698, NVIDIA 0.790 (0.747 and 0.761: a tie). The paths swap places with the size, which is why the fleet probes at each mode's own
+size. The numbers move with the other jobs, so read them with the load average in `video/plates/probe/<slug>.probe.<res>.json`.
+
 ## Open items for the owner
 
 1. Choose the film host (R2 or Stream) and the address for `FILM_BASE_URL`.
 2. The burned captions and the WebVTT say the same thing: the family page's `<track>` should not be `default`, or a viewer sees them twice.
 3. Landing-site's `scripts/story/pages.mts` prefixes a film URL with `../`; a hosted film's address is absolute, so it needs to leave an `https://` address alone (a one-line change in that file, not in this package).
 4. FFmpeg here is a GPL build with libx264; the films contain only its encoded output. Flagged for counsel with the espeak-ng note in THIRD_PARTY.md, with AAC patent licensing.
-5. The ci-video bookends are not wired (below).
-
-## Bookends (optional, not wired)
-
-`CI_VIDEO_KIT=/path/to/CI-Common/packages/video-kit node --experimental-strip-types scripts/film-bookends.mts` finds the kit and runs its `doctor`. With the variable unset it prints that it
-was skipped. It does not yet make per-family intro and outro cards: that needs a kit project per family and has not been built or run. The film's own title and end cards are complete without it.
+5. The kit's films (plates and the wrap, "Plates and the home-tour wrap"): rule on the label of a home with no family, and have CI-Common #429's disclosure card fit a short portrait cut with four lines ("Limits that stay", 1).
+6. Whether a kit film that shows app logos prints the names-logos-owners line ("Limits that stay", 9), and whether a still picture of a captioned room may run to 4 s in a film ("The wrap").
+7. Which film beats may be given up when the kit's film is over the cap ("The cap": the closing first, then the rooms with no pair, then the pairs; never the first-run beats or one beat for each person). It is the renderer's reading of "the hook, one beat per person, the pairs, the closing"; a family's author who wants a beat kept sets it in the story, not here.

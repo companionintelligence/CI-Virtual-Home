@@ -199,18 +199,28 @@ export function sizeGuard(bytes: number, what: string, max = WEB_MAX_BYTES): str
 /** every disclosure any film can print, in a fixed order: what `toolSha` hashes of claims.json when it is not told which a film prints */
 const ALL_FILM_DISCLOSURES: readonly string[] = Object.values(FILM_DISCLOSURES);
 /**
+ * The files of scripts/film that no frame of a film is a function of: the wrap around CI-Common's video-kit (it runs after the plates, on the kit's output). A change to one is not a change to a film, so
+ * the pin does not read it. Everything else in scripts/film is read, as it always was. The PLATES' code (scripts/film/plates/, assets/story/film/plates/) is in subfolders, which the pin never walks, and
+ * scripts/story-film.mts (the door that sends `--plates` to them) is outside the folders it reads: drawing plates, and the code that does, never makes a film on record stale.
+ */
+export const NOT_FRAME_CODE: readonly string[] = ['wrap.mts'];
+/** The code the pin hashes, in the order it hashes it: assets/story/film/*.ts, scripts/film/*.mts (but NOT_FRAME_CODE), the film script, the camera (track.ts) and the card solver (place.ts). */
+export function frameCodeFiles(): string[] {
+  const files: string[] = [];
+  const add = (dir: string, re: RegExp, skip: readonly string[] = []) => { if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir).sort()) if (re.test(f) && !skip.includes(f)) files.push(path.join(dir, f)); };
+  add(path.join(ROOT, 'assets', 'story', 'film'), /\.ts$/);
+  add(path.join(ROOT, 'scripts', 'film'), /\.mts$/, NOT_FRAME_CODE);
+  files.push(path.join(ROOT, 'scripts', 'render-family-film.mts'), path.join(ROOT, 'assets', 'story', 'track.ts'), path.join(ROOT, 'assets', 'story', 'place.ts'));
+  return files;
+}
+/**
  * A hash of the code that draws a film and of the text of the claims.json disclosures it prints (`printed`: the ids, default every id a film can print; `inputsShaOf` passes
  * the ones this film prints). Nothing else of claims.json is in it: a claim the film does not show (the lander's `rent-line`, a disclosure's source, status or note, a
  * disclosure only the site prints) cannot change a frame, so it must not make a film stale; a change to a printed text must. A change in the code makes it stale.
  */
 export function toolSha(claims: Claims = loadClaims(), printed: readonly string[] = ALL_FILM_DISCLOSURES): string {
-  const files: string[] = [];
-  const add = (dir: string, re: RegExp) => { if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir).sort()) if (re.test(f)) files.push(path.join(dir, f)); };
-  add(path.join(ROOT, 'assets', 'story', 'film'), /\.ts$/);
-  add(path.join(ROOT, 'scripts', 'film'), /\.mts$/);
-  files.push(path.join(ROOT, 'scripts', 'render-family-film.mts'), path.join(ROOT, 'assets', 'story', 'track.ts'), path.join(ROOT, 'assets', 'story', 'place.ts'));
   const h = crypto.createHash('sha256');
-  for (const f of files) if (fs.existsSync(f)) h.update(path.relative(ROOT, f)).update(fs.readFileSync(f));
+  for (const f of frameCodeFiles()) if (fs.existsSync(f)) h.update(path.relative(ROOT, f)).update(fs.readFileSync(f));
   return h.update('claims.json: the disclosures a film prints').update(JSON.stringify(printed.map(id => [id, claims.disclosures.find(d => d.id === id)?.text ?? null]))).digest('hex');
 }
 
