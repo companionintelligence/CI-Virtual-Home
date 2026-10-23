@@ -29,7 +29,7 @@
 .companies .office-search { width: min(100%, 540px); margin-top: 18px; }
 .companies .sizes { margin-top: 14px; }
 
-.sizes button:disabled { cursor: default; color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
+.sizes button:disabled, .jobs .tag:disabled { cursor: default; color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }   /* (gallery.css's `.jobs .tag` colours a chip the ink, and it comes later than `.tag:disabled`) */
 
 .homes-head #clear { margin-left: auto; }
 
