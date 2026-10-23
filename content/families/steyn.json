@@ -1,0 +1,1474 @@
+{
+  "schema": "family/v1",
+  "slug": "steyn",
+  "house": "two-bed-flat",
+  "fictional": true,
+  "family": {
+    "surname": "Steyn",
+    "tagline": "A rented walk-up flat, an easel and one Companion Core.",
+    "household": "young-family",
+    "business": false,
+    "story": "Lindiwe plans a housing charity’s campaigns from the study alcove. Matthias writes features at the dining table, and Tamsin paints at her easel. The Core sits on a writing desk in the living room.",
+    "address": {
+      "line": "12 Orchil Walk",
+      "place": "Coldharbour"
+    },
+    "narrator": "v-bright-f",
+    "home": {
+      "lede": "A three-storey walk-up of warm yellow brick, with white sash windows and a stone stoop up to the street door. The family’s flat fills the first floor up, with an iron balcony. A walled brick court lies behind the block.",
+      "spots": [
+        {
+          "room": "Study Alcove",
+          "line": "A writing desk, a task chair and a bookshelf in a nook off the passage."
+        },
+        {
+          "room": "Living Room",
+          "line": "A chesterfield sofa, a patterned rug and the Core on its writing desk."
+        },
+        {
+          "room": "Dining Room",
+          "line": "A glass table, two Windsor chairs and a chandelier."
+        },
+        {
+          "room": "Kitchen",
+          "line": "A range, a fridge and a run of counters along one wall."
+        },
+        {
+          "room": "Kids' Room",
+          "line": "A loft bed, a small desk and an easel by the wall."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "alcove-plan",
+        "line": "Monday starts with three jobs and a timer."
+      },
+      {
+        "at": "morning",
+        "beat": "kitchen-pitch",
+        "line": "Matthias moves a pitch card along the fridge."
+      },
+      {
+        "at": "midday",
+        "beat": "kitchen-board",
+        "line": "Lunch at the counter settles the week’s dinners."
+      },
+      {
+        "at": "afternoon",
+        "beat": "dining-clip",
+        "line": "Matthias saves a council page before it changes."
+      },
+      {
+        "at": "afternoon",
+        "beat": "alcove-tracker",
+        "line": "Rooibos fills the tracker while Lindiwe reads along."
+      },
+      {
+        "at": "after-school",
+        "beat": "kids-paint",
+        "line": "Tamsin finishes a painting, and Lindiwe takes its picture."
+      },
+      {
+        "at": "after-school",
+        "beat": "living-story",
+        "line": "Tamsin curls up on the sofa with her story."
+      },
+      {
+        "at": "weekend",
+        "beat": "court-read",
+        "line": "Sunday’s long reads wait out in the back court."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "lindiwe",
+      "name": "Lindiwe",
+      "age": 36,
+      "role": "parent",
+      "work": "marketing lead at a housing charity",
+      "colour": "chart-1",
+      "archetype": "marketer",
+      "companion": {
+        "name": "Rooibos",
+        "runtime": "OpenClaw",
+        "job": "Opens Grist in its own browser and fills the rows Lindiwe reads out.",
+        "personality": [
+          "patient",
+          "thorough",
+          "gentle"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Fills rows only. Lindiwe reads every row before it stands."
+      },
+      "profile": {
+        "bio": "Lindiwe plans a housing charity’s campaigns from the study alcove. Her lists, drawings and trackers sit on the Core, and Rooibos fills in the rows she reads out."
+      }
+    },
+    {
+      "id": "matthias",
+      "name": "Matthias",
+      "age": 38,
+      "role": "parent",
+      "work": "feature writer",
+      "colour": "chart-2",
+      "archetype": "journalist",
+      "companion": {
+        "name": "Caraway",
+        "runtime": "Hermes",
+        "job": "Drafts chase notes from the lines Matthias texts it.",
+        "personality": [
+          "steady",
+          "dry",
+          "careful"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Matthias reads and sends every note."
+      },
+      "profile": {
+        "bio": "Matthias writes features at the dining table. His saved pages, tapes and drafts sit on the Core, and Caraway drafts the chase notes that he reads before they go."
+      }
+    },
+    {
+      "id": "tamsin",
+      "name": "Tamsin",
+      "age": 6,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "maker",
+      "profile": {
+        "bio": "Tamsin paints at her easel and listens to stories on the sofa. Her paintings and drawings sit on the Core, where the family can find them again."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Living room and the Core"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Matthias at the table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Tamsin’s room"
+    },
+    {
+      "id": "alcove",
+      "kind": "room",
+      "room": "office",
+      "title": "Lindiwe in the study alcove"
+    },
+    {
+      "id": "court",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The back court"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel waits up the stoop",
+        "body": "Matthias carries the parcel up the stoop and the stairs to the living room. Tamsin counts the steps out loud, all the way up."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Matthias lifts out the Companion Core",
+        "body": "Matthias sets the Companion Core on the writing desk. Tamsin lays the power cable, the quick-start guide and the recovery USB drive out on the rug."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug in, then press the button",
+        "body": "Lindiwe plugs the Core in, and Tamsin presses the button. It wakes and opens its own Wi-Fi network."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Joining the Core from Lindiwe’s phone",
+        "body": "Lindiwe joins the Core’s own network from her phone’s Wi-Fi settings. Then she picks the flat’s home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "homehub",
+        "linkwarden"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Two agents, then two apps",
+        "body": "Lindiwe browses the Companion Hub store from the writing desk and picks OpenClaw and Hermes. The family adds HomeHub and Linkwarden, then walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: HomeHub, Linkwarden"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "lindiwe",
+      "agent": "lindiwe",
+      "approval": "lindiwe",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Lindiwe names her agent Rooibos",
+        "body": "Lindiwe names her agent Rooibos and sends a first message. A reply comes back, the Core beside her."
+      },
+      "say": {
+        "speaker": "lindiwe",
+        "text": "Hello, Lindiwe. Rooibos here. What first?"
+      },
+      "detail": {
+        "before": "Lindiwe kept the charity’s campaign chores in her head and typed each one into a tracker herself.",
+        "after": "Rooibos runs in its own sandbox on the Core. Lindiwe names a chore, and Rooibos prepares it for her to approve.",
+        "steps": [
+          "Pick OpenClaw in the Companion Hub store",
+          "Give the agent a name",
+          "Say hello and name the first chore"
+        ],
+        "fact": "OpenClaw is an agent with its own browser, running in its own sandbox on your Core."
+      },
+      "film": true
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "service": "nextdns",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Banner ads fade on every device",
+        "body": "The router now asks Pi-hole on the Core for every name lookup. Tamsin’s tablet, both phones and the laptop meet fewer banner ads.",
+        "chips": [
+          "Pi-hole",
+          "alternative to NextDNS"
+        ]
+      },
+      "detail": {
+        "before": "Name lookups went to NextDNS, set up one device at a time, so the tablet was often missed.",
+        "after": "Pi-hole answers every name lookup on the Core, and the router sends all the flat’s devices through it.",
+        "steps": [
+          "Point the router at Pi-hole",
+          "Open a page on the tablet",
+          "Add a wrongly blocked site to the allow list"
+        ],
+        "fact": "Pi-hole blocks ads, trackers and bad domains for every device on your network at the DNS level."
+      }
+    },
+    {
+      "id": "living-story",
+      "chapter": "living",
+      "member": "tamsin",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "service": "audible",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tamsin’s story waits where she stopped",
+        "body": "Tamsin curls up on the sofa with a story from the family’s own files. Audiobookshelf on the Core remembers where she stopped, so tomorrow starts there.",
+        "chips": [
+          "Audiobookshelf",
+          "alternative to Audible"
+        ]
+      },
+      "detail": {
+        "before": "Tamsin’s stories played in the Audible app, and her place in each one was kept there.",
+        "after": "Audiobookshelf holds the story files the family already has on the Core and remembers where each listener stopped.",
+        "steps": [
+          "Add the story files to the library",
+          "Press play on the tablet",
+          "Come back to the same place"
+        ],
+        "fact": "Audiobookshelf lets you listen to your audiobooks and podcasts, and pick up where you left off on any device."
+      },
+      "film": true
+    },
+    {
+      "id": "living-note",
+      "chapter": "living",
+      "member": "matthias",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "cryptgeon",
+        "replaces": [
+          "Privnote"
+        ]
+      },
+      "capability": "send a note or file as a one-time link that destroys itself after it is read",
+      "service": "privnote",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "A password that is read once",
+        "body": "The landlord’s repairs site sends one temporary password, and Matthias passes it to Lindiwe. The Cryptgeon note on the Core disappears once she has read it.",
+        "chips": [
+          "Cryptgeon",
+          "alternative to Privnote"
+        ]
+      },
+      "detail": {
+        "before": "A temporary password used to travel in a text thread or a Privnote link.",
+        "after": "Cryptgeon on the Core makes a one-time note. Once Lindiwe opens it, the note is gone.",
+        "steps": [
+          "Write the password into a new note",
+          "Send Lindiwe the one-time link",
+          "Open it once on the home Wi-Fi"
+        ],
+        "fact": "Cryptgeon sends a note or file as a one-time link that destroys itself after it is read."
+      }
+    },
+    {
+      "id": "living-page",
+      "chapter": "living",
+      "member": "lindiwe",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "linkstack",
+        "replaces": [
+          "Linktree"
+        ]
+      },
+      "capability": "a link page for your business or yourself, like Linktree",
+      "service": "linktree",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "right"
+      },
+      "popup": {
+        "title": "The poster’s page, tested at home",
+        "body": "The winter campaign poster needs one page that lists its links. Lindiwe builds it in LinkStack on the Core and tests it on her phone over the flat’s Wi-Fi.",
+        "chips": [
+          "LinkStack",
+          "alternative to Linktree"
+        ],
+        "note": "Only devices on the home Wi-Fi reach this page."
+      },
+      "detail": {
+        "before": "The poster’s links lived on a Linktree page that had to be edited online.",
+        "after": "LinkStack builds the same page on the Core. Lindiwe tests each link from her phone on the home Wi-Fi.",
+        "steps": [
+          "Add the poster’s links one by one",
+          "Open the page on a phone",
+          "Fix any link that does not open"
+        ],
+        "fact": "LinkStack is a link page for your business or yourself, like Linktree."
+      }
+    },
+    {
+      "id": "dining-clip",
+      "chapter": "dining",
+      "member": "matthias",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Raindrop.io"
+        ]
+      },
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "service": "raindrop-io",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The council reworded its minutes",
+        "body": "A council page was reworded overnight, but Matthias had saved it earlier. Linkwarden on the Core kept a screenshot and a PDF of the original wording.",
+        "chips": [
+          "Linkwarden",
+          "alternative to Raindrop.io"
+        ]
+      },
+      "detail": {
+        "before": "Matthias bookmarked pages in Raindrop.io, and the page itself stayed out on the web where it could change.",
+        "after": "Linkwarden saves each page with a screenshot and a PDF on the Core, so he can reread it as it was.",
+        "steps": [
+          "Open the page before it changes",
+          "Save it in Linkwarden",
+          "Open the saved copy later"
+        ],
+        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-pages",
+      "chapter": "dining",
+      "member": "matthias",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Smallpdf"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "service": "smallpdf",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Six pages out of eighty",
+        "body": "A long council report arrives as one PDF. Matthias splits out the six pages he needs in Stirling-PDF on the Core and leaves the rest.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Smallpdf"
+        ]
+      },
+      "detail": {
+        "before": "Pulling pages from a big PDF meant uploading the whole report to Smallpdf, including pages he had no need to send.",
+        "after": "Stirling-PDF splits the report on the Core. Matthias saves just the pages he needs as their own file.",
+        "steps": [
+          "Open the report in Stirling-PDF",
+          "Pick the pages he needs",
+          "Save them as a new file"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+      }
+    },
+    {
+      "id": "dining-tape",
+      "chapter": "dining",
+      "member": "matthias",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "TwistedWave"
+        ]
+      },
+      "capability": "edit audio in a browser tab: cut, fade, normalise and export",
+      "service": "twistedwave",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "front"
+      },
+      "popup": {
+        "title": "One quote cut from the tape",
+        "body": "Matthias listens through headphones and marks one quote. AudioMass cuts it from a copy on the Core, so the whole tape stays as it was.",
+        "chips": [
+          "AudioMass",
+          "alternative to TwistedWave"
+        ]
+      },
+      "detail": {
+        "before": "Matthias cut clips in TwistedWave, with the original recording and the clip kept in one project.",
+        "after": "AudioMass opens in a browser tab on the Core. He cuts the clip from a copy and leaves the original recording alone.",
+        "steps": [
+          "Open a copy of the tape",
+          "Mark the quote and cut it",
+          "Export the clip and check it by ear"
+        ],
+        "fact": "AudioMass edits audio in a browser tab: cut, fade, normalise and export."
+      }
+    },
+    {
+      "id": "dining-draft",
+      "chapter": "dining",
+      "member": "matthias",
+      "agent": "matthias",
+      "approval": "matthias",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that talks to you through the messaging platform you pick, running on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Caraway drafts the chase note",
+        "body": "The records office is late with its reply. Matthias texts Caraway three lines, then reads the draft, changes a date and sends the note himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "matthias",
+        "text": "Chase note drafted. Please check the dates first."
+      },
+      "detail": {
+        "before": "A late reply meant finding the thread, rereading it and writing the chase from a blank page.",
+        "after": "Matthias texts Caraway a few lines. Caraway drafts the chase on the Core’s local model, and Matthias reads it, fixes it and sends it himself.",
+        "steps": [
+          "Text Caraway three lines",
+          "Read the draft and fix the date",
+          "Send the note himself"
+        ],
+        "fact": "Hermes is an agent that talks to you through the messaging platform you pick, running in its own sandbox on your Core."
+      }
+    },
+    {
+      "id": "dining-write",
+      "chapter": "dining",
+      "member": "matthias",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Google Workspace"
+        ]
+      },
+      "capability": "the LibreOffice suite in your browser, with your files on your Core",
+      "service": "google-workspace",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "The draft stays in one file",
+        "body": "Matthias writes the feature in LibreOffice in his browser, with the file on the Core. The editor gets a PDF copy by email when it is ready.",
+        "chips": [
+          "LibreOffice",
+          "alternative to Google Workspace"
+        ]
+      },
+      "detail": {
+        "before": "Drafts lived in Google Workspace documents, and every version stayed with the rented suite.",
+        "after": "LibreOffice opens the draft in a browser tab, and the file stays on the Core. Matthias exports a PDF for his editor.",
+        "steps": [
+          "Open the draft from the Core",
+          "Write and revise in the browser",
+          "Export a PDF for the editor"
+        ],
+        "fact": "LibreOffice is an office suite you open in your browser, with your files kept on your Core."
+      }
+    },
+    {
+      "id": "kitchen-board",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "service": "cozi",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One board for the whole week",
+        "body": "Three people share one small kitchen and a crowded week. Dinners, the shopping list and the school dates sit in one HomeHub on the Core.",
+        "chips": [
+          "HomeHub",
+          "alternative to Cozi"
+        ]
+      },
+      "detail": {
+        "before": "Dinners were on a note, the shopping sat in a Cozi list and the school dates hung on the fridge.",
+        "after": "HomeHub keeps notes, shopping, chores and expenses in one household hub on the Core, with a recipe book.",
+        "steps": [
+          "Plan the week’s dinners in the recipe book",
+          "Add what is missing to the shopping list",
+          "Pin the school dates as a note"
+        ],
+        "fact": "HomeHub is a shared household hub for notes, shopping, chores and expenses, with a recipe book and an expiry tracker."
+      }
+    },
+    {
+      "id": "kitchen-pitch",
+      "chapter": "kitchen",
+      "member": "matthias",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jotty",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "lightweight checklists and notes with Kanban boards and sharing",
+      "service": "trello",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Pitches move across the fridge",
+        "body": "Matthias moves paper cards across the fridge door as a pitch goes from idea to filed. The same columns live in Jotty on the Core.",
+        "chips": [
+          "Jotty",
+          "alternative to Trello"
+        ]
+      },
+      "detail": {
+        "before": "The pitch board lived in a Trello account, one more tab beside the paper cards on the fridge.",
+        "after": "Jotty keeps the same columns as a Kanban board on the Core, so the fridge cards and the board agree.",
+        "steps": [
+          "Write each pitch on a card",
+          "Move the card across the fridge",
+          "Move it across the board too"
+        ],
+        "fact": "Jotty has lightweight checklists and notes with Kanban boards and sharing."
+      }
+    },
+    {
+      "id": "kitchen-poster",
+      "chapter": "kitchen",
+      "member": "lindiwe",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "design and prototype in a web-based design tool you host",
+      "service": "figma",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left",
+        "from": "right"
+      },
+      "popup": {
+        "title": "The poster proof on the counter",
+        "body": "Lindiwe lays out the winter campaign poster in Penpot on the Core. She prints a proof and props it by the kettle to check the type.",
+        "chips": [
+          "Penpot",
+          "alternative to Figma"
+        ]
+      },
+      "detail": {
+        "before": "The poster layout lived in a Figma file, and each revision was another copy in the same place.",
+        "after": "Penpot hosts the layout on the Core. Lindiwe revises it there and exports a proof when the type looks right.",
+        "steps": [
+          "Lay out the poster in Penpot",
+          "Export a proof and print it",
+          "Fix the type and export again"
+        ],
+        "fact": "Penpot designs and prototypes in a web-based design tool you host."
+      }
+    },
+    {
+      "id": "kitchen-papers",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "service": "google-drive",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The tenancy papers have one home",
+        "body": "The tenancy agreement, the boiler certificate and the deposit receipt used to live in three places. Now Papra archives all three on the Core.",
+        "chips": [
+          "Papra",
+          "alternative to Google Drive"
+        ]
+      },
+      "detail": {
+        "before": "The tenancy papers sat in an email attachment, a Google Drive folder and a drawer.",
+        "after": "Papra archives the tenancy agreement, the boiler certificate and the deposit receipt on the Core, ready when the landlord asks.",
+        "steps": [
+          "Scan or drop in each paper",
+          "Name each paper for what it is",
+          "Find all three in one place"
+        ],
+        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+      }
+    },
+    {
+      "id": "kids-paint",
+      "chapter": "kids",
+      "member": "tamsin",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "turn a folder of photos and videos into a feed with albums and a timeline",
+      "anchor": {
+        "role": "easel",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Tamsin’s paintings become a gallery",
+        "body": "Lindiwe photographs each finished painting and drops the pictures in one folder. Foldergram turns the folder into a feed with albums and a timeline.",
+        "chips": [
+          "Foldergram"
+        ]
+      },
+      "detail": {
+        "before": "Tamsin’s paintings piled up on the fridge door, then in a drawer, and the best ones were hard to find.",
+        "after": "Foldergram turns the folder of photos into a feed on the Core, with albums and a timeline of her paintings.",
+        "steps": [
+          "Photograph each finished painting",
+          "Drop the pictures in the folder",
+          "Scroll back through the albums"
+        ],
+        "fact": "Foldergram turns a folder of photos and videos into a feed with albums and a timeline."
+      },
+      "film": true
+    },
+    {
+      "id": "kids-send",
+      "chapter": "kids",
+      "member": "tamsin",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "send files between phones and laptops on the same Wi-Fi",
+      "service": "airdrop",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A drawing crosses the room",
+        "body": "Tamsin finishes a drawing on her tablet and picks Matthias’s laptop in PairDrop. The drawing lands in his folder before she has put the pencil down.",
+        "chips": [
+          "PairDrop",
+          "alternative to AirDrop"
+        ]
+      },
+      "detail": {
+        "before": "A drawing reached the laptop through AirDrop or a message, one picture at a time.",
+        "after": "PairDrop sends the drawing across the home Wi-Fi from the tablet to the laptop, with nothing sent anywhere else.",
+        "steps": [
+          "Open PairDrop on the tablet and the laptop",
+          "Pick the laptop",
+          "Send the drawing"
+        ],
+        "fact": "PairDrop sends files between phones and laptops on the same Wi-Fi."
+      }
+    },
+    {
+      "id": "kids-plan",
+      "chapter": "kids",
+      "member": "tamsin",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "easel",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Thursday is painting day",
+        "body": "Tamsin picks Thursday for the next painting, and Matthias adds the block to Companion Planning on the Core. She ticks it off when the paint is dry.",
+        "chips": [
+          "Companion Planning"
+        ]
+      },
+      "detail": {
+        "before": "Painting days were promised out loud and forgotten by Thursday, with nothing written down.",
+        "after": "Companion Planning keeps the block in one local file on the Core, beside the rest of the week.",
+        "steps": [
+          "Pick the day with Tamsin",
+          "Add the block to Companion Planning",
+          "Tick it off when the paint is dry"
+        ],
+        "fact": "Companion Planning plans tasks and time blocks in one local file on your Core."
+      }
+    },
+    {
+      "id": "alcove-plan",
+      "chapter": "alcove",
+      "member": "lindiwe",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "super-productivity",
+        "replaces": [
+          "Asana"
+        ]
+      },
+      "capability": "plan your day, track time and run a timer",
+      "service": "asana",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Monday’s three jobs, in order",
+        "body": "Monday starts with three campaign jobs on a scrap of paper. Lindiwe types them into Super Productivity on the Core and starts the timer on the first.",
+        "chips": [
+          "Super Productivity",
+          "alternative to Asana"
+        ]
+      },
+      "detail": {
+        "before": "The day’s tasks lived in Asana, with the campaign jobs mixed in among everyone else’s.",
+        "after": "Super Productivity keeps the day’s plan and its timer on the Core, one task for each campaign job.",
+        "steps": [
+          "Write the three jobs as tasks",
+          "Put them in the order of the day",
+          "Start the timer on the first"
+        ],
+        "fact": "Super Productivity plans your day, tracks time and runs a Pomodoro timer."
+      }
+    },
+    {
+      "id": "alcove-list",
+      "chapter": "alcove",
+      "member": "lindiwe",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "listmonk",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "capability": "write and send newsletters to your own mailing list",
+      "service": "mailchimp",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The supporter list comes home",
+        "body": "Lindiwe brings the charity’s supporter list in from the old mailing tool. Listmonk on the Core now holds the list and the draft of Thursday’s newsletter.",
+        "chips": [
+          "Listmonk",
+          "alternative to Mailchimp"
+        ],
+        "note": "Sending at volume needs an outside mail provider."
+      },
+      "detail": {
+        "before": "The supporter list and its drafts lived in Mailchimp, and every newsletter was built there.",
+        "after": "Listmonk keeps the list and the drafts on the Core. Lindiwe writes the newsletter there and picks the mail provider that sends it.",
+        "steps": [
+          "Import the supporter list",
+          "Write Thursday’s newsletter",
+          "Choose how it is sent"
+        ],
+        "fact": "Listmonk writes and sends newsletters to your own mailing list."
+      },
+      "film": true
+    },
+    {
+      "id": "alcove-icon",
+      "chapter": "alcove",
+      "member": "lindiwe",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "service": "adobe-illustrator",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto",
+        "from": "right"
+      },
+      "popup": {
+        "title": "One icon, drawn for every leaflet",
+        "body": "Lindiwe draws the charity’s small house icon once in Inkscape. The file sits on the Core, so every leaflet and poster starts from the same lines.",
+        "chips": [
+          "Inkscape",
+          "alternative to Adobe Illustrator"
+        ]
+      },
+      "detail": {
+        "before": "The icon was an Adobe Illustrator file that only opened on one old laptop.",
+        "after": "Inkscape draws the icon as vector lines in a browser tab, and the file stays on the Core for every leaflet.",
+        "steps": [
+          "Draw the house icon as vector lines",
+          "Save the file on the Core",
+          "Open the same file for the next leaflet"
+        ],
+        "fact": "Inkscape draws logos, diagrams and line art as vector graphics, in your browser."
+      }
+    },
+    {
+      "id": "alcove-tracker",
+      "chapter": "alcove",
+      "member": "lindiwe",
+      "agent": "lindiwe",
+      "approval": "lindiwe",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "service": "airtable",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Rooibos fills the drive tracker",
+        "body": "Lindiwe reads out the leaflet drops from the shelf. Rooibos opens Grist in its own browser and fills the tracker. Lindiwe reads every row before it stands.",
+        "chips": [
+          "Grist",
+          "alternative to Airtable"
+        ]
+      },
+      "say": {
+        "speaker": "lindiwe",
+        "text": "Tracker filled. Please read each row first."
+      },
+      "detail": {
+        "before": "Each drop was typed into an Airtable base by hand, a row at a time, after the leaflets were counted.",
+        "after": "Rooibos opens Grist in its own browser and fills a row for each drop from Lindiwe’s list. Lindiwe reads every row before it stands.",
+        "steps": [
+          "Read out the week’s leaflet drops",
+          "Rooibos fills a row for each one",
+          "Read every row before it stands"
+        ],
+        "fact": "Grist is a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+      }
+    },
+    {
+      "id": "court-call",
+      "chapter": "court",
+      "member": "lindiwe",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "service": "salesforce",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "deck",
+            "nth": 0
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The quiet corner for a call",
+        "body": "Lindiwe takes a partner call on the bench in the back court. Afterwards she adds the new contact and the next step in Twenty on the Core.",
+        "chips": [
+          "Twenty",
+          "alternative to Salesforce"
+        ]
+      },
+      "detail": {
+        "before": "A partner’s details used to go into a Salesforce record, typed in after the call.",
+        "after": "Twenty keeps the contact and the next step in a CRM on the Core, hosted by the family.",
+        "steps": [
+          "Take the call on the court bench",
+          "Add the contact to Twenty",
+          "Write the next step beside it"
+        ],
+        "fact": "Twenty keeps customers, deals and custom fields in a CRM you host yourself."
+      }
+    },
+    {
+      "id": "court-read",
+      "chapter": "court",
+      "member": "matthias",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "readeck",
+        "replaces": [
+          "Instapaper"
+        ]
+      },
+      "capability": "save articles to read later without a hosted bookmarking service",
+      "service": "instapaper",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "deck",
+            "nth": 0
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing",
+        "side": "right",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Sunday’s long reads wait outside",
+        "body": "Matthias keeps the week’s long reads for Sunday morning on the court bench. Readeck holds each saved article on the Core, ready on a phone in the sun.",
+        "chips": [
+          "Readeck",
+          "alternative to Instapaper"
+        ]
+      },
+      "detail": {
+        "before": "Matthias saved long reads to Instapaper through the week and opened them all at once on Sunday.",
+        "after": "Readeck keeps the saved articles on the Core, and Matthias opens them on his phone out in the court.",
+        "steps": [
+          "Save an article through the week",
+          "Open Readeck on the phone on Sunday",
+          "Read it out on the bench"
+        ],
+        "fact": "Readeck saves articles to read later without a hosted bookmarking service."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core up the stairs",
+        "body": "From the alcove to the back court, one Companion Core serves the flat, and the easel is still wet."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Lindiwe’s lists, Matthias’s notes and Tamsin’s paintings sit on a Companion Core at home. Browse the Companion Hub store and choose your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Told in the v3 shape: nineteen of twenty-two room beats are pairs. The three pair-less beats are the Hermes chase note, Foldergram and Companion Planning; none of them replaces anything in the catalog.",
+    "The plan lists Paperless-ngx and Frigate and neither is told: Paperless-ngx is over the fleet app cap (Papra holds the tenancy papers), and the flat has no camera of the family's own, so Pi-hole is the iot beat.",
+    "Tamsin is six: no chat model and no agent in her beats (age rule 16). The maker pool has no app a child uses, so her pool beat is Companion Planning, a block Matthias adds for the day she picks.",
+    "LinkStack is a limit card: the page is tested over the home Wi-Fi and the note says only devices there reach it. Listmonk carries the mail provider note and promises no delivery. No beat anchors on a bed.",
+    "The Front Balcony is 1 m deep and the camera cannot stand in it, so the garden chapter is the back court bench (patio-seat). It sits last before the outro: two cuts in all, the walk out and the walk round to the street."
+  ]
+}
