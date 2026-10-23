@@ -192,8 +192,8 @@ it: [`reference/story/film.md`](reference/story/film.md).
 No stock footage, music, sound effect, image or typeface was added for the film. The voice is the one `Story site: voice` records (Kokoro-82M, generated locally); the picture
 is the repo's own renderer; the Companion Core in it is the stylised model the page builds, never a photograph. LYGIA and Grassworks are not used.
 
-The optional CI-Common brand bookends (`scripts/film-bookends.mts`) run only when the owner sets `CI_VIDEO_KIT` to a checkout of CI-Common's `packages/video-kit`; the
-kit is then a build-time tool of the owner's machine, never a dependency in `package.json`.
+CI-Common's video-kit (`ci-video`, video-kit 0.35.0 or newer) composes the films' plates with the house styles: `scripts/film/wrap.mts` runs it (`import-home`, `build`, `check`, `render`) only when the owner points `CI_COMMON_KIT` at a CI-Common checkout (or sets one up with `--setup-kit`); the
+kit, and what it brings (HyperFrames, GSAP, Manrope, all listed in CI-Common's own THIRD_PARTY.md), is then a build-time tool of the owner's machine, never a dependency in `package.json`, and nothing of it is imported by this repository (the contract between the two is the JSON file `plates.json`). The plates' encode is ffmpeg with libx264, as the films'.
 
 ## Licence texts for adapted source
 
