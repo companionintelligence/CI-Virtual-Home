@@ -13,6 +13,10 @@
 //        [--probe [seconds]]   draw N seconds (default 1) of the first plate at each --gl in a comma list and print seconds a frame, the renderer and a projected time
 //        [--home-tour]      the ids are homes, whether or not a family lives there     [--no-spline-gate]   draw a family whose camera fails story:spline
 //
+// A family's plates are the beats the kit's film PLAYS, not always every flagged one: the kit's film is never longer than the film's 110 s (FILM.maxS), so when every flagged beat does not fit, the closing,
+// the rooms that show no pair, then the pairs are given up (lib.mts selectBeats; reference/story/film.md "The cap"). Nothing is drawn for a beat that is given up. A home is named by its house id or its film id.
+// A home tour's plate declares what it is about as MEASURED (the Core, through the camera that drew it) or no subject at all.
+//
 // Outputs (outside git, `video/plates/<id>/`, or $CI_PLATES_OUT): plates/<aspect>/<beat>.<key8>.mp4 (H.264, no overlay), logos/, inserts/, cache.json (what each plate was made from: a plate
 // whose key has not moved is never drawn again), report.json, and plates.json, written last. reference/story/film.md ("Plates and the home-tour wrap") is the contract.
 import fs from 'node:fs';
@@ -24,17 +28,17 @@ import { loadFamily, filmableSlugs, captionProblems, filmText, FILM_LIGHTING, is
 import { gradeSlug, defaultDirs } from '../../story/spline-report.mts';
 import { builderHandles, guardTerms, scanText } from '../../portal-redact.mts';
 import { shotCaption } from '../../story/lib/media.mts';
-import { PLATE_GLS, plateGl, openRig, closeRig, openHouse, warm, renderRange, machine, chromiumId, RigHolder, type PlateGl, type Rig } from './render.mts';
+import { PLATE_GLS, plateGl, openRig, closeRig, openHouse, warm, renderRange, sampleShot, machine, chromiumId, RigHolder, type PlateGl, type Rig } from './render.mts';
 import {
   ROOT, platesDir, segmentsOf, cameraFingerprint, powerRel, segmentKey, doorsSha, engineSha, toolSha, houseSha, composeBeat, cuesOf, familyText, loadCtx, chipsOf, logoFileOf, memberOf,
   buildFamilyManifest, buildHomeManifest, homeBeats, digestOf, manifestProblems, canon, sha256, hash10, familiesDir, homeInfo, homeText, homesWithoutFamily, HOME_TOUR_SHOTS, DEFAULT_SUBJECT, PLATE_KEYS_DEFAULT,
-  selectBeats, kitFilmLength, disclosureWords,
-  type Segment, type Composed, type BeatEntry, type PlateEntry, type InsertEntry, type Profile, type Ctx, type PlatesText, type Chip, type PlanBeat, type Selection,
+  selectBeats, kitFilmLength, disclosureWords, resolveHome, measureSubject, SUBJECT_V, SUBJECT_SAMPLES,
+  type Segment, type Composed, type BeatEntry, type PlateEntry, type InsertEntry, type Profile, type Ctx, type PlatesText, type Chip, type PlanBeat, type Selection, type Measured,
 } from './lib.mts';
 
 export const CACHE_V = 1;
 /** what the cache remembers about one drawn plate */
-export type CacheEntry = { key: string; doorsSha: string | null; file: string; sha256: string; frames: number; durationS: number; bytes: number; width: number; height: number; gl: string; renderer: string; wallSeconds: number };
+export type CacheEntry = { key: string; doorsSha: string | null; file: string; sha256: string; frames: number; durationS: number; bytes: number; width: number; height: number; gl: string; renderer: string; wallSeconds: number; /** a home tour's plate: what it is about, measured from the camera that drew it (lib.mts measureSubject) */ measured?: Measured };
 export type Cache = { v: 1; id: string; /** per aspect: a hash of the whole film's camera path, which is what a door's opening is a function of */ pathShas: Record<string, string>; shots?: string[]; entries: Record<string, CacheEntry> };
 export const cachePath = (id: string): string => path.join(platesDir(id), 'cache.json');
 export function readCache(id: string): Cache {
@@ -324,7 +328,9 @@ export async function runHome(houseId: string, o: Opts, holder: RigHolder = new 
     const statusNow = (chromium: string) => o.aspects.flatMap(a => wanted.map(shot => { const k = keyOf(shot, a, chromium), e = cache.entries[`${a}/${shot}`]; return { aspect: a, shot, key: k, current: !o.force && entryCurrent(id, e, k) }; }));
     const status = statusNow(chromium0);
     if (o.dryRun) { log(`${wanted.length} shots x ${o.aspects.length} aspects: ${status.filter(s => s.current).length} current`); return { ok: true, id, dir, seconds: 0, drawn: 0 }; }
-    const need = status.filter(s => !o.only || o.only.includes(s.shot)).some(s => !s.current) || !cache.shots;
+    // a plate is also unfinished until its subject is measured (from the camera that drew it: a picture that is current needs the page opened, not drawn again)
+    const unmeasured = (e: CacheEntry | undefined) => !e || !e.measured || e.measured.v !== SUBJECT_V;
+    const need = status.filter(s => !o.only || o.only.includes(s.shot)).some(s => !s.current || unmeasured(cache.entries[`${s.aspect}/${s.shot}`])) || !cache.shots;
     let drawn = 0, renderer = Object.values(cache.entries)[0]?.renderer ?? 'unknown';
     if (need) {
       if (o.noRender) throw new Error('--no-render: a plate would have to be drawn');
@@ -339,17 +345,25 @@ export async function runHome(houseId: string, o: Opts, holder: RigHolder = new 
           await warm(home.page, aspect, size.pageRes);
           for (const shot of present.filter(x => !o.only || o.only.includes(x))) {
             const key = keyOf(shot, aspect, chromium0), k = `${aspect}/${shot}`, e = cache.entries[k];
-            if (!o.force && entryCurrent(id, e, key) && e.renderer === renderer) continue;
+            const have = !o.force && entryCurrent(id, e, key) && e.renderer === renderer;
+            if (have && !unmeasured(e)) continue;
             const info2 = await home.page.evaluate(async (a: any) => { // @ts-ignore (a URL in the page, not a module of this script)
               const P = await import('/assets/story/film/plates/index.js'); (window as any).__plates = P; return P.prepareShot(a); }, { shot: `house:${houseId}:${shot}`, key: aspect, res: o.res, fps: FILM.fps });
-            const file = plateFile(aspect, shot, key), out = path.join(dir, file);
-            log(`${aspect} ${shot}: drawing ${info2.frames} frames (${info2.duration.toFixed(1)} s)`);
-            const r = await renderRange(home.page, 0, info2.frames, out, { fps: FILM.fps, label: `${aspect} ${shot}`, onProgress: (d, t) => { if (d === t || d % 120 < 12) process.stdout.write(`\r  ${aspect} ${shot}: ${d} / ${t}   `); } });
-            process.stdout.write('\n');
+            let entry: CacheEntry = e;
+            if (!have) {
+              const file = plateFile(aspect, shot, key), out = path.join(dir, file);
+              log(`${aspect} ${shot}: drawing ${info2.frames} frames (${info2.duration.toFixed(1)} s)`);
+              const r = await renderRange(home.page, 0, info2.frames, out, { fps: FILM.fps, label: `${aspect} ${shot}`, onProgress: (d, t) => { if (d === t || d % 120 < 12) process.stdout.write(`\r  ${aspect} ${shot}: ${d} / ${t}   `); } });
+              process.stdout.write('\n');
+              entry = { key, doorsSha: null, file, sha256: r.sha256, frames: r.frames, durationS: +(info2.frames / FILM.fps).toFixed(3), bytes: r.bytes, width: size.w, height: size.h, gl: rig!.gl, renderer, wallSeconds: +r.wallSeconds.toFixed(1) };
+              drawn++;
+              log(`  ${(r.bytes / 1048576).toFixed(1)} MiB, ${r.wallSeconds.toFixed(0)} s wall (${(r.wallSeconds / r.frames).toFixed(2)} s a frame)`);
+            }
+            // what the plate is about: the Core, in the camera that drew the plate (read back after the plate is drawn, so no pixel of it depends on this)
+            const sm = await sampleShot(home.page, info2.frames, SUBJECT_SAMPLES), measured = measureSubject(sm.samples as any, sm.core, size, shot);
             await home.page.evaluate(() => (window as any).__plates.end());
-            cache.entries[k] = { key, doorsSha: null, file, sha256: r.sha256, frames: r.frames, durationS: +(info2.frames / FILM.fps).toFixed(3), bytes: r.bytes, width: size.w, height: size.h, gl: rig!.gl, renderer, wallSeconds: +r.wallSeconds.toFixed(1) };
-            writeCache(cache); drawn++;
-            log(`  ${(r.bytes / 1048576).toFixed(1)} MiB, ${r.wallSeconds.toFixed(0)} s wall (${(r.wallSeconds / r.frames).toFixed(2)} s a frame)`);
+            cache.entries[k] = { ...entry, measured }; writeCache(cache);
+            log(`${aspect} ${shot}: ${measured.subject ? `about the Core, ${JSON.stringify(measured.subject)} (in view in ${(measured.camera as any).coreInView} of ${SUBJECT_SAMPLES} frames)` : `no subject: ${(measured.camera as any).why}`}`);
           }
         }
       } finally { await home.ctx.close().catch(() => {}); }
@@ -361,7 +375,9 @@ export async function runHome(houseId: string, o: Opts, holder: RigHolder = new 
       for (const aspect of o.aspects) {
         const e = cache.entries[`${aspect}/${shot}`];
         if (!e) throw new Error(`${aspect} ${shot} is not drawn`);
-        plates[KIT_NAME[aspect]] = { file: e.file, sha256: e.sha256, durationS: e.durationS, width: e.width, height: e.height, subject: DEFAULT_SUBJECT[aspect], camera: { preset: shot, subjectDeclared: true, segmentKey: e.key } };
+        if (unmeasured(e)) throw new Error(`${aspect} ${shot}: its subject is not measured`);
+        // (the subject is the Core as measured, or none: the kit has then nothing to protect, and the record says why. Never a rectangle this renderer chose.)
+        plates[KIT_NAME[aspect]] = { file: e.file, sha256: e.sha256, durationS: e.durationS, width: e.width, height: e.height, ...(e.measured!.subject ? { subject: e.measured!.subject } : {}), camera: { ...e.measured!.camera, segmentKey: e.key } };
       }
       return plates;
     });
@@ -371,7 +387,7 @@ export async function runHome(houseId: string, o: Opts, holder: RigHolder = new 
     const profile: Profile = { chromium: rig?.chromium ?? readPrevProfile(id)?.chromium ?? 'unrecorded', renderer, ffmpeg: rig?.ffmpeg ?? readPrevProfile(id)?.ffmpeg ?? 'unrecorded', gl: rig?.gl ?? o.gl, ...(rig ? { machine: machine() } : {}) };
     const manifest = buildHomeManifest({ info, beats, text, profile, lighting: o.lighting, platesSha, claimsSha: digestOf(text), inputsSha: digestOf({ tool, engine, house, res: o.res, aspects: o.aspects, lighting: o.lighting, text, shots }) });
     lintAndWrite(manifest, { claims, catalog: new Map(), media: null, index: null, root: ROOT } as any, id, dir, [], log);
-    fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify({ id, kind: 'home-tour', house: houseId, res: o.res, aspects: o.aspects, gl: profile.gl, renderer, shots, plates: Object.fromEntries(Object.entries(cache.entries).map(([k, e]) => [k, { frames: e.frames, bytes: e.bytes, wallSeconds: e.wallSeconds, spf: +(e.wallSeconds / Math.max(1, e.frames)).toFixed(3) }])) }, null, 1) + '\n');
+    fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify({ id, kind: 'home-tour', house: houseId, res: o.res, aspects: o.aspects, gl: profile.gl, renderer, shots, subjects: Object.fromEntries(Object.entries(cache.entries).map(([k, e]) => [k, e.measured ? { subject: e.measured.subject, ...(e.measured.camera as object) } : null])), plates: Object.fromEntries(Object.entries(cache.entries).map(([k, e]) => [k, { frames: e.frames, bytes: e.bytes, wallSeconds: e.wallSeconds, spf: +(e.wallSeconds / Math.max(1, e.frames)).toFixed(3) }])) }, null, 1) + '\n');
     return { ok: true, id, dir, manifest, seconds: (Date.now() - t0) / 1000, drawn };
   } catch (e: any) { return { ok: false, id, dir: platesDir(id), error: e.message, seconds: (Date.now() - t0) / 1000, drawn: 0 }; }
 }
@@ -401,8 +417,9 @@ export async function probe(slug: string, gls: PlateGl[], o: Opts, seconds: numb
       } finally { await home.ctx.close().catch(() => {}); }
     } finally { await closeRig(rig); }
   }
+  // (named by the size too: the two GL paths swap places between 540 p and 1080 p, so a probe is a statement about one size)
   fs.mkdirSync(platesDir('probe'), { recursive: true });
-  fs.writeFileSync(path.join(platesDir('probe'), `${slug}.probe.json`), JSON.stringify({ slug, res: o.res, results: out }, null, 1) + '\n');
+  fs.writeFileSync(path.join(platesDir('probe'), `${slug}.probe.${o.res}.json`), JSON.stringify({ slug, res: o.res, results: out }, null, 1) + '\n');
   return out;
 }
 
@@ -422,8 +439,7 @@ export function parseArgv(argv: string[]): { flags: Record<string, string>; ids:
 /** What an id means: a family's slug (a family film) or a home's id (a home tour). */
 export function kindOf(id: string, forceHome: boolean): 'family' | 'home' | null {
   if (!forceHome && fs.existsSync(path.join(familiesDir(), `${id}.bake.json`))) return 'family';
-  const houses = (JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'houses', 'index.json'), 'utf8')).houses as Array<{ id: string }>).map(h => h.id);
-  return houses.includes(id) ? 'home' : null;
+  return resolveHome(id) ? 'home' : null;
 }
 
 export async function main(argv: string[]): Promise<number> {
@@ -446,7 +462,7 @@ export async function main(argv: string[]): Promise<number> {
     for (const id of [...new Set(list)]) {
       const kind = kindOf(id, o.homeTour);
       if (!kind) { console.error(`✗ ${id}: not a family with a bake lock, nor a home`); results.push({ ok: false, id, error: 'unknown', seconds: 0 }); continue; }
-      const r = kind === 'family' ? await runFamily(id, o, holder) : await runHome(id, o, holder);
+      const r = kind === 'family' ? await runFamily(id, o, holder) : await runHome(resolveHome(id)!, o, holder);      // (a home by its house id or by its film id)
       results.push(r);
       if (!r.ok) console.error(`✗ ${id}: ${r.error}`);
       else console.log(`✓ ${id}: ${r.drawn ?? 0} plate(s) drawn in ${r.seconds.toFixed(0)} s`);

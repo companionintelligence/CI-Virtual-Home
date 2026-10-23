@@ -205,7 +205,10 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `scripts/film/wrap.mts` is the one file of `scripts/film/` the pin skips (`NOT_FRAME_CODE`): never edit the film's own modules for the plates, and never put plates code where the pin reads it (`test-film-plates.mts` fails
   when a film on record goes stale or the pin reads plates code). Plates are lit as day, never carry a word, and are never a video in git (`/video/*`). A home with no family has a home tour: its own shots, its display name and
   kind of place as its only words, the stylised-Core line on the end card, no hook, no claim. Every output of the kit goes through `wrap.mts` (disclosures equal claims.json's, the label, day light, `ci.computer/core` as the
-  only address, the copy lint and the word beta, the credit scan, the picture gates) before it is kept; the kit is found through `CI_COMMON_KIT` and is never a dependency. The GPU path is `--gl default` (Intel) or
+  only address, the copy lint and the word beta, the credit scan, the picture gates) before it is kept; the kit is found through `CI_COMMON_KIT` and is never a dependency. **The kit's film is at most the film's 110 s** (`FILM.maxS`):
+  the plates choose their beats to fit it (`selectBeats`, `kitFilmLength`, which is the kit's own arithmetic: every flagged beat while it fits, else the closing, the rooms with no pair, the pairs; never the first-run beats or one beat for
+  each person) and the wrap refuses a longer one; never widen the cap for the kit and never add a flag that does. A screenshot in the kit's film takes its caption from `media.mts` `shotCaption` (a QA run's, or a first-party app's
+  "with sample data"), never from a wording of its own. A home tour's plate declares the Core as measured from its camera, or no subject; never a rectangle the renderer chose. The GPU path is `--gl default` (Intel) or
   `--gl nvidia` (ANGLE's GL backend by PRIME offload; never `--use-angle=vulkan`), one render at a time.
 - **The tour is a live-player feature.** It exists only for `room-creator.html?mode=view&house=<id>&family=<slug>` (`?no=story` switches it
   off); its modules are `assets/story/` and `portal/story.css`, and its hook in `assets/viewer.ts` is a few additive lines behind `VIEW_MODE`

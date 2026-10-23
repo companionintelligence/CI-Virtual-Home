@@ -184,6 +184,41 @@ export function composeBeat(rs: RuntimeStory, b: RuntimeBeat, size: PlateSize, o
   return anchor ?? { subject: DEFAULT_SUBJECT[size.key], declared: true, tilt: 0, shift: 0, cleared: true, band, camera: meta };
 }
 
+// ---- the subject of a home tour's plate --------------------------------------------------------------------------------------------------------
+/** how the Core's place in a home tour's shot is measured: bump it when the measurement changes, so a plate drawn under the old one is measured again (the picture is not drawn again) */
+export const SUBJECT_V = 1;
+/** frames sampled across a shot: the camera that drew each one is read back from the page and the Core's box is projected through it */
+export const SUBJECT_SAMPLES = 12;
+export type ShotSample = { i: number; eye: V3; target: V3; fov: number };
+export type Measured = { v: number; /** the rectangle the plate is about, or null: nothing true can be said of a moving picture whose subject is out of it */ subject: Rect | null; camera: Record<string, unknown> };
+const median = (a: number[]): number => { const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+/**
+ * What a home tour's plate is about, MEASURED: the Companion Core's box (the house's `hero.core`) projected through the camera that drew each of `samples` frames of the shot, as fractions of the frame
+ * (the aspect of the plate). A home has no story, so no beat says what the shot is for; the Core is what every one of its shots is a picture of (door-to-core ends on it, hero-reveal lands on it, the orbit
+ * circles it). The shot MOVES, so no one rectangle is true of every frame: the rectangle declared is the place the Core sits in a typical frame, the median of its edges over the sampled frames where it is
+ * in view, and the record says how much the Core moves (`subjectUnion`) and in how many frames it is in view. Where the Core is in view in fewer than half of the frames nothing true can be said, and no
+ * subject is declared (the kit then has none to protect; the record says why). Never a fixed rectangle: that was DEFAULT_SUBJECT, which did not contain the Core in the middle of a door-to-core.
+ */
+export function measureSubject(samples: ShotSample[], core: Box6Like | null, size: PlateSize, shot: string): Measured {
+  const meta = { preset: shot, sampledFrames: samples.length };
+  const none = (why: string): Measured => ({ v: SUBJECT_V, subject: null, camera: { ...meta, subjectKind: 'none', why } });
+  if (!core || core.length !== 6) return none('the home has no Core box to project');
+  if (!samples.length) return none('no frame was sampled');
+  const seen: Array<{ x0: number; x1: number; y0: number; y1: number }> = [];
+  for (const s of samples) {
+    const pb = projectBoxClipped(camera(s.eye, s.target, s.fov, size.aspect), core as any);
+    if (!pb) continue;
+    const r = { x0: (pb.minX + 1) / 2, x1: (pb.maxX + 1) / 2, y0: (1 - pb.maxY) / 2, y1: (1 - pb.minY) / 2 };
+    if (r.x1 > 0 && r.x0 < 1 && r.y1 > 0 && r.y0 < 1) seen.push({ x0: clamp01(r.x0), x1: clamp01(r.x1), y0: clamp01(r.y0), y1: clamp01(r.y1) });
+  }
+  if (seen.length * 2 < samples.length) return none(`the Core is in view in ${seen.length} of ${samples.length} sampled frames`);
+  const rect = clampRect({ x: median(seen.map(r => r.x0)), y: median(seen.map(r => r.y0)), w: median(seen.map(r => r.x1)) - median(seen.map(r => r.x0)), h: median(seen.map(r => r.y1)) - median(seen.map(r => r.y0)) });
+  if (!rect) return none('the Core is too small in the frame to be a subject');
+  const union = clampRect({ x: Math.min(...seen.map(r => r.x0)), y: Math.min(...seen.map(r => r.y0)), w: Math.max(...seen.map(r => r.x1)) - Math.min(...seen.map(r => r.x0)), h: Math.max(...seen.map(r => r.y1)) - Math.min(...seen.map(r => r.y0)) });
+  return { v: SUBJECT_V, subject: rect, camera: { ...meta, subjectKind: 'core-median', coreInView: seen.length, ...(union ? { subjectUnion: union } : {}) } };
+}
+type Box6Like = readonly number[];
+
 // ---- the captions -------------------------------------------------------------------------------------------------------------------------------
 export type PlateCue = { fromS: number; toS: number; text: string };
 /** The most characters of a line the film's cues and the kit's subtitles hold in 16:9 (the kit's burn width there): a plate's cues are cut to ONE line of this, so the subtitle box is one line tall and the kit's text takes the least of the frame. */
@@ -372,7 +407,7 @@ export function selectBeats(o: { approachS: number; beats: PlanBeat[]; disclosur
 }
 
 // ---- the manifest -------------------------------------------------------------------------------------------------------------------------------
-export type PlateEntry = { file: string; sha256: string; durationS: number; width: number; height: number; subject: Rect; camera: Record<string, unknown> };
+export type PlateEntry = { file: string; sha256: string; durationS: number; width: number; height: number; /** absent where nothing true can be said of the picture (a home tour's shot whose Core is out of view), and the kit then has no subject to protect */ subject?: Rect; camera: Record<string, unknown> };
 export type BeatEntry = { id: string; member: { id: string; name: string; companion?: string } | null; title: string; body?: string; chips: Chip[]; cues?: PlateCue[]; plates: Partial<Record<'landscape' | 'portrait' | 'square', PlateEntry>> };
 export type InsertEntry = { id: string; app: string; file: string; sha256: string; width: number; height: number; alt: string; label: string };
 
@@ -487,6 +522,11 @@ export function homeInfo(houseId: string, root: string = ROOT): HomeInfo {
   if (!h) throw new Error(`no home ${houseId} in content/houses/index.json`);
   const types = placeTypes(idx, readPlan(root)), type = types.of[houseId] ?? 'home';
   return { house: houseId, id: homeFilmId(h), name: displayName(h), type, label: PLACE_LABEL[type] };
+}
+/** The house a name means: a house id (`studio-loft`) or the film id the home is known by (`warehouse-loft`), or null. */
+export function resolveHome(name: string, root: string = ROOT): string | null {
+  const idx = readJson(path.join(root, 'content', 'houses', 'index.json')).houses as Array<{ id: string; name?: string }>;
+  return (idx.find(h => h.id === name) ?? idx.find(h => homeFilmId(h) === name))?.id ?? null;
 }
 /** The sanctioned end card of a home with no family. The only claim it can make is that the Core is drawn as an illustration (stylised-art): no family, no scripted scene, no app, no story. */
 export function homeText(info: HomeInfo, claims: Claims = loadClaims()): PlatesText {

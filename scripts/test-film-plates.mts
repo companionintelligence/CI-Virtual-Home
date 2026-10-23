@@ -26,14 +26,14 @@ import { camera, project } from '../assets/shot-probe.js';
 import { ROOT, entryIsCurrent, loadFamily, readFilms, toolSha as filmToolSha, frameCodeFiles, NOT_FRAME_CODE, familiesDir, filmableSlugs } from './film/lib.mts';
 import {
   segmentsOf, plateId, cameraFingerprint, powerRel, segmentKey, doorsSha, cuesOf, familyText, hookOf, chipsOf, loadCtx, manifestProblems, copyProblems, readableOf, cutPicks,
-  plateEncodeArgs, ENCODE, engineSha, toolSha as platesToolSha, homeInfo, homeText, homesWithoutFamily, homeBeats, buildHomeManifest, homeFilmId, canon, digestOf, platesDir, DEFAULT_SUBJECT, composeBeat, oneLines,
-  kitFilmLength, selectBeats, rankBeats, disclosureWords, KIT_FILM, DROP_ORDER,
+  plateEncodeArgs, ENCODE, engineSha, toolSha as platesToolSha, homeInfo, homeText, homesWithoutFamily, homeBeats, buildHomeManifest, homeFilmId, canon, digestOf, platesDir, DEFAULT_SUBJECT, composeBeat, oneLines, resolveHome,
+  kitFilmLength, selectBeats, rankBeats, disclosureWords, KIT_FILM, DROP_ORDER, measureSubject, SUBJECT_V, SUBJECT_SAMPLES,
   type Segment, type PlanBeat,
 } from './film/plates/lib.mts';
 import { parseOpts, planFamily, statusOf, writeFamilyManifest, plateFile, entryCurrent, parseAspects, kindOf, insertsFor, type Cache, type CacheEntry } from './film/plates/cli.mts';
 import { shotCaption, docsCaption, appCaption } from './story/lib/media.mts';
 import { checkPlates } from './film/plates/schema.mts';
-import { orderOf, mergeQueue, modeEnv, readQueue, writeQueue, MODES, type Queue } from './film/plates/fleet.mts';
+import { orderOf, mergeQueue, modeEnv, readQueue, writeQueue, MODES, pickNames, filmIdOf, cutsOf, shortCutsNote, type Queue } from './film/plates/fleet.mts';
 import { findKit } from './film/wrap.mts';
 import { filmClock, sceneAt } from '../assets/story/film/layout.js';
 
@@ -437,6 +437,31 @@ test('plates.json for a home with no family: its name and its kind of place, its
   for (const b of m.beats) { assert.equal(b.member, null); assert.deepEqual(b.chips, []); assert.ok(!b.cues && !b.body); }
   assert.ok(!m.cuts && !m.inserts && !m.text.hook);
 });
+test('what a home tour\'s plate is about is MEASURED: the Core projected through the camera that drew each sampled frame (the median place), or no subject at all, never a rectangle chosen here', async () => {
+  const core = [-0.1, 0, -0.1, 0.1, 0.2, 0.1], z = plateSize('16x9', 540), p = plateSize('9x16', 540), at = (x: number, y = 1, zz = 3) => ({ i: 0, eye: [x, y, zz] as [number, number, number], target: [x, 0.1, 0] as [number, number, number], fov: 46 });
+  // a Core in the middle of every frame: the subject is where it is, and it contains the Core's centre
+  const still = measureSubject(Array.from({ length: SUBJECT_SAMPLES }, () => at(0)), core, z, 'orbit');
+  assert.equal(still.v, SUBJECT_V); assert.ok(still.subject, 'a subject'); assert.equal((still.camera as any).subjectKind, 'core-median'); assert.equal((still.camera as any).coreInView, SUBJECT_SAMPLES); assert.equal((still.camera as any).preset, 'orbit');
+  const s = still.subject!; assert.ok(s.x < 0.5 && s.x + s.w > 0.5 && s.y < 0.6 && s.y + s.h > 0.4, `the Core is where the subject is: ${JSON.stringify(s)}`);
+  assert.ok(s.w < 0.2 && s.h < 0.2, 'the Core, not the room');
+  // the same Core is another rectangle in another aspect (the frame is another shape)
+  assert.notDeepEqual(measureSubject(Array.from({ length: SUBJECT_SAMPLES }, () => at(0)), core, p, 'orbit').subject, s);
+  // a Core that crosses the frame: the subject is its place in a typical frame, and the record keeps the whole sweep
+  const sweep = measureSubject(Array.from({ length: SUBJECT_SAMPLES }, (_, i) => at(-0.8 + 1.6 * i / (SUBJECT_SAMPLES - 1))), core, z, 'door-to-core');
+  assert.ok(sweep.subject && sweep.subject.w < 0.2, 'the median is a Core, not the sweep'); assert.ok((sweep.camera as any).subjectUnion.w > sweep.subject!.w * 3, 'and the record says how far it moves');
+  // out of view in half the frames or more: nothing true can be said, so none is declared, and the record says why
+  const half = (n: number) => Array.from({ length: 12 }, (_, i) => (i < n ? at(0) : { ...at(0), target: [30, 0.1, 3] as [number, number, number] }));
+  assert.equal(measureSubject(half(5), core, z, 'orbit').subject, null); assert.match((measureSubject(half(5), core, z, 'orbit').camera as any).why, /in view in 5 of 12/);
+  assert.ok(measureSubject(half(6), core, z, 'orbit').subject, 'in half of the frames it is a subject');
+  assert.equal(measureSubject([], core, z, 'x').subject, null); assert.equal(measureSubject([at(0)], null, z, 'x').subject, null); assert.match((measureSubject([at(0)], null, z, 'x').camera as any).why, /no Core/);
+  // a plate with no subject is a plate the contract allows, and its record is the measurement's: it names no fixed rectangle
+  const info = homeInfo('garden-flat'), claims: any = loadCtx(ROOT).claims, none = measureSubject(half(0), core, z, 'orbit'), plate = (m: ReturnType<typeof measureSubject>) => ({ file: 'plates/landscape/orbit.0123abcd.mp4', sha256: 'a'.repeat(64), durationS: 10, width: 960, height: 540, ...(m.subject ? { subject: m.subject } : {}), camera: { ...m.camera, segmentKey: 'k' } });
+  const beats = homeBeats(info, ['orbit'], () => ({ landscape: plate(none) }) as any), m = buildHomeManifest({ info, beats, text: homeText(info, claims), profile: { chromium: 'c', renderer: 'r', ffmpeg: 'f', gl: 'default' }, lighting: 'day', platesSha: 'a'.repeat(16), claimsSha: 'b'.repeat(16), inputsSha: 'c'.repeat(16) });
+  assert.deepEqual(checkPlates(m, SCHEMA), []); assert.equal(m.beats[0].plates.landscape.subject, undefined); assert.equal(m.beats[0].plates.landscape.camera.subjectKind, 'none');
+  // the home tour's code names no fixed rectangle for a plate any more (DEFAULT_SUBJECT is a family plate's fallback, recorded as declared)
+  const cli = fs.readFileSync(path.join(import.meta.dirname, 'film', 'plates', 'cli.mts'), 'utf8'), run = cli.slice(cli.indexOf('export async function runHome'), cli.indexOf('// ---- the probe'));
+  assert.ok(!/DEFAULT_SUBJECT/.test(run), 'runHome declares a measured subject or none');
+});
 test('a manifest that breaks the contract is caught by the mirrored schema and the renderer\'s own checks', async () => {
   const fam = await loadFamily('brennan', { silent: true }), claims: any = loadCtx(ROOT).claims;
   const good = () => { const t = familyText(fam.rs, claims); return { v: 1, kind: 'family-film', id: 'x', displayName: 'X', family: { slug: 'x', name: 'X', place: 'P', tagline: 'T' }, lighting: 'day', fps: 30, text: t, audio: null, beats: [{ id: 'a', member: null, title: 'T', chips: [{ app: 'A', pairText: 'A, alternative to B' }], plates: { landscape: { file: 'plates/landscape/a.mp4', sha256: 'a'.repeat(64), durationS: 1, width: 960, height: 540 } } }] } as any; };
@@ -531,17 +556,33 @@ test('the fleet queue: the Brennans first, the rest of the families, the homes l
   assert.deepEqual(o.map(x => x.id), ['brennan', 'brennan-hollin', 'brennan-merrow', 'adler', 'zed', 'garden-flat', 'two-bed-flat']);
   assert.deepEqual(o.map(x => x.kind), ['family', 'family', 'family', 'family', 'family', 'home', 'home']);
   assert.deepEqual(orderOf(fams, homes, ['zed', 'garden-flat']).slice(0, 3).map(x => x.id), ['zed', 'garden-flat', 'brennan']);
+  // a home is named by its house id or by the film id it is known by (the loft is `warehouse-loft`, its house `studio-loft`): --only and --order take either
+  const all = orderOf(['brennan', 'adler'], ['studio-loft', 'garden-flat']);
+  assert.deepEqual(all.map(x => [x.id, filmIdOf(x)]), [['brennan', 'brennan'], ['adler', 'adler'], ['garden-flat', 'garden-flat'], ['studio-loft', 'warehouse-loft']]);
+  assert.deepEqual(pickNames(all, ['warehouse-loft', 'adler']).picked.map(x => x.id), ['studio-loft', 'adler']); assert.deepEqual(pickNames(all, ['studio-loft', 'warehouse-loft']).picked.map(x => x.id), ['studio-loft'], 'one home named twice is one item');
+  assert.deepEqual(pickNames(all, ['nonesuch', 'garden-flat']), { picked: [all[2]], unknown: ['nonesuch'] });
+  assert.deepEqual(orderOf(['brennan', 'adler'], ['studio-loft', 'garden-flat'], ['warehouse-loft']).map(x => x.id), ['studio-loft', 'brennan', 'adler', 'garden-flat']);
+  assert.equal(resolveHome('studio-loft'), 'studio-loft'); assert.equal(resolveHome('warehouse-loft'), 'studio-loft'); assert.equal(resolveHome('nonesuch'), null); assert.equal(kindOf('warehouse-loft', false), 'home', 'the plates CLI takes the film id too');
   const dir = tmp('queue');
   return withEnv({ CI_QUEUE_FILE: path.join(dir, 'queue.json') }, () => {
     assert.equal(readQueue(), null);
     let q: Queue = mergeQueue(null, orderOf(['brennan', 'adler'], ['garden-flat']), '16x9,9x16');
     assert.deepEqual(q.items.map(i => i.film), ['brennan', 'adler', 'garden-flat'], 'a home is filmed under its display id');
-    q.items[0].modes.draft = { state: 'wrapped', seconds: { plates: 10, wrap: 5 } }; q.gl = { chosen: 'nvidia', probe: null }; writeQueue(q);
+    q.items[0].modes.draft = { state: 'wrapped', seconds: { plates: 10, wrap: 5 } }; q.gl = { draft: { chosen: 'nvidia', res: 540, probe: null } }; writeQueue(q);
     q = mergeQueue(readQueue(), orderOf(['brennan', 'adler', 'banerjee'], ['garden-flat']), '16x9');
-    assert.equal(q.items[0].modes.draft?.state, 'wrapped', 'the state of an item already in the queue is kept'); assert.equal(q.gl?.chosen, 'nvidia', 'and so is the GL path (a resumed run does not draw every plate again)'); assert.equal(q.aspect, '16x9,9x16');
+    assert.equal(q.items[0].modes.draft?.state, 'wrapped', 'the state of an item already in the queue is kept'); assert.equal(q.gl.draft?.chosen, 'nvidia', 'and so is the draft\'s GL path (a resumed run does not draw every plate again)'); assert.equal(q.aspect, '16x9,9x16');
+    assert.equal(q.gl.final, undefined, 'the finals have no path yet: it is measured at 1080 p, when they start (the two paths swap places between 540 p and 1080 p)');
+    // a queue from before the GL path was chosen for each mode carries one path probed at 540 p: it is not the finals', so it is dropped
+    const old = JSON.parse(fs.readFileSync(path.join(dir, 'queue.json'), 'utf8')); old.gl = { chosen: 'nvidia', probe: null }; fs.writeFileSync(path.join(dir, 'queue.json'), JSON.stringify(old));
+    assert.deepEqual(readQueue()!.gl, {});
     assert.deepEqual(q.items.map(i => i.id), ['brennan', 'adler', 'banerjee', 'garden-flat'].sort((a, b) => ['brennan', 'adler', 'banerjee', 'garden-flat'].indexOf(a) - ['brennan', 'adler', 'banerjee', 'garden-flat'].indexOf(b)).length ? q.items.map(i => i.id) : []);
     assert.equal(q.items.find(i => i.id === 'banerjee')!.modes.draft, undefined);
     assert.deepEqual([MODES.draft.res, MODES.final.res, MODES.draft.quality, MODES.final.quality], [540, 1080, 'draft', 'high']);
+    // the report says plainly which short cuts the kit refused
+    assert.deepEqual(cutsOf({ cuts: { passed: ['a-30'], failed: [{ id: 'a-15', why: 'x' }] } }), { passed: ['a-30'], refused: ['a-15'] }); assert.deepEqual(cutsOf(null), { passed: [], refused: [] });
+    q.items[0].modes.draft = { state: 'wrapped', cuts: { passed: [], refused: ['brennan-15', 'brennan-30'] } };
+    const note = shortCutsNote(q).join('\n'); assert.match(note, /four lines/); assert.match(note, /29 of the 30 families/); assert.match(note, /brennan draft \(brennan-15, brennan-30\)/); assert.match(note, /not shortened/);
+    assert.match(shortCutsNote({ ...q, items: [] }).join('\n'), /Nothing is wrapped yet/);
     const d = modeEnv('draft'), f = modeEnv('final');
     assert.ok(d.CI_PLATES_OUT && d.CI_KIT_OUT && d.CI_PLATES_OUT !== path.join(ROOT, 'video', 'plates')); assert.deepEqual(f, {});
   });

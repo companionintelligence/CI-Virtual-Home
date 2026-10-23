@@ -126,5 +126,24 @@ export async function renderRange(page: any, f0: number, f1: number, out: string
   return { frames: f1 - f0, bytes: bytes.length, sha256: sha256(bytes), spreadMin: Math.min(...spread), wallSeconds: (Date.now() - t0) / 1000 };
 }
 
+/**
+ * Read back the camera of a prepared home-tour shot (`window.__plates.prepareShot` has been called) at `n` frames spread over [0, frames - 1], and the Core's box. Each frame is drawn through the page's own
+ * `__houseRenderFrames(i)` (a pure function of i, random access: drawing one changes no other) and the pose is the live camera's, so the pose is the one that drew the plate, not a copy of its maths.
+ * Called AFTER a plate is drawn (or with none to draw), never inside it.
+ */
+export async function sampleShot(page: any, frames: number, n: number): Promise<{ core: number[] | null; samples: Array<{ i: number; eye: [number, number, number]; target: [number, number, number]; fov: number }> }> {
+  return page.evaluate(([count, k]: number[]) => {
+    const W: any = window, THREE = W.__THREE, cam = W.__houseDebug().camera, world = W.__houseShotWorld(), samples: any[] = [];
+    for (let j = 0; j < k; j++) {
+      const i = Math.round((count - 1) * j / Math.max(1, k - 1));
+      W.__houseRenderFrames(i, 1, null);
+      cam.updateMatrixWorld(true);
+      const eye = new THREE.Vector3().setFromMatrixPosition(cam.matrixWorld), fwd = new THREE.Vector3(0, 0, -1).transformDirection(cam.matrixWorld);
+      samples.push({ i, eye: eye.toArray(), target: eye.clone().addScaledVector(fwd, 10).toArray(), fov: cam.fov });
+    }
+    return { core: world.hero && world.hero.core ? Array.from(world.hero.core as ArrayLike<number>) : null, samples };
+  }, [frames, n]);
+}
+
 /** The host the numbers were made on, for the report (never for a key). */
 export const machine = (): string => `${os.cpus()[0]?.model?.trim() || 'cpu'} x${os.cpus().length}, load ${fs.readFileSync('/proc/loadavg', 'utf8').trim().split(' ').slice(0, 3).join(' ')}`;
