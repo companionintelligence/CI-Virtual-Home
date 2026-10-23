@@ -60,6 +60,8 @@ export const SHOT_BUDGET = 90 * 1024;
 export const LOGO_PX = 128;
 export const SHOT_PX = 960;
 export const CAPTION_TAIL = 'Not a recording of this family.';
+/** The reason recorded for a capture that exists at the pin and has no entry in SHOT_SHOWS and VETTED yet: it is not used until someone looks at it (the test warns). */
+export const UNLOOKED = 'Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).';
 /** The caption of an app's screenshot, exactly (story-v2.md): the owner's wording, never edited per app. */
 export const appCaption = (name: string): string => `Real screenshot of ${name} from a Companion Hub QA run. ${CAPTION_TAIL}`;
 export const HUB_CAPTION_HEAD = 'Real screenshot of Companion Hub';

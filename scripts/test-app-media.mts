@@ -13,16 +13,19 @@
 //   tree          nothing is in portal/apps or portal/ci that the manifest does not name (and nothing else is in them)
 //   rules         the manifest check catches a missing alt, a wrong caption, a missing file, a wrong size and a file that is not its hash
 //   encoder       (ffmpeg with libwebp) a synthetic logo and screenshot encode to the same bytes twice, at the size and with the
-//                 transparency the contract asks for; and, when CI-Marketplace, CI-Hub and CI-Portal are beside this repo at the pinned commits, a
-//                 build of a few apps and every Companion Hub and account page shot is made twice into temp dirs and compared byte for byte
-//   stale         an app a family uses that has no entry is a warning, not a failure (portal:build says the same)
+//                 transparency the contract asks for; and, when CI-Marketplace, CI-Hub and CI-Portal are beside this repo at the pinned commits, the whole
+//                 `story:media --check` (every file and the manifest are what the pinned sources give) and a build of a few apps and every Companion Hub and
+//                 account page shot made twice into temp dirs and compared byte for byte
+//   stale         an app a family or a persona pool names that has no entry in the manifest (and is not in noMedia) FAILS: the gate that keeps the manifest from
+//                 falling behind the stories unnoticed. It reads the committed manifest and the stories only, so it holds in CI with no sibling repo
+//                 (portal:build says the same, and fails on it under --strict-families). A capture nobody has vetted is a warning, not a failure
 // Exit 0 when all hold; 1 otherwise. Needs no network, no browser and no GPU.
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
-  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, appCaption, HUB_CAPTION_HEAD, PORTAL_CAPTION_HEAD,
+  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, UNLOOKED, appCaption, HUB_CAPTION_HEAD, PORTAL_CAPTION_HEAD,
   readMedia, checkManifest, checkPageImages, staleApps, usedAppIds, imageSize, webpHasAlpha, stable, imageTag, shotFigure, logoImg, appMedia,
   type MediaManifest,
 } from './story/lib/media.mts';
@@ -149,8 +152,24 @@ caught('a rejection with no reason', x => { x.rejected.push({ kind: 'shot', id: 
 console.log('\nstale');
 const used = usedAppIds(ROOT), stale = staleApps(m, ROOT);
 ok(used.length >= 70, `${used.length} apps are used by the families, the persona pools, the plan and the first-party trio`);
-if (stale.length) note(`warning: ${stale.length} app${stale.length === 1 ? '' : 's'} a family uses ${stale.length === 1 ? 'has' : 'have'} no entry (pnpm run story:media): ${stale.join(', ')}`);
-else ok(true, 'every app a story uses has an entry');
+// A GATE, not a warning (it was one until 2026-10: the manifest then fell 34 logos behind the stories and nothing said so). It reads only the committed
+// manifest and the stories, so it runs in CI with no sibling repo: an app a family or a persona pool names must have an entry (a logo, or a screenshot) or
+// be listed in noMedia (on purpose: the logo was held back, see REJECT_LOGO). The fix is `pnpm run story:media` and a look at what it made.
+ok(stale.length === 0, `every app a story or a persona pool names has an entry in ${MANIFEST} or is in noMedia${stale.length ? ` (missing: ${stale.join(', ')}; run pnpm run story:media with the sibling repos beside this one)` : ''}`);
+ok(m.noMedia.every(id => m.rejected.some(r => r.kind === 'logo' && r.id === id)), `every app in noMedia says why its logo is not shown in "rejected" (${m.noMedia.join(', ') || 'none'})`);
+ok(m.rejected.filter(r => r.kind === 'logo').every(r => !m.apps[r.id]?.logo), 'no logo is both shipped and rejected');
+const unlooked = m.rejected.filter(r => r.reason === UNLOOKED).map(r => r.id);
+if (unlooked.length) note(`warning: ${unlooked.length} QA capture${unlooked.length === 1 ? '' : 's'} nobody has looked at yet (not used): ${unlooked.join(', ')}`);
+{
+  // the gate itself: a manifest that lost an app a story names, or never had a newly named one, is stale (and an app held in noMedia is not)
+  const x = clone();
+  const gone = used.find(id => x.apps[id]) as string;
+  delete x.apps[gone];
+  ok(staleApps(x, ROOT).includes(gone), 'an app a story names that has no entry is reported stale');
+  x.noMedia.push(gone);
+  ok(!staleApps(x, ROOT).includes(gone), 'an app listed in noMedia is not');
+  ok(staleApps(null, ROOT).length === used.length, 'no manifest at all makes every used app stale');
+}
 
 // ---- the encoder ------------------------------------------------------------------------------------------------------------------------
 console.log('\nencoder');
@@ -163,6 +182,9 @@ else {
   const have = [['CI-Marketplace', m.sources.marketplace], ['CI-Hub', m.sources.hub], ['CI-Portal', m.sources.portal]].every(([r, sha]) => fs.existsSync(path.join(sibling(r), '.git')) && spawnSync('git', ['-C', sibling(r), 'cat-file', '-e', `${sha}^{commit}`]).status === 0);
   if (!have) note('skipped: CI-Marketplace, CI-Hub and CI-Portal are not beside this repo at the pinned commits (the build twice into temp dirs runs where they are)');
   else {
+    // the whole check, where the sources are: every file and the manifest are what the pinned commits give (about half a minute)
+    const chk = node(['--check']);
+    ok(chk.status === 0, `story:media --check: the manifest and every file are what the pinned sources give${chk.status === 0 ? '' : `: ${chk.out.split('\n').filter(l => !/nobody has looked/.test(l)).join(' | ').trim().slice(0, 400)}`}`);
     const sample = ['nextcloud', 'immich', 'pi-hole', 'code-server', 'ci-memory', 'grocy'].filter(id => m.apps[id]);
     const t1 = fs.mkdtempSync(path.join(os.tmpdir(), 'app-media-a-')), t2 = fs.mkdtempSync(path.join(os.tmpdir(), 'app-media-b-'));
     try {

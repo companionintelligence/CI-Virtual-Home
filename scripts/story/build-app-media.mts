@@ -28,7 +28,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from '../portal-lib.mts';
 import {
-  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, appCaption, hash10, imageSize, webpHasAlpha, usedAppIds, checkManifest, stable,
+  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, UNLOOKED, appCaption, hash10, imageSize, webpHasAlpha, usedAppIds, checkManifest, stable,
   type MediaManifest, type MediaImage, type MediaShot, type CiShot, type Rejected, type AppMedia,
 } from './lib/media.mts';
 
@@ -137,6 +137,18 @@ const REJECT_SHOT: Record<string, string> = {
   'vikunja': 'Shows the local address 127.0.0.1:19997.',
   'wingfit': 'Shows an error toast ("You must be authenticated"), a photograph of people and a personal GitHub handle.',
   'wordpress': 'The install language list, with the WordPress logo cut off at the top.',
+};
+
+/**
+ * The logos that are held back, and why (looked at full size on 2026-10-22; each lands in the manifest's `rejected` list as a `logo`). The store listing's
+ * mark is not always the app's own mark, and a logo "identifies the app named beside it", so one that identifies something else does not ship: the app is
+ * then shown by its name alone (an app with neither a logo nor a screenshot is listed in `noMedia`). The owner may overrule any of them by deleting the entry.
+ */
+const REJECT_LOGO: Record<string, string> = {
+  'whisper-webui': 'The listing\'s mark is the OpenAI Whisper logo (the OpenAI blossom over the word "Whisper"): another company\'s mark, which would read as OpenAI\'s endorsement of a different project. Shown by name only unless the owner clears it or the project supplies its own mark.',
+  'taxhacker': 'The listing\'s mark is an illustrated anime-style hooded character at a laptop, not a product mark: it identifies nothing of the app and reads as a person or a character.',
+  'tandoor': 'The listing\'s mark is a photograph of cooked food (256 px, blurred at 128 px), not a mark: a photograph, and nothing of it identifies the app.',
+  'razzia': 'The listing\'s "logo" file is a 1920 x 947 screenshot of the app\'s PIN-code sign-in page, not a mark: scaled to 128 px it is an unreadable dark tile, and it is a sign-in page (found by eye after the audit, which listed only the other three).',
 };
 
 type CiChoice = { id: string; repo: Repo; path: string; oid: string; alt: string; caption: string };
@@ -328,7 +340,8 @@ function build(): Built {
     // the logo: the app's own mark from the store listing, the PNG (transparency) before the others
     let logo: MediaImage | null = null;
     const logoFile = LOGO_FILES.map(f => `apps/${id}/metadata/${f}`).find(p => hasBlob('marketplace', SOURCES.marketplace, p));
-    if (logoFile) {
+    if (REJECT_LOGO[id]) { /* held back by eye: the reason is in `rejected` below */ }
+    else if (logoFile) {
       const webp = encodeLogo(blob('marketplace', SOURCES.marketplace, logoFile));
       const size = imageSize(webp)!;
       const rel = named(`portal/apps/${id}`, 'logo', webp);
@@ -342,7 +355,11 @@ function build(): Built {
     const source = `CI-Marketplace ${shotPath}@${sha12('marketplace')}`;
     if (REJECT_SHOT[id]) rejected.push({ kind: 'shot', id, source, reason: REJECT_SHOT[id] });
     else if (!hasBlob('marketplace', SOURCES.marketplace, shotPath)) rejected.push({ kind: 'shot', id, source, reason: `The source has none: ${shotPath} does not exist.` });
-    else if (!SHOT_SHOWS[id] || !VETTED[id]) { log.push(`${id}: ${shotPath} exists but nobody has looked at it (no entry in SHOT_SHOWS and VETTED): not used`); }
+    else if (!SHOT_SHOWS[id] || !VETTED[id]) {
+      // a capture nobody has looked at is never shipped, and the manifest says so (the test notes it as a warning: someone should look)
+      log.push(`${id}: ${shotPath} exists but nobody has looked at it (no entry in SHOT_SHOWS and VETTED): not used`);
+      rejected.push({ kind: 'shot', id, source, reason: UNLOOKED });
+    }
     else {
       const seen = oid12('marketplace', SOURCES.marketplace, shotPath);
       if (seen !== VETTED[id]) die(`${id}: ${shotPath} is blob ${seen} at ${sha12('marketplace')}, not the ${VETTED[id]} that was looked at: look at it again, then update VETTED (and SHOT_SHOWS)`);
@@ -354,6 +371,12 @@ function build(): Built {
       note(`  ${id} shot ${(bytes.length / 1024).toFixed(1)} KB q${quality}`);
     }
     if (!logo && !shot) noMedia.push(id); else apps[id] = { name, logo, shot };
+  }
+
+  // the logos held back by eye (every one, whether a story names the app yet or not: the rule must already hold when one does)
+  for (const [id, reason] of Object.entries(REJECT_LOGO)) {
+    const logoFile = LOGO_FILES.map(f => `apps/${id}/metadata/${f}`).find(p => hasBlob('marketplace', SOURCES.marketplace, p)) || `apps/${id}/metadata/logo.png`;
+    rejected.push({ kind: 'logo', id, source: `CI-Marketplace ${logoFile}@${sha12('marketplace')}`, reason });
   }
 
   // Companion Hub and the Companion account page

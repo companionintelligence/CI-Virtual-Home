@@ -167,6 +167,9 @@ const appMedia = await (async () => {
   for (const s of [...manifest.ci.hub, ...manifest.ci.portal]) named.set(s.file, s.caption);
   for (const rel of named.keys()) copy(rel);
   const stale = media.staleApps(manifest, ROOT);
+  // a push to main builds strict (--strict-families / CI_STORY_STRICT=1): an app a story or a persona pool names with no manifest entry is then an error, so a
+  // manifest that fell behind the stories cannot be deployed unnoticed (scripts/test-app-media.mts holds the same line in the quick gates, with no sibling repo needed)
+  if (stale.length && (args['strict-families'] === 'true' || process.env.CI_STORY_STRICT === '1')) problems.push(`app media: ${stale.length} app${stale.length === 1 ? '' : 's'} a family or a persona pool names ${stale.length === 1 ? 'has' : 'have'} no entry in ${media.MANIFEST} (--strict-families wants every app covered; pnpm run story:media): ${stale.join(', ')}`);
   console.log(`app media: ${named.size} files shipped (${manifest.rejected.length} candidates rejected, see ${media.MANIFEST})${stale.length ? `\n  warning: ${stale.length} app${stale.length === 1 ? '' : 's'} a family uses ${stale.length === 1 ? 'has' : 'have'} no entry in ${media.MANIFEST} (pnpm run story:media): ${stale.join(', ')}` : ''}`);
   return { media, manifest, named };
 })();
