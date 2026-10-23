@@ -1,0 +1,1439 @@
+{
+  "schema": "family/v1",
+  "slug": "penhallow",
+  "house": "garden-flat",
+  "fictional": true,
+  "family": {
+    "surname": "Penhallow",
+    "tagline": "A level flat, a quiet terrace and one Companion Core.",
+    "household": "grandparents",
+    "business": false,
+    "story": "Wilfred, a retired solicitor, still advises two clients from the Study, where the Core sits. Anwen cooks and keeps the terrace, and their grandchild Petra has the room with the desk. One Companion Core serves all three.",
+    "address": {
+      "line": "3 Chandlers Wharf",
+      "place": "Quayside Mews"
+    },
+    "narrator": "v-storyteller-m",
+    "home": {
+      "lede": "The flat is on the ground floor of a low timber block, level from the street door to every room. Wide glass opens the living and dining room onto a fenced terrace with planters and string lights. The Study sits straight ahead of the front door.",
+      "spots": [
+        {
+          "room": "Study",
+          "line": "The Core sits on the desk, with a ladder shelf beside it."
+        },
+        {
+          "room": "Living & Dining",
+          "line": "A sofa faces the TV, and a round table stands by the glass."
+        },
+        {
+          "room": "Kitchen",
+          "line": "A run of counters with a range, a sink and a fridge."
+        },
+        {
+          "room": "Grandchild's Bedroom",
+          "line": "A small desk with cube shelves beside it."
+        },
+        {
+          "room": "Garden Terrace",
+          "line": "A patio set and a fire bowl, with planters under string lights."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "study-summary",
+        "line": "Wilfred starts the day with Tamarind's first read of a lease."
+      },
+      {
+        "at": "morning",
+        "beat": "kitchen-schedule",
+        "line": "Anwen lays the week's dates out by the fridge."
+      },
+      {
+        "at": "midday",
+        "beat": "dining-sign",
+        "line": "A client calls round and signs at the table."
+      },
+      {
+        "at": "afternoon",
+        "beat": "terrace-sources",
+        "line": "Wilfred reads on the terrace and keeps what he will cite."
+      },
+      {
+        "at": "after-school",
+        "beat": "kids-reader",
+        "line": "Petra curls up at her desk with a story."
+      },
+      {
+        "at": "weekend",
+        "beat": "living-quiz",
+        "line": "The family quiz fills the living room with groans and cheers."
+      },
+      {
+        "at": "weekend",
+        "beat": "terrace-music",
+        "line": "Sunday lunch moves outside, with a playlist Anwen made."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "wilfred",
+      "name": "Wilfred",
+      "age": 67,
+      "role": "grandparent",
+      "work": "retired solicitor, still advises two clients",
+      "colour": "chart-1",
+      "archetype": "lawyer",
+      "companion": {
+        "name": "Tamarind",
+        "runtime": "OpenClaw",
+        "job": "Opens Nextcloud in its own browser and files the letters Wilfred lists.",
+        "personality": [
+          "steady",
+          "patient",
+          "practical"
+        ],
+        "voice": "v-steady-m",
+        "memory": true,
+        "limits": "Files and drafts only. Wilfred reads every page before it stands."
+      },
+      "profile": {
+        "bio": "Wilfred is a retired solicitor who still advises two clients from the Study, where the Core sits. His folders and drafts sit on the Core, and Tamarind prepares the chores he approves."
+      }
+    },
+    {
+      "id": "anwen",
+      "name": "Anwen",
+      "age": 65,
+      "role": "grandparent",
+      "work": "cooks and keeps the terrace",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Fenugreek",
+        "runtime": "Hermes",
+        "job": "Drafts the messages Anwen lists and waits for her to send them.",
+        "personality": [
+          "warm",
+          "patient",
+          "calm"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Anwen reads each message and sends it herself."
+      },
+      "profile": {
+        "bio": "Anwen cooks for the family and keeps the terrace. Her recipes, lists and photographs sit on the Core, and Fenugreek drafts the messages she approves."
+      }
+    },
+    {
+      "id": "petra",
+      "name": "Petra",
+      "age": 9,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner",
+      "profile": {
+        "bio": "Petra has the room with the desk. She reads, records her own stories and writes the questions for the family quiz."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "Wilfred's study"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Petra's room"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The round table"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "terrace",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the terrace"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the front door",
+        "body": "The courier leaves the parcel at the front door. Wilfred carries it down the level passage to the Study, and Petra holds the doors."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Four things in the parcel",
+        "body": "Anwen lifts out the Companion Core, a small computer for the home. Beneath it are a power cable, a quick-start guide and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plugged in on the desk",
+        "body": "Wilfred plugs the Core in behind the desk, and Petra presses the button. The Core wakes and opens its own Wi-Fi network."
+      }
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Anwen joins from her phone",
+        "body": "Anwen joins the Core's own network from her phone's Wi-Fi settings. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nextcloud",
+        "kitchenowl"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Two agents, three apps to start",
+        "body": "In the Companion Hub store, Wilfred picks OpenClaw and Anwen picks Hermes. The family adds Companion Memory, Nextcloud and KitchenOwl, then walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Companion Memory",
+            "Apps: Nextcloud, KitchenOwl"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "wilfred",
+      "agent": "wilfred",
+      "approval": "wilfred",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Tamarind answers from the desk",
+        "body": "Wilfred greets the agent he named Tamarind. The answer comes from the Core on the desk beside him.",
+        "chips": [
+          "OpenClaw"
+        ]
+      },
+      "say": {
+        "speaker": "wilfred",
+        "text": "Good morning, Wilfred. Tamarind here. Where shall we start?"
+      },
+      "detail": {
+        "before": "Every reminder and every reply was typed by Wilfred himself, between one client call and the next.",
+        "after": "Tamarind runs in its own sandbox on the Core. Wilfred names the chores, and Tamarind prepares them for him to approve.",
+        "steps": [
+          "Pick OpenClaw in the Companion Hub store",
+          "Give the agent a name",
+          "Say hello and name the first chore"
+        ],
+        "fact": "OpenClaw is an agent with its own browser, running in its own sandbox on your Core."
+      }
+    },
+    {
+      "id": "study-summary",
+      "chapter": "study",
+      "member": "wilfred",
+      "agent": "wilfred",
+      "approval": "wilfred",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk and gives your agents individual context",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Tamarind summarises the old lease",
+        "body": "Tamarind drafts a first-pass summary of a lease from the folder Wilfred connected to Companion Memory. Wilfred checks it against the lease, line by line.",
+        "chips": [
+          "Companion Memory"
+        ]
+      },
+      "say": {
+        "speaker": "wilfred",
+        "text": "Here is the summary. Please check it against the lease before you rely on it."
+      },
+      "detail": {
+        "before": "A new lease meant reading every page before Wilfred could judge what it said.",
+        "after": "Tamarind drafts a summary on the Core from the folder in Companion Memory. Wilfred reads the lease itself and corrects the draft.",
+        "steps": [
+          "Connect the lease folder to Companion Memory",
+          "Ask Tamarind for a first-pass summary",
+          "Check each point against the lease"
+        ],
+        "fact": "Companion Memory gives OpenClaw and Hermes individual context from what you connect, and nothing is connected by default."
+      }
+    },
+    {
+      "id": "study-folders",
+      "chapter": "study",
+      "member": "wilfred",
+      "agent": "wilfred",
+      "approval": "wilfred",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "OneDrive"
+        ]
+      },
+      "service": "onedrive",
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Two clients, two folders",
+        "body": "When the firm's shared drive closed, Wilfred kept his two clients' folders in Nextcloud. Tamarind files the scanned letters, and Wilfred checks each one.",
+        "chips": [
+          "Nextcloud",
+          "alternative to OneDrive"
+        ]
+      },
+      "detail": {
+        "before": "Wilfred's client folders lived in a OneDrive the firm ran, and the drive closed when he retired.",
+        "after": "Nextcloud keeps one folder per client on the Core. Tamarind files each scanned letter, and Wilfred opens it before it stays.",
+        "steps": [
+          "Create a folder for each client",
+          "Tell Tamarind which letters to file",
+          "Check each filed letter"
+        ],
+        "fact": "Nextcloud keeps your files, calendar and contacts on your own Core, synced to your devices."
+      }
+    },
+    {
+      "id": "study-backup",
+      "chapter": "study",
+      "member": "wilfred",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Carbonite"
+        ]
+      },
+      "service": "carbonite",
+      "capability": "back up your files with encryption before they leave your Core",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A second copy on the shelf",
+        "body": "Duplicati copies the client folders to a USB drive on the Study shelf, encrypting them first. Wilfred looks at the drive each Friday.",
+        "chips": [
+          "Duplicati",
+          "alternative to Carbonite"
+        ]
+      },
+      "detail": {
+        "before": "Wilfred's client folders were copied to Carbonite, and the copy sat out of his sight.",
+        "after": "Duplicati encrypts the folders and copies them to a local USB drive. Wilfred keeps the drive on the Study shelf.",
+        "steps": [
+          "Choose the client folders",
+          "Pick the USB drive as the destination",
+          "Look at the drive each Friday"
+        ],
+        "fact": "Duplicati backs up your files with encryption before they leave your Core."
+      }
+    },
+    {
+      "id": "kids-reader",
+      "chapter": "kids",
+      "member": "petra",
+      "category": "kids",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Apple Books"
+        ]
+      },
+      "service": "apple-books",
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A story that reads itself aloud",
+        "body": "Petra opens her new book in Koodo Reader and turns on read-aloud. The library lives on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "alternative to Apple Books"
+        ]
+      },
+      "detail": {
+        "before": "Petra's picture books lived in Apple Books, on one tablet.",
+        "after": "Koodo Reader opens the family's own ebooks in a browser, with notes, highlights and read-aloud. The library sits on the Core.",
+        "steps": [
+          "Open Koodo Reader in a browser",
+          "Pick the book",
+          "Turn on read-aloud"
+        ],
+        "fact": "Koodo Reader reads ebooks in your browser, with notes, highlights and text-to-speech, and your library lives on your Core."
+      }
+    },
+    {
+      "id": "kids-record",
+      "chapter": "kids",
+      "member": "petra",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "TwistedWave"
+        ]
+      },
+      "service": "twistedwave",
+      "capability": "edit audio in a browser tab: cut, fade, normalise and export",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A story told, trimmed and kept",
+        "body": "Petra records her story on the tablet, then trims the cough at the start in AudioMass. She saves the file to the Core, in the folder she chooses.",
+        "chips": [
+          "AudioMass",
+          "alternative to TwistedWave"
+        ]
+      },
+      "detail": {
+        "before": "Petra's first recordings were TwistedWave files on Wilfred's old laptop.",
+        "after": "AudioMass opens in a browser tab served from the Core. Petra cuts, fades and exports, and the file goes where she chooses.",
+        "steps": [
+          "Open the recording in AudioMass",
+          "Cut the cough at the start",
+          "Export to her folder on the Core"
+        ],
+        "fact": "AudioMass edits audio in a browser tab: cut, fade, normalise and export."
+      }
+    },
+    {
+      "id": "dining-merge",
+      "chapter": "dining",
+      "member": "wilfred",
+      "category": "productivity",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Smallpdf"
+        ]
+      },
+      "service": "smallpdf",
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The schedules join the contract",
+        "body": "Wilfred merges a contract and its schedules into one PDF in Stirling-PDF, on the Core, not on a PDF website.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Smallpdf"
+        ]
+      },
+      "detail": {
+        "before": "Wilfred merged PDFs by uploading each set of pages to Smallpdf, then downloading the result.",
+        "after": "Stirling-PDF merges, splits and compresses PDFs on the Core. Wilfred opens it in a browser tab and saves the result to the client folder.",
+        "steps": [
+          "Open Stirling-PDF in a browser tab",
+          "Drop in the contract and its schedules",
+          "Save the merged file to the client folder"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+      }
+    },
+    {
+      "id": "dining-sign",
+      "chapter": "dining",
+      "member": "wilfred",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "service": "docusign",
+      "capability": "fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The engagement letter, signed here",
+        "body": "A client calls round, and Wilfred opens the engagement letter in Docuseal on a tablet. She signs at the round table, and the signed copy joins her folder.",
+        "chips": [
+          "Docuseal",
+          "alternative to DocuSign"
+        ]
+      },
+      "detail": {
+        "before": "Engagement letters went out through DocuSign, and the signed copy came back to an inbox.",
+        "after": "Docuseal fills and signs the PDF on the Core. The client signs on Wilfred's tablet in the room, and the file joins her folder.",
+        "steps": [
+          "Open the engagement letter in Docuseal",
+          "Hand the tablet across the table",
+          "File the signed copy"
+        ],
+        "fact": "Docuseal fills and signs PDF forms on any device, from your own Core."
+      }
+    },
+    {
+      "id": "living-note",
+      "chapter": "living",
+      "member": "wilfred",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "cryptgeon",
+        "replaces": [
+          "Privnote"
+        ]
+      },
+      "service": "privnote",
+      "capability": "send a note or file as a one-time link that destroys itself after it is read",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A note that burns after reading",
+        "body": "A client needs a password Wilfred will not email. He writes it into Cryptgeon and holds the tablet out once. The note then destroys itself.",
+        "chips": [
+          "Cryptgeon",
+          "alternative to Privnote"
+        ]
+      },
+      "detail": {
+        "before": "Wilfred used Privnote for one-time notes.",
+        "after": "Cryptgeon makes the one-time note on the Core. Wilfred hands the tablet across the table, and the note destroys itself after it is read.",
+        "steps": [
+          "Write the password into Cryptgeon",
+          "Hold the tablet out to the client once",
+          "Let the note destroy itself"
+        ],
+        "fact": "Cryptgeon sends a note or file as a one-time link that destroys itself after it is read."
+      }
+    },
+    {
+      "id": "living-quiz",
+      "chapter": "living",
+      "member": "petra",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "razzia",
+        "replaces": []
+      },
+      "capability": "run a quiz night for a small group on your own Core",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Petra writes the family quiz",
+        "body": "Petra types the questions for the family quiz into Razzia. Wilfred and Anwen answer from the sofa, and Wilfred gets one wrong on purpose.",
+        "chips": [
+          "Razzia"
+        ]
+      },
+      "detail": {
+        "before": "Quiz night meant questions on scraps of paper and a pencil for the score.",
+        "after": "Razzia runs the quiz from the Core. Petra types the questions, and the grandparents answer on their own screens.",
+        "steps": [
+          "Open Razzia in a browser tab",
+          "Type the questions",
+          "Start the quiz for the family"
+        ],
+        "fact": "Razzia runs a quiz night for a small group on your own Core."
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "service": "nextdns",
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Every screen asks the Core first",
+        "body": "The television, the tablets and both phones ask the Core's Pi-hole where to go first. Pi-hole blocks ad and tracker domains for every device on the network.",
+        "chips": [
+          "Pi-hole",
+          "alternative to NextDNS"
+        ]
+      },
+      "detail": {
+        "before": "Each device in the flat was pointed at NextDNS, one setting at a time.",
+        "after": "Pi-hole answers for every device on the home network and blocks ad and tracker domains. The router now asks the Core first.",
+        "steps": [
+          "Point the router at the Core",
+          "Let every device ask Pi-hole first"
+        ],
+        "fact": "Pi-hole blocks ads, trackers and bad domains for every device on your network at the DNS level."
+      }
+    },
+    {
+      "id": "living-listen",
+      "chapter": "living",
+      "member": "anwen",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Apple Podcasts"
+        ]
+      },
+      "service": "apple-podcasts",
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The story waits where she stopped",
+        "body": "Anwen's podcast pauses when the kettle boils, and Audiobookshelf keeps her place. She picks the episode up by the fireplace after lunch.",
+        "chips": [
+          "Audiobookshelf",
+          "alternative to Apple Podcasts"
+        ]
+      },
+      "detail": {
+        "before": "Anwen's podcasts lived in Apple Podcasts, and the place she stopped lived on one phone.",
+        "after": "Audiobookshelf holds the audiobooks and podcasts on the Core and remembers where she stopped, on any of the family's devices.",
+        "steps": [
+          "Add the podcast to Audiobookshelf",
+          "Listen in the kitchen",
+          "Pick the episode up by the fireplace"
+        ],
+        "fact": "Audiobookshelf plays audiobooks and podcasts and picks up where you left off on any device."
+      }
+    },
+    {
+      "id": "living-pair",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "service": "airdrop",
+      "capability": "send files between phones and laptops on the same Wi-Fi",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A photo hops to Wilfred's tablet",
+        "body": "A photo from Petra's school trip hops from Anwen's phone to Wilfred's tablet with PairDrop. Both devices are on the home Wi-Fi.",
+        "chips": [
+          "PairDrop",
+          "alternative to AirDrop"
+        ]
+      },
+      "detail": {
+        "before": "Photos moved between the family's devices with AirDrop, one device at a time.",
+        "after": "PairDrop sends files between phones, tablets and laptops on the same Wi-Fi, in a browser tab on each.",
+        "steps": [
+          "Open PairDrop on both devices",
+          "Pick the photo",
+          "Send it to the other device"
+        ],
+        "fact": "PairDrop sends files between phones and laptops on the same Wi-Fi."
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "anwen",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "counter",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One list for the whole week",
+        "body": "Anwen plans the week's dinners in KitchenOwl. Wilfred and Petra add to the same shopping list from the sofa.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "detail": {
+        "before": "The week's dinners lived in Anwen's head and on the backs of envelopes.",
+        "after": "KitchenOwl keeps the grocery list, the recipes and the week's meals on the Core. Everyone in the flat adds to the one list.",
+        "steps": [
+          "Plan the week's dinners",
+          "Add what the pantry lacks",
+          "Let the others add to the list"
+        ],
+        "fact": "KitchenOwl is a shared grocery list, recipe book, meal planner and expense tracker for the household."
+      }
+    },
+    {
+      "id": "kitchen-recipes",
+      "chapter": "kitchen",
+      "member": "anwen",
+      "category": "food",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "service": "notion",
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "range",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A recipe book with chapters",
+        "body": "Anwen writes her recipes into BookStack, a chapter for soups and one for puddings. Each page keeps its history.",
+        "chips": [
+          "BookStack",
+          "alternative to Notion"
+        ]
+      },
+      "detail": {
+        "before": "Anwen's recipes were scattered across a Notion page, a few texts and a card box.",
+        "after": "BookStack writes the recipes as a book on the Core, with chapters, search and page history.",
+        "steps": [
+          "Start a book for the family recipes",
+          "Add a chapter for soups",
+          "Write the stew, then edit it later"
+        ],
+        "fact": "BookStack writes a wiki or a set of manuals in books, chapters and pages, with search and history."
+      }
+    },
+    {
+      "id": "kitchen-text",
+      "chapter": "kitchen",
+      "member": "anwen",
+      "agent": "anwen",
+      "approval": "anwen",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "counter",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Fenugreek drafts the invitation",
+        "body": "Fenugreek drafts a message inviting the neighbours to Saturday's plant swap on the terrace. Anwen reads it, changes a word and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "anwen",
+        "text": "Here is a draft for the neighbours. Please read it before you send it."
+      },
+      "detail": {
+        "before": "Every invitation was typed out by hand on Anwen's phone.",
+        "after": "Fenugreek runs in a sandbox on the Core and replies through the messaging app Anwen picked. Those messages travel through that chat service.",
+        "steps": [
+          "Ask Fenugreek for a draft",
+          "Read it and change a word",
+          "Send it herself"
+        ],
+        "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+      }
+    },
+    {
+      "id": "kitchen-schedule",
+      "chapter": "kitchen",
+      "member": "anwen",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "service": "google-calendar",
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The school run joins the calendar",
+        "body": "Anwen puts the school run, the dentist and the plant swap on one calendar in Baikal. Wilfred's phone shows the same week.",
+        "chips": [
+          "Baikal",
+          "alternative to Google Calendar"
+        ]
+      },
+      "detail": {
+        "before": "Anwen kept the family's dates in Google Calendar and copied them to Wilfred by hand.",
+        "after": "Baikal is a small CalDAV and CardDAV server on the Core. The phones read the one family calendar from it.",
+        "steps": [
+          "Add the Core's calendar to each phone",
+          "Enter the school run and the dentist",
+          "Let Wilfred's phone read the same week"
+        ],
+        "fact": "Baikal is a small CalDAV and CardDAV server for your calendars and contacts."
+      }
+    },
+    {
+      "id": "kitchen-receipt",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "service": "evernote",
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "counter",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The dishwasher's receipt is found",
+        "body": "When the dishwasher stops mid-cycle, the receipt and the paperwork are in Papra, filed the day it arrived. A search for the brand name finds both.",
+        "chips": [
+          "Papra",
+          "alternative to Evernote"
+        ]
+      },
+      "detail": {
+        "before": "Receipts went into an Evernote notebook called house, and the dishwasher's was never found.",
+        "after": "Papra archives the receipts, warranties and contracts the household rarely looks at, on the Core, until the day one is needed.",
+        "steps": [
+          "Scan the receipt",
+          "File it with the paperwork",
+          "Search for it when the dishwasher stops"
+        ],
+        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+      }
+    },
+    {
+      "id": "terrace-seasons",
+      "chapter": "terrace",
+      "member": "anwen",
+      "category": "media",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "librephotos",
+        "replaces": [
+          "iCloud Photos"
+        ]
+      },
+      "service": "icloud-photos",
+      "capability": "find photos by face, object and place, with albums built by date and location",
+      "anchor": {
+        "role": "garden",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The same planter, three springs",
+        "body": "Anwen photographs the herb planter each April, and LibrePhotos builds an album by date. Three springs show the thyme growing.",
+        "chips": [
+          "LibrePhotos",
+          "alternative to iCloud Photos"
+        ]
+      },
+      "detail": {
+        "before": "The planter's pictures were in iCloud Photos, mixed with everything else on Anwen's phone.",
+        "after": "LibrePhotos keeps the photos on the Core and builds albums by date and place. Anwen opens the April album and finds all three years side by side.",
+        "steps": [
+          "Add the photos to LibrePhotos",
+          "Open the album sorted by date",
+          "Compare the thyme year by year"
+        ],
+        "fact": "LibrePhotos finds photos by face, object and place, with albums built by date and location."
+      }
+    },
+    {
+      "id": "terrace-music",
+      "chapter": "terrace",
+      "member": "anwen",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "mstream",
+        "replaces": [
+          "Apple Music"
+        ]
+      },
+      "service": "apple-music",
+      "capability": "stream your own music from your Core to a browser or an app",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "patio-seat"
+          },
+          {
+            "role": "garden",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sunday lunch gets its own music",
+        "body": "Anwen plays her own music collection on the terrace, streamed from the Core with mStream. The playlists are files she keeps.",
+        "chips": [
+          "mStream",
+          "alternative to Apple Music"
+        ]
+      },
+      "detail": {
+        "before": "Anwen's playlists were built in Apple Music, apart from the songs she already owned.",
+        "after": "mStream plays the music files on the Core in a browser on the terrace. The playlists are made from her own files.",
+        "steps": [
+          "Point mStream at the music folder",
+          "Make a playlist for Sunday lunch",
+          "Play it in a browser on the terrace"
+        ],
+        "fact": "mStream streams your own music from your Core to a browser or an app."
+      }
+    },
+    {
+      "id": "terrace-rota",
+      "chapter": "terrace",
+      "member": "anwen",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "Tody"
+        ]
+      },
+      "service": "tody",
+      "capability": "assign and track household chores and recurring tasks, with NFC tag completion",
+      "anchor": {
+        "role": "garden",
+        "nth": 3,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The watering can has a tag",
+        "body": "A tag on the watering can marks the job done when Wilfred taps it with his phone. Donetick keeps the rota for the pots and the bins.",
+        "chips": [
+          "Donetick",
+          "alternative to Tody"
+        ]
+      },
+      "detail": {
+        "before": "Anwen's chores were in Tody, and the terrace jobs lived on a chart nobody updated.",
+        "after": "Donetick assigns each job and its turn on the Core, and a tag on the can marks it done.",
+        "steps": [
+          "Add the terrace jobs and who has them",
+          "Stick a tag on the watering can",
+          "Tap it to mark the job done"
+        ],
+        "fact": "Donetick assigns and tracks household chores and recurring tasks, with NFC tag completion."
+      }
+    },
+    {
+      "id": "terrace-sources",
+      "chapter": "terrace",
+      "member": "wilfred",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Raindrop.io"
+        ]
+      },
+      "service": "raindrop-io",
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A cited page stays readable",
+        "body": "Reading on the terrace, Wilfred saves the page he will cite in Linkwarden. The copy keeps a screenshot and a PDF, so the source is still there next year.",
+        "chips": [
+          "Linkwarden",
+          "alternative to Raindrop.io"
+        ]
+      },
+      "detail": {
+        "before": "Wilfred bookmarked each cited page in Raindrop.io, and a few of the links later led nowhere.",
+        "after": "Linkwarden saves each cited page with a screenshot and a PDF on the Core, so the page he read is still there.",
+        "steps": [
+          "Save the page in Linkwarden",
+          "Tag it with the matter",
+          "Open the saved copy when the link fails"
+        ],
+        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+      }
+    },
+    {
+      "id": "terrace-sketch",
+      "chapter": "terrace",
+      "member": "petra",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "service": "miro",
+      "capability": "a whiteboard with a hand-drawn look to sketch ideas together",
+      "anchor": {
+        "role": "garden",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 4
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Petra sketches next year's planters",
+        "body": "Petra and Anwen sketch next year's planters on a shared whiteboard in Excalidraw, which runs on the Core.",
+        "chips": [
+          "Excalidraw",
+          "alternative to Miro"
+        ]
+      },
+      "detail": {
+        "before": "Petra's first sketches were Miro boards, one for each idea.",
+        "after": "Excalidraw is a whiteboard with a hand-drawn look. It runs on the Core, so it opens in a browser tab anywhere in the flat.",
+        "steps": [
+          "Open Excalidraw in a browser tab",
+          "Draw the planters and the paths",
+          "Add the herbs Anwen picks"
+        ],
+        "fact": "Excalidraw is a whiteboard with a hand-drawn look, for sketching ideas together."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one level flat",
+        "body": "Client folders, recipes, photographs and homework run on one Companion Core. The flat is level from the street door to the terrace."
+      }
+    }
+  ],
+  "closing": {
+    "body": "Your letters, recipes and family photographs can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The plan's signature apps home-assistant and hortusfox are left out on purpose: both are over the fleet's 40 percent cap. The terrace is told through Donetick, LibrePhotos and mStream, and the network through Pi-hole.",
+    "The house has no kitchen island, so the kitchen beats anchor on the counter, the range and the fridge. The Study has no desk item of its own: Wilfred's beats anchor on the Core, the ladder shelf and the room.",
+    "Tamarind (OpenClaw) acts only on Nextcloud on the Core and no beat opens an outside site. Fenugreek (Hermes) drafts and Anwen sends. Three agent lines in the file.",
+    "The Study is narrow: the Core can be framed only from the passage, so the first-run beats and study-summary share that view. The ftue beats carry no side or eye hint for the same reason.",
+    "Terrace beats use the bench, the patio, the planter and two beds. patio-seat nth 1 and garden nth 0 are the communal back garden north of the block, so the beats avoid them. Eyes stand on the pavement over the hedge.",
+    "Every app has a QA screenshot in the catalog, so no reviewed.json entry is needed. Pairs are written alternative to; none is on the lander hold list. Docuseal is in-room only and never called binding."
+  ]
+}
