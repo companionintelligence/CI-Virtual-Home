@@ -243,7 +243,8 @@ html[data-story] .vh-help { z-index: 7; }
   line-height: 1.3; width: 100%; max-width: none;
 }
 .st-start-card[data-layout="sheet"] { max-height: 50%; }
-.st-start-card[data-layout="panel"] { width: 45%; max-width: 45%; max-height: 100%; }
+/* (at most 45 % of the width, but never narrower than 17.5rem: below 660 px of width, an iPhone SE held on its side, 45 % is 255 px, in which the kicker's first word, "INTERACTIVE", set at the scale's size with its tracking, is wider than the line and breaks in the middle) */
+.st-start-card[data-layout="panel"] { width: max(45%, 17.5rem); max-width: max(45%, 17.5rem); max-height: 100%; }
 .st-start-card[data-layout="sheet"] .st-start-kick, .st-start-card[data-layout="panel"] .st-start-kick { margin: 0 0 0.3rem; line-height: 1.15; }
 .st-start-card[data-layout="sheet"] h2, .st-start-card[data-layout="panel"] h2 { margin: 0 0 0.35rem; line-height: 1.06; }
 .st-start-card[data-layout="sheet"] .st-start-p, .st-start-card[data-layout="panel"] .st-start-p { margin: 0; line-height: 1.3; }

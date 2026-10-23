@@ -506,7 +506,7 @@ export class Director {
     const bars = this.barRects();
     // a phone on its side takes the side panel (whatever its width: 740 px is the phone's type scale but not a layout for a sheet), a phone upright the sheet
     const side = sidePhone(o.w, o.h);
-    const out: ReturnType<typeof placePopup> & { type: number } | SheetOut & { type: number } =!side && sheetLayout(o.w, o.h) ? this.placeSheetFor(o, focus, core, bars) : this.placePanelFor(o, focus, core, bars, side);
+    const out: ReturnType<typeof placePopup> & { type: number } | SheetOut & { type: number } = !side && sheetLayout(o.w, o.h) ? this.placeSheetFor(o, focus, core, bars) : this.placePanelFor(o, focus, core, bars, side);
     this.card.put(out.rect, out.mode, 'where' in out ? (out as SheetOut).where : undefined);
     this.place_ = { rect: out.rect, mode: out.mode, subject: focus, ok: out.ok, overlapFocus: out.overlapFocus, slot: out.slot, variant: out.variant, scrolls: out.scrolls, type: out.type, refused: out.refused };
   }

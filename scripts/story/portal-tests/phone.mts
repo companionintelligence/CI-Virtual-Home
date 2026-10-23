@@ -51,7 +51,7 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     const vis = (e: Element) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && !e.closest('[hidden]') && Number(s.opacity) > 0.01; };
     const box = (e: Element | null) => { if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, r: r.right, b: r.bottom }; };
     // text past the card it is in (a row that scrolls sideways is judged by its own box)
-    const clip: string[] = [];
+    const clip: string[] = [], broken: string[] = [];
     for (const card of Array.from(document.querySelectorAll('.st-card, .st-start-card, .st-end, .vh-help'))) {
       if (!vis(card)) continue; const cr = card.getBoundingClientRect();
       const w = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
@@ -59,9 +59,17 @@ export default async function phone(ctx: TestCtx): Promise<void> {
         if (!(n.textContent || '').trim()) continue; const e = n.parentElement; if (!e || e.closest('[hidden]') || e.closest('.st-members-list, .st-chips, .st-live-region')) continue;
         const rg = document.createRange(); rg.selectNodeContents(n);
         for (const r of Array.from(rg.getClientRects())) if (r.width > 0 && (r.right > cr.right + 0.5 || r.left < cr.left - 0.5)) { clip.push(`${(card as HTMLElement).className}: ${(n.textContent || '').trim().slice(0, 30)}`); break; }
+        // a word broken in the middle (overflow-wrap: anywhere does it to a word wider than its line): a word, or a part of one up to its hyphen, whose box is on two lines. A page's own text only (not what scrolls out of view in a card).
+        if (e.closest('.st-live-region')) continue;
+        const text = n.textContent || '';
+        for (const m of text.matchAll(/[^\s-]+-?/g)) {
+          const wr = document.createRange(); wr.setStart(n, m.index!); wr.setEnd(n, m.index! + m[0].length);
+          const tops = new Set(Array.from(wr.getClientRects()).filter(q => q.width > 0.5).map(q => Math.round(q.top / 4)));
+          if (tops.size > 1) { broken.push(`${(card as HTMLElement).className.split(' ')[0]}: ${m[0]}`); break; }
+        }
       }
     }
-    return { vw, vh, hOverflow: de.scrollWidth > vw + 1 || document.body.scrollWidth > vw + 1, clip };
+    return { vw, vh, hOverflow: de.scrollWidth > vw + 1 || document.body.scrollWidth > vw + 1, clip, broken };
   };
   const SMALL = (scope: string) => {
     const out: string[] = [];
@@ -130,7 +138,9 @@ export default async function phone(ctx: TestCtx): Promise<void> {
       ok(st.top >= st.vh * 0.5 - 1, `${label}: the home shows above it (the sheet starts at ${Math.round(st.top / st.vh * 100)} % of the height)`);
       ok(st.prim.top >= st.vh * 2 / 3 - 1 && st.prim.bottom <= st.vh && st.prim.h >= 43.5, `${label}: the primary action is ${Math.round(st.prim.h)} px tall and in the bottom third (its top at ${Math.round(st.prim.top / st.vh * 100)} % of the height)`);
     } else {
-      ok(st.layout === 'panel' && st.w <= st.vw * SIDE_PANEL + 0.5 && st.right <= st.vw * SIDE_PANEL + 8 + 0.5 && st.h <= st.vh + 0.5, `${label}: the start card is a side panel ${Math.round(st.w)} px wide, ${(st.w / st.vw * 100).toFixed(1)} % of the width (at most 45 %), inside the window`);
+      // (at most 45 % of the width, but never narrower than 17.5rem = 297.5 px, where 45 % is too narrow for the kicker's first word: a window under 660 px wide)
+      const panelMax = Math.max(st.vw * SIDE_PANEL, 17.5 * 17);
+      ok(st.layout === 'panel' && st.w <= panelMax + 0.5 && st.right <= panelMax + 8 + 0.5 && st.h <= st.vh + 0.5, `${label}: the start card is a side panel ${Math.round(st.w)} px wide, ${(st.w / st.vw * 100).toFixed(1)} % of the width (at most 45 %, or 17.5rem on a window under 660 px wide), inside the window`);
       ok(st.prim.h >= 43.5 && st.prim.bottom <= st.vh && st.prim.top >= 0, `${label}: the primary action is ${Math.round(st.prim.h)} px tall and in view`);
     }
     ok(st.kick === 'Interactive tour' && !!st.title && !!st.tag && st.titleShown && st.tagShown, `${label}: the kicker, the title ("${st.title}") and the tagline are on the sheet`);
@@ -145,7 +155,7 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     const alpha0 = Number((/\/ ([\d.]+)\)/.exec(st.scrim) || [])[1]), band = Number((/\/ [\d.]+\) ([\d.]+)px/.exec(st.scrim) || [])[1]);
     ok(alpha0 >= 0.2 && band >= st.barsBottom - 0.5 && st.hits.length > 0 && st.hits.every(Boolean), `${label}: the dialog takes the taps over the top bar and the scrim veils it (${(alpha0 * 100).toFixed(0)} % to ${band} px, where the bar and the home's label end at ${Math.round(st.barsBottom)} px), so the bar does not look live while it is dead`);
     const v1 = await page.evaluate(VIEW);
-    ok(!v1.hOverflow && v1.clip.length === 0, `${label}: no sideways scroll and no text past its card on the start sheet${v1.clip.length ? ': ' + v1.clip.slice(0, 2).join(' | ') : ''}`);
+    ok(!v1.hOverflow && v1.clip.length === 0 && v1.broken.length === 0, `${label}: no sideways scroll, no text past its card and no word broken in the middle on the start sheet${v1.clip.length ? ': ' + v1.clip.slice(0, 2).join(' | ') : ''}${v1.broken.length ? ': broken ' + v1.broken.slice(0, 3).join(' | ') : ''}`);
     const small1 = await page.evaluate(SMALL, '.st-start');
     ok(small1.length === 0, `${label}: every control of the start sheet is a 44 px target${small1.length ? ': ' + small1.join(', ') : ''}`);
     // the disclosure opens, and its words are in view (the sheet scrolls to them), still inside the limit
@@ -272,7 +282,7 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     ok(withMore.length > 0 && withMore.every(r => r.moreH >= 43.5 && r.moreIn), `${label}: "More" is a 44 px target inside the card in all ${withMore.length} beats that have one`);
     // the card's own words never leave it
     const v2 = await page.evaluate(VIEW);
-    ok(!v2.hOverflow && v2.clip.length === 0, `${label}: no sideways scroll and no text past its card on the beat sheet${v2.clip.length ? ': ' + v2.clip.slice(0, 2).join(' | ') : ''}`);
+    ok(!v2.hOverflow && v2.clip.length === 0 && v2.broken.length === 0, `${label}: no sideways scroll, no text past its card and no word broken in the middle on the beat sheet${v2.clip.length ? ': ' + v2.clip.slice(0, 2).join(' | ') : ''}${v2.broken.length ? ': broken ' + v2.broken.slice(0, 3).join(' | ') : ''}`);
     // the agent's line grows the sheet downward and moves nothing that is read
     const grow = await page.evaluate(async () => {
       const api = (window as any).__houseStory, rs = api.rs; const i = rs.beats.findIndex((b: any) => b.say); if (i < 0) return null;
@@ -350,6 +360,8 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     ok(end.minBtn >= 43.5, `${label}: every button of the end card is a 44 px target (the smallest is ${Math.round(end.minBtn)} px)`);
     if (sz.side) ok(end.side === '1' && end.ctaInBar && end.barSticky === 'sticky', `${label}: on its side the call to action is the bar that sticks to the bottom edge of the panel (${end.barSticky})`);
     else ok(end.side !== '1' && !end.ctaInBar, `${label}: held upright the call to action is the first button of the row, as it always was`);
+    const v3 = await page.evaluate(VIEW);
+    ok(!v3.hOverflow && v3.clip.length === 0 && v3.broken.length === 0, `${label}: no sideways scroll, no text past its card and no word broken in the middle on the end card${v3.clip.length ? ': ' + v3.clip.slice(0, 2).join(' | ') : ''}${v3.broken.length ? ': broken ' + v3.broken.slice(0, 3).join(' | ') : ''}`);
     // no layout shift on the way in: the player's own bars stayed where they were (the sheets are over the scene, not in the page's flow)
     const after = await page.evaluate(() => { const bar = (document.querySelector('.vh-top') as HTMLElement).getBoundingClientRect(), d = (document.querySelector('.vh-dock') as HTMLElement).getBoundingClientRect(); return { bar: [bar.left, bar.top, bar.width, bar.height], dock: [d.left, d.top, d.width, d.height], cls: ((window as any).__cls || []).filter((e: any) => e.t >= 0).reduce((a: number, e: any) => a + e.v, 0) }; });
     ok(JSON.stringify(after.bar.map(Math.round)) === JSON.stringify(quiet.bar.map(Math.round)) && JSON.stringify(after.dock.map(Math.round)) === JSON.stringify(quiet.dock.map(Math.round)), `${label}: the top bar and the dock did not move from the start sheet to the end card`);
