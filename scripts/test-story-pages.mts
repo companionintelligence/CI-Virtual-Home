@@ -155,7 +155,9 @@ for (const s of L.stories) {
     const t = pageOf(s, {}, { campaign: false }), on = pageOf(s, {}, { campaign: true });
     const head = (t.match(/<header class="site-head">[\s\S]*?<\/header>/) || [''])[0], foot = (t.match(/<footer[\s\S]*?<\/footer>/) || [''])[0], main = (t.match(/<main[\s\S]*?<\/main>/) || [''])[0];
     for (const part of [head, foot]) assert.ok(part.includes(`href="${LINKS.core}"`) && />Buy Companion Core</.test(part), 'Buy Companion Core in the chrome');
-    for (const part of [head, foot]) assert.ok(part.includes(`href="${LINKS.download}">Download Companion</a>`), 'Download Companion in the chrome');
+    // (the header's two links carry the short forms a phone shows, "Download" and "Buy Core", in a span of their own; the footer's are plain)
+    assert.ok(head.includes(`href="${LINKS.download}"><span class="nav-long">Download Companion</span><span class="nav-short">Download</span></a>`) && head.includes(`href="${LINKS.core}"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>`), 'Download Companion and Buy Companion Core in the header, with the phone\'s short forms');
+    assert.ok(foot.includes(`href="${LINKS.download}">Download Companion</a>`), 'Download Companion in the footer');
     assert.ok(!/Buy Companion Core/.test(main), 'the story says See Companion Core, not Buy');
     assert.equal((main.match(new RegExp(`href="${LINKS.core}"[^>]*>See Companion Core<`, 'g')) || []).length, 2, 'See Companion Core in the hero and at the close');
     assert.ok(!t.includes('campaign.js') && on.includes('<script src="../portal/campaign.js" defer data-cfasync="false"></script>'), 'campaign.js is loaded only when the build has it, exactly as its header says');

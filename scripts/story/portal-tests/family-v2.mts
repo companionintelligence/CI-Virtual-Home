@@ -137,19 +137,19 @@ export default async function familyV2(ctx: TestCtx): Promise<void> {
       const cls = await page.evaluate(() => (window as any).__cls as number);
       ok(cls < 0.03, `${tag}: the lazy images shift nothing as they arrive (layout shift ${cls.toFixed(4)})`);
       // the nav sticks under the header, follows the scroll, and does not change size
-      const navBox = () => page.evaluate(() => { const n = document.querySelector('.who-nav')!, r = n.getBoundingClientRect(); return { top: Math.round(r.top), h: Math.round(r.height), w: Math.round(r.width), pos: getComputedStyle(n).position, cur: (document.querySelector('.who-nav a[aria-current]') as HTMLElement | null)?.getAttribute('href') || '' }; });
+      const navBox = () => page.evaluate(() => { const n = document.querySelector('.who-nav')!, r = n.getBoundingClientRect(); return { top: Math.round(r.top), head: Math.round(document.querySelector('.site-head')!.getBoundingClientRect().bottom), h: Math.round(r.height), w: Math.round(r.width), pos: getComputedStyle(n).position, cur: (document.querySelector('.who-nav a[aria-current]') as HTMLElement | null)?.getAttribute('href') || '' }; });
       await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; });
       const first = await navBox();
       const sizes: string[] = [`${first.h}x${first.w}`];
       const followed: string[] = [];
       for (const id of people) {
-        await page.evaluate((id: string) => { const e = document.getElementById(id)!; window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 140); }, id);
+        await page.evaluate((id: string) => { const e = document.getElementById(id)!; window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 100); }, id);
         await sleep(450);
         const n = await navBox();
         sizes.push(`${n.h}x${n.w}`);
-        followed.push(n.cur === `#${id}` && n.pos === 'sticky' && n.top >= 54 && n.top <= 58 ? 'ok' : `${id}: ${JSON.stringify(n)}`);
+        followed.push(n.cur === `#${id}` && n.pos === 'sticky' && Math.abs(n.top - n.head) <= 3 ? 'ok' : `${id}: ${JSON.stringify(n)}`);
       }
-      ok(followed.every(x => x === 'ok'), `${tag}: the person nav sticks under the header and its aria-current follows the scroll through ${people.join(', ')}${followed.some(x => x !== 'ok') ? ' (' + followed.filter(x => x !== 'ok').join(' | ') + ')' : ''}`);
+      ok(followed.every(x => x === 'ok'), `${tag}: the person nav sticks right under the header (whatever its height) and its aria-current follows the scroll through ${people.join(', ')}${followed.some(x => x !== 'ok') ? ' (' + followed.filter(x => x !== 'ok').join(' | ') + ')' : ''}`);
       ok(new Set(sizes).size === 1, `${tag}: and it never changes size as it follows (${[...new Set(sizes)].join(', ')})`);
       // a person's anchor lands under the bars, not behind them
       await page.evaluate(() => window.scrollTo(0, 0));

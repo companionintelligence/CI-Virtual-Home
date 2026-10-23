@@ -134,7 +134,6 @@
 @media (max-width: 900px) {
   :root { --grid-gutter: 16px; --grid-margin: 16px; }
 }
-}
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -151,6 +150,9 @@ body {
   word-spacing: var(--font-word-spacing);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* a phone turned on its side with a notch: the content stays out of the cut-out (0 everywhere else). Fixed and absolute edge elements add the same insets themselves. */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 /* text links: the ring colour, the ink on hover, a 1px rule in the current colour */
 a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: color 0.15s ease; }
@@ -165,8 +167,8 @@ kbd {
   padding: 1px 6px; border-radius: var(--radius-control);
   border: 1px solid var(--hairline); color: var(--muted-foreground);
 }
-.skip { position: absolute; left: 12px; top: -60px; padding: 8px 12px; border-radius: var(--radius-control); background: var(--button-primary); color: var(--button-primary-foreground); z-index: 40; }
-.skip:focus { top: 12px; }
+.skip { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); top: -60px; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--radius-control); background: var(--button-primary); color: var(--button-primary-foreground); z-index: 40; }
+.skip:focus { top: max(12px, env(safe-area-inset-top, 0px)); }
 
 /* ---------------- header ----------------
    Sticky, so Buy and Download are in reach at every scroll position, on a phone too: a solid band on the page's
@@ -325,7 +327,7 @@ html { scroll-padding-top: 80px; }
 .count { font-size: 14px; font-weight: 500; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
 .search {
   display: flex; align-items: center; gap: 8px;
-  height: 44px; width: 340px; padding: 0 10px 0 14px;
+  height: 46px; width: 340px; padding: 0 10px 0 14px;
   border: 1px solid var(--pg-hairline-strong); border-radius: var(--radius-control);
   background: var(--pg-surface);
   color: var(--muted-foreground);
@@ -336,18 +338,18 @@ html { scroll-padding-top: 80px; }
 .search input::placeholder { color: color-mix(in srgb, var(--muted-foreground) 80%, transparent); }
 .search input::-webkit-search-cancel-button { -webkit-appearance: none; }
 .search .i { width: 16px; height: 16px; }
-/* The storeys control and the style tags are small outlined controls with a 44 px touch target: the element is 44 px
-   tall and a transparent border keeps the drawn control (background-clip: padding-box) at its visual size. */
+/* The kind-of-place control and the chips are small outlined controls with a 44 px touch target: the control is 46 px (its two hairlines round 44 px buttons),
+   a chip is 44 px with a transparent border that keeps the drawn control (background-clip: padding-box) at its visual size. */
 .seg {
-  display: inline-flex; align-items: center; padding: 0 3px; gap: 2px;
-  height: 44px;
+  display: inline-flex; align-items: center; padding: 0 1px; gap: 0;
+  height: 46px;
   border: 1px solid var(--pg-hairline-strong); border-radius: var(--radius-control);
   background: var(--pg-surface);
 }
 .seg-label { padding: 0 6px 0 12px; font-size: 12.5px; font-weight: 600; color: var(--muted-foreground); white-space: nowrap; }
 .seg button {
-  height: 42px; min-width: 42px; padding: 0 13px;
-  border: 0; border-block: 5px solid transparent; background-clip: padding-box;
+  height: 44px; min-width: 44px; padding: 0 13px;
+  border: 0;
   border-radius: var(--radius-control); background-color: transparent; cursor: pointer;
   font-size: 13.5px; font-weight: 500; color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
@@ -619,6 +621,7 @@ html { scroll-padding-top: 80px; }
 html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:disabled { opacity: 1; }
 .jobs { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin-top: 18px; }
 .jobs-label { margin-right: 6px; }
+.jobs-row { display: contents; }   /* (a phone makes it the row that scrolls sideways, below) */
 .jobs .tag { font-size: 14px; color: var(--foreground); padding: 0 15px; }
 .jobs .tag[aria-pressed="true"] { color: var(--button-primary-foreground); }
 .swap .types { margin-top: 14px; }
@@ -666,12 +669,21 @@ html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:
   .search { flex: 1 1 220px; width: auto; }
   .search kbd { display: none; }
   .foot-grid { grid-template-columns: 1fr; }
-  .foot-links ul { columns: 2 180px; column-gap: 28px; }
+  .foot-links ul { columns: 2 140px; column-gap: 28px; }
   .argument-steps { grid-template-columns: 1fr; gap: 16px; }
   .proof-pair { grid-template-columns: 1fr; gap: 22px; }
   .proof-after::before { left: 50%; top: -17px; margin: 0 0 0 -6px; transform: rotate(135deg); }
   .cta-band.has-fig { grid-template-columns: minmax(0, 1fr); }
   .core-fig { grid-column: 1; grid-row: auto; }
+}
+/* "Virtual homes" beside the lockup is for a screen that has the room: below 600 px the bar is the lockup and the two links */
+@media (max-width: 600px) {
+  .brand .brand-title, .brand-sep { display: none; }   /* (.brand a sets display, so the title needs the same specificity) */
+}
+/* the short labels from 780 px down: with Docs and the long "Download Companion" and "Buy Companion Core" the bar needs 746 px */
+@media (max-width: 780px) {
+  .nav-long { display: none; }
+  .nav-short { display: inline; }
 }
 @media (max-width: 700px) {
   .site-nav .nav-docs { display: none; }
@@ -685,9 +697,6 @@ html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:
   .brand { gap: 10px; }
   .brand-logo { height: 40px; }
   .site-head { --pg-head-h: 56px; }
-  .brand .brand-title, .brand-sep { display: none; }   /* (.brand a sets display, so the title needs the same specificity) */
-  .nav-long { display: none; }
-  .nav-short { display: inline; }
   .site-nav a { padding: 0 8px; }
   .site-nav .nav-buy { padding: 0 12px; margin-left: 4px; }
   .hero { padding-top: 14px; padding-bottom: 20px; gap: 22px; }
@@ -707,9 +716,12 @@ html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:
   .tag { flex: none; }
   .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .pair { padding: 8px 12px; }
-  .jobs { flex-wrap: nowrap; overflow-x: auto; margin: 16px calc(-1 * var(--grid-margin)) 0; padding: 0 var(--grid-margin); scroll-padding-inline: var(--grid-margin); scrollbar-width: none; scroll-snap-type: x proximity; }
-  .jobs::-webkit-scrollbar { display: none; }
-  .jobs-label, .jobs .tag { flex: none; scroll-snap-align: start; }
+  /* the label sits over a row of chips that scrolls sideways (the first chip is always in view, whatever the width) */
+  .jobs { display: block; margin-top: 16px; }
+  .jobs-label { display: block; margin: 0 0 4px; }
+  .jobs-row { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; margin: 0 calc(-1 * var(--grid-margin)); padding: 0 var(--grid-margin); scroll-padding-inline: var(--grid-margin); scrollbar-width: none; scroll-snap-type: x proximity; }
+  .jobs-row::-webkit-scrollbar { display: none; }
+  .jobs .tag { flex: none; scroll-snap-align: start; }
   .all-homes > summary { width: 100%; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; padding-top: 14px; }
   .card-body { padding-top: 8px; }
@@ -727,24 +739,96 @@ html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:
      about three rows; the first card, the one that names the same people's other homes, takes the row */
   .card-family .card-body { padding-top: 8px; }
   .card-family .cast, .card-family .pairs-lines, .card-family .go { display: none; }
-  .card-family .home-line { font-size: 12.5px; }
   #grid > .card-family:first-child { grid-column: 1 / -1; }
   #grid > .card-family:first-child h3 { font-size: 18px; line-height: 1.3; }
   #grid > .card-family:first-child .go { display: inline-flex; }
   .card-family .thumb-play span { display: none; }
   .homes { padding-bottom: 40px; }
   .site-foot { padding-bottom: 24px; }
-  .argument-steps > li { padding: 18px 18px 16px; }
+  /* the three steps are one list on a phone (a rule between them, no card round each): the same words, a screen less to scroll past */
+  .argument-steps { gap: 0; margin-top: 14px; }
+  .argument-steps > li { padding: 16px 0 16px; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; background: transparent; }
+  .argument-steps > li:first-child { border-top: 0; padding-top: 4px; }
+  .argument-steps h3 { margin-bottom: 6px; }
+  .argument-steps p { line-height: 1.5; }
+  .proof-pair { margin-top: 16px; gap: 20px; }
+  .proof-pair > div { padding: 16px 18px; }
+  .proof-chips { margin-top: 12px; }
+  .proof-actions { margin-top: 14px; gap: 0 16px; }
+  .cta-band { padding: 18px; gap: 16px; }
+  .cta-actions { margin-top: 18px; }
+}
+
+/* ---------------- phones: type floors, targets, the footer ----------------
+   Reading text is 16 px, the small print (disclosures, captions, notes, the footer) 14 px, a label or a chip 13 px, on a phone upright (up to 700 px wide) and on its side
+   (a short screen that cannot hover). The desktop sizes above are unchanged. A control is 44 px tall or more (a row of chips that scrolls sideways is judged by its own
+   row), and a text field is 16 px so a phone does not zoom in on it. portal-tests/mobile-site.mts holds all of it. */
+@media (max-width: 700px), (max-height: 500px) and (hover: none) {
+  .lede-families, .homes-count, .proof-limit { font-size: 16px; }
+  .hero-hint, .hero-noscript, .chip, .pair span, .home-line, .home-note, .crumbs, .fact, .home-facts .fact, .card .style, .siblings, .go { font-size: 14px; }
+  .home-facts .fact { height: 32px; }
+  .pair b { font-size: 16px; }
+  .card h3 { font-size: 16px; }
+  .card .facts { font-size: 14px; }
+  .thumb-missing span { font-size: 13px; }
+  .search input { font-size: 16px; }
+  .jobs .tag, .tag { font-size: 14px; }
+  .cta-limits p, .cta-copy .cta-limits p, .core-fig figcaption, .cta-copy .cta-note, .foot-notes p, .apps-named, .site-foot, .foot-homes a, .foot-links a, .foot-apps summary { font-size: 14px; }
+  .legal { font-size: 13px; }
+  .site-nav a { font-size: 15px; }
+  .site-nav .nav-buy { font-size: 15px; }
+  .site-foot { line-height: 1.5; }
+  .no-family { font-size: 14px; }
+  .card-family .pairs-lines, .card-family .thumb-play span { font-size: 14px; }
+  .who { font-size: 13px; }
+  .who b { font-size: 14px; }
+  /* the homes in the footer: three short columns in rows that line up, each name a 44 px target (a long name wraps to two lines), so thirty-six links are about 0.6 of a screen where two columns of single lines are 0.9 */
+  .foot-homes ul { columns: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
+  .foot-homes a { display: flex; align-items: center; min-height: 44px; min-width: 44px; line-height: 1.25; }
+}
+@media (min-width: 521px) and (max-height: 500px) { .thumb-play { font-size: 13px; } }
+/* the smallest phones (320 px): the lockup and the two links share 288 px */
+@media (max-width: 359px) {
+  .brand-logo { height: 32px; }
+  .site-nav { gap: 0; }
+  .site-nav a { padding: 0 6px; }
+  .site-nav .nav-buy { padding: 0 10px; margin-left: 2px; }
+  .foot-homes ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (pointer: coarse) {
-  .search { height: 44px; }
-  .site-nav a, .brand a, .foot-links a, .hero-pointer, .proof-family, .argument-more a, .foot-apps summary { min-height: 44px; }
-  .foot-homes a { min-height: 36px; }
+  .search { height: 46px; }
+  .site-nav a, .brand a, .foot-links a, .hero-pointer, .proof-family, .argument-more a, .foot-apps summary, .crumbs a, .btn-small, #clear { min-height: 44px; }
+  .foot-links a { min-width: 44px; }
+  .foot-homes a { min-height: 44px; }
+  .siblings a { display: inline-flex; align-items: center; min-height: 44px; }
 }
 @media (hover: none) {
   .thumb-play { opacity: 1; }
 }
+/* a phone on its side: the screen is 390 px tall or less, so the header is slimmer and the hero sits beside its picture */
+@media (max-height: 500px) {
+  html { scroll-padding-top: 64px; }
+  .site-head { min-height: 52px; padding-top: 4px; padding-bottom: 4px; --pg-head-h: 52px; }
+  .brand-logo { height: 36px; }
+  #argument, #proof, #core, #swap, #homes { scroll-margin-top: 64px; }
+}
+@media (min-width: 700px) and (max-width: 1100px) and (max-height: 500px) {
+  .hero { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px; padding-top: 14px; padding-bottom: 20px; }
+  .hero-media { aspect-ratio: 16 / 10; }
+  .home-page .hero-media { aspect-ratio: 1200 / 630; }
+  .hero h1 { font-size: clamp(28px, 3.6vw, 34px); }
+  .home-page .hero h1 { font-size: clamp(28px, 3.6vw, 34px); }
+  .lede, .lede-families { margin-top: 8px; font-size: 16px; line-height: 1.45; }
+  .hero-chips { margin-bottom: 10px; }
+  .hero-cta { margin-top: 12px; }
+  .hero-hint { margin-top: 4px; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { transition: none !important; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+/* print: the page as a plain document (no sticky bar over the text, no hover-only marks) */
+@media print {
+  .site-head { position: static; }
+  .skip, .thumb-play { display: none; }
 }

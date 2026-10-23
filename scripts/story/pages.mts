@@ -87,7 +87,11 @@ export function errorRules(claims: any): RegExp[] {
 
 // ---------------------------------------------------------------------------------------------------- chrome (the page sits in family/, so ../ is the site's root)
 const rel = '../';
-/** The site's header: the logo lockup (the main site's link), "Virtual homes" (this site's top) and the page links; the chrome keeps the site's labels on every page (Buy Companion Core, Download Companion); the story's own "See Companion Core" is the hero's and the close's. */
+/**
+ * The site's header: the logo lockup (the main site's link), "Virtual homes" (this site's top) and the page links, the same bar as the front page's and a home's page's.
+ * The chrome keeps the site's labels on every page (Buy Companion Core, Download Companion; a phone has the short forms "Buy Core" and "Download", the same links, so both
+ * stay one tap away at every scroll position and no menu hides them); the story's own "See Companion Core" is the hero's and the close's.
+ */
 export function header(): string {
   return `<a class="skip" href="#main">Skip to the family</a>
   <header class="site-head">
@@ -97,12 +101,11 @@ export function header(): string {
       <a class="brand-title" href="${rel}">Virtual homes</a>
     </div>
     <nav class="site-nav" aria-label="Site" id="site-nav">
-      <a href="${rel}#homes">Homes</a>
-      <a href="${LINKS.docs}">Docs</a>
-      <a href="${LINKS.download}">Download Companion</a>
-      <a class="nav-buy" href="${LINKS.core}">Buy ${PRODUCT}</a>
+      <a class="nav-homes" href="${rel}#homes">Homes</a>
+      <a class="nav-docs" href="${LINKS.docs}">Docs</a>
+      <a class="nav-download" href="${LINKS.download}"><span class="nav-long">Download Companion</span><span class="nav-short">Download</span></a>
+      <a class="nav-buy" href="${LINKS.core}"><span class="nav-long">Buy ${PRODUCT}</span><span class="nav-short">Buy Core</span></a>
     </nav>
-    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">${icon('menu')}</button>
   </header>`;
 }
 
@@ -124,6 +127,7 @@ export function footer(claims: any, house: House, o: { agents?: boolean; narrati
       <div>
         <p class="foot-brand"><img src="${rel}assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>${SITE_NAME}</b></p>
         <nav class="foot-links" aria-label="${SITE_NAME}">
+          <a href="${rel}" data-campaign>Virtual homes</a>
           <a href="${LINKS.site}">ci.computer</a>
           <a href="${LINKS.core}">Buy ${PRODUCT}</a>
           <a href="${LINKS.download}">Download Companion</a>
@@ -553,12 +557,11 @@ export function familyPage(c: FamilyPageCtx): string {
   <link rel="stylesheet" href="${rel}portal/media.css">
   <link rel="stylesheet" href="${rel}portal/family.css">
   ${c.campaign ? `<script src="${rel}portal/campaign.js" defer data-cfasync="false"></script>\n  ` : ''}<script data-cfasync="false">if (/[?&](t|shot|tod|play|beat|member)=/.test(location.search)) location.replace(${JSON.stringify(player)} + '&' + location.search.slice(1) + location.hash);</script>
-  <script type="module" src="${rel}portal/site.js" data-cfasync="false"></script>
   <script src="${rel}portal/family.js" defer data-cfasync="false"></script>
   ${hasShot ? `<script src="${rel}portal/shots.js" defer data-cfasync="false"></script>\n  ` : ''}${ld}
 </head>
 <body class="page-family">
-  ${sprite(['out', 'play', 'next', 'prev', 'menu', 'film', 'box', 'arrow'])}
+  ${sprite(['out', 'play', 'next', 'prev', 'film', 'box', 'arrow'])}
   ${header()}
   <main id="main">
     <section class="hero" aria-labelledby="family-h">

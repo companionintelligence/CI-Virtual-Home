@@ -137,7 +137,7 @@ const header = (): string => `<header class="site-head">
     <nav class="site-nav" aria-label="Site">
       <a class="nav-homes" href="../#homes" data-campaign>Homes</a>
       <a class="nav-docs" href="${LINKS.docs}">Docs</a>
-      <a class="nav-download" href="${LINKS.download}">Download Companion</a>
+      <a class="nav-download" href="${LINKS.download}"><span class="nav-long">Download Companion</span><span class="nav-short">Download</span></a>
       <a class="nav-buy" href="${LINKS.core}"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>
     </nav>
   </header>`;
@@ -292,7 +292,8 @@ export function notFoundPage(site: string, word: string): string {
     @font-face { font-family: "PG Manrope"; src: url("${esc(new URL('assets/fonts/manrope-latin-var.woff2', site).href)}") format("woff2"); font-weight: 200 800; font-display: swap; }
     :root { color-scheme: light dark; --bg: #f3faf7; --fg: #0a222e; --muted: #3a524b; --mark-deep: #066c80; --mark-light: #72ddd4; --link: var(--mark-deep); --button-primary: var(--mark-deep); --button-primary-foreground: #ffffff; --button-primary-hover: color-mix(in srgb, var(--mark-deep) 84%, white); --hairline: color-mix(in srgb, #0a222e 12%, transparent); --button-ghost-border: color-mix(in srgb, #0a222e 30%, transparent); --button-ghost-hover: color-mix(in srgb, #0a222e 5%, transparent); --radius-control: 3px; }
     @media (prefers-color-scheme: dark) { :root { --bg: #041620; --fg: #e8f2f4; --muted: #a3babf; --link: var(--mark-light); --hairline: color-mix(in srgb, #e8f2f4 12%, transparent); --button-ghost-border: color-mix(in srgb, #e8f2f4 30%, transparent); --button-ghost-hover: color-mix(in srgb, #e8f2f4 5%, transparent); } }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; box-sizing: border-box; background: var(--bg); color: var(--fg);
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px max(24px, env(safe-area-inset-right, 0px)) 24px max(24px, env(safe-area-inset-left, 0px)); background: var(--bg); color: var(--fg);
       font: 17px/1.6 "PG Manrope", "Manrope", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     main { display: grid; gap: 12px; justify-items: center; max-width: 42em; text-align: center; }
     h1 { margin: 0; font-size: clamp(32px, 3.5vw + 10px, 60px); font-weight: 500; letter-spacing: -0.025em; line-height: 1.04; }
@@ -300,16 +301,18 @@ export function notFoundPage(site: string, word: string): string {
     a { color: var(--link); font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
     a:hover { color: var(--fg); }
     .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
-    .btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; border: 1px solid transparent; border-radius: var(--radius-control); text-decoration: none; font-weight: 500; font-size: 16px;
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 20px; border: 1px solid transparent; border-radius: var(--radius-control); text-decoration: none; font-weight: 500; font-size: 16px;
       background: var(--button-primary); color: var(--button-primary-foreground); }
     .btn:hover { background: var(--button-primary-hover); color: var(--button-primary-foreground); }
     .btn.ghost { background: transparent; color: var(--fg); border-color: var(--button-ghost-border); }
     .btn.ghost:hover { background: var(--button-ghost-hover); border-color: var(--fg); color: var(--fg); }
-    .more { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin-top: 8px; font-size: 14px; }
-    .more a { color: var(--muted); text-decoration: none; }
+    .more { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 12px; margin-top: 4px; font-size: 16px; }
+    .more a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; justify-content: center; padding: 0 8px; color: var(--muted); text-decoration: none; }
     .more a:hover { color: var(--fg); text-decoration: underline; }
-    .fine { margin-top: 12px; font-size: 13px; line-height: 1.45; max-width: 36em; }
+    .fine { margin-top: 12px; font-size: 14px; line-height: 1.5; max-width: 36em; }
     a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: var(--radius-control); }
+    /* a phone: the three buttons share the width, one to a row */
+    @media (max-width: 520px) { .actions { flex-direction: column; align-items: stretch; width: 100%; } }
   </style>
 </head>
 <body>

@@ -139,6 +139,12 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   script that rewrites the address keeps the parameters that are not its own (gallery.js does, and so does the player's `url()`: `OWN_PARAMS` in `assets/viewer.ts` and `assets/story/url.ts` is the one list of what is the player's own, and `family-pages.mts` asserts it). `scripts/test-campaign.mts`
   (`pnpm run test:campaign`, quick) and the `campaign` leg of `portal:test` check it.
 <!-- end front page -->
+- **The public pages on a phone** (the front page, a family's page, a home's page, the 404; `scripts/story/portal-tests/mobile-site.mts` at 390 x 844, 360 x 640, 320 x 568 and 844 x 390 on its side, and `scripts/test-site-css.mts`, quick):
+  the stylesheets' braces stay balanced (a stray `}` once dropped `*, *::before, *::after { box-sizing: border-box }` and every page laid out in content-box: a 69 px header, a front page wider than the
+  screen); the header is one bar on every page (the lockup, Docs from 701 px, Download, Buy; a phone shows "Download" and "Buy Core", never a menu that hides them); every control is a 44 px target; type is
+  13 px for a label, 14 px for small print and 16 px for reading text on a phone (a text field 16 px, so it does not zoom); the bars that stick (the header, a family's people, the tour button) are as slim as a
+  44 px target allows and the last two let go on a short screen; the body and every fixed or absolute edge element honour `env(safe-area-inset-*)`; the screenshot dialog keeps both its buttons on the screen
+  (the owner's type scale for it is unchanged); no card picture is eager (the hero's is the first screen's). The tour's own sheet and type scale are `portal/viewer.css` and `portal/story.css`, not these.
 - Every executable `<script>` in the built pages has `data-cfasync="false"` (Cloudflare's Rocket Loader is on for the zone and would
   run the player's head script after the first paint); `portal:build` checks it. New icons go through `pnpm run portal:icons`.
 - A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is the title the

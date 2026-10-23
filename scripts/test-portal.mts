@@ -55,6 +55,9 @@
 //             ---- story v2 ---- family-v2.mts (the family page's sticky person nav, details, screenshot dialog, floor plan, contrast, layout shift),
 //             lander.mts (the front page's fold, depth, chooser, no-JavaScript and failure cases) and player-more.mts (the tour card's logo, its "More" toggle and
 //             where the card goes when it is open) ---- end story v2 ----
+//             ---- the public pages on a phone ---- mobile-site.mts (the front page, three family pages, a home's page and the 404 at 390 x 844, 360 x 640, 320 x 568 and 844 x 390 on its
+//             side: no sideways scroll, border-box, the one header bar, 44 px targets, the type floors, images, the fold and depth, print, focus, reduced motion, safe-area insets, contrast in
+//             both colour sets, the screenshot dialog's fit, and the Slow 4G budget) ---- end the public pages on a phone ----
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
 //             a line saying so when it is not (pnpm exec playwright install webkit); required with --webkit
