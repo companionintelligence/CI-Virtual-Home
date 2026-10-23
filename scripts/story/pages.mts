@@ -12,7 +12,7 @@
 //                    room they use, their moments (title, words, the apps with what each replaces, "Watch this moment" into the tour at
 //                    that beat) and "Start with <name>" (the tour at the first beat of their room)
 //   a day            (story v2) family.day as a vertical timeline: the part of the day, the person, the line, a link to the moment
-//   the home         (story v2 + the spec) the lede, a block for each spot, the storeys, the area and the rooms from the spec, and the schematic
+//   the home         (story v2 + the spec) the lede, a block for each spot, the storeys, the area and the rooms from the spec (an apartment's are its own flat's: scripts/apartment-unit.mts), and the schematic
 //                    floor plan with a pin for each person (scripts/story/lib/plan-map.mts)
 //   the Core         the distinct apps, each with its real logo, what it replaces and its Companion Hub store page
 //   how it runs      real, labelled screenshots of Companion Hub and of the Companion account page, and what each does
@@ -48,6 +48,7 @@ import { appMedia, ciShots, imageTag, logoImg, mediaUrl } from './lib/media.mts'
 import { finePrintHtml, finePrintItems } from './lib/fine-print.mts';
 import type { Facts } from './lib/fine-print.mts';
 import { readPlan, placePins, levelSvg, aspect, roomLabel } from './lib/plan-map.mts';
+import { unitOf, unitSpec } from '../apartment-unit.mts';
 
 export const PRODUCT = 'Companion Core';
 export const HUB_URL = 'https://hub.ci.computer/store';
@@ -388,10 +389,13 @@ const inRoom = (label: string): string => (/^\S+['’]s\b/.test(label) ? `in ${l
 export function homeHtml(c: FamilyPageCtx): string {
   const { s, house, casting } = c;
   const labels = roomLabels(casting);
-  const plan = c.spec ? readPlan(c.spec, labels) : null;
+  // An apartment's spec draws the whole block (its neighbours' flats, the stair core, the shops and the roof), so its plan, its storeys and its room count are the family's own
+  // unit's (scripts/apartment-unit.mts); the spec of any other home is read whole, as it always was.
+  const apartment = !!c.spec && unitOf(c.spec).apartment;
+  const plan = c.spec ? readPlan(unitSpec(c.spec), labels) : null;
   const home = s.family.home;
   if (!plan && !home) return '';
-  const storeys = house.storeys || (plan ? plan.levels.length : 0);
+  const storeys = apartment && plan ? plan.levels.length : house.storeys || (plan ? plan.levels.length : 0);
   const rooms = plan ? plan.levels.reduce((n, l) => n + l.rooms.length, 0) : 0;
   const facts = [storeys ? `${storeys} ${storeys === 1 ? 'storey' : 'storeys'}` : '', house.areaSqm ? `${nf.format(house.areaSqm)} m²` : '', rooms ? `${rooms} ${rooms === 1 ? 'room' : 'rooms'}` : ''].filter(Boolean);
   const colour = new Map(s.members.map(m => [m.id, m.colour]));

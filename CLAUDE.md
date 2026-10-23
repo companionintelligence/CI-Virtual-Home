@@ -257,7 +257,9 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `data-shot`, with the manifest's exact caption; `portal/shots.js` opens it in the page's one `<dialog>`). After the people: "A day in the house" (`family.day`), "The home" (`family.home`, and from the spec: storeys, floor
   area, rooms and the floor plan, one SVG for each storey in one shared view box with a 44 px pin for each person as an HTML link laid over it by percentage; a room's name is the spec's in sentence case, "Master" is "Primary",
   "Portal" is "Archway", and a name that does not fit its room at 7 units is a tooltip only), the apps with their logos, "How it runs" and how the Core starts. The **plan is a diagram** (it says so): never a plan of walls, doors or
-  stairs, and the pin is where the casting puts the person. Real media is lazy and sized (`checkPageImages` in the build); the front page carries none. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
+  stairs, and the pin is where the casting puts the person. An apartment's spec draws the whole block, so its facts line and its plan are the **flat's**, never the block's
+  (`scripts/apartment-unit.mts`, `reference/APARTMENTS.md` 2.10): `index.json`'s `storeys` is the unit's, the rooms counted and drawn are the unit's, and
+  `scripts/test-apartment-unit.mts` pins the unit of each of the six. Real media is lazy and sized (`checkPageImages` in the build); the front page carries none. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
   subject. Never put a screenshot in the tour or a scene (an ad cut or a film may carry one only as a labelled insert: App media above); never an app's logo without its name beside it. Tests: `pnpm run test:node` (`test-story-pages.mts`) and `portal:test -- --only hooks`.
 <!-- ---- end layout (story v2) ---- -->
 <!-- ---- type scale (live pass 3) ---- -->
