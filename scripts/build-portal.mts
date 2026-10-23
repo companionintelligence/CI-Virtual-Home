@@ -1,7 +1,7 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
 //
-//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/] [--families <dir>] [--strict-families] [--stale-report]
+//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/] [--families <dir>] [--strict-families] [--stale-report] [--offices]
 //   pnpm run portal:preview [--port 8081] [--tailscale | --host <ipv4>]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //                                         (--tailscale: also on this machine's Tailscale address, so other devices on the tailnet can open it; never 0.0.0.0)
 //
@@ -48,6 +48,10 @@
 // ".html", as Cloudflare Pages serves them (the file-name address answers a 308). A campaign's tags are never in the built hrefs:
 // portal/campaign.js adds them in the browser.
 //
+// --offices (off by default; a flag only, no environment variable turns it on): adds the draft /office page, a page for each fixture company and the Homes and Offices switcher
+// (scripts/office/site.mts, reference/office/office-contract-m0.md). They are noindex, not in the sitemap, and the build refuses the flag together with --strict-families (what a
+// push to main builds): the office is not public. Without the flag the output is byte for byte what it was.
+//
 // The story pieces (family pages, the tour's data, the sitemap's family entries) are added by scripts/story/site.mts through ONE call
 // (step 5c2) and held to the same checks (step 7). Where the story is told is up to the homes' own front page: see FRONT PAGE HOOK below.
 //
@@ -81,6 +85,8 @@ import { landerChecks, landerHeadChecks } from './story/lib/lander-check.mts';
 import { displayName } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
+// --offices is for a local look at the draft office (see the header): a build for the public site (--strict-families, CI_STORY_STRICT=1) refuses it before it does any work
+if (args.offices === 'true' && (args['strict-families'] === 'true' || process.env.CI_STORY_STRICT === '1')) { console.error('  ✗ --offices together with --strict-families (or CI_STORY_STRICT=1): the office pages are not public, so a build for the public site refuses them'); process.exit(1); }
 const OUT = path.resolve(args.out || path.join(ROOT, 'dist'));
 const rel = (p: string): string => path.relative(ROOT, p) || '.';
 const problems: string[] = [];
@@ -112,7 +118,7 @@ if (stale.length) { console.error(`compiled assets are missing or older than the
 
 // 1. start from a clean copy of what this script owns (.nojekyll: an older build wrote it for GitHub Pages; now it is only
 //    cleared out of a dist/ that still has one)
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', 'family', 'story', 'audio', 'film', '_headers', '.nojekyll', '404.html', 'robots.txt', 'sitemap.xml', 'favicon.ico', 'apple-touch-icon.png'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', 'family', 'story', 'audio', 'film', '_headers', '.nojekyll', '404.html', 'robots.txt', 'sitemap.xml', 'favicon.ico', 'apple-touch-icon.png', 'office.html', 'company'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
@@ -556,6 +562,13 @@ for (const h of houses) {
   fs.writeFileSync(f, next);
 }
 // ---- end front page ----
+
+// ---- offices ---- (only with --offices; reference/office/office-contract-m0.md). After the pages of the homes are final and before the checks below, so those read the result.
+if (args.offices === 'true') {
+  if (story.strict) problems.push('--offices together with --strict-families (or CI_STORY_STRICT=1): the office pages are not public, so a build for the public site refuses them');
+  else { const o = await (await import('./office/site.mts')).buildOfficeSite({ ROOT, OUT, SITE, problems }); files += o.files; bytes += o.bytes; }
+}
+// ---- end offices ----
 
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)
 const refs = new Set<string>();

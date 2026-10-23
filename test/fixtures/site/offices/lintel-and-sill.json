@@ -1,0 +1,35 @@
+{
+  "schema": "office-card/v0",
+  "note": "A placeholder for M0 (reference/office/office-contract-m0.md). The name is a proposal counsel has not cleared; the people, titles, tagline and sector are not final; the building does not exist yet. The pairs are the store's own (content/story/services.json), checked at build time.",
+  "slug": "lintel-and-sill",
+  "name": "Lintel & Sill",
+  "tagline": "An architecture practice in a Georgian house, with its paper on one Core.",
+  "sector": "Architecture practice",
+  "size": "small",
+  "scope": "company",
+  "headcount": 11,
+  "floor": 11,
+  "address": { "line": "9 Tanyard Terrace", "place": "Quenby Green" },
+  "building": { "kind": "Georgian townhouse", "concept": "A stone-coloured terrace house on three floors, with sash windows and a columned porch." },
+  "story": "Lintel & Sill is a small architecture practice. Its people draw house extensions and shopfronts across three floors. The drawings, the post and the hours sit on the Core in the old pantry.",
+  "people": [
+    { "id": "gideon", "name": "Gideon", "function": "owner", "title": "Principal architect", "colour": "chart-1", "ownsCore": false },
+    { "id": "hira", "name": "Hira", "function": "design", "title": "Architect", "colour": "chart-2", "ownsCore": false },
+    { "id": "reuben", "name": "Reuben", "function": "projects", "title": "Project architect", "colour": "chart-3", "ownsCore": false },
+    { "id": "delphine", "name": "Delphine", "function": "finance", "title": "Practice manager", "colour": "chart-4", "ownsCore": true },
+    { "id": "oskar", "name": "Oskar", "function": "legal", "title": "Appointments and contracts coordinator", "colour": "chart-5", "ownsCore": false },
+    { "id": "rhys", "name": "Rhys", "function": "people", "title": "Office and people coordinator", "colour": "chart-1", "ownsCore": false }
+  ],
+  "pairs": [
+    { "app": "docuseal", "service": "docusign" },
+    { "app": "immich", "service": "google-photos" },
+    { "app": "baikal", "service": "google-calendar" },
+    { "app": "stirling-pdf", "service": "adobe-acrobat" },
+    { "app": "bookstack", "service": "confluence" },
+    { "app": "anything-llm", "service": "chatgpt" }
+  ],
+  "limits": [
+    "Email, the bank and the pay service stay with the services that run them.",
+    "The site visit is out of frame, and clients and consultants outside cannot reach the Core."
+  ]
+}

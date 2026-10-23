@@ -25,6 +25,7 @@ import { isV3Story } from './v3.mts';
 import { EXTRA_BANS } from './extra-bans.mts';
 import { sourceStrings } from './ts-strings.mts';
 import { FICTIONAL_LINE, type Story } from '../../../assets/story/types.ts';
+import { FICTIONAL_COMPANY_LINE } from './co/consts.mts';
 
 export const decode = (s: string): string => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
 export const walkFiles = (dir: string, rel = ''): string[] => (fs.existsSync(path.join(dir, rel)) ? fs.readdirSync(path.join(dir, rel)) : []).flatMap((n) => {
@@ -74,7 +75,7 @@ export function headingProblems(headings: string[], proper: Set<string>): string
 }
 
 // ---- the disclosures each kind of page owes (claims.json `disclosures[].where`, read as: which surface)
-export type Surface = 'gallery' | 'home' | 'family' | 'notfound' | 'player';
+export type Surface = 'gallery' | 'home' | 'family' | 'notfound' | 'player' | 'office' | 'company';
 /**
  * `enforced`: printed today on every page of the surface, so a page without it is an error. `pending`: claims.json owes it and nothing prints it yet.
  * `when` limits a row to pages that need it: `logos` (the page shows an app or service logo), `voice` (the family's tour has narration),
@@ -106,6 +107,18 @@ export const DISCLOSURES: Owed[] = [
   { id: 'names-logos-owners', surface: 'player', level: 'enforced' },
   { id: 'scripted-scenes', surface: 'player', level: 'enforced' },
   { id: 'attribution-agents', surface: 'player', level: 'enforced' },
+  // the draft office (a build made with --offices: office.html and company/<slug>.html; scripts/office/fine-print.mts is the table the pages print from)
+  { id: 'fictional-company', surface: 'office', level: 'enforced' },
+  { id: 'launch-not-offer', surface: 'office', level: 'enforced' },
+  { id: 'scripted-scenes', surface: 'office', level: 'enforced' },
+  { id: 'names-logos-owners', surface: 'office', level: 'enforced' },
+  { id: 'third-party-apps', surface: 'office', level: 'enforced' },
+  { id: 'fictional-company', surface: 'company', level: 'enforced' },
+  { id: 'launch-not-offer', surface: 'company', level: 'enforced' },
+  { id: 'scripted-scenes', surface: 'company', level: 'enforced' },
+  { id: 'names-logos-owners', surface: 'company', level: 'enforced' },
+  { id: 'third-party-apps', surface: 'company', level: 'enforced' },
+  { id: 'apps-availability', surface: 'company', level: 'enforced' },
 ];
 
 /** Findings the owner has read and accepted, so a `review` rule does not fail them: the exact rule, a page (glob of the built path) and the matched text. */
@@ -167,8 +180,8 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
   for (const f of cards.families) addProper(`${f.surname} ${f.address} ${f.members.map((m: any) => `${m.name} ${m.companion || ''}`).join(' ')} ${f.apps.map((a: any) => a.name).join(' ')}`);
 
   // ---- pages
-  const surfaceOf = (p: string): Surface | null => p === 'index.html' ? 'gallery' : p === '404.html' ? 'notfound' : p.startsWith('homes/') ? 'home' : p.startsWith('family/') ? 'family' : null;
-  const pageFiles = ['index.html', '404.html', ...walkFiles(dir, 'homes').filter((f) => f.endsWith('.html')), ...walkFiles(dir, 'family').filter((f) => f.endsWith('.html'))].filter((f) => fs.existsSync(path.join(dir, f)));
+  const surfaceOf = (p: string): Surface | null => p === 'index.html' ? 'gallery' : p === '404.html' ? 'notfound' : p === 'office.html' ? 'office' : p.startsWith('homes/') ? 'home' : p.startsWith('family/') ? 'family' : p.startsWith('company/') ? 'company' : null;
+  const pageFiles = ['index.html', '404.html', 'office.html', ...walkFiles(dir, 'homes').filter((f) => f.endsWith('.html')), ...walkFiles(dir, 'family').filter((f) => f.endsWith('.html')), ...walkFiles(dir, 'company').filter((f) => f.endsWith('.html'))].filter((f) => fs.existsSync(path.join(dir, f)));
   const missing = new Map<string, string[]>();          // "<id> on <surface>" -> pages without it
   const owe = (s: Surface, p: string, text: string, ctx: { logos: boolean; voice: boolean; family: boolean }): void => {
     for (const o of DISCLOSURES.filter((d) => d.surface === s)) {
@@ -188,6 +201,8 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
     const html = surfaceOf(p) === 'family' ? raw.replace(/<p class="home-note">[\s\S]*?<\/p>/, ' ') : raw;
     const r = readable(html);
     const surface = surfaceOf(p)!;
+    // (a company's name is a proper name, in its page's heading and on its card)
+    if (surface === 'office' || surface === 'company') for (const m of raw.matchAll(/data-(?:name|company)="([^"]*)"/g)) addProper(decode(m[1]));
     check(p, r.text, { exempt: ['©'] });
     r.attrs.forEach((a) => check(`${p} (attribute)`, a, { exempt: ['©'] }));
     [...html.matchAll(/\salt="([^"]*)"/g)].forEach((m) => check(`${p} (alt)`, decode(m[1]), { only: [ORDINARY] }));
@@ -202,6 +217,7 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
       family: /class="family-block"|meet-family|family\//.test(html) && surface === 'home' && /Fictional family\. Real software\./.test(r.text),
     });
     if (surface === 'family' || surface === 'gallery') if (!r.text.includes(FICTIONAL_LINE)) res.errors.push(`${p}: the line is missing: "${FICTIONAL_LINE}"`);
+    if (surface === 'office' || surface === 'company') if (!r.text.includes(FICTIONAL_COMPANY_LINE)) res.errors.push(`${p}: the line is missing: "${FICTIONAL_COMPANY_LINE}"`);
   }
 
   // ---- the player's HTML: title, meta, <noscript>, the head script's strings (the loader and the failure card)

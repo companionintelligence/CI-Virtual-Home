@@ -1,0 +1,35 @@
+{
+  "schema": "office-card/v0",
+  "note": "A placeholder for M0 (reference/office/office-contract-m0.md). The name is a proposal counsel has not cleared; the people, titles, tagline and sector are not final; the building does not exist yet. The pairs are the store's own (content/story/services.json), checked at build time.",
+  "slug": "reelwick",
+  "name": "Reelwick",
+  "tagline": "Software for independent cinemas, with one Companion Core in the comms room.",
+  "sector": "Software for independent cinemas",
+  "size": "startup",
+  "scope": "company",
+  "headcount": 6,
+  "floor": 6,
+  "address": { "line": "2 Maltings Yard", "place": "Ostley Wick" },
+  "building": { "kind": "Brick loft", "concept": "A converted brick warehouse bay with arched steel windows and a closed bay next door." },
+  "story": "Reelwick writes rota and schedule software for independent cinemas. Six people share one brick bay. Their code, handbook, contacts and logins sit on the Core in the comms room.",
+  "people": [
+    { "id": "marit", "name": "Marit", "function": "owner", "title": "Founder and chief executive", "colour": "chart-1", "ownsCore": false },
+    { "id": "anselm", "name": "Anselm", "function": "engineering", "title": "Chief technology officer", "colour": "chart-2", "ownsCore": true },
+    { "id": "femi", "name": "Femi", "function": "engineering", "title": "Software engineer", "colour": "chart-3", "ownsCore": false },
+    { "id": "anika", "name": "Anika", "function": "design", "title": "Product designer", "colour": "chart-4", "ownsCore": false },
+    { "id": "kofi", "name": "Kofi", "function": "sales", "title": "Sales and partnerships", "colour": "chart-5", "ownsCore": false },
+    { "id": "odile", "name": "Odile", "function": "people", "title": "People and office lead", "colour": "chart-1", "ownsCore": false }
+  ],
+  "pairs": [
+    { "app": "forgejo", "service": "github" },
+    { "app": "campfire", "service": "slack" },
+    { "app": "vaultwarden", "service": "1password" },
+    { "app": "penpot", "service": "figma" },
+    { "app": "docmost", "service": "notion" },
+    { "app": "nextcloud", "service": "google-drive" }
+  ],
+  "limits": [
+    "The product runs in a cloud account that stays where it is.",
+    "What moved is the company's own working memory."
+  ]
+}

@@ -14,12 +14,56 @@ import { companyStrings } from './strings.mts';
 import type { CompanyStory, CoAnchorLeaf } from './types.mts';
 
 /** the pairs the plan holds back (content/story/lander.json `hold`: "service|app"): counsel has not cleared them */
-function heldPairs(root: string): Set<string> {
+export function heldPairs(root: string): Set<string> {
   try { return new Set(JSON.parse(fs.readFileSync(path.join(root, 'content', 'story', 'lander.json'), 'utf8')).hold as string[]); } catch { return new Set(); }
 }
 const lower = (s: string): string => s.toLowerCase();
+
+/** The problems of a company's name and slug: not a stock example, not a service the store pairs, not a family's surname, one slug namespace. (The /office page's cards ask the same.) */
+export function nameProblems(name: string, slug: string, ctx: CoCtx): string[] {
+  const out: string[] = [];
+  const nm = wordsOf(name);
+  for (const d of ctx.names.deny) if (nm.includes(wordsOf(d))) out.push(`"${name}" contains "${d}", the name of a stock example company (content/story/company-names.json)`);
+  for (const [n, sv] of ctx.services.byName) if (n.length >= 4 && nm.includes(wordsOf(n))) out.push(`"${name}" contains "${n}", the name of ${sv.name} (a service the store pairs an app with)`);
+  if (ctx.familySurnames.has(lower(name))) out.push(`"${name}" is a family's surname`);
+  if (ctx.familySlugs.has(slug)) out.push(`the slug "${slug}" is a family's (one slug namespace: family/<slug> and company/<slug>)`);
+  if (ctx.houseIds.has(slug)) out.push(`the slug "${slug}" is a house id`);
+  return out;
+}
+
+/**
+ * The problems of one pair "<app>, alternative to <service>": the store names it (the service's own `apps` list is the store's `replaces` rows), the registry lets a story name the
+ * service, the app is not an avoid app, and the plan does not hold the pair back (owner decision O7). `service` is a registry id.
+ */
+export function pairProblems(appId: string, serviceId: string, ctx: CoCtx, held: Set<string> = heldPairs(ctx.root)): string[] {
+  const out: string[] = [];
+  const sv = ctx.services.byId.get(serviceId), app = ctx.apps.get(appId);
+  if (!sv) return [`service "${serviceId}" is not in content/story/services.json`];
+  if (!app) return [`"${appId}" is not an app of the catalog (content/story/catalog-apps.json)`];
+  if (app.storySafe === 'avoid') out.push(`${app.name} is an app the catalog marks avoid`);
+  if (app.inLiveStore === false) out.push(`${app.name} is not in the live store`);
+  if (!serviceOk(sv)) out.push(`${sv.name} is a service the registry will not let a story name (flags: ${sv.flags.join(', ') || 'none'}; alternative-to form ${sv.alternativeToForm}; story status ${sv.storyStatus})`);
+  if (!sv.apps.includes(appId)) out.push(`the store does not pair ${appId} with ${sv.name} (its own replaces rows are the only pairs a story may print)`);
+  if (held.has(`${serviceId}|${appId}`)) out.push(`${appId} with ${sv.name} is on the plan's hold list (content/story/lander.json): counsel has not cleared it`);
+  return out;
+}
 const wordsOf = (s: string): string => ` ${lower(s).replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim()} `;
 const roomOk = (r: string | undefined): boolean => !r || ((OFFICE_ROOM_ROLES as readonly string[]).includes(r) && !(HOME_ONLY_ROOM_ROLES as readonly string[]).includes(r));
+
+export interface LintHit { severity: 'error' | 'review' | 'warn'; rule: string; at: string; message: string; fix?: string }
+/** The claims' banned phrases (and the site lint's extra ones) over strings a visitor reads: one hit per rule and string. The company gate and the /office cards ask the same. */
+export function lintStrings(strings: readonly [at: string, text: string][], ctx: CoCtx): LintHit[] {
+  const out: LintHit[] = [];
+  for (const [at, raw] of strings) {
+    const t = plain(raw);
+    for (const b of ctx.bans) {
+      if (!b.re.test(t)) continue;
+      const shown = t.length > 70 ? `${t.slice(0, 70)}...` : t;
+      out.push({ severity: b.severity, rule: b.id, at, message: `"${shown}" ${b.why}`, fix: b.fix });
+    }
+  }
+  return out;
+}
 
 export function validateCompany(data: unknown, ctx: CoCtx): Report {
   const slug = typeof (data as { slug?: unknown } | null)?.slug === 'string' ? (data as { slug: string }).slug : '(no slug)';
@@ -86,12 +130,7 @@ export function validateCompany(data: unknown, ctx: CoCtx): Report {
   if (says > 6) out.E('co-companions', 'beats', `${says} beats have a scripted line (at most 6)`);
 
   // ---- co-names: not a stock name, not a service, not a family; one slug namespace; no companion name a family uses
-  const nm = wordsOf(c.name);
-  for (const d of ctx.names.deny) if (nm.includes(wordsOf(d))) out.E('co-names', 'company.name', `"${c.name}" contains "${d}", the name of a stock example company (content/story/company-names.json)`);
-  for (const [n, sv] of ctx.services.byName) if (n.length >= 4 && nm.includes(wordsOf(n))) out.E('co-names', 'company.name', `"${c.name}" contains "${n}", the name of ${sv.name} (a service the store pairs an app with)`);
-  if (ctx.familySurnames.has(lower(c.name))) out.E('co-names', 'company.name', `"${c.name}" is a family's surname`);
-  if (ctx.familySlugs.has(s.slug)) out.E('co-names', 'slug', `the slug "${s.slug}" is a family's (one slug namespace: family/<slug> and company/<slug>)`);
-  if (ctx.houseIds.has(s.slug)) out.E('co-names', 'slug', `the slug "${s.slug}" is a house id`);
+  for (const m of nameProblems(c.name, s.slug, ctx)) out.E('co-names', /slug/.test(m) ? 'slug' : 'company.name', m);
   for (const m of s.members) if (m.companion && ctx.familyCompanions.has(lower(m.companion.name))) out.E('co-names', `member ${m.id}.companion.name`, `${m.companion.name} is a family's companion; the names are unique across the site`);
 
   // ---- co-rooms and co-anchor: an office room, never a home's; a chain that ends in a role that every office has
@@ -151,22 +190,13 @@ export function validateCompany(data: unknown, ctx: CoCtx): Report {
     if (!b.app) { out.E('co-pairs', b.id, 'the beat has a service and no app: a pair is an app and the service it is the alternative to'); continue; }
     if (!replaces.length) out.E('co-pairs', b.id, 'the beat has a service and app.replaces is empty');
     else if (ctx.services.byName.get(lower(replaces[0]))?.id !== sv.id) out.E('co-pairs', b.id, `app.replaces[0] is "${replaces[0]}", which is not the name or an alias of ${sv.name}`, `Write "${sv.name}" first.`);
-    if (!serviceOk(sv)) out.E('co-pairs', b.id, `${sv.name} is a service the registry will not let a story name (flags: ${sv.flags.join(', ') || 'none'}; alternative-to form ${sv.alternativeToForm}; story status ${sv.storyStatus})`);
-    if (!sv.apps.includes(b.app.id)) out.E('co-pairs', b.id, `the store does not pair ${b.app.id} with ${sv.name} (its own replaces rows are the only pairs a story may print)`, 'A pair is one the store names; do not invent one.');
-    if (held.has(`${sv.id}|${b.app.id}`)) out.E('co-pairs', b.id, `${b.app.id} with ${sv.name} is on the plan's hold list (content/story/lander.json): counsel has not cleared it`, 'Choose another pair, or leave the beat without one.');
+    for (const m of pairProblems(b.app.id, b.service, ctx, held)) out.E('co-pairs', b.id, m, 'A pair is one the store names and the plan does not hold; do not invent one.');
     const chips = b.popup.chips ?? [];
     if (chips.length !== 2 || chips[1] !== `alternative to ${sv.name}`) out.E('co-pairs', `${b.id}.chips`, `the chips of a beat with a pair are the app's name and "alternative to ${sv.name}"`, 'Never "replaces".');
   }
 
   // ---- the claims' banned phrases (and the site lint's extra ones) over every string a visitor reads
-  for (const [at, raw] of companyStrings(s)) {
-    const t = plain(raw);
-    for (const b of ctx.bans) {
-      if (!b.re.test(t)) continue;
-      const shown = t.length > 70 ? `${t.slice(0, 70)}...` : t;
-      out.add(b.severity, b.id, at, `"${shown}" ${b.why}`, b.fix);
-    }
-  }
+  for (const h of lintStrings(companyStrings(s), ctx)) out.add(h.severity, h.rule, h.at, h.message, h.fix);
   out.stats.beats = s.beats.length;
   for (const k of out.unusedReviewed()) out.W('reviewed', k, 'this allow-list entry matched no finding; remove it from content/story/reviewed.json');
   return out;

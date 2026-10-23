@@ -309,6 +309,29 @@ Uniqueness metrics always gate, because a clash between two families is true for
 | `fleet-voices` | complete | narrator counts equal `voices.json` `narratorFor` (never above it, even before complete) |
 | `fleet-v3` and the story v3 counts | every family v3 | `FLEET_V3` in `lib/fleet.mts`. Reported always, gated only once **every** family is a v3 family (`isV3Story`), so a fleet in the middle of the rewrite is held to nothing new: distinct apps 100 instead of 70 (`fleet-apps`); at least 70 distinct services in the fleet and 14 in each v3 home (`fleet-services`); each v3 home's room beats at least 80 percent paired (`fleet-pairs`); families naming Kiwix at most 6 (moot while Kiwix is `avoid`); the share of room beats on an app in at most 8 homes is information only (`fleet-rare`, 40 percent or more wanted). `fleet-v3` (every family is v3) gates only when `FLEET_V3.v3Required` is set, in the last PR. The app cap is `FLEET.appShareMax` of the families present (`appCap(n)`: 12 of 30, 14 of 36), never a fixed number |
 
+### Company rules (`pnpm run story:validate -- --kind office`, M0; `scripts/story/lib/co/validate.mts`)
+
+A company file (`content/offices/<slug>.json`, `company/v1`, [the office contract](../office/office-contract-m0.md)) is a different gate: the family rules above do not run on it and these do
+not run on a family. M0 holds a company to the rules that need no building; the ones that read the building, the catalog's caveats and the whole set arrive with M1 (`co-functions`,
+`co-text-role`, `co-app-facts`, `co-anchor` resolution in a real building, `co-day`, `co-office`, `co-bring-home`, the shared shape rules, the `biz-*` rows of the claims, the fleet gates).
+The claims' banned phrases (and the site lint's extra ones) run over every string a visitor reads, with their own ids and severities.
+
+| Rule | Severity | Meaning |
+|---|---|---|
+| `schema` | error | the file does not match `content/story/schema/company.schema.json` (every other rule assumes the shape) |
+| `co-size` | error | a startup is told for 3 to 12 people as the company, a small business for 10 to 30 as the company, a medium one for 50 to 250 as a site or a department; the floor is at most 25 and at most the head count; no more featured people than the floor |
+| `co-members` | error / warn | ids and names unique; each person has at least 3 beats; the first run is the Core owner's; a beat's member, agent and approval are members; two people sharing a colour is a warning |
+| `co-owner` | error | exactly one person owns the Core, and has a beat in the Core's room, the office or the floor |
+| `co-companions` | error | exactly one companion, on the owner; an agent beat has an approval and an agent that has a companion; at most six scripted lines, each spoken by someone with a companion |
+| `co-names` | error | the name is not a stock example (`company-names.json` `deny`), holds no service's name, is no family's surname; the slug is no family's and no house id; no companion a family already has |
+| `co-rooms`, `co-anchor` | error | a chapter or an anchor in an office room, never a home's (living, dining, bedroom, kids, garage, laundry, bath, garden, patio); a fallback chain ends in a role every office has (street, front-door, core, room, counter) |
+| `co-chapters` | error / warn | the first chapter is the first run, the last the outro; at least five room chapters including the floor (or the workshop), a meeting room and the kitchen; ids unique; every beat in a chapter the file has; an empty chapter is a warning |
+| `co-beats` | error | 18 to 34 room beats; one on the meeting table or the whiteboard; the owner has one on the server rack or in the Core's room; two in the kitchen |
+| `co-categories` | error | setup, documents, communication, money and it in every company; at least 8 of the 11 topics |
+| `co-apps` | error | every app (`app.id`, `with`) is in the catalog and not marked avoid |
+| `co-pairs` | error | a beat with `app.replaces` has a `service`; the service is in `services.json` and may be named; the store pairs the app with it (the service's own `apps`: the store's `replaces` rows, owner decision O7); the pair is not on the plan's `hold` list; the chips are the app and "alternative to <Service>" |
+| `co-replaces` | error | no text of a company says "replaces" (a pair reads "<app>, alternative to <service>") |
+
 ## Adding a rule
 
 1. Put the check in the module that owns its kind (`text`, `shape`, `structure`, `apps`, `anchors`, `quotas` or `fleet`

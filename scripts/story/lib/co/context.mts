@@ -23,6 +23,16 @@ export interface CoCtx {
 
 const J = (p: string): any => JSON.parse(fs.readFileSync(p, 'utf8'));
 
+/**
+ * The office's own banned phrases, beside the claims' (the claims canon is not edited for them): a pair reads "<app>, alternative to <service>", and no company text says "replaces"
+ * (owner decision O7 and story v3; the store's own `replaces` rows are data, not words a visitor reads).
+ */
+const OFFICE_BANS: Ban[] = [{
+  id: 'co-replaces', pattern: '\\breplaces\\b', flags: 'i', severity: 'error',
+  why: 'A pair reads "<app>, alternative to <service>": no text of a company says an app "replaces" a service (owner decision O7, story v3).',
+  fix: 'Say "alternative to", or say what the person does now.', re: /\breplaces\b/i,
+}];
+
 export function loadCompanyContext(root: string = ROOT): CoCtx {
   const S = path.join(root, 'content', 'story');
   const claims: ClaimsFile = J(path.join(S, 'claims.json'));
@@ -32,6 +42,7 @@ export function loadCompanyContext(root: string = ROOT): CoCtx {
   const bans: Ban[] = [
     ...claims.bannedPhrases.map((b) => ({ ...b, re: new RegExp(b.pattern, b.flags) })),
     ...EXTRA_BANS.filter((e) => !claims.bannedPhrases.some((b) => b.id === e.id)).map((e) => ({ id: e.id, pattern: e.pattern, flags: e.flags, severity: e.severity, why: e.why, fix: e.fix, re: new RegExp(e.pattern, e.flags) })),
+    ...OFFICE_BANS,
   ];
   const svc = { byId: new Map<string, Service>(), byName: new Map<string, Service>() };
   for (const sv of services.services) { svc.byId.set(sv.id, sv); for (const n of [sv.name, ...sv.aliases]) svc.byName.set(n.toLowerCase(), sv); }

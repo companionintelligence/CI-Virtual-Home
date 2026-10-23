@@ -318,6 +318,22 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
+**The office (M0: a draft, off by default, not public; [reference/office/office-contract-m0.md](reference/office/office-contract-m0.md)).** `/office` is a second page of the portal: fictional
+companies in offices, told like the families, labelled "Fictional company. Real software." (the `fictional-company` disclosure of `claims.json`). Nothing of it is public until the owner and counsel say so,
+and these rules keep it that way:
+
+- It exists only in a build made with `pnpm run portal:build -- --offices` (`pnpm run portal:preview -- --offices` serves it). No environment variable turns it on, `--strict-families` and
+  `CI_STORY_STRICT=1` refuse it before any work, `ci.yml` and `deploy.yml` do not know it, and without the flag `dist/` is byte for byte what it was (`scripts/test-office-front.mts` holds it). Its pages
+  are `noindex, nofollow`, have no canonical and are not in `sitemap.xml` or `robots.txt`; the Homes and Offices switcher is injected into the built pages of a flagged build only.
+- Its code is `scripts/office/` (the cards, the pages, the build, the fine print) and `scripts/office/assets/office.css|js`, which are **not** in `portal/` (step 3 of the build copies every file of
+  `portal/`, so a file there would ship). The page's data is the fixtures in `test/fixtures/site/offices/`; M1 derives it from a company's story. M0 adds no file under `assets/` or `portal/` and moves
+  no shipped byte (the office types in `assets/spec/` are types only: their compiled `.js` is an empty file); a change that does is not M0's to make.
+- A building is a HouseSpec with `use: "office"` (`reference/HOUSE-SPEC.md`), author `Companion Intelligence`, listed under `offices` in `content/houses/index.json`, never under `houses`; `scripts/validate/office.mts`
+  holds it to the office rules and is silent for a home. No office is in `content/houses/` before the gate sweep (the 22 scripts that glob it, contract section 6) has put every fleet metric on `listSpecs({ kind: 'home' })`.
+- A pair reads "<app>, alternative to <service>", never "replaces" (`co-replaces`); it is one the store names (`content/story/services.json`, the service's own `apps`), never one on `content/story/lander.json`'s
+  `hold` list, and a service is named only in a chip or a "Rented before" panel, never in free text (owner decision O7). The company names are proposals counsel has not cleared (`content/story/company-names.json`).
+- A company is a `company/v1` file (`content/story/schema/company.schema.json`) checked by `pnpm run story:validate -- --kind office`; the family gate and every family file are untouched by it.
+
 **Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`), the story gates
 (`story:validate` on every family, `story:cast -- --check`, `story:cast-lint`, `story:services:check`, `story:bake -- --check --all`; `story:validate -- --complete` and
 `story:ads -- --check` run but do not block yet), the quick Node tests (`pnpm run test:node`: every `scripts/test-*.mts` marked `@check-house quick`, found by glob, so no

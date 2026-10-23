@@ -1,0 +1,85 @@
+/* /office and a company's page (scripts/office/pages.mts; reference/office/office-contract-m0.md). It builds on portal/gallery.css, which is loaded first: the tokens, the header, the
+   hero, the search, the chips, the cards, the Core band and the footer are the homes' own, so the two galleries read as one site. Only what the office adds is here. What the
+   header's switcher needs is not: it is written inline into every page that has the switcher, the homes' pages too (scripts/office/pages.mts SWITCH_CSS). */
+
+/* the page is a draft for review until counsel has cleared the names and the owner has said go */
+.draft-note {
+  margin: 12px var(--grid-margin) 0; padding: 8px 12px;
+  border: 1px dashed var(--pg-hairline-strong); border-radius: var(--radius-control);
+  background: var(--card); color: var(--muted-foreground);
+  font-size: 14px; line-height: 1.45;
+}
+
+/* a hero with words only: the buildings are not drawn yet */
+.hero-text { grid-template-columns: minmax(0, 1fr); }
+.hero-text .hero-copy { max-width: 46em; }
+.hero-text h1 { max-width: 16em; }
+.company-page .hero-text { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: start; }
+.company-facts { margin: 14px 0 0; font-size: 15.5px; line-height: 1.55; color: var(--muted-foreground); }
+
+/* the draft plate: where the building's picture will be. A flat tile, the company's initial, the kind of building, and the plain fact that it is not drawn yet. */
+.plate { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 2px; padding: 12px 14px; background: linear-gradient(135deg, var(--pg-thumb-bg), var(--card)); }
+.plate-mono { position: absolute; right: 14px; top: 4px; font-size: 76px; font-weight: 300; line-height: 1; letter-spacing: -0.03em; color: color-mix(in srgb, var(--link) 38%, transparent); }
+.plate-kind { position: relative; font-size: var(--type-label); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--link); }
+.plate-note { position: relative; font-size: 13px; color: var(--muted-foreground); }
+.plate-hero { aspect-ratio: 16 / 10; border-radius: var(--radius-media); }
+.plate-hero .plate-mono { font-size: 120px; top: 8px; }
+
+/* the filters: the search, a job, a size */
+.companies .office-search { width: min(100%, 540px); margin-top: 18px; }
+.companies .sizes { margin-top: 14px; }
+
+.sizes button:disabled { cursor: default; color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
+
+.homes-head #clear { margin-left: auto; }
+
+/* a company's card: gallery.css's family card, with a size and a line for how many people */
+.size-tag { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--link); }
+.card-company .scope-line { margin: 6px 0 0; font-size: 14px; color: var(--foreground); }
+.card-company .who span { overflow-wrap: anywhere; }
+.card-company .cast { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.card-company .go { display: inline-flex; }
+
+/* a company's page */
+.company-section { padding: clamp(20px, 2.6vw, 32px) var(--grid-margin) 0; max-width: 72em; }
+.company-section h2 { margin: 0 0 12px; font-size: var(--type-title); font-weight: var(--type-title-weight); letter-spacing: var(--type-title-tracking); line-height: var(--type-title-leading); }
+.company-section p { margin: 0 0 8px; max-width: 46em; color: var(--muted-foreground); text-wrap: pretty; }
+.company-section .company-story { color: var(--foreground); font-size: var(--type-lede); line-height: var(--type-lede-leading); }
+.company-note { font-size: 14px; }
+.people { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px 24px; }
+.people li { display: flex; align-items: center; gap: 12px; scroll-margin-top: 80px; }
+.people .who { font-size: 14px; }
+.people .who b { font-size: 16px; }
+.people .fn { color: var(--link); font-weight: 500; }
+.pairs-all { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 16px; line-height: 1.45; color: var(--foreground); }
+.pairs-all li { padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+.limits { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 46em; }
+.limits li { position: relative; padding-left: 20px; line-height: 1.5; color: var(--muted-foreground); }
+.limits li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--link); }
+.company-near { display: flex; flex-wrap: wrap; gap: 8px 24px; padding: 24px var(--grid-margin) 8px; }
+.company-near a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 500; }
+.company-page .cta-band { margin-top: clamp(24px, 3vw, 40px); }
+
+@media (max-width: 900px) {
+  .company-page .hero-text { grid-template-columns: minmax(0, 1fr); }
+}
+/* the four sizes are two rows of two on a phone: "Medium business" does not fit a row of four */
+@media (max-width: 520px) {
+  .companies .sizes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: auto; padding: 1px; }
+  .companies .sizes button { width: 100%; }
+}
+/* a phone: one company to a row, with its people and its pairs (the homes' two-up compact card hides them, for thirty-six families; here are a few companies) */
+@media (max-width: 700px) {
+  .companies .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .card-company .cast, .card-company .pairs-lines { display: grid; }
+  .card-company .cast { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .card-company .go { display: inline-flex; }
+  .card-company h3 { font-size: 18px; }
+  .card-company .scope-line { font-size: 16px; }
+  .draft-note { font-size: 14px; }
+  .company-facts { font-size: 16px; }
+  .people { grid-template-columns: minmax(0, 1fr); }
+  .companies .office-search { width: 100%; }
+
+  .plate-hero .plate-mono { font-size: 88px; }
+}
