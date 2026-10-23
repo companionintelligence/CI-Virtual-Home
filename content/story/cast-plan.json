@@ -660,8 +660,8 @@
    "reason": "A one-bedroom flat above the shops: the Desk Nook with the Core is the reporter's, the Living Room sofa is where the shop owner does the books, and the shop itself is downstairs.",
    "household_text": "A couple above the shops: one runs a stationery shop, one reports.",
    "care": "The shop's orders and the reporter's notes stay on the Core.",
-   "signatureApps": ["ci-hermes", "invoice-ninja", "obsidian", "umami", "hi-events", "paperless", "archivebox"],
-   "beatApps": {"food": "homehub", "iot": "homarr"},
+   "signatureApps": ["ci-hermes", "invoice-ninja", "obsidian", "umami", "hi-events", "papra", "archivebox"],
+   "beatApps": {"food": "homehub", "iot": "homarr", "privacy": "duplicati"},
    "members": [
     {"id": "nasrin", "name": "Nasrin", "age": 41, "role": "partner", "archetype": "business-owner", "work": "runs a stationery shop in the building", "room": "Living Room", "sleepsIn": "Bedroom", "companion": "Sumac"},
     {"id": "saeed", "name": "Saeed", "age": 37, "role": "partner", "archetype": "journalist", "work": "freelance reporter", "room": "Desk Nook", "sleepsIn": "Bedroom", "companion": "Barberry"}

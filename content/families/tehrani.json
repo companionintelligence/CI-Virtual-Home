@@ -1,0 +1,1398 @@
+{
+  "schema": "family/v1",
+  "slug": "tehrani",
+  "house": "city-one-bed",
+  "fictional": true,
+  "family": {
+    "surname": "Tehrani",
+    "tagline": "A stationery shop below, a reporter's desk above, one Companion Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Nasrin runs the stationery shop on the ground floor of their building. Saeed reports for a living from the Desk Nook upstairs, where the Companion Core sits on his desk. One Core serves them both.",
+    "address": {
+      "line": "12 Chandler Row",
+      "place": "Linton Square"
+    },
+    "narrator": "v-young-f",
+    "home": {
+      "lede": "A pale-rendered mid-rise stands on a city street, with shops behind tall glass below and a teal lobby door. The flat on the first floor up opens its living room and kitchen onto a steel-railed balcony over the street.",
+      "spots": [
+        {
+          "room": "Desk Nook",
+          "line": "A writing desk, a laptop and a ladder shelf, with the Core on the desk."
+        },
+        {
+          "room": "Living Room",
+          "line": "A sofa, a club chair and a trunk coffee table on a wide rug."
+        },
+        {
+          "room": "Kitchen",
+          "line": "An L of counters with a range, a fridge and a window over the sink."
+        },
+        {
+          "room": "Street Balcony",
+          "line": "A bistro table and two bentwood chairs above the shopfronts."
+        },
+        {
+          "room": "Laundry Closet",
+          "line": "A washing machine and a dryer side by side in a narrow closet."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "kitchen-feeds",
+        "line": "Saeed reads the morning's feeds at the counter with his coffee."
+      },
+      {
+        "at": "morning",
+        "beat": "balcony-stamp",
+        "line": "Nasrin draws in the morning light at the balcony table."
+      },
+      {
+        "at": "midday",
+        "beat": "living-invoice",
+        "line": "Nasrin writes up the school's order on the sofa after lunch."
+      },
+      {
+        "at": "midday",
+        "beat": "front-ride",
+        "line": "Saeed rides to an interview from the street door."
+      },
+      {
+        "at": "afternoon",
+        "beat": "nook-merge",
+        "line": "The records Saeed requested arrive, and he puts them in order."
+      },
+      {
+        "at": "afternoon",
+        "beat": "living-visits",
+        "line": "Nasrin checks how many people looked at the new range."
+      },
+      {
+        "at": "weekend",
+        "beat": "kitchen-subs",
+        "line": "Saeed goes through the week's renewals at the counter."
+      },
+      {
+        "at": "weekend",
+        "beat": "front-event",
+        "line": "The shop's regulars gather for the lettering evening."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "nasrin",
+      "name": "Nasrin",
+      "age": 41,
+      "role": "partner",
+      "work": "runs a stationery shop in the building",
+      "colour": "chart-1",
+      "archetype": "business-owner",
+      "companion": {
+        "name": "Sumac",
+        "runtime": "OpenClaw",
+        "job": "Opens Invoice Ninja in its own browser and drafts the invoices Nasrin lists.",
+        "personality": [
+          "brisk",
+          "precise",
+          "organised"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Nasrin reads every line before it stands."
+      },
+      "profile": {
+        "bio": "Nasrin runs the stationery shop below the flat and does the shop's books on the sofa. Her invoices, stock and customer list sit on the Core, and Sumac drafts the invoices she approves."
+      }
+    },
+    {
+      "id": "saeed",
+      "name": "Saeed",
+      "age": 37,
+      "role": "partner",
+      "work": "freelance reporter",
+      "colour": "chart-2",
+      "archetype": "journalist",
+      "companion": {
+        "name": "Barberry",
+        "runtime": "Hermes",
+        "job": "Lists the claims in Saeed's notes that have no source beside them.",
+        "personality": [
+          "curious",
+          "gentle",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Lists only. Saeed checks every claim against the file."
+      },
+      "profile": {
+        "bio": "Saeed reports from the Desk Nook, where the Core sits on his desk. His notes, saved pages and records are plain files there, and Barberry lists the claims he still has to check."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "nook",
+      "kind": "room",
+      "room": "office",
+      "title": "Saeed's desk nook"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "laundry",
+      "kind": "room",
+      "room": "laundry",
+      "title": "The laundry closet"
+    },
+    {
+      "id": "balcony",
+      "kind": "room",
+      "room": "patio",
+      "title": "The street balcony"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "entry",
+      "kind": "room",
+      "room": "entry",
+      "title": "The entry hall"
+    },
+    {
+      "id": "out-front",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out front"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The courier stops at the shop",
+        "body": "The courier leaves the Core with Nasrin at the shop door. Saeed carries the package up the stairs to the flat."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "What is inside the package",
+        "body": "Saeed cuts the tape on the writing desk. Inside are the Core, a power cable, a quick-start guide and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left",
+        "eye": "seated"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plugged in on the desk",
+        "body": "Saeed plugs the Core in by the desk lamp, and Nasrin presses the button. It wakes and opens its own Wi-Fi network."
+      }
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Nasrin joins from her phone",
+        "body": "Nasrin joins the Core's own network from her phone's Wi-Fi settings. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "obsidian",
+        "invoice-ninja"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Hermes for Saeed, OpenClaw for Nasrin",
+        "body": "In the Companion Hub store, Saeed picks Hermes and Nasrin picks OpenClaw. The couple adds Obsidian and Invoice Ninja, then walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Obsidian, Invoice Ninja"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "saeed",
+      "agent": "saeed",
+      "approval": "saeed",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Saeed names his agent Barberry",
+        "body": "Saeed names his agent Barberry and sends a first message. The reply comes from the Core on his desk.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "saeed",
+        "text": "Hello, Saeed. I am Barberry. Where shall we begin?"
+      },
+      "detail": {
+        "before": "Saeed kept his reminders in a notebook and wrote each follow-up from a blank page.",
+        "after": "Barberry runs in its own sandbox on the Core. Saeed texts it a few lines and reads whatever draft comes back.",
+        "steps": [
+          "Pick Hermes in the Companion Hub store",
+          "Give the agent a name",
+          "Send it a first message"
+        ],
+        "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+      }
+    },
+    {
+      "id": "nook-start",
+      "chapter": "nook",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "homarr",
+        "replaces": []
+      },
+      "capability": "one start page for the apps on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One start page for the Core",
+        "body": "Homarr puts the apps on the Core on one start page. The laptops open it first, so nobody has to remember an address.",
+        "chips": [
+          "Homarr"
+        ]
+      },
+      "detail": {
+        "before": "Each app had its own address, kept in a bookmark or in someone's head.",
+        "after": "Homarr lists the apps on the Core on one start page, and each laptop opens it first.",
+        "steps": [
+          "Open Homarr in a browser tab",
+          "Add each app on the Core once",
+          "Set it as the first page on both laptops"
+        ],
+        "fact": "Homarr is one start page for the apps on your Core."
+      }
+    },
+    {
+      "id": "nook-backup",
+      "chapter": "nook",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Carbonite"
+        ]
+      },
+      "capability": "back up your files with encryption before they leave your Core",
+      "service": "carbonite",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A weekly copy to a disk",
+        "body": "Duplicati copies the shop's invoices and Saeed's notes to a disk on the ladder shelf each Friday. The disk stays in the flat, not with a backup service.",
+        "chips": [
+          "Duplicati",
+          "alternative to Carbonite"
+        ]
+      },
+      "detail": {
+        "before": "Their backups went to Carbonite, away from the flat and out of their sight.",
+        "after": "Duplicati copies the chosen folders to a local disk on the shelf, with encryption, as they leave the Core.",
+        "steps": [
+          "Pick the invoices and the notes folders",
+          "Choose the disk on the shelf",
+          "Set the Friday schedule"
+        ],
+        "fact": "Duplicati backs up your files with encryption before they leave your Core."
+      }
+    },
+    {
+      "id": "nook-vault",
+      "chapter": "nook",
+      "member": "saeed",
+      "agent": "saeed",
+      "approval": "saeed",
+      "category": "productivity",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "service": "evernote",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "Barberry lists what is unchecked",
+        "body": "A long investigation's notes sit in Obsidian as plain files. Barberry lists the claims with no source, and Saeed checks each one.",
+        "chips": [
+          "Obsidian",
+          "alternative to Evernote"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "detail": {
+        "before": "Years of Saeed's reporting notes lived as pages inside Evernote.",
+        "after": "Obsidian opens the vault in a browser tab from the Core. The notes are Markdown files, and Barberry reads them to list the gaps.",
+        "steps": [
+          "Move the notes into the vault folder",
+          "Text Barberry the story's name",
+          "Check each listed claim against the file"
+        ],
+        "fact": "Obsidian is a note app in your browser. Your notes stay as local Markdown files."
+      }
+    },
+    {
+      "id": "nook-archive",
+      "chapter": "nook",
+      "member": "saeed",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "archivebox",
+        "replaces": [
+          "Instapaper"
+        ]
+      },
+      "capability": "keep your own searchable archive of web pages",
+      "service": "instapaper",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The page was gone that week",
+        "body": "A council page Saeed quoted is taken down the week the story runs. ArchiveBox kept a dated copy on the Core, so he can show what it said.",
+        "chips": [
+          "ArchiveBox",
+          "alternative to Instapaper"
+        ]
+      },
+      "detail": {
+        "before": "Saeed saved pages to read later in Instapaper, and a page he cited had no copy beside his draft.",
+        "after": "ArchiveBox saves a searchable, dated copy of each page he cites on the Core. The copy opens when the live page no longer does.",
+        "steps": [
+          "Paste the page's address into ArchiveBox",
+          "Let it save a dated copy",
+          "Open the copy if the page changes"
+        ],
+        "fact": "ArchiveBox keeps your own searchable archive of web pages."
+      }
+    },
+    {
+      "id": "nook-merge",
+      "chapter": "nook",
+      "member": "saeed",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Smallpdf"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "service": "smallpdf",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nine files become one record",
+        "body": "A records request comes back as nine separate PDFs. Saeed merges them in date order with Stirling-PDF, and the single file stays on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Smallpdf"
+        ]
+      },
+      "detail": {
+        "before": "Saeed merged records through Smallpdf, uploading each file to its website, one at a time.",
+        "after": "Stirling-PDF merges the files on the Core. Saeed puts the pages in date order and saves the result beside his notes.",
+        "steps": [
+          "Drop the files into Stirling-PDF",
+          "Put the pages in date order",
+          "Save the merged file beside the notes"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+      }
+    },
+    {
+      "id": "nook-board",
+      "chapter": "nook",
+      "member": "saeed",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look to sketch ideas",
+      "service": "miro",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A timeline sketched by hand",
+        "body": "Saeed sketches who knew what, and when, on a whiteboard in his browser. The sketch is a file on the Core, ready to redraw when a date moves.",
+        "chips": [
+          "Excalidraw",
+          "alternative to Miro"
+        ]
+      },
+      "detail": {
+        "before": "Saeed's story timelines lived on Miro boards.",
+        "after": "Excalidraw opens in a browser tab from the Core. The timeline is a file there, and he redraws it when a date moves.",
+        "steps": [
+          "Open Excalidraw in a browser tab",
+          "Draw the events in date order",
+          "Save the board with the story's notes"
+        ],
+        "fact": "Excalidraw is a whiteboard with a hand-drawn look, for sketching ideas together."
+      }
+    },
+    {
+      "id": "nook-photos",
+      "chapter": "nook",
+      "member": "saeed",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "send files between phones and laptops on the same Wi-Fi",
+      "service": "airdrop",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right",
+        "from": "right"
+      },
+      "popup": {
+        "title": "A handwritten letter reaches the laptop",
+        "body": "A source mails Saeed a handwritten letter. He takes pictures of each page, and PairDrop sends them to the laptop over the home Wi-Fi.",
+        "chips": [
+          "PairDrop",
+          "alternative to AirDrop"
+        ]
+      },
+      "detail": {
+        "before": "Saeed's phone pictures reached the laptop by AirDrop, one transfer at a time.",
+        "after": "PairDrop opens in a browser tab on the phone and the laptop, served from the Core. The files pass over the home Wi-Fi.",
+        "steps": [
+          "Open PairDrop on the phone and the laptop",
+          "Pick the laptop on the phone",
+          "Save the pages beside the notes"
+        ],
+        "fact": "PairDrop sends files between phones and laptops on the same Wi-Fi."
+      }
+    },
+    {
+      "id": "living-invoice",
+      "chapter": "living",
+      "member": "nasrin",
+      "agent": "nasrin",
+      "approval": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "film": true,
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "send invoices and quotes, and track expenses and time",
+      "service": "quickbooks",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Sumac drafts the school's invoice",
+        "body": "A school orders notebooks. Sumac drafts the invoice in Invoice Ninja from Nasrin's list, and she reads every line first.",
+        "chips": [
+          "Invoice Ninja",
+          "alternative to QuickBooks"
+        ]
+      },
+      "say": {
+        "speaker": "nasrin",
+        "text": "Here is the draft. Please read each line."
+      },
+      "detail": {
+        "before": "Nasrin typed every school invoice into QuickBooks by hand, from the order list.",
+        "after": "Sumac opens Invoice Ninja in its own browser and drafts the invoice from Nasrin's list. She reads every line before it stands.",
+        "steps": [
+          "List the school's items and amounts",
+          "Sumac drafts the invoice in Invoice Ninja",
+          "Read every line before it stands"
+        ],
+        "fact": "Invoice Ninja sends invoices and quotes and tracks expenses and time."
+      }
+    },
+    {
+      "id": "living-sign",
+      "chapter": "living",
+      "member": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "capability": "fill and sign PDF forms on any device, from your own Core",
+      "service": "docusign",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "The supplier signs on the sofa",
+        "body": "A paper supplier's rep visits the flat to renew the trade terms. She signs the PDF on Nasrin's tablet, and the signed file sits on the Core.",
+        "chips": [
+          "Docuseal",
+          "alternative to DocuSign"
+        ]
+      },
+      "detail": {
+        "before": "The trade terms went out through DocuSign for each signature, and the signed copies came back by email.",
+        "after": "Docuseal fills and signs the PDF on Nasrin's tablet in the room. The signed file is saved on the Core.",
+        "steps": [
+          "Open the terms PDF in Docuseal",
+          "Hand the tablet to the supplier's rep",
+          "Save the signed file on the Core"
+        ],
+        "fact": "Docuseal fills and signs PDF forms on any device, from your own Core."
+      }
+    },
+    {
+      "id": "living-customers",
+      "chapter": "living",
+      "member": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "service": "salesforce",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Every customer in one record",
+        "body": "Schools and offices reorder every term. Twenty keeps each customer, last term's order and a call-back date in one record.",
+        "chips": [
+          "Twenty",
+          "alternative to Salesforce"
+        ]
+      },
+      "detail": {
+        "before": "Nasrin kept her customer list in Salesforce, apart from the orders.",
+        "after": "Twenty holds each customer's record on the Core, with the last order and a date to call back.",
+        "steps": [
+          "Add each school or office as a company",
+          "Note the last term's order",
+          "Set a date to call back"
+        ],
+        "fact": "Twenty keeps customers, deals and custom fields in a CRM you host yourself."
+      }
+    },
+    {
+      "id": "living-visits",
+      "chapter": "living",
+      "member": "nasrin",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "umami",
+        "replaces": [
+          "Google Analytics"
+        ]
+      },
+      "capability": "website analytics that keeps visitor data in your hands",
+      "service": "google-analytics",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Counting visits to the order page",
+        "body": "Nasrin checks how many people looked at the new notebook range. Umami keeps those visit counts on the Core, so the order page's visitor data stays in her hands.",
+        "chips": [
+          "Umami",
+          "alternative to Google Analytics"
+        ],
+        "note": "Umami needs outside access to count visits."
+      },
+      "detail": {
+        "before": "Visits to the order page were counted in Google Analytics.",
+        "after": "Umami counts the same visits and keeps the figures on the Core. Nasrin reads them from the sofa.",
+        "steps": [
+          "Add the order page to Umami",
+          "Read the weekly visit counts",
+          "Compare the new range with the old"
+        ],
+        "fact": "Umami is website analytics that keeps visitor data in your hands."
+      }
+    },
+    {
+      "id": "living-news",
+      "chapter": "living",
+      "member": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "listmonk",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "capability": "write and send newsletters to your own mailing list",
+      "service": "mailchimp",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The new-term newsletter",
+        "body": "Nasrin writes the new-term newsletter on the sofa after closing. Listmonk keeps the subscriber list on the Core and sends the letter through a mail provider.",
+        "chips": [
+          "Listmonk",
+          "alternative to Mailchimp"
+        ],
+        "note": "Sending needs a mail provider outside the Core."
+      },
+      "detail": {
+        "before": "Nasrin's subscriber list and each newsletter sat in Mailchimp.",
+        "after": "Listmonk keeps the subscriber list on the Core. She writes the letter there and sends it through a mail provider.",
+        "steps": [
+          "Import the subscriber list into Listmonk",
+          "Write the new-term letter",
+          "Send it through the mail provider"
+        ],
+        "fact": "Listmonk writes and sends newsletters to your own mailing list."
+      }
+    },
+    {
+      "id": "living-podcast",
+      "chapter": "living",
+      "member": "saeed",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Apple Podcasts"
+        ]
+      },
+      "capability": "listen to audiobooks and podcasts and pick up where you left off",
+      "service": "apple-podcasts",
+      "anchor": {
+        "role": "couch",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Episodes that keep his place",
+        "body": "Saeed follows a local history podcast for his story. Audiobookshelf keeps the episodes on the Core and picks up where he left off on any device.",
+        "chips": [
+          "Audiobookshelf",
+          "alternative to Apple Podcasts"
+        ]
+      },
+      "detail": {
+        "before": "Saeed's podcast subscriptions and listening history lived in Apple Podcasts.",
+        "after": "Audiobookshelf holds the episodes and his place in each on the Core, and any device picks up where he stopped.",
+        "steps": [
+          "Add the podcast's feed to Audiobookshelf",
+          "Play an episode on the sofa",
+          "Pick it up again on the phone"
+        ],
+        "fact": "Audiobookshelf lets you listen to audiobooks and podcasts, and pick up where you left off on any device."
+      }
+    },
+    {
+      "id": "laundry-receipt",
+      "chapter": "laundry",
+      "member": "nasrin",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "archive receipts, warranties and contracts you rarely look at",
+      "service": "google-drive",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "The washer's receipt and manual",
+        "body": "The washing machine stops mid-cycle, and Nasrin needs the receipt. Papra archived it with the manual and the repair terms, so she finds all three together.",
+        "chips": [
+          "Papra",
+          "alternative to Google Drive"
+        ]
+      },
+      "detail": {
+        "before": "The receipt sat in a Google Drive folder, away from the manual and the repair terms.",
+        "after": "Papra archives receipts, manuals and terms on the Core, so one search finds all three.",
+        "steps": [
+          "Scan the receipt and the manual",
+          "Add the repair terms",
+          "Search for the machine's name"
+        ],
+        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
+      }
+    },
+    {
+      "id": "balcony-stamp",
+      "chapter": "balcony",
+      "member": "nasrin",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics in your browser",
+      "service": "adobe-illustrator",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Redrawing the stamp in daylight",
+        "body": "Nasrin redraws the shop's gift-wrap stamp at the balcony table in the morning light. Inkscape saves it as a vector file on the Core.",
+        "chips": [
+          "Inkscape",
+          "alternative to Adobe Illustrator"
+        ]
+      },
+      "detail": {
+        "before": "The stamp artwork was an Adobe Illustrator file that only one laptop could open.",
+        "after": "Inkscape opens in a browser tab served by the Core, so the artwork opens on any laptop in the flat.",
+        "steps": [
+          "Open Inkscape in a browser tab",
+          "Redraw the stamp's border and lettering",
+          "Save the file on the Core"
+        ],
+        "fact": "Inkscape draws logos, diagrams and line art as vector graphics, in your browser."
+      }
+    },
+    {
+      "id": "kitchen-feeds",
+      "chapter": "kitchen",
+      "member": "saeed",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "freshrss",
+        "replaces": []
+      },
+      "capability": "read the sites you follow in one feed, on your own Core",
+      "anchor": {
+        "role": "counter",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "from": "right"
+      },
+      "popup": {
+        "title": "The morning feeds in one place",
+        "body": "Saeed follows council minutes, court lists and two local papers. FreshRSS gathers the sites in one feed on the Core, and he reads it over coffee.",
+        "chips": [
+          "FreshRSS"
+        ]
+      },
+      "detail": {
+        "before": "Saeed opened a dozen sites one after another each morning to see what had changed.",
+        "after": "FreshRSS pulls the sites he follows into one feed on the Core, so one list shows what is new.",
+        "steps": [
+          "Add each site he follows to FreshRSS",
+          "Group the sites by story",
+          "Read the new items over coffee"
+        ],
+        "fact": "FreshRSS lets you read the sites you follow in one feed, on your own Core."
+      }
+    },
+    {
+      "id": "kitchen-subs",
+      "chapter": "kitchen",
+      "member": "saeed",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "service": "rocket-money",
+      "anchor": {
+        "role": "counter",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The papers he pays to read",
+        "body": "Saeed lists every paper and archive he pays to read. Wallos holds the renewal dates on the Core and reminds him before each one.",
+        "chips": [
+          "Wallos",
+          "alternative to Rocket Money"
+        ],
+        "note": "Wallos fetches service logos from outside."
+      },
+      "detail": {
+        "before": "Saeed tracked his reading subscriptions in Rocket Money.",
+        "after": "Wallos holds the renewal dates on the Core and sends a reminder before each one. He decides whether to keep it.",
+        "steps": [
+          "List each paper and archive he pays for",
+          "Add every renewal date",
+          "Read the reminder before the date"
+        ],
+        "fact": "Wallos tracks every subscription you pay for and reminds you before it renews."
+      }
+    },
+    {
+      "id": "kitchen-calendar",
+      "chapter": "kitchen",
+      "member": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for calendars and contacts",
+      "service": "google-calendar",
+      "anchor": {
+        "role": "counter",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Deliveries and interviews, one calendar",
+        "body": "Supplier deliveries, school visits and Saeed's interviews share one calendar. Baikal serves it from the Core, and both phones read it over the home Wi-Fi.",
+        "chips": [
+          "Baikal",
+          "alternative to Google Calendar"
+        ]
+      },
+      "detail": {
+        "before": "Deliveries lived on a Google Calendar that Saeed never saw, so his interviews clashed with them.",
+        "after": "Baikal serves one calendar from the Core. Deliveries, school visits and interviews sit on it, and both phones read it.",
+        "steps": [
+          "Add the supplier's delivery days",
+          "Add Saeed's interviews as they are booked",
+          "Check the week from either phone"
+        ],
+        "fact": "Baikal is a small CalDAV and CardDAV server for your calendars and contacts."
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses",
+      "service": "cozi",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dinner and delivery days together",
+        "body": "HomeHub keeps the shopping list, the dinners and the shop's delivery days together on the Core, read at the fridge.",
+        "chips": [
+          "HomeHub",
+          "alternative to Cozi"
+        ]
+      },
+      "detail": {
+        "before": "Their lists lived in Cozi, and the shop's late delivery days never made it onto them.",
+        "after": "HomeHub keeps one set of lists on the Core, and the shop's delivery days sit beside the dinners.",
+        "steps": [
+          "Add the week's dinners",
+          "Mark the shop's delivery days",
+          "Read the list at the fridge"
+        ],
+        "fact": "HomeHub is a shared household hub for notes, shopping, chores and expenses, with a recipe book and an expiry tracker."
+      }
+    },
+    {
+      "id": "entry-stock",
+      "chapter": "entry",
+      "member": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "build a no-code database for orders, inventory or projects",
+      "service": "airtable",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One stock table for the shop",
+        "body": "Deliveries for the shop come through the hall before they go downstairs. Nasrin logs each one in a single Baserow table on the Core, a row for each item.",
+        "chips": [
+          "Baserow",
+          "alternative to Airtable"
+        ]
+      },
+      "detail": {
+        "before": "Nasrin kept the stock list as a base in Airtable, and counted the shelves by hand.",
+        "after": "Baserow holds the stock as one table on the Core, with a row for each item. She updates a row when a delivery arrives.",
+        "steps": [
+          "Make a table with a row for each item",
+          "Add the shelf counts",
+          "Update a row when a delivery arrives"
+        ],
+        "fact": "Baserow builds a no-code database for orders, inventory or projects."
+      }
+    },
+    {
+      "id": "front-event",
+      "chapter": "out-front",
+      "member": "nasrin",
+      "category": "small-business",
+      "segment": "small-business",
+      "film": true,
+      "app": {
+        "id": "hi-events",
+        "replaces": [
+          "Eventbrite"
+        ]
+      },
+      "capability": "create events, share tickets and check guests in with a scanner",
+      "service": "eventbrite",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A lettering evening at the shop",
+        "body": "Nasrin plans a hand-lettering evening for her regulars. Hi.Events keeps the guest list on the Core and checks guests in at the door.",
+        "chips": [
+          "Hi.Events",
+          "alternative to Eventbrite"
+        ],
+        "note": "Public ticket pages need outside access."
+      },
+      "detail": {
+        "before": "Nasrin ran earlier workshops through Eventbrite, with the guest list held there.",
+        "after": "Hi.Events keeps the guest list on the Core. Free events and RSVPs work without a payment provider.",
+        "steps": [
+          "Create the evening as a free event",
+          "Invite the shop's regulars",
+          "Check guests in at the door"
+        ],
+        "fact": "Hi.Events creates events, shares tickets and checks guests in with a scanner."
+      }
+    },
+    {
+      "id": "front-ride",
+      "chapter": "out-front",
+      "member": "saeed",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "endurain",
+        "replaces": [
+          "Strava"
+        ]
+      },
+      "capability": "track runs, rides and gear and see your fitness stats on your own server",
+      "service": "strava",
+      "anchor": {
+        "role": "garden",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "front-door"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Rides kept on the Core",
+        "body": "Saeed cycles to most of his interviews from the street door. Endurain keeps each ride and the bike's gear on the Core, and syncing out is optional.",
+        "chips": [
+          "Endurain",
+          "alternative to Strava"
+        ]
+      },
+      "detail": {
+        "before": "Saeed's rides went to Strava, route by route, from the street door onwards.",
+        "after": "Endurain takes each ride as a GPX file and keeps the rides and the bike's gear on the Core. He leaves syncing off.",
+        "steps": [
+          "Finish the ride at the street door",
+          "Upload the ride's GPX file to Endurain",
+          "Leave syncing off"
+        ],
+        "fact": "Endurain tracks runs, rides and gear and shows your fitness stats on your own server."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "side": "left",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core above the shopfronts",
+        "body": "Invoices, event lists, reporting notes and morning feeds run on one Companion Core, in a flat above the shops."
+      }
+    }
+  ],
+  "closing": {
+    "body": "Your invoices, orders and reporting notes can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Paperless-ngx is over the 40 percent app cap, so the cast plan's paperless is swapped for Papra (laundry-receipt); the plan and the derived casting are changed to match.",
+    "Whisper-WebUI would suit Saeed's interview tape but has no QA screenshot, so it needs an owner entry in reviewed.json; it is left out and the tape is not told.",
+    "Umami and Hi.Events carry the catalog's public-access caveat. Each beat carries the note and tells a count or a guest list at home, never a public link.",
+    "Listmonk sending needs an outside mail provider; the beat says so and promises no delivery. Docuseal: the supplier signs in the room, never from outside the home network.",
+    "Endurain: syncing out is optional (catalog caveat); the beat logs rides only and makes no health claim. Wallos carries its logo-fetch note.",
+    "Barberry (Hermes) acts on Obsidian through its MCP entry and only lists; Sumac (OpenClaw) opens Invoice Ninja and only drafts. Both are approved line by line by their owner.",
+    "Camera: the first run walks the street to the Core, then every room beat is on the second level. The only walk off it is down the stairs to the street for out-front and the outro."
+  ]
+}
