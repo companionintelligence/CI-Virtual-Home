@@ -26,8 +26,8 @@ export const FLEET = { topicMin: 10, appsMin: 70, appShareMax: 0.4, richMin: 3, 
  *   kiwixMax      families that name Kiwix (Kiwix is marked avoid since the 2026-10-19 decisions, so this is 0 in a v3 fleet; the cap is the old plan's)
  *   rareHomes     an app in at most this many homes is rare; rareShare is reported (info), never gated
  *   v3Required    fleet-v3: every family is a v3 family. Off until the last home is rewritten; the last PR sets it
- * The app cap stays appShareMax of the families present (appCap): 12 of the 30 families written so far, 14 of 36 once the six apartments (cast since
- * 2026-10-22, stories to come) have theirs. Nothing hard-codes it, and there is no `families` constant: the size of the fleet is the casting's
+ * The app cap stays appShareMax of the families present (appCap): 12 of the 30 families written so far, 14 of 36 with the six apartments (cast on
+ * 2026-10-22, their stories written). Nothing hard-codes it, and there is no `families` constant: the size of the fleet is the casting's
  * (content/story/casting.json, from cast-plan.json) and cast-lint.mts derives the same cap from the plan.
  */
 export const FLEET_V3 = { appsMin: 100, pairShareMin: 0.8, servicesMin: 70, servicesPerHomeMin: 14, kiwixMax: 6, rareHomes: 8, rareShare: 0.4, v3Required: false } as const;

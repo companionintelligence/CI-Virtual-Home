@@ -16,7 +16,7 @@ and what was measured. Everything below was tried in the engine; "measured" mean
 | `walkup-duplex` | Walk-up Duplex | two levels in a dark-brick deck-access block | 110 (both levels) | 4 |
 
 All six are built, baked, in the gallery (`Apartment` tag) and recorded (plans, isometrics, CAD sheets, planner tracks, thumbnails and
-link previews). Each has a family in the cast plan (`content/story/cast-plan.json`, cast on 2026-10-22: valdivia in studio-loft, tehrani in city-one-bed, steyn in two-bed-flat, voss in corner-penthouse, penhallow in garden-flat, rademaker in walkup-duplex) and no story yet; none has a golden baseline yet
+link previews). Each has a family in the cast plan (`content/story/cast-plan.json`, cast on 2026-10-22: valdivia in studio-loft, tehrani in city-one-bed, steyn in two-bed-flat, voss in corner-penthouse, penhallow in garden-flat, rademaker in walkup-duplex) and a story each (`content/families/<slug>.json`, in the v3 shape); none has a golden baseline yet
 (section 8). `studio-loft` is the exemplar: build the next one the way it is built.
 
 ---
@@ -301,6 +301,19 @@ node --experimental-strip-types scripts/validate-house-spec.mts --layout content
 A layout change means: regenerate, `--write` (a re-bake replaces `compose@1` and `dress@1` items, keeps yours), `--dress
 --write` again, strip the newline again. Bake at the default dress level (no `--level`): `test-dress-phase` S proves a baked
 house is what `--dress` writes today. Never put a `dress` field on a room.
+
+### 2.10 The flat's facts: what a page may count
+
+The spec draws the block, so `levels.length` and the number of `rooms[]` are the block's (the one-bedroom flat has six levels and twenty-seven rooms; seven rooms are the flat). `areaSqm` is the
+unit's already (2.1 step 7). A page that prints "N storeys, N m², N rooms" must print the flat's, so `content/houses/index.json` carries the unit's `storeys` for an apartment (which the gallery, a
+home's page, a plain card and the player's facts line read), a family's page counts the unit's rooms, and its floor plan draws only the unit's storeys and rooms in one outline.
+
+The unit is read, not marked (a mark in a baked spec would move the bake): `scripts/apartment-unit.mts`. On each storey the flat's own rooms are the ones with a `program` that is not `hall`; a storey with
+none of them is the block's (the podium, the floors above, the roof); and a room belongs to the flat when its centre lies inside the box those rooms span, which takes in the flat's own halls (an entry
+hall, a passage, the family's stair) and leaves out the neighbours, the core and the podium's shops. So the recipe above has a consequence the rule needs: give every room of the flat a program that is
+not `hall` or put it inside the flat's box; leave a neighbour's, a shop's and the roof's rooms without a program; and make the core's room a `hall` that lies beside the flat, not inside it.
+An apartment is one that `content/story/lander.json` lists under `types.apartment`; any other home is read whole. `scripts/test-apartment-unit.mts` pins the unit of each of the six, room by room:
+add a new apartment to that list and to that table in the same commit, and look at what it says.
 
 ---
 

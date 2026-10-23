@@ -60,7 +60,7 @@ export const filterTokens = (archetypes: readonly string[]): string[] => {
 
 /**
  * The homes the cast plan says have no family (yet): house id → why (content/story/cast-plan.json `homesWithoutFamily`; empty since the six
- * apartments were cast on 2026-10-22, until their stories are written they are casting families without a file, which site.mts reports; a new
+ * apartments were cast on 2026-10-22 and their stories written; a casting family whose story is not written yet is reported by site.mts, and a new
  * kind of home, such as an office, would be listed here).
  * Such a home is a home like any other on the site: a plain card that opens the player, a page of its own, no tour. scripts/story/cast-lint.mts
  * holds the list to the homes, so a home with neither a family nor a line here is the cast's error, not a surprise of the build.

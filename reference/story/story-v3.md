@@ -33,7 +33,7 @@ These win over any older document.
 **Staging.** Stage 1 (foundation): the archetypes, the age rule, the Kiwix tooling, the `service` pairs and the registry, the household, persona-band and pair
 rules (this document), then the 30-home recast and the app rotation. Stage 2 (pilot): the three flagship homes (`seraphine`, `bgfamily`, `familyhouse-nora`)
 rewritten end to end, reviewed and fleet-checked. Stage 3: the other 27 homes in batches, then the six apartments once they are folded in, then the page
-builders for the pair component (the apartments were cast in a separate file, `reference/story/program-2026-10/v3-inputs/apartments-cast.json`, and that cast was applied to `cast-plan.json` on 2026-10-22: their six families are there, their stories are still to be written).
+builders for the pair component (the apartments were cast in a separate file, `reference/story/program-2026-10/v3-inputs/apartments-cast.json`, and that cast was applied to `cast-plan.json` on 2026-10-22: their six families are there, and their stories are written, in this shape).
 
 **What "varied and pointed" means for the writers.**
 
@@ -55,7 +55,7 @@ builders for the pair component (the apartments were cast in a separate file, `r
 Every field below is optional on `family/v1` (the schema id stays `https://homes.ci.computer/schema/family-v1.json`). A family file with none of them
 validates as before. A family with at least one `beat.service` is a **v3 family** (`isV3Story`, `scripts/story/lib/v3.mts`) and is held to the v3 rules at full
 severity; every other family meets them as warnings, the device `detail-missing` uses for v2. So `story:validate` on the thirty families written before v3
-stays at exit 0 (with warnings) until each home is rewritten. When every family is a v3 family (the six apartments will be told in this shape from the start), `fleet-v3` turns the warnings into errors fleet-wide (the
+stays at exit 0 (with warnings) until each home is rewritten. When every family is a v3 family (the six apartments were told in this shape from the start), `fleet-v3` turns the warnings into errors fleet-wide (the
 constant `FLEET_V3.v3Required`, off today).
 
 Where this differs from story v2's text: a persona's "3 to 7 beats of its own" was a writing guide that nothing enforced; in a v3 family the bands below replace it.
