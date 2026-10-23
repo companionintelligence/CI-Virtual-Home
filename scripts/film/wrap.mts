@@ -25,15 +25,19 @@ import { ROOT, loadClaims, loadFamily, filmDisclosureIds, sha256, type Claims } 
 import { probe, gate as filmGate } from './qa.mts';
 import { edgeSpread, BLANK_STD } from './ads-qa.mts';
 import { builderHandles, guardTerms, scanText, type GuardTerm } from '../portal-redact.mts';
+import { FILM } from '../../assets/story/film/layout.js';
 import { platesDir, kitProjectsRoot, copyProblems, canon } from './plates/lib.mts';
 
 export const KIT_ENV = 'CI_COMMON_KIT';
 export const KIT_MIN = [0, 35, 0] as const;
 /** the link a home film's end card carries, and the one nothing else may print */
 export const LINK = 'ci.computer/core';
-/** the longest a film made through the kit may be (the repository's own film is capped at 110 s; see gateOutput) */
-export const KIT_FILM_MAX_S = 120;
-/** a picture that does not change for this long is a fault in a film made through the kit (the repository's own film refuses 2 s: it has a karaoke highlight moving on every frame) */
+/**
+ * A picture that does not change for this long is a fault in a film made through the kit; one shorter is said. The repository's own film refuses 2 s (qa.mts FREEZE_S) because a karaoke highlight moves on
+ * every frame of it, so a stopped picture can only be a stuck render; the kit's subtitles change once a cue, and the bake rests the camera while a caption is read, so a captioned room at rest holds still for
+ * the length of a cue (measured on the Brennan homes of the pilot: none, 1.7 to 1.9 s and 2.0 to 3.0 s). This is the one gate the wrap reads differently from the film's, and the film.md says so.
+ * (The film's length cap is NOT read differently: a kit film is at most FILM.maxS, as the film is, and the plates select their beats to fit it.)
+ */
 export const KIT_FREEZE_MAX_S = 4;
 
 // ---- the kit --------------------------------------------------------------------------------------------------------------------------------------------
@@ -190,13 +194,11 @@ export function gateOutput(file: string, o: { cut: string; format: string; fps: 
   const seconds = o.expectSeconds ?? p.duration, wantFrames = seconds * o.fps, frames = Math.abs(v.frames - wantFrames) <= 1.01 ? v.frames : Math.round(wantFrames);
   const rep = filmGate(file, { w: v.w, h: v.h, fps: o.fps, frames, durationS: seconds, titleEnd: 0, outroTail: 0, web: false, channels: 0, silent: true });
   for (const e of rep.errors) {
-    // The film's cap is 110 s. The kit's film is the plates plus what the kit adds (the title, the apps, the end card and the disclosures held long enough to read: about 26 s, 14 of them the four lines of an
-    // agent-naming family), so a film of this kind runs a few seconds past it. Up to KIT_FILM_MAX_S that is said, not refused (an owner call: reference/story/film.md); beyond it the film fails.
-    // A silent film's room rests while a caption is read (the bake holds a beat's camera at rest), so a still picture of two or three seconds is the film, not a fault; a render that stuck is far longer.
+    // The film's cap (110 s) is a hard error here as it is for the film: the plates choose their beats so that the kit's film fits it (plates/lib.mts selectBeats), and nothing in this file widens it.
+    // A silent film's room rests while a caption is read (the bake holds a beat's camera at rest), so a still picture of a cue's length is the film, not a fault; a render that stuck is far longer (KIT_FREEZE_MAX_S).
     const frozen = /the picture is frozen for ([\d.]+) s/.exec(e);
     if (frozen && +frozen[1] < KIT_FREEZE_MAX_S) { warnings.push(`${e.replace('is frozen', 'holds still')} (a captioned room at rest; refused from ${KIT_FREEZE_MAX_S} s)`); continue; }
-    if (/over the 110 s cap/.test(e) && p.duration <= KIT_FILM_MAX_S) warnings.push(`${p.duration.toFixed(1)} s is over the 110 s a film of this repository is capped at; the kit's film adds its title, apps, end card and disclosures to the plates (refused above ${KIT_FILM_MAX_S} s)`);
-    else errors.push(e);
+    errors.push(e);
   }
   for (const w of rep.warnings) if (!/under the 75 s a family film is designed for/.test(w)) warnings.push(w);
   if (o.expectSeconds === null) warnings.push('the kit did not say how long this file should be: the length is its own');
@@ -213,6 +215,14 @@ export function builtSeconds(out: string): Map<string, number> {
   const m = new Map<string, number>();
   for (const x of out.matchAll(/built\s+(\S+?)\/(landscape|portrait|square)\s+([\d.]+)s/g)) m.set(`${x[1]}/${x[2]}`, +x[3]);
   return m;
+}
+/** The kit's own figure for its film (from `build`) against the cap, for each format the film is built in: a sentence when it is over, else null. A film is never longer than FILM.maxS and there is no other number. */
+export function kitCapProblem(built: Map<string, number>, filmId: string): string | null {
+  for (const format of ['landscape', 'portrait']) {
+    const s = built.get(`${filmId}/${format}`);
+    if (s !== undefined && s > FILM.maxS) return `the kit's film (${format}) is ${s.toFixed(1)} s and the cap is ${FILM.maxS} s`;
+  }
+  return null;
 }
 /** `out/<cut>-<format>.mp4` -> [cut, format] */
 export function outputOf(name: string): [string, string] | null { const m = /^(.*)-(landscape|portrait|square)\.mp4$/.exec(name); return m ? [m[1], m[2]] : null; }
@@ -246,6 +256,9 @@ export async function wrapOne(id: string, o: WrapOpts): Promise<WrapResult> {
       // and said, and the film is kept; --strict-cuts makes it an error
       t = Date.now();
       const sb0 = JSON.parse(fs.readFileSync(path.join(project, 'storyboard.json'), 'utf8')) as Board, filmId = sb0.app?.id ?? id;
+      // the cap, from the kit's own figure and before an hour of rendering: a film is never longer than FILM.maxS (the plates' beats are chosen to fit it; this is the check that they did)
+      const tooLong = kitCapProblem(built, filmId);
+      if (tooLong) throw new Error(`${tooLong}: the plates in ${path.relative(ROOT, manifestFile)} are too long for it (pnpm run story:film -- ${id} --plates writes the beats that fit)`);
       const chk = await runKit(o.kit, project, ['check', '--cut', filmId], { env, timeoutMs: 30 * 60_000 });
       if (chk.code !== 0) throw new Error(`ci-video check failed for the film (the kit's own gates, the caption-versus-subject rule among them):\n${chk.out.trim().split('\n').slice(-24).join('\n')}`);
       for (const d of sb0.deliverables || []) {

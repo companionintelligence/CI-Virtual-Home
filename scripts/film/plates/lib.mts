@@ -20,7 +20,7 @@ import { tiltTarget, bandTop, clearBand, KIT_LABEL, MAX_TILT_DEG, type V3 } from
 import { plateSize, KIT_NAME, type PlateKey, type PlateSize } from '../../../assets/story/film/plates/format.js';
 import { displayName } from '../../../assets/home-names.js';
 import { ROOT, familiesDir, loadClaims, filmDisclosureIds, filmText, sha256, hash10, readJson, FILM_LIGHTING, type Claims, type Family } from '../lib.mts';
-import { readMedia, appCaption, type MediaManifest } from '../../story/lib/media.mts';
+import { readMedia, type MediaManifest } from '../../story/lib/media.mts';
 import { buildPairIndex, pairLine, type PairIndex } from '../../story/lib/pairs.mts';
 import { readPlan, readInputs, bansOf, placeTypes, type PlaceType } from '../../story/lib/lander.mts';
 import { EXTRA_BANS } from '../../story/lib/extra-bans.mts';
@@ -297,6 +297,79 @@ export function chipsOf(story: Story, b: { app?: { id: string } | undefined; wit
 }
 /** The real logo file of an app (relative to the repository root), or null: an app with no entry is shown by its name alone, never with a stand-in. */
 export const logoFileOf = (media: MediaManifest | null, id: string): string | null => media?.apps[id]?.logo?.file || null;
+
+// ---- the kit's film: how long it is, and which beats fit under the cap ---------------------------------------------------------------------------------------
+/**
+ * The kit's recipe for a family film as numbers: video-kit 0.35.0 `filmScenes` (src/sources/virtual-home-recipes.ts), `overlapsOf` and `layout` (src/build.ts). The kit adds a title card, the apps
+ * (six chips a scene), a screenshot (6 s each), the end card and the disclosure card held long enough to read to the plates, and its scenes overlap: a dissolve takes 0.5 s of both, a change of person is
+ * a "hold" (0.4 s of bare ground, which lengthens the film) and the disclosure card is cut to. `scripts/test-film-plates.mts` holds this to the kit's own figure for a real manifest when a kit is at hand.
+ */
+export const KIT_FILM = { titleS: 3, closeS: 4, proofS: 6, appsMinS: 4, appsBaseS: 2.2, appsPerChipS: 0.55, chipsPerAppsScene: 6, dissolveS: 0.5, holdS: 0.4, codaMinS: 5, codaLeadS: 1.2, codaWordsPerS: 4 } as const;
+const r1 = (v: number) => Math.round(v * 10) / 10;
+const n3 = (v: number) => Math.round(v * 1000) / 1000;
+/** the words of the disclosures as the kit counts them (it holds the card for as long as they take to read) */
+export const disclosureWords = (ds: Array<{ text: string }>): number => ds.reduce((n, d) => n + d.text.split(/\s+/).filter(Boolean).length, 0);
+export type KitBeat = { seconds: number; member: string | null };
+/** The length of the kit's film, in seconds, for these plates (in film order, the approach first), this many distinct apps, this many screenshots and a disclosure card of this many words. */
+export function kitFilmLength(o: { beats: KitBeat[]; apps: number; inserts: number; disclosureWords: number }): number {
+  type Enter = 'dissolve' | 'hold' | 'cut';
+  const scenes: Array<{ s: number; enter: Enter }> = [{ s: KIT_FILM.titleS, enter: 'dissolve' }];
+  o.beats.forEach((b, i) => scenes.push({ s: n3(b.seconds), enter: i > 0 && o.beats[i - 1].member !== b.member ? 'hold' : 'dissolve' }));
+  for (let left = o.apps, i = 0; left > 0; left -= KIT_FILM.chipsPerAppsScene, i++) scenes.push({ s: r1(Math.max(KIT_FILM.appsMinS, KIT_FILM.appsBaseS + KIT_FILM.appsPerChipS * Math.min(KIT_FILM.chipsPerAppsScene, left))), enter: i === 0 ? 'hold' : 'dissolve' });
+  for (let i = 0; i < o.inserts; i++) scenes.push({ s: KIT_FILM.proofS, enter: 'dissolve' });
+  scenes.push({ s: KIT_FILM.closeS, enter: 'dissolve' });
+  scenes.push({ s: Math.max(KIT_FILM.codaMinS, r1(KIT_FILM.codaLeadS + o.disclosureWords / KIT_FILM.codaWordsPerS)), enter: 'cut' });
+  const overlap = (e: Enter) => (e === 'cut' ? 0 : e === 'hold' ? -KIT_FILM.holdS : KIT_FILM.dissolveS);
+  let at = 0, total = 0;
+  scenes.forEach((sc, i) => { total = Math.max(total, at + sc.s); if (i < scenes.length - 1) at = n3(at + sc.s - overlap(scenes[i + 1].enter)); });
+  return n3(total);
+}
+
+/** One film beat as the selection reads it: its length, whose it is, the kind of chapter it is in (ftue, room, outside, outro), the apps it names and whether one of them shows a pair. */
+export type PlanBeat = { id: string; seconds: number; member: string | null; chapter: string; apps: string[]; pair: boolean };
+/** Why a beat is kept first or dropped first. Highest to lowest: `open`, `person`, `pair`, `room`, `close`. */
+export type Rank = 'open' | 'person' | 'pair' | 'room' | 'close';
+/** The order beats are given up in when the kit's film is over the cap: the closing first, then the other room beats, then the pairs (the latest of a rank first). `open` and `person` are never given up. */
+export const DROP_ORDER: Rank[] = ['close', 'room', 'pair'];
+export type Selection = { kept: string[]; dropped: Array<{ id: string; rank: Rank; seconds: number }>; ranks: Record<string, Rank>; fullS: number; keptS: number; capS: number };
+
+/** The rank of each beat, in film order: the first-run beats (`open`: the hook, the Core arriving and a person naming their companion), the first room beat of each person (`person`), the beats that show a pair (`pair`), the rest of the rooms (`room`) and the closing chapter (`close`). */
+export function rankBeats(beats: PlanBeat[]): Record<string, Rank> {
+  const out: Record<string, Rank> = {}, seen = new Set<string>();
+  for (const b of beats) {
+    if (b.chapter === 'ftue') out[b.id] = 'open';
+    else if (b.chapter === 'outro') out[b.id] = 'close';
+    else if (b.member && !seen.has(b.member)) { seen.add(b.member); out[b.id] = 'person'; }
+    else out[b.id] = b.pair ? 'pair' : 'room';
+  }
+  return out;
+}
+const appsOf = (beats: PlanBeat[]): number => new Set(beats.flatMap(b => b.apps)).size;
+const lengthOf = (approachS: number, beats: PlanBeat[], words: number, inserts = 0): number => kitFilmLength({ beats: [{ seconds: approachS, member: null }, ...beats.map(b => ({ seconds: b.seconds, member: b.member }))], apps: appsOf(beats), inserts, disclosureWords: words });
+
+/**
+ * Which of a family's flagged beats the kit's film plays so that it is at most `maxS` (the repository's cap on a film, FILM.maxS: the page it sits on and a platform's patience, not a number
+ * the kit may exceed). All of them while they fit. Otherwise they are given up in a fixed order (DROP_ORDER above, the latest of a rank first) until the film fits; the first-run beats and one beat for
+ * each person stay. A family that does not fit even then is refused, naming the longest beats to unflag, as the film does: nothing here widens the cap, and no flag turns it off.
+ * Screenshots are not part of this (they are added only while the film stays under the cap, after the story is chosen).
+ */
+export function selectBeats(o: { approachS: number; beats: PlanBeat[]; disclosureWords: number; maxS?: number; slug?: string }): Selection {
+  const cap = o.maxS ?? FILM.maxS, ranks = rankBeats(o.beats), full = lengthOf(o.approachS, o.beats, o.disclosureWords);
+  const kept = o.beats.slice(), dropped: Selection['dropped'] = [];
+  for (const rank of DROP_ORDER) {
+    while (lengthOf(o.approachS, kept, o.disclosureWords) > cap) {
+      const at = kept.map((b, i) => (ranks[b.id] === rank ? i : -1)).filter(i => i >= 0).pop();
+      if (at === undefined) break;
+      const [b] = kept.splice(at, 1); dropped.push({ id: b.id, rank, seconds: b.seconds });
+    }
+  }
+  const keptS = lengthOf(o.approachS, kept, o.disclosureWords);
+  if (keptS > cap) {
+    const longest = kept.slice().sort((a, b) => b.seconds - a.seconds).slice(0, 3).map(b => `${b.id} (${b.seconds.toFixed(1)} s)`).join(', ');
+    throw new Error(`${o.slug ? `${o.slug}: ` : ''}the kit's film is ${keptS.toFixed(1)} s with only the first-run beats and one beat for each person, and the cap is ${cap} s; unflag "film" on a beat or two (the longest: ${longest})`);
+  }
+  return { kept: kept.map(b => b.id), dropped, ranks, fullS: full, keptS, capS: cap };
+}
 
 // ---- the manifest -------------------------------------------------------------------------------------------------------------------------------
 export type PlateEntry = { file: string; sha256: string; durationS: number; width: number; height: number; subject: Rect; camera: Record<string, unknown> };

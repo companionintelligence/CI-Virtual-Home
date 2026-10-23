@@ -23,13 +23,15 @@ import { plateSize, squarePageRes, PAGE_RES, KIT_NAME } from '../assets/story/fi
 import { FILM } from '../assets/story/film/layout.js';
 import { tiltTarget, tiltFor, clearBand, bandTop, KIT_BAND, KIT_CAPTION, KIT_CHARS, MAX_TILT_DEG } from '../assets/story/film/plates/compose.js';
 import { camera, project } from '../assets/shot-probe.js';
-import { ROOT, entryIsCurrent, loadFamily, readFilms, toolSha as filmToolSha, frameCodeFiles, NOT_FRAME_CODE, familiesDir } from './film/lib.mts';
+import { ROOT, entryIsCurrent, loadFamily, readFilms, toolSha as filmToolSha, frameCodeFiles, NOT_FRAME_CODE, familiesDir, filmableSlugs } from './film/lib.mts';
 import {
   segmentsOf, plateId, cameraFingerprint, powerRel, segmentKey, doorsSha, cuesOf, familyText, hookOf, chipsOf, loadCtx, manifestProblems, copyProblems, readableOf, cutPicks,
   plateEncodeArgs, ENCODE, engineSha, toolSha as platesToolSha, homeInfo, homeText, homesWithoutFamily, homeBeats, buildHomeManifest, homeFilmId, canon, digestOf, platesDir, DEFAULT_SUBJECT, composeBeat, oneLines,
-  type Segment,
+  kitFilmLength, selectBeats, rankBeats, disclosureWords, KIT_FILM, DROP_ORDER,
+  type Segment, type PlanBeat,
 } from './film/plates/lib.mts';
-import { parseOpts, planFamily, statusOf, writeFamilyManifest, plateFile, entryCurrent, parseAspects, kindOf, kitFilmSeconds, type Cache, type CacheEntry } from './film/plates/cli.mts';
+import { parseOpts, planFamily, statusOf, writeFamilyManifest, plateFile, entryCurrent, parseAspects, kindOf, insertsFor, type Cache, type CacheEntry } from './film/plates/cli.mts';
+import { shotCaption, docsCaption, appCaption } from './story/lib/media.mts';
 import { checkPlates } from './film/plates/schema.mts';
 import { orderOf, mergeQueue, modeEnv, readQueue, writeQueue, MODES, type Queue } from './film/plates/fleet.mts';
 import { findKit } from './film/wrap.mts';
@@ -319,7 +321,10 @@ test('the screenshots: only the app-media manifest\'s own, with its exact captio
   await withEnv({ CI_PLATES_OUT: dir }, async () => {
     const media = loadCtx(ROOT).media, withShot = media && Object.entries(media.apps).filter(([, a]) => a.shot);
     assert.ok(withShot && withShot.length, 'the manifest ships real screenshots');
-    for (const [, a] of withShot!) assert.equal(a.shot!.caption, `Real screenshot of ${a.name} from a Companion Hub QA run. Not a recording of this family.`);
+    // the caption is the manifest's own for where the picture came from (media.mts: a QA run's, or a first-party app's documentation's), never a wording written here
+    for (const [, a] of withShot!) assert.equal(a.shot!.caption, shotCaption(a.name, a.shot!.source), a.name);
+    assert.ok(withShot!.some(([, a]) => /^CI-Docs /.test(a.shot!.source)) && withShot!.some(([, a]) => !/^CI-Docs /.test(a.shot!.source)), 'both kinds of source ship');
+    assert.notEqual(docsCaption('X'), appCaption('X'));
     // the families whose film beats name an app that has a shot: each manifest keeps to the rules, and a film with no room for a screenshot (the kit adds a title, the apps, the end card and the disclosures
     // to the plates, and a film is at most 110 s) writes none and says so
     let withInserts = 0, dropped = 0;
@@ -331,7 +336,7 @@ test('the screenshots: only the app-media manifest\'s own, with its exact captio
       assert.deepEqual(checkPlates(m, SCHEMA), [], slug);
       if (!m.inserts) { dropped++; assert.ok(logs.some(l => /would run past 110 s/.test(l)), `${slug}: no screenshot and no reason`); continue; }
       withInserts++; assert.ok(m.inserts.length <= 2);
-      for (const ins of m.inserts) { assert.equal(ins.label, `Real screenshot of ${ins.app} from a Companion Hub QA run. Not a recording of this family.`); assert.match(ins.file, /^inserts\/shot-[a-z0-9-]+\.[0-9a-f]{10}\.webp$/); assert.ok(fs.readFileSync(path.join(platesDir(slug), ins.file)).length > 0); assert.ok(ins.alt); assert.ok(ins.width > 0 && ins.height > 0); }
+      for (const ins of m.inserts) { const a = Object.values(media!.apps).find(x => x.name === ins.app)!; assert.equal(ins.label, shotCaption(a.name, a.shot!.source)); assert.match(ins.file, /^inserts\/shot-[a-z0-9-]+\.[0-9a-f]{10}\.webp$/); assert.ok(fs.readFileSync(path.join(platesDir(slug), ins.file)).length > 0); assert.ok(ins.alt); assert.ok(ins.width > 0 && ins.height > 0); }
       const none = writeFamilyManifest(plan, fakeCache(plan), null, opts({ inserts: '0' }), () => {});
       assert.ok(!none.inserts, 'no screenshots when none are asked for');
       break;
@@ -339,10 +344,78 @@ test('the screenshots: only the app-media manifest\'s own, with its exact captio
     assert.ok(withInserts + dropped > 0, 'some family names an app with a screenshot');
   });
 });
-test('the length of the kit\'s film is counted before a screenshot is added: the title, the plates, the apps, the screenshots, the end card and the disclosures held for reading', () => {
-  assert.ok(kitFilmSeconds(85, 5, 0, 52) > 105 && kitFilmSeconds(85, 5, 0, 52) < 120);
-  assert.equal(kitFilmSeconds(60, 0, 0, 4), 3 + 60 + 0 + 0 + 4 + 5, 'a home with no apps: the title, the plates, the end card and the five seconds the disclosures are held at least');
-  assert.ok(kitFilmSeconds(60, 5, 2, 20) - kitFilmSeconds(60, 5, 0, 20) === 12, 'each screenshot is six seconds');
+/** a kit film's plates as the pilot's three storyboards had them (the kit's `build` said 109.567, 112.532 and 114.433 s): [beat, seconds, person] */
+const PILOT = {
+  brennan: { built: 109.567, apps: 4, words: 52, beats: [['approach', 4, null], ['ftue-plug-in', 9.533, null], ['ftue-join', 7.533, null], ['ftue-hello', 11.9, 'sally'], ['office-split', 9.567, 'sally'], ['suite-code', 10.8, 'john'], ['steve-session', 11.2, 'steve'], ['jean-sources', 10.767, 'jean'], ['outro-street', 8.767, null]] },
+  hollin: { built: 112.532, apps: 5, words: 52, beats: [['approach', 4, null], ['ftue-plug-in', 8.733, null], ['ftue-join', 7.933, null], ['ftue-hello', 11.1, 'a'], ['living-session', 11.6, 'b'], ['kids-notes', 9.6, 'c'], ['office-follow', 13.5, 'd'], ['study-code', 11.533, 'e'], ['outro-street', 7.533, null]] },
+  merrow: { built: 114.433, apps: 6, words: 52, beats: [['approach', 4, null], ['ftue-plug-in', 7.533, null], ['ftue-join', 6.333, null], ['ftue-hello', 12.7, 'a'], ['kitchen-board', 9.167, 'b'], ['kids-floorplan', 10.8, 'c'], ['office-draft', 10, 'd'], ['garage-repos', 8.8, 'e'], ['den-steam', 10.4, 'f'], ['outro-street', 6.8, null]] },
+} as const;
+const pilotBeats = (k: keyof typeof PILOT) => PILOT[k].beats.map(([, seconds, member]) => ({ seconds: seconds as number, member: member as string | null }));
+test('the length of the kit\'s film is the kit\'s own figure: the title, the plates, the apps, the screenshots, the end card and the disclosures held for reading, less the dissolves and with the holds between people', () => {
+  for (const k of Object.keys(PILOT) as Array<keyof typeof PILOT>) assert.ok(Math.abs(kitFilmLength({ beats: pilotBeats(k), apps: PILOT[k].apps, inserts: 0, disclosureWords: PILOT[k].words }) - PILOT[k].built) < 0.002, `${k}: the kit's build said ${PILOT[k].built} s`);
+  assert.equal(kitFilmLength({ beats: [{ seconds: 60, member: null }], apps: 0, inserts: 0, disclosureWords: 4 }), 3 + 60 - KIT_FILM.dissolveS + 4 - KIT_FILM.dissolveS + 5, 'a home with no apps: the title, the plates, the end card (dissolved to) and the five seconds the disclosures are held at least (cut to)');
+  const one = (n: number) => kitFilmLength({ beats: pilotBeats('brennan'), apps: 4, inserts: n, disclosureWords: 52 });
+  assert.ok(Math.abs(one(2) - one(0) - 2 * (KIT_FILM.proofS - KIT_FILM.dissolveS)) < 1e-9 && one(1) > one(0), 'each screenshot is six seconds, less the dissolve into it');
+  assert.equal(disclosureWords([{ text: 'a b  c' }, { text: ' d ' }]), 4); assert.equal(disclosureWords([]), 0);
+  const brennan = pilotBeats('brennan'), moved = brennan.map(b => ({ ...b, member: null }));
+  assert.ok(kitFilmLength({ beats: moved, apps: 4, inserts: 0, disclosureWords: 52 }) < kitFilmLength({ beats: brennan, apps: 4, inserts: 0, disclosureWords: 52 }), 'a change of person is a hold of bare ground (the film is longer), a continuing person a dissolve (shorter)');
+});
+
+// ---- the cap: a kit film is never longer than the film's 110 s --------------------------------------------------------------------------------------------------------
+const pb = (id: string, seconds: number, member: string | null, chapter: string, apps: string[] = [], pair = false): PlanBeat => ({ id, seconds, member, chapter, apps, pair });
+const brennanBeats = (): PlanBeat[] => [pb('ftue-plug-in', 9.533, null, 'ftue'), pb('ftue-join', 7.533, null, 'ftue'), pb('ftue-hello', 11.9, 'sally', 'ftue'), pb('office-split', 9.567, 'sally', 'room', ['A'], true), pb('suite-code', 10.8, 'john', 'room', ['B'], true),
+  pb('steve-session', 11.2, 'steve', 'room', ['C']), pb('jean-sources', 10.767, 'jean', 'room', ['D'], true), pb('outro-street', 8.767, null, 'outro')];
+test('which beats the kit\'s film plays: all while it fits; else the closing, then the rooms that show no pair, then the pairs are given up, the latest of a rank first, and the first-run beats and one beat for each person stay', () => {
+  const o = { approachS: 4, disclosureWords: 52 };
+  assert.deepEqual(DROP_ORDER, ['close', 'room', 'pair']);
+  const all = selectBeats({ ...o, beats: brennanBeats() });
+  assert.equal(all.dropped.length, 0); assert.equal(all.kept.length, 8); assert.ok(all.keptS <= FILM.maxS && Math.abs(all.fullS - 109.567) < 0.002, 'the Brennans fit, as the kit said: 109.567 s');
+  assert.deepEqual(rankBeats(brennanBeats()), { 'ftue-plug-in': 'open', 'ftue-join': 'open', 'ftue-hello': 'open', 'office-split': 'person', 'suite-code': 'person', 'steve-session': 'person', 'jean-sources': 'person', 'outro-street': 'close' });
+  // a longer film: the closing goes first
+  const longer = brennanBeats().map(b => (b.id === 'ftue-hello' ? { ...b, seconds: b.seconds + 3 } : b)), a = selectBeats({ ...o, beats: longer });
+  assert.ok(a.fullS > FILM.maxS && a.keptS <= FILM.maxS); assert.deepEqual(a.dropped.map(d => d.id), ['outro-street']); assert.ok(!a.kept.includes('outro-street'));
+  // a longer one still: then the rooms that show no pair (the latest first), and the pairs only after them
+  const rooms = [...brennanBeats().slice(0, 5), pb('suite-ask', 9, 'john', 'room', ['B']), pb('suite-manual', 9, 'john', 'room', ['B'], true), ...brennanBeats().slice(5)], b = selectBeats({ ...o, beats: rooms });
+  assert.ok(b.fullS > 120 || b.dropped.length >= 2, 'two more rooms'); assert.equal(b.dropped[0].id, 'outro-street'); assert.equal(b.dropped[1].id, 'suite-ask', 'a room with no pair goes before one with a pair');
+  assert.ok(b.keptS <= FILM.maxS);
+  for (const d of b.dropped) assert.ok(d.rank === 'close' || d.rank === 'room' || d.rank === 'pair', `${d.id} is ${d.rank}: the first-run beats and one beat for each person are never given up`);
+  for (const id of ['ftue-plug-in', 'ftue-join', 'ftue-hello', 'office-split', 'suite-code', 'steve-session', 'jean-sources']) assert.ok(b.kept.includes(id), `${id} stays`);
+  // the cap is not widened by anything: a family that cannot fit with only those is refused, naming the longest beats
+  const huge = brennanBeats().map(x => ({ ...x, seconds: x.seconds + 4 }));
+  assert.throws(() => selectBeats({ ...o, beats: huge, slug: 'x' }), /x: the kit's film is .* s with only the first-run beats and one beat for each person, and the cap is 110 s; unflag "film" on a beat or two \(the longest: /);
+  // (a smaller cap is honoured the same way)
+  assert.ok(selectBeats({ ...o, beats: brennanBeats(), maxS: 105 }).keptS <= 105 && selectBeats({ ...o, beats: brennanBeats(), maxS: 105 }).dropped.length === 1);
+});
+test('every family\'s kit film fits the cap with the beats the plan keeps, and the plan says what it gave up', async () => {
+  let given = 0, over = 0;
+  for (const slug of filmableSlugs()) {
+    const plan = await planFamily(slug, opts(), 'chromium-test'), s = plan.selection;
+    assert.ok(s.keptS <= FILM.maxS, `${slug}: ${s.keptS} s`); if (s.fullS > FILM.maxS) { over++; assert.ok(s.dropped.length > 0, `${slug}: over the cap with nothing given up`); }
+    assert.equal(plan.segs.length, 1 + s.kept.length); assert.equal(plan.allSegs.length, 1 + s.kept.length + s.dropped.length, `${slug}: every flagged beat is kept or given up`);
+    assert.equal(plan.segs[0].id, 'approach');
+    for (const d of s.dropped) { given++; assert.ok(['close', 'room', 'pair'].includes(d.rank), `${slug} ${d.id}`); assert.ok(plan.notes.some(n => n.includes(d.id)), `${slug}: the plan names ${d.id}`); }
+    for (const aspect of Object.keys(plan.jobs)) assert.deepEqual(plan.jobs[aspect].map(j => j.seg.id), plan.segs.map(x => x.id), `${slug}: a plate is planned for what is kept and for nothing else`);
+  }
+  assert.ok(over > 0 && given > 0, 'some family is over the cap with every flagged beat (the Hollins and the Merrows are): the selection is not a no-op');
+  // the Brennans fit as they are; the Hollins give up their closing
+  const brennan = await planFamily('brennan', opts(), 'chromium-test'), hollin = await planFamily('brennan-hollin', opts(), 'chromium-test');
+  assert.deepEqual(brennan.selection.dropped, []); assert.deepEqual(hollin.selection.dropped.map(d => d.id), ['outro-street']); assert.ok(hollin.selection.fullS > FILM.maxS && hollin.selection.keptS <= FILM.maxS);
+  // the camera path the doors depend on is the whole film's, the beats given up included: giving one up moves no other plate's key
+  const full = hollin.jobs['16x9'], keys = new Map(full.map(j => [j.seg.id, j.key]));
+  assert.ok(!keys.has('outro-street')); assert.ok(full.length === hollin.allSegs.length - 1);
+});
+test('a first-party app\'s screenshot is a screenshot too: the film takes the CI-Docs one with its own caption (sample data), and a changed caption is refused', async () => {
+  const dir = tmp('docs-inserts');
+  await withEnv({ CI_PLATES_OUT: dir }, async () => {
+    const plan = await planFamily('petrov', opts(), 'chromium-test'), notes: string[] = [], got = insertsFor(plan, 3, notes, path.join(dir, 'petrov')), media = plan.ctx.media!;
+    const memory = got.find(i => i.app === media.apps['ci-memory'].name);
+    assert.ok(memory, `Companion Memory's screenshot is used (${notes.join(' | ')})`);
+    assert.equal(memory!.label, docsCaption(media.apps['ci-memory'].name)); assert.match(memory!.label, /with sample data\. Not a recording of this family\.$/);
+    for (const i of got) { const a = Object.values(media.apps).find(x => x.name === i.app)!; assert.equal(i.label, shotCaption(a.name, a.shot!.source)); }
+    // the wrong caption for a source (the QA run's on a documentation capture) is not the manifest's wording: it is left out, and said
+    const wrong = { ...plan, ctx: { ...plan.ctx, media: { ...media, apps: { ...media.apps, 'ci-memory': { ...media.apps['ci-memory'], shot: { ...media.apps['ci-memory'].shot!, caption: appCaption(media.apps['ci-memory'].name) } } } } } }, n2: string[] = [];
+    assert.ok(!insertsFor(wrong, 3, n2, path.join(dir, 'petrov')).some(i => i.app === media.apps['ci-memory'].name)); assert.ok(n2.some(n => /caption is not the manifest's wording/.test(n)));
+  });
 });
 test('plates.json for a home with no family: its name and its kind of place, its own shots, the stylised-Core line, nothing invented', () => {
   const homes = homesWithoutFamily();
@@ -425,22 +498,29 @@ test('the encode: one H.264 yuv420p stream, no audio and no metadata, and the sa
 });
 
 // ---- the kit's own word on the manifest ------------------------------------------------------------------------------------------------------------------------
-test('the kit accepts the manifest: `ci-video import-home --dry-run` on real (tiny) plates under a manifest the renderer wrote', { skip: (!kit && 'no video-kit >= 0.35 ($CI_COMMON_KIT)') || (!haveFfmpeg && 'no ffmpeg') }, async () => {
+for (const slug of ['brennan', 'brennan-hollin']) test(`the kit accepts the manifest of ${slug}: \`ci-video import-home --dry-run\` on real (tiny) plates under a manifest the renderer wrote, and its own figure for the film is the length counted here`, { skip: (!kit && 'no video-kit >= 0.35 ($CI_COMMON_KIT)') || (!haveFfmpeg && 'no ffmpeg') }, async () => {
   const dir = tmp('kit');
   await withEnv({ CI_PLATES_OUT: dir }, async () => {
-    const o = opts(), plan = await planFamily('brennan', o, 'chromium-test'), cache = fakeCache(plan), dims: Record<string, [number, number]> = { '16x9': [320, 180], '9x16': [180, 320] };
+    const o = opts(), plan = await planFamily(slug, o, 'chromium-test'), cache = fakeCache(plan), dims: Record<string, [number, number]> = { '16x9': [320, 180], '9x16': [180, 320] };
     // tiny H.264 plates of the right length and aspect, hashed as the cache says they are
     for (const [aspect, jobs] of Object.entries(plan.jobs)) for (const j of jobs) {
-      const e = cache.entries[`${aspect}/${j.seg.id}`], out = path.join(platesDir('brennan'), e.file); fs.mkdirSync(path.dirname(out), { recursive: true });
+      const e = cache.entries[`${aspect}/${j.seg.id}`], out = path.join(platesDir(slug), e.file); fs.mkdirSync(path.dirname(out), { recursive: true });
       const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', `testsrc2=s=${dims[aspect][0]}x${dims[aspect][1]}:r=30`, '-frames:v', String(j.seg.frames), '-an', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-g', '30', out]);
       assert.equal(r.status, 0, String(r.stderr));
       e.sha256 = (await import('node:crypto')).createHash('sha256').update(fs.readFileSync(out)).digest('hex'); e.width = dims[aspect][0]; e.height = dims[aspect][1];
     }
     const m = writeFamilyManifest(plan, cache, null, o, () => {});
-    const r = spawnSync(process.execPath, ['--experimental-strip-types', '--no-warnings', kit!.bin, 'import-home', path.join(platesDir('brennan'), 'plates.json'), '--project', path.join(dir, 'project'), '--dry-run'], { encoding: 'utf8' });
+    const r = spawnSync(process.execPath, ['--experimental-strip-types', '--no-warnings', kit!.bin, 'import-home', path.join(platesDir(slug), 'plates.json'), '--project', path.join(dir, 'project'), '--dry-run'], { encoding: 'utf8' });
     assert.equal(r.status, 0, `the kit refuses the manifest:\n${r.stdout}${r.stderr}`);
-    assert.match(r.stdout, /cut\s+brennan\s+film/); assert.ok(m.beats.length > 5);
+    assert.match(r.stdout, new RegExp(`cut\\s+${slug}\\s+film`)); assert.ok(m.beats.length > 5);
     assert.ok(!/caption-versus-subject/.test(r.stdout), `the kit finds its text over a subject:\n${r.stdout}`);
+    // the kit's own length for the film is the one this renderer counted (it chose the beats by it), and it is under the cap
+    const film = new RegExp(`cut\\s+${slug}\\s+film\\s+\\d+ scenes\\s+([\\d.]+)s`).exec(r.stdout);
+    assert.ok(film, `the kit says how long its film is:\n${r.stdout}`);
+    const beats = m.beats.map((b: any) => ({ seconds: Math.max(...Object.values<any>(b.plates).map(p => p.durationS)), member: b.member?.id ?? null }));
+    const mine = kitFilmLength({ beats, apps: new Set(m.beats.flatMap((b: any) => b.chips.map((c: any) => c.app))).size, inserts: (m.inserts || []).length, disclosureWords: disclosureWords(m.text.disclosures) });
+    assert.ok(Math.abs(+film![1] - mine) < 0.002, `the kit says ${film![1]} s, this renderer counted ${mine} s`);
+    assert.ok(+film![1] <= FILM.maxS, `the kit's film is ${film![1]} s and the cap is ${FILM.maxS} s`);
   });
 });
 

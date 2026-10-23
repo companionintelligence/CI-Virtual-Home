@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { findKit, versionAtLeast, KIT_MIN, KIT_ENV, wrapChecks, readableStrings, vttLines, cutsOf, builtSeconds, outputOf, gateOutput, fileTags, expectationOf, LINK, defaultKitDir, type Expect } from './film/wrap.mts';
+import { findKit, versionAtLeast, KIT_MIN, KIT_ENV, wrapChecks, readableStrings, vttLines, cutsOf, builtSeconds, kitCapProblem, outputOf, gateOutput, fileTags, expectationOf, LINK, defaultKitDir, type Expect } from './film/wrap.mts';
 import { loadClaims } from './film/lib.mts';
 import { builderHandles, guardTerms } from './portal-redact.mts';
 import { ROOT } from './film/lib.mts';
@@ -140,10 +140,15 @@ test('a film that owes the family\'s lines is told so from this repository, not 
 test('what the kit says about its files: the length of each from `ci-video build`, the cut and the format from a file\'s name', () => {
   const out = '  built brennan/landscape    104.2s  /x/build/landscape/index.html\n  built brennan/portrait     104.2s  /x/y\n  built brennan-15/portrait  15.8s  /x\n  built brennan-15/square  15.8s  /x\n';
   const m = builtSeconds(out); assert.equal(m.get('brennan/landscape'), 104.2); assert.equal(m.get('brennan-15/square'), 15.8); assert.equal(m.size, 4);
+  // the kit's figure is held to the film's cap before anything is rendered; the cuts are not the film (their targets are 15 and 30 s)
+  assert.equal(kitCapProblem(builtSeconds('  built brennan/landscape 109.567s  /x\n  built brennan/portrait 109.567s  /x\n'), 'brennan'), null);
+  assert.match(kitCapProblem(builtSeconds('  built brennan-hollin/landscape 112.532s  /x\n  built brennan-hollin/portrait 112.532s  /x\n'), 'brennan-hollin')!, /landscape\) is 112\.5 s and the cap is 110 s/);
+  assert.match(kitCapProblem(builtSeconds('  built x/landscape 100s  /x\n  built x/portrait 110.2s  /x\n'), 'x')!, /portrait/);
+  assert.equal(kitCapProblem(builtSeconds('  built x-15/portrait 120s  /x\n'), 'x'), null);
   assert.deepEqual(outputOf('brennan-landscape.mp4'), ['brennan', 'landscape']); assert.deepEqual(outputOf('brennan-15-portrait.mp4'), ['brennan-15', 'portrait']); assert.equal(outputOf('brennan.vtt'), null); assert.equal(outputOf('brennan-widescreen.mp4'), null);
 });
 const mk = (file: string, src: string, w: number, h: number, secs: number, extra: string[] = []) => { const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', `${src}${src.includes("=") ? ":" : "="}s=${w}x${h}:r=30`, '-t', String(secs), '-an', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-g', '15', ...extra, file]); assert.equal(r.status, 0, String(r.stderr)); return file; };
-test('the picture gates over a rendered file: right, wrong aspect, blank, frozen, with sound, over the cap, with a credit in its metadata', { skip: !haveFfmpeg && 'no ffmpeg' }, () => {
+test('the picture gates over a rendered file: right, wrong aspect, blank, frozen, with sound, over the cap, with a credit in its metadata', { skip: !haveFfmpeg && 'no ffmpeg' }, async () => {
   const dir = tmp('files'), g = (f: string, o: Partial<Parameters<typeof gateOutput>[1]> = {}) => gateOutput(f, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 4, terms, ...o });
   const good = mk(path.join(dir, 'good.mp4'), 'testsrc2', 960, 540, 4, ['-map_metadata', '-1']);
   assert.deepEqual(g(good).errors, [], 'a picture that moves, the length the kit said, no sound');
@@ -159,15 +164,19 @@ test('the picture gates over a rendered file: right, wrong aspect, blank, frozen
   const handle = builderHandles(ROOT)[0], tagged = mk(path.join(dir, 'tagged.mp4'), 'testsrc2', 960, 540, 4, ['-metadata', `artist=${handle}`]);
   assert.equal(fileTags(tagged).artist, handle);
   assert.ok(g(tagged).errors.some(e => /builder handle/.test(e)), 'the metadata is scanned');
+  // the film's cap is the film's here too: a kit film a few seconds past 110 s is refused, as is any other (the plates choose their beats so that it fits; nothing in the wrap widens it)
   const slightly = mk(path.join(dir, 'slightly.mp4'), 'testsrc2', 320, 180, 112, ['-crf', '45']), rep112 = gateOutput(slightly, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 112, terms, minShort: 100 });
-  assert.deepEqual(rep112.errors, [], 'a kit film a few seconds past the repository\'s 110 s is said, not refused'); assert.ok(rep112.warnings.some(w => /over the 110 s/.test(w)));
+  assert.ok(rep112.errors.some(e => /over the 110 s cap/.test(e)), 'a kit film of 112 s is over the cap and is an error, not a warning'); assert.ok(!rep112.warnings.some(w => /over the 110 s/.test(w)));
+  const atCap = mk(path.join(dir, 'atcap.mp4'), 'testsrc2', 320, 180, 109.9, ['-crf', '45']);
+  assert.ok(!gateOutput(atCap, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 109.9, terms, minShort: 100 }).errors.some(e => /cap/.test(e)), 'a film under the cap passes');
   // a captioned room at rest: a second of picture and three seconds of the same one is said, and a stuck render (six seconds) is refused
   const still = path.join(dir, 'still.mp4');
   assert.equal(spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'testsrc2=s=960x540:r=30:d=1', '-vf', 'tpad=stop_mode=clone:stop_duration=3,format=yuv420p', '-c:v', 'libx264', '-preset', 'ultrafast', still]).status, 0);
   const rs = gateOutput(still, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 4, terms });
   assert.ok(!rs.errors.some(e => /frozen/.test(e)) && rs.warnings.some(w => /holds still/.test(w)), `a still room of three seconds is said, not refused: ${JSON.stringify(rs.errors)} ${JSON.stringify(rs.warnings)}`);
   const long = mk(path.join(dir, 'long.mp4'), 'testsrc2', 320, 180, 125, ['-crf', '45']);
-  assert.ok(gateOutput(long, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 125, terms, minShort: 100 }).errors.some(e => /110 s cap/.test(e)), 'past 120 s it fails');
+  assert.ok(gateOutput(long, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 125, terms, minShort: 100 }).errors.some(e => /110 s cap/.test(e)), 'and a longer one');
+  assert.equal((await import('./film/wrap.mts') as any).KIT_FILM_MAX_S, undefined, 'there is no second, longer cap for the kit\'s film');
   // the kit renders the whole frames that cover its length: 109.567 s is 3288 frames at 30, not 3287
   assert.deepEqual(gateOutput(good, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 3.99, terms }).errors.filter(e => /frames/.test(e)), [], 'one frame either way is the kit\'s rounding');
   assert.ok(gateOutput(good, { cut: 'x', format: 'landscape', fps: 30, expectSeconds: 3.5, terms }).errors.length > 0, 'a file half a second off the kit\'s figure is not');

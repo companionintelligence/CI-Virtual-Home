@@ -18,17 +18,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { FILM, filmClock, audioPlacements, captionCues, overCap, type FilmClock } from '../../../assets/story/film/layout.js';
+import { FILM, filmClock, audioPlacements, captionCues, type FilmClock } from '../../../assets/story/film/layout.js';
 import { plateSize, KIT_NAME, PLATE_KEYS, type PlateKey } from '../../../assets/story/film/plates/format.js';
 import { loadFamily, filmableSlugs, captionProblems, filmText, FILM_LIGHTING, isFilmLighting, FILM_LIGHTINGS, type Family } from '../lib.mts';
 import { gradeSlug, defaultDirs } from '../../story/spline-report.mts';
 import { builderHandles, guardTerms, scanText } from '../../portal-redact.mts';
-import { appCaption } from '../../story/lib/media.mts';
+import { shotCaption } from '../../story/lib/media.mts';
 import { PLATE_GLS, plateGl, openRig, closeRig, openHouse, warm, renderRange, machine, chromiumId, RigHolder, type PlateGl, type Rig } from './render.mts';
 import {
   ROOT, platesDir, segmentsOf, cameraFingerprint, powerRel, segmentKey, doorsSha, engineSha, toolSha, houseSha, composeBeat, cuesOf, familyText, loadCtx, chipsOf, logoFileOf, memberOf,
   buildFamilyManifest, buildHomeManifest, homeBeats, digestOf, manifestProblems, canon, sha256, hash10, familiesDir, homeInfo, homeText, homesWithoutFamily, HOME_TOUR_SHOTS, DEFAULT_SUBJECT, PLATE_KEYS_DEFAULT,
-  type Segment, type Composed, type BeatEntry, type PlateEntry, type InsertEntry, type Profile, type Ctx, type PlatesText, type Chip,
+  selectBeats, kitFilmLength, disclosureWords,
+  type Segment, type Composed, type BeatEntry, type PlateEntry, type InsertEntry, type Profile, type Ctx, type PlatesText, type Chip, type PlanBeat, type Selection,
 } from './lib.mts';
 
 export const CACHE_V = 1;
@@ -86,7 +87,8 @@ export function entryCurrent(id: string, e: CacheEntry | undefined, key: string)
 
 // ---- a family -------------------------------------------------------------------------------------------------------------------------------------------
 export type FamilyPlan = {
-  fam: Family; clock: FilmClock; segs: Segment[]; text: PlatesText; ctx: Ctx; notes: string[];
+  /** `segs` are the segments the kit's film plays (the approach and the beats the selection keeps); `allSegs` are all of the film's, whose camera path the doors are a function of */
+  fam: Family; clock: FilmClock; segs: Segment[]; allSegs: Segment[]; selection: Selection; text: PlatesText; ctx: Ctx; notes: string[];
   cues: ReturnType<typeof captionCues>;
   /** per aspect: each segment, its size and its key */
   jobs: Record<string, Array<{ seg: Segment; size: ReturnType<typeof plateSize>; key: string; camera: string; /** the plate's camera is the film's turned down by this much (radians) to clear the kit's text */ tilt: number; compose: Composed | null }>>;
@@ -95,26 +97,37 @@ export type FamilyPlan = {
 /** Everything about a family's plates that needs no browser: the clock, the segments, the words, the keys. Throws with the reason a family cannot be filmed. */
 export async function planFamily(slug: string, o: Opts, chromium: string, ctx?: Ctx): Promise<FamilyPlan> {
   const fam = await loadFamily(slug, { silent: true }), clock = filmClock(fam.rs, { silent: true }), notes: string[] = [];
-  const cap = overCap(fam.rs, clock);
-  if (cap) notes.push(`${cap} (the plates are not capped; the kit's film adds the apps, the end card and the disclosures, and the wrap checks the length)`);
   const { placements, problems } = audioPlacements(fam.rs, clock);
   if (problems.length) throw new Error(`${slug}: ${problems.join('; ')}`);
   const ft = filmText(fam.rs, undefined, { silent: true }), cues = captionCues(fam.rs, placements, ft.names), caps = captionProblems(cues, clock.duration);
   if (caps.errors.length) throw new Error(`${slug}: ${caps.errors.slice(0, 3).join('; ')}`);
-  const c = ctx ?? loadCtx(ROOT, [fam.story]), text = familyText(fam.rs, c.claims), segs = segmentsOf(clock);
+  const c = ctx ?? loadCtx(ROOT, [fam.story]), text = familyText(fam.rs, c.claims), allSegs = segmentsOf(clock);
+  // Which beats the kit's film plays. The kit adds a title, the apps, the end card and the disclosures to the plates (about 25 to 40 s), and a film is never longer than FILM.maxS: when every flagged beat
+  // does not fit, they are given up in a fixed order (lib.mts DROP_ORDER) and a family that cannot fit even then is refused. Nothing is drawn for a beat that is given up.
+  const kindOfChapter = new Map(fam.rs.chapters.map(ch => [ch.id, ch.kind as string])), approach = allSegs[0];
+  const planBeats: PlanBeat[] = allSegs.filter(s => s.part).map(s => {
+    const b = fam.rs.beats[s.part!.idx], chips = chipsOf(fam.story, b, c, []);
+    return { id: s.id, seconds: s.durationS, member: memberOf(fam.rs, b)?.id ?? null, chapter: kindOfChapter.get(b.chapter) ?? 'room', apps: chips.map(x => x.app), pair: chips.some(x => !!x.pairText) };
+  });
+  const selection = selectBeats({ approachS: approach.durationS, beats: planBeats, disclosureWords: disclosureWords(text.disclosures), slug });
+  if (selection.dropped.length) notes.push(`the kit's film would be ${selection.fullS.toFixed(1)} s with all ${planBeats.length} flagged beats and the cap is ${FILM.maxS} s: ${selection.dropped.map(d => `${d.id} (${d.rank}, ${d.seconds.toFixed(1)} s)`).join(', ')} given up, ${selection.keptS.toFixed(1)} s`);
+  const segs = allSegs.filter(s => s.kind === 'approach' || selection.kept.includes(s.id));
   const tool = toolSha(), engine = engineSha(), house = houseSha(fam.story.house), jobs: FamilyPlan['jobs'] = {}, pathShas: Record<string, string> = {};
   for (const aspect of o.aspects) {
     const size = plateSize(aspect, o.res), pathParts: unknown[] = [];
-    jobs[aspect] = segs.map(seg => {
+    jobs[aspect] = [];
+    // (the camera path of the WHOLE film is hashed, the beats given up included: a door opens once, at the first crossing of the whole path)
+    for (const seg of allSegs) {
+      const kept = segs.includes(seg);
       // the plate is composed for the kit's text: its camera is the film's, turned down just far enough that the beat's subject is clear of the caption and the subtitles
-      const b = seg.part ? fam.rs.beats[seg.part.idx] : null, compose = b ? composeBeat(fam.rs, b, size, { title: b.popup.title, cues: cuesOf(cues, seg, clock.fps).map(c => c.text) }) : null, tilt = compose ? compose.tilt : 0;
+      const b = seg.part ? fam.rs.beats[seg.part.idx] : null, compose = kept && b ? composeBeat(fam.rs, b, size, { title: b.popup.title, cues: cuesOf(cues, seg, clock.fps).map(c => c.text) }) : null, tilt = compose ? compose.tilt : 0;
       const camera = cameraFingerprint(fam.rs, clock, seg, size.aspect, tilt), power = powerRel(fam.rs, clock, seg);
       pathParts.push([seg.id, seg.f0, seg.f1, camera]);
-      return { seg, size, camera, tilt, compose, key: segmentKey({ house, engine, tool, gl: o.gl, chromium, aspect, w: size.w, h: size.h, fps: clock.fps, lighting: o.lighting, frames: seg.frames, camera, power }) };
-    });
+      if (kept) jobs[aspect].push({ seg, size, camera, tilt, compose, key: segmentKey({ house, engine, tool, gl: o.gl, chromium, aspect, w: size.w, h: size.h, fps: clock.fps, lighting: o.lighting, frames: seg.frames, camera, power }) });
+    }
     pathShas[aspect] = digestOf(pathParts);
   }
-  return { fam, clock, segs, text, ctx: c, notes, cues, jobs, pathShas, tool, engine, house, chromium };
+  return { fam, clock, segs, allSegs, selection, text, ctx: c, notes, cues, jobs, pathShas, tool, engine, house, chromium };
 }
 
 export type Status = { aspect: PlateKey; seg: Segment; key: string; current: boolean; why?: string };
@@ -128,7 +141,7 @@ export function statusOf(id: string, jobs: FamilyPlan['jobs'], cache: Cache, for
   return out;
 }
 
-const insertsFor = (plan: FamilyPlan, n: number, notes: string[], dir: string): InsertEntry[] => {
+export const insertsFor = (plan: FamilyPlan, n: number, notes: string[], dir: string): InsertEntry[] => {
   const media = plan.ctx.media, out: InsertEntry[] = [], seen = new Set<string>();
   if (!media || n <= 0) return out;
   for (const b of plan.segs.flatMap(s => (s.part ? [plan.fam.rs.beats[s.part.idx]] : []))) {
@@ -137,8 +150,8 @@ const insertsFor = (plan: FamilyPlan, n: number, notes: string[], dir: string): 
       seen.add(id);
       const m = media.apps[id], shot = m?.shot;
       if (!m || !shot) continue;
-      // only the manifest's own shot, with the manifest's exact caption: the kit prints it for as long as the picture is up
-      if (shot.caption !== appCaption(m.name)) { notes.push(`${id}: the screenshot's caption is not the manifest's wording for ${m.name}; it is not used`); continue; }
+      // only the manifest's own shot, with the manifest's exact caption for where it came from (a QA run's, or a first-party app's own documentation's: media.mts `shotCaption`, never a wording of this file): the kit prints it for as long as the picture is up
+      if (shot.caption !== shotCaption(m.name, shot.source || '')) { notes.push(`${id}: the screenshot's caption is not the manifest's wording for ${m.name}; it is not used`); continue; }
       const src = path.join(ROOT, shot.file);
       if (!fs.existsSync(src)) { notes.push(`${id}: ${shot.file} is not in the tree; the screenshot is not used`); continue; }
       const bytes = fs.readFileSync(src), name = `inserts/shot-${id}.${hash10(bytes)}.webp`;
@@ -161,12 +174,6 @@ function stageLogo(plan: { ctx: Ctx }, appId: string, dir: string, notes: string
   const rel = `logos/${appId}.${h}.webp`;
   fs.mkdirSync(path.join(dir, 'logos'), { recursive: true }); fs.writeFileSync(path.join(dir, rel), bytes);
   return rel;
-}
-
-/** The seconds the kit's film is, about: its title card, the plates, the apps, the labelled screenshots, the end card and the coda. */
-export function kitFilmSeconds(plates: number, apps: number, inserts: number, disclosureWords: number): number {
-  const chunks = Math.ceil(apps / 6), appsS = Array.from({ length: chunks }, (_, i) => Math.max(4, 2.2 + 0.55 * Math.min(6, apps - i * 6))).reduce((a, b) => a + b, 0);
-  return 3 + plates + appsS + 6 * inserts + 4 + Math.max(5, 1.2 + disclosureWords / 4);
 }
 
 export async function runFamily(slug: string, o: Opts, holder: RigHolder = new RigHolder(o.gl)): Promise<{ ok: boolean; id: string; dir: string; manifest?: any; error?: string; seconds: number; drawn: number; current: number; notes: string[] }> {
@@ -264,20 +271,24 @@ export function writeFamilyManifest(plan: FamilyPlan, cache: Cache, rigInfo: { c
     const cues = cuesOf(plan.cues, seg, plan.clock.fps);
     beats.push({ id: seg.id, member: memberOf(rs, b), title: b.popup.title, body: b.popup.body, chips, ...(cues.length ? { cues } : {}), plates });
   }
-  // the screenshots, within the length the film can bear (a film is at most 110 s)
-  const platesS = plan.segs.reduce((a, s) => a + s.durationS, 0), apps = new Set(beats.flatMap(b => b.chips.map(c => c.app))).size;
-  const words = plan.text.disclosures.reduce((n, d) => n + d.text.split(/\s+/).length, 0);
+  // The kit's film, counted before it is rendered (lib.mts kitFilmLength, the kit's own recipe): it is never over the cap. The beats were chosen to fit without screenshots (selectBeats); a screenshot is 6 s
+  // and is added only while the film stays under the cap, after the story is chosen. A manifest that would break the cap is not written, whatever chose its beats.
+  const apps = new Set(beats.flatMap(b => b.chips.map(c => c.app))).size, words = disclosureWords(plan.text.disclosures);
+  const kitBeats = beats.map(b => ({ seconds: Math.max(...Object.values(b.plates).map(p => p!.durationS)), member: b.member?.id ?? null }));
+  const kitS = (n: number) => kitFilmLength({ beats: kitBeats, apps, inserts: n, disclosureWords: words });
+  if (kitS(0) > FILM.maxS) throw new Error(`the kit's film for ${id} would be ${kitS(0).toFixed(1)} s, over the ${FILM.maxS} s cap: no manifest is written`);
   let want = o.inserts;
-  while (want > 0 && kitFilmSeconds(platesS, apps, want, words) > FILM.maxS) want--;
+  while (want > 0 && kitS(want) > FILM.maxS) want--;
   if (want < o.inserts) notes.push(`the kit's film would run past ${FILM.maxS} s with ${o.inserts} screenshots; ${want} written`);
   const inserts = insertsFor(plan, want, notes, dir);
+  notes.push(`the kit's film: ${kitS(inserts.length).toFixed(1)} s (the cap is ${FILM.maxS} s)`);
   const platesSha = digestOf(beats.map(b => Object.entries(b.plates).map(([a, p]) => [b.id, a, p!.sha256])));
   const manifest = buildFamilyManifest({
     fam, beats, inserts, text: plan.text, profile, platesSha, claimsSha: digestOf(plan.text),
     inputsSha: digestOf({ story: fam.shas.story, bake: fam.shas.bake, voice: fam.shas.voice, tool: plan.tool, engine: plan.engine, house: plan.house, res: o.res, aspects: o.aspects, lighting: o.lighting, text: plan.text, inserts: inserts.map(i => i.sha256), logos: [...logos.values()] }),
   });
   lintAndWrite(manifest, plan.ctx, id, dir, notes, log);
-  fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify({ id, kind: 'family-film', res: o.res, aspects: o.aspects, gl: profile.gl, renderer: profile.renderer, notes: [...plan.notes, ...notes], plates: Object.fromEntries(Object.entries(cache.entries).map(([k, e]) => [k, { frames: e.frames, bytes: e.bytes, wallSeconds: e.wallSeconds, spf: +(e.wallSeconds / Math.max(1, e.frames)).toFixed(3) }])) }, null, 1) + '\n');
+  fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify({ id, kind: 'family-film', res: o.res, aspects: o.aspects, selection: { fullS: plan.selection.fullS, keptS: plan.selection.keptS, capS: plan.selection.capS, dropped: plan.selection.dropped }, gl: profile.gl, renderer: profile.renderer, notes: [...plan.notes, ...notes], plates: Object.fromEntries(Object.entries(cache.entries).map(([k, e]) => [k, { frames: e.frames, bytes: e.bytes, wallSeconds: e.wallSeconds, spf: +(e.wallSeconds / Math.max(1, e.frames)).toFixed(3) }])) }, null, 1) + '\n');
   return manifest;
 }
 const prevProfilePath = (id: string) => path.join(platesDir(id), 'plates.json');
