@@ -4,7 +4,7 @@
 //
 //   node --experimental-strip-types scripts/test-app-media.mts       (any cwd; pnpm run story:media:test)
 //
-//   manifest      v1, the three pinned commits, every app's keys and every file named in portal/apps/ or portal/ci/, sorted keys and a final newline
+//   manifest      v1, the four pinned commits (CI-Marketplace, CI-Hub, CI-Portal, CI-Docs), every app's keys and every file named in portal/apps/ or portal/ci/, sorted keys and a final newline
 //   files         each named file exists, is a WebP of the size the manifest says, is named by the hash of its bytes, and fits its budget
 //                 (a logo 128 x 128 and at most 12 KB, a screenshot 960 px wide and at most 90 KB)
 //   words         every image has alt text, every app screenshot carries the caption exactly, Hub and account page captions begin as the
@@ -13,19 +13,23 @@
 //   tree          nothing is in portal/apps or portal/ci that the manifest does not name (and nothing else is in them)
 //   rules         the manifest check catches a missing alt, a wrong caption, a missing file, a wrong size and a file that is not its hash
 //   encoder       (ffmpeg with libwebp) a synthetic logo and screenshot encode to the same bytes twice, at the size and with the
-//                 transparency the contract asks for; and, when CI-Marketplace, CI-Hub and CI-Portal are beside this repo at the pinned commits, a
-//                 build of a few apps and every Companion Hub and account page shot is made twice into temp dirs and compared byte for byte
-//   stale         an app a family uses that has no entry is a warning, not a failure (portal:build says the same)
+//                 transparency the contract asks for; and, when CI-Marketplace, CI-Hub, CI-Portal and CI-Docs are beside this repo at the pinned commits, the whole
+//                 `story:media --check` (every file and the manifest are what the pinned sources give) and a build of a few apps and every Companion Hub and
+//                 account page shot made twice into temp dirs and compared byte for byte
+//   stale         an app a family or a persona pool names that has no entry in the manifest (and is not in noMedia) FAILS: the gate that keeps the manifest from
+//                 falling behind the stories unnoticed. It reads the committed manifest and the stories only, so it holds in CI with no sibling repo
+//                 (portal:build says the same, and fails on it under --strict-families). A capture nobody has vetted is a warning, not a failure
 // Exit 0 when all hold; 1 otherwise. Needs no network, no browser and no GPU.
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
-  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, appCaption, HUB_CAPTION_HEAD, PORTAL_CAPTION_HEAD,
+  ROOT, MANIFEST, LOGO_BUDGET, SHOT_BUDGET, LOGO_PX, SHOT_PX, CAPTION_TAIL, UNLOOKED, appCaption, docsCaption, shotCaption, HUB_CAPTION_HEAD, PORTAL_CAPTION_HEAD,
   readMedia, checkManifest, checkPageImages, staleApps, usedAppIds, imageSize, webpHasAlpha, stable, imageTag, shotFigure, logoImg, appMedia,
   type MediaManifest,
 } from './story/lib/media.mts';
+import { DOCS_SHOTS, DOCS_APP_REJECT, docsRejections } from './story/lib/media-docs.mts';
 
 let failures = 0, passes = 0;
 const ok = (cond: unknown, what: string): void => { if (cond) { passes++; console.log(`  \x1b[32m✓\x1b[0m ${what}`); } else { failures++; console.log(`  \x1b[31m✗ ${what}\x1b[0m`); } };
@@ -45,7 +49,7 @@ if (!m) { console.log('\n\x1b[31mno manifest: nothing more to check\x1b[0m'); pr
 ok(manifestText === `${stable(m)}\n`, 'the file is the manifest written the one way (sorted keys, two-space indent, a final newline), so a rerun is the same bytes');
 ok(!/"(generated|date|time|timestamp|at)"/.test(manifestText) && !/\b20\d\d-\d\d-\d\d/.test(manifestText), 'no timestamp in it');
 ok(m.v === 1 && Object.keys(m).sort().join() === 'apps,ci,noMedia,rejected,sources,v', `its keys are apps, ci, noMedia, rejected, sources, v (${Object.keys(m).sort().join(', ')})`);
-ok(['marketplace', 'hub', 'portal'].every(k => /^[0-9a-f]{40}$/.test((m.sources as any)[k] || '')), 'three full commit shas pin the sources');
+ok(['marketplace', 'hub', 'portal', 'docs'].every(k => /^[0-9a-f]{40}$/.test((m.sources as any)[k] || '')), 'four full commit shas pin the sources (the Marketplace, the Hub, the Portal and the Docs)');
 const apps = Object.entries(m.apps);
 const logos = apps.filter(([, a]) => a.logo), shots = apps.filter(([, a]) => a.shot);
 ok(apps.length >= 70, `${apps.length} apps have an entry (${logos.length} logos, ${shots.length} screenshots)`);
@@ -64,7 +68,9 @@ ok(Math.max(...[...shots.map(([, a]) => a.shot!), ...m.ci.hub, ...m.ci.portal].m
 const total = sizes.reduce((a, b) => a + b, 0);
 ok(total < 9 * 1024 * 1024, `${all.length} files, ${(total / 1024).toFixed(0)} KB in all (under 9 MB)`);
 ok(logos.filter(([, a]) => webpHasAlpha(fs.readFileSync(path.join(ROOT, a.logo!.file)))).length >= 10, 'logos whose source is transparent are still transparent (an alpha channel in at least ten of them)');
-ok(shots.every(([id, a]) => a.shot!.caption === appCaption(a.name)), `every app screenshot's caption is exactly "${appCaption('<Name>')}"`);
+ok(shots.every(([id, a]) => a.shot!.caption === shotCaption(a.name, a.shot!.source)), `every app screenshot's caption is exactly "${appCaption('<Name>')}" (a QA capture) or "${docsCaption('<Name>')}" (a CI-Docs capture)`);
+const docsShots = shots.filter(([, a]) => /^CI-Docs /.test(a.shot!.source));
+ok(docsShots.every(([id]) => /^ci-/.test(id)) && Object.keys(DOCS_SHOTS).every(id => !m.apps[id] || m.apps[id].shot?.source.startsWith('CI-Docs ')), `the CI-Docs captures are first-party apps' screens (${docsShots.map(([id]) => id).join(', ') || 'none'}), each the one DOCS_SHOTS names`);
 ok(m.ci.hub.every(s => s.caption.startsWith(HUB_CAPTION_HEAD) && s.caption.endsWith(CAPTION_TAIL)), `every Companion Hub caption begins "${HUB_CAPTION_HEAD}" and ends "${CAPTION_TAIL}"`);
 ok(m.ci.portal.every(s => s.caption.startsWith(PORTAL_CAPTION_HEAD) && s.caption.endsWith(CAPTION_TAIL)), `every account page caption begins "${PORTAL_CAPTION_HEAD}" and ends "${CAPTION_TAIL}"`);
 ok(![...apps.map(([, a]) => a.logo?.alt), ...all.map(i => (i as any).alt)].some(t => !t || /[–—!]|\d{4}/.test(t)), 'no alt text is empty, has a dash or an exclamation mark, or a year');
@@ -74,7 +80,10 @@ const withoutShot = apps.filter(([, a]) => !a.shot).map(([id]) => id);
 ok(withoutShot.every(id => m.rejected.some(r => r.kind === 'shot' && r.id === id)), `every app without a screenshot says why in "rejected" (${withoutShot.join(', ') || 'none'})`);
 ok(m.rejected.every(r => !/\bSims\b|Base Game|\bBG /.test(`${r.id} ${r.source} ${r.reason}`)), 'nothing in the rejected list names the build a home came from');
 ok(new Set(m.rejected.map(r => `${r.kind}:${r.source}`)).size === m.rejected.length, 'no candidate is listed as rejected twice');
-ok(!m.rejected.some(r => r.kind === 'shot' && m.apps[r.id]?.shot), 'no screenshot is both shipped and rejected');
+ok(!m.rejected.some(r => r.kind === 'shot' && m.apps[r.id]?.shot && r.source === m.apps[r.id].shot!.source), 'no screenshot is both shipped and rejected');
+ok(Object.entries(DOCS_APP_REJECT).every(([id, d]) => m.rejected.some(r => r.kind === 'shot' && r.id === id && r.source.startsWith(`CI-Docs ${d.path}@`))), 'the CI-Docs captures of apps with no slot say why (kind shot, under the app id)');
+const docsRejected = m.rejected.filter(r => r.source.startsWith('CI-Docs '));
+ok(docsRejected.length >= 300, `every file of CI-Docs public/screenshots that does not ship is accounted for with its reason (${docsRejected.length} in the list)`);
 
 // ---- the tree -------------------------------------------------------------------------------------------------------------------------
 console.log('\ntree');
@@ -101,6 +110,19 @@ caught('a missing file', x => { x.apps[firstId].shot!.file = `portal/apps/${firs
 caught('a wrong size', x => { x.apps[firstId].shot!.h += 1; }, /the file is/);
 caught('a source that is not pinned', x => { x.apps[firstId].shot!.source = 'CI-Marketplace e2e/screenshots/x.png@000000000000'; }, /source/);
 caught('an entry with neither a logo nor a screenshot', x => { x.apps[firstId].logo = null; x.apps[firstId].shot = null; }, /neither a logo nor a screenshot/);
+{
+  const docsId = Object.keys(DOCS_SHOTS).find(id => m.apps[id]?.shot);
+  if (docsId) caught('a CI-Docs capture with the QA run caption', x => { x.apps[docsId].shot!.caption = appCaption(x.apps[docsId].name); }, /caption is not exactly/);
+  caught('a CI-Docs capture of a third-party app', x => { x.apps[firstId].shot!.source = `CI-Docs public/screenshots/x.webp@${m.sources.docs.slice(0, 12)}`; }, /first-party app/);
+  caught('a QA capture with the documentation caption', x => { x.apps[firstId].shot!.caption = docsCaption(x.apps[firstId].name); }, /caption is not exactly/);
+  // the Docs rules: a file nobody has looked at stops the build, and a dark twin is accounted for beside its light capture
+  let threw = '';
+  try { docsRejections(['asks/asks-composer-light.webp', 'brand-new/never-seen.webp'], new Set(), {}); } catch (e) { threw = (e as Error).message; }
+  ok(/brand-new\/never-seen\.webp/.test(threw) && !/asks-composer-light/.test(threw), 'a CI-Docs capture no rule names stops the build and is named');
+  const two = docsRejections(['asks/asks-composer-light.webp', 'asks/asks-composer-dark.webp'], new Set(), {});
+  ok(two.length === 2 && /dark-theme twin of asks-composer-light\.webp/.test(two[1].reason), 'a dark twin is left out with the light capture named');
+  ok(docsRejections(['planning/planning-today-light.webp'], new Set(['public/screenshots/planning/planning-today-light.webp']), {}).length === 0, 'a capture that ships is not listed as rejected');
+}
 caught('a rejection with no reason', x => { x.rejected.push({ kind: 'shot', id: 'x', source: 'CI-Hub a@b', reason: ' ' }); }, /needs kind, id, source and a reason/);
 {
   // a file that is not named by its hash (the same name, other bytes), in a scratch tree
@@ -149,8 +171,24 @@ caught('a rejection with no reason', x => { x.rejected.push({ kind: 'shot', id: 
 console.log('\nstale');
 const used = usedAppIds(ROOT), stale = staleApps(m, ROOT);
 ok(used.length >= 70, `${used.length} apps are used by the families, the persona pools, the plan and the first-party trio`);
-if (stale.length) note(`warning: ${stale.length} app${stale.length === 1 ? '' : 's'} a family uses ${stale.length === 1 ? 'has' : 'have'} no entry (pnpm run story:media): ${stale.join(', ')}`);
-else ok(true, 'every app a story uses has an entry');
+// A GATE, not a warning (it was one until 2026-10: the manifest then fell 34 logos behind the stories and nothing said so). It reads only the committed
+// manifest and the stories, so it runs in CI with no sibling repo: an app a family or a persona pool names must have an entry (a logo, or a screenshot) or
+// be listed in noMedia (on purpose: the logo was held back, see REJECT_LOGO). The fix is `pnpm run story:media` and a look at what it made.
+ok(stale.length === 0, `every app a story or a persona pool names has an entry in ${MANIFEST} or is in noMedia${stale.length ? ` (missing: ${stale.join(', ')}; run pnpm run story:media with the sibling repos beside this one)` : ''}`);
+ok(m.noMedia.every(id => m.rejected.some(r => r.kind === 'logo' && r.id === id)), `every app in noMedia says why its logo is not shown in "rejected" (${m.noMedia.join(', ') || 'none'})`);
+ok(m.rejected.filter(r => r.kind === 'logo').every(r => !m.apps[r.id]?.logo), 'no logo is both shipped and rejected');
+const unlooked = m.rejected.filter(r => r.reason === UNLOOKED).map(r => r.id);
+if (unlooked.length) note(`warning: ${unlooked.length} QA capture${unlooked.length === 1 ? '' : 's'} nobody has looked at yet (not used): ${unlooked.join(', ')}`);
+{
+  // the gate itself: a manifest that lost an app a story names, or never had a newly named one, is stale (and an app held in noMedia is not)
+  const x = clone();
+  const gone = used.find(id => x.apps[id]) as string;
+  delete x.apps[gone];
+  ok(staleApps(x, ROOT).includes(gone), 'an app a story names that has no entry is reported stale');
+  x.noMedia.push(gone);
+  ok(!staleApps(x, ROOT).includes(gone), 'an app listed in noMedia is not');
+  ok(staleApps(null, ROOT).length === used.length, 'no manifest at all makes every used app stale');
+}
 
 // ---- the encoder ------------------------------------------------------------------------------------------------------------------------
 console.log('\nencoder');
@@ -160,9 +198,12 @@ else {
   const self = node(['--selftest']);
   ok(self.status === 0, `a synthetic logo and screenshot encode to the same bytes twice, at 128 x 128 with transparency and 960 px wide, inside their budgets${self.status === 0 ? '' : `: ${self.out.trim().slice(0, 300)}`}`);
   const sibling = (r: string): string => path.join(process.env.CI_SIBLINGS || path.join(ROOT, '..'), r);
-  const have = [['CI-Marketplace', m.sources.marketplace], ['CI-Hub', m.sources.hub], ['CI-Portal', m.sources.portal]].every(([r, sha]) => fs.existsSync(path.join(sibling(r), '.git')) && spawnSync('git', ['-C', sibling(r), 'cat-file', '-e', `${sha}^{commit}`]).status === 0);
-  if (!have) note('skipped: CI-Marketplace, CI-Hub and CI-Portal are not beside this repo at the pinned commits (the build twice into temp dirs runs where they are)');
+  const have = [['CI-Marketplace', m.sources.marketplace], ['CI-Hub', m.sources.hub], ['CI-Portal', m.sources.portal], ['CI-Docs', m.sources.docs]].every(([r, sha]) => fs.existsSync(path.join(sibling(r), '.git')) && spawnSync('git', ['-C', sibling(r), 'cat-file', '-e', `${sha}^{commit}`]).status === 0);
+  if (!have) note('skipped: CI-Marketplace, CI-Hub, CI-Portal and CI-Docs are not beside this repo at the pinned commits (the build twice into temp dirs runs where they are)');
   else {
+    // the whole check, where the sources are: every file and the manifest are what the pinned commits give (about half a minute)
+    const chk = node(['--check']);
+    ok(chk.status === 0, `story:media --check: the manifest and every file are what the pinned sources give${chk.status === 0 ? '' : `: ${chk.out.split('\n').filter(l => !/nobody has looked/.test(l)).join(' | ').trim().slice(0, 400)}`}`);
     const sample = ['nextcloud', 'immich', 'pi-hole', 'code-server', 'ci-memory', 'grocy'].filter(id => m.apps[id]);
     const t1 = fs.mkdtempSync(path.join(os.tmpdir(), 'app-media-a-')), t2 = fs.mkdtempSync(path.join(os.tmpdir(), 'app-media-b-'));
     try {

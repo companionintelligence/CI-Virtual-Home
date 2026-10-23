@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { TestCtx } from '../hooks.ts';
 import { loadAll } from '../site-lib.mts';
-import { readMedia, checkPageImages, appCaption } from '../lib/media.mts';
+import { readMedia, checkPageImages, shotCaption } from '../lib/media.mts';
 import { readPlan, placePins } from '../lib/plan-map.mts';
 import { builderHandles, guardTerms, scanText } from '../../portal-redact.mts';
 
@@ -56,7 +56,7 @@ export default async function familyV2(ctx: TestCtx): Promise<void> {
       for (const m of t.matchAll(/<a class="shot-open"[^>]*><img[^>]*src="\.\.\/(portal\/apps\/([a-z0-9-]+)\/shot\.[0-9a-f]{10}\.webp)"/g)) {
         shots++;
         const a = media.apps[m[2]];
-        need(a && t.includes(`<figcaption>${appCaption(a.name)}</figcaption>`), `${m[2]}: the exact caption`);
+        need(a && a.shot && t.includes(`<figcaption>${shotCaption(a.name, a.shot.source)}</figcaption>`), `${m[2]}: the exact caption`);
       }
       need((t.match(/<dialog\b/g) || []).length === 1, 'one dialog');
     }
