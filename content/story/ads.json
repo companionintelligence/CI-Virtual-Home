@@ -5378,6 +5378,279 @@
         }
       ]
     },
+    "penhallow": {
+      "bake": "estimated",
+      "cuts": [
+        {
+          "id": "penhallow-wilfred",
+          "member": "wilfred",
+          "name": "Wilfred",
+          "archetype": "lawyer",
+          "status": "ready",
+          "hook": {
+            "beat": "dining-merge",
+            "kind": "title",
+            "text": "The schedules join the contract",
+            "rule": "flagged"
+          },
+          "beats": [
+            "dining-merge"
+          ],
+          "captions": [
+            "Wilfred merges a contract and its schedules into one PDF in Stirling-PDF, on the Core, not on a PDF website."
+          ],
+          "chips": [
+            "Stirling-PDF",
+            "alternative to Smallpdf"
+          ],
+          "apps": [
+            {
+              "id": "stirling-pdf",
+              "replaces": [
+                "Smallpdf"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15,
+          "frames": 450,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "dining-merge",
+                "kind": "hook",
+                "at": 0,
+                "end": 10.8,
+                "narrAt": 2,
+                "narrEnd": 10,
+                "sentences": "1/1",
+                "tour": {
+                  "from": 138.48,
+                  "to": 147.578
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 10.8,
+                "t1": 11.15,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 11.15,
+              "t1": 15,
+              "panelAt": 11.35
+            }
+          },
+          "notes": [],
+          "hash": "7d655c539273aeb36e43a9a66f35284a31748cd704599cc646783decde37ec84"
+        },
+        {
+          "id": "penhallow-anwen",
+          "member": "anwen",
+          "name": "Anwen",
+          "archetype": "host",
+          "status": "ready",
+          "hook": {
+            "beat": "kitchen-recipes",
+            "kind": "title",
+            "text": "A recipe book with chapters",
+            "rule": "flagged"
+          },
+          "beats": [
+            "kitchen-recipes"
+          ],
+          "captions": [
+            "Anwen writes her recipes into BookStack, a chapter for soups and one for puddings. Each page keeps its history."
+          ],
+          "chips": [
+            "BookStack",
+            "alternative to Notion"
+          ],
+          "apps": [
+            {
+              "id": "bookstack",
+              "replaces": [
+                "Notion"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15,
+          "frames": 450,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "kitchen-recipes",
+                "kind": "hook",
+                "at": 0,
+                "end": 10.633,
+                "narrAt": 2,
+                "narrEnd": 9.6,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 252.444,
+                  "to": 261.142
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 10.633,
+                "t1": 10.983,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 10.983,
+              "t1": 15,
+              "panelAt": 11.183
+            }
+          },
+          "notes": [],
+          "hash": "65a774ac5fcdaa18c7530c4c76e01112dc5741a949f1680993c2397feb8dea1f"
+        },
+        {
+          "id": "penhallow-petra",
+          "member": "petra",
+          "name": "Petra",
+          "archetype": "learner",
+          "status": "ready",
+          "hook": {
+            "beat": "kids-reader",
+            "kind": "title",
+            "text": "A story that reads itself aloud",
+            "rule": "flagged"
+          },
+          "beats": [
+            "kids-reader",
+            "kids-record"
+          ],
+          "captions": [
+            "Petra opens her new book in Koodo Reader and turns on read-aloud. The library lives on the Core.",
+            "Petra records her story on the tablet, then trims the cough at the start in AudioMass."
+          ],
+          "chips": [
+            "Koodo Reader",
+            "alternative to Apple Books"
+          ],
+          "apps": [
+            {
+              "id": "koodo-reader",
+              "replaces": [
+                "Apple Books"
+              ]
+            },
+            {
+              "id": "audiomass",
+              "replaces": [
+                "TwistedWave"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 22,
+          "frames": 660,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "kids-reader",
+                "kind": "hook",
+                "at": 0,
+                "end": 10,
+                "narrAt": 2,
+                "narrEnd": 9.2,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 105.445,
+                  "to": 113.743
+                }
+              },
+              {
+                "beat": "kids-record",
+                "kind": "extend",
+                "at": 10.35,
+                "end": 18.15,
+                "narrAt": 10.95,
+                "narrEnd": 17.35,
+                "sentences": "1/2",
+                "tour": {
+                  "from": 114.912,
+                  "to": 122.712
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 10,
+                "t1": 10.35,
+                "to": 1
+              },
+              {
+                "t0": 18.15,
+                "t1": 18.5,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 18.5,
+              "t1": 22,
+              "panelAt": 18.7
+            }
+          },
+          "notes": [
+            "kids-reader alone is under 15 s: the cut goes on to kids-record (1 of 2 sentences)"
+          ],
+          "hash": "7fbcb46536218551171d0ae895c91d07d0cac269a623a4770212e32e4e230d01"
+        }
+      ]
+    },
     "petrov": {
       "bake": "estimated",
       "cuts": [
@@ -5868,6 +6141,331 @@
         }
       ]
     },
+    "rademaker": {
+      "bake": "estimated",
+      "cuts": [
+        {
+          "id": "rademaker-fernanda",
+          "member": "fernanda",
+          "name": "Fernanda",
+          "archetype": "educator",
+          "status": "ready",
+          "hook": {
+            "beat": "kitchen-handout",
+            "kind": "title",
+            "text": "Thursday's handout, written at the table",
+            "rule": "flagged"
+          },
+          "beats": [
+            "kitchen-handout"
+          ],
+          "captions": [
+            "Fernanda writes Thursday's handout at the long table. LibreOffice opens in a browser tab from the Core, and the file lands in her lesson folder there."
+          ],
+          "chips": [
+            "LibreOffice",
+            "alternative to Google Workspace"
+          ],
+          "apps": [
+            {
+              "id": "libreoffice",
+              "replaces": [
+                "Google Workspace"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 17.066666666666666,
+          "frames": 512,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "kitchen-handout",
+                "kind": "hook",
+                "at": 0,
+                "end": 13.2,
+                "narrAt": 2,
+                "narrEnd": 12.4,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 146.642,
+                  "to": 158.14
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 13.2,
+                "t1": 13.55,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
+            }
+          },
+          "notes": [],
+          "hash": "d53716e8e3baedc69e4b12edd8995cb321d3dada47c6c7c485e17628ed614189"
+        },
+        {
+          "id": "rademaker-chike",
+          "member": "chike",
+          "name": "Chike",
+          "archetype": "builder",
+          "status": "ready",
+          "hook": {
+            "beat": "study-repos",
+            "kind": "title",
+            "text": "A weekend project gets a home",
+            "rule": "flagged"
+          },
+          "beats": [
+            "study-repos"
+          ],
+          "captions": [
+            "Chike pushes his weekend project, a bus-timetable board, to Forgejo on the Core. Its issues and pull requests sit beside the code."
+          ],
+          "chips": [
+            "Forgejo",
+            "alternative to GitLab"
+          ],
+          "apps": [
+            {
+              "id": "forgejo",
+              "replaces": [
+                "GitLab (SaaS)"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15.466666666666667,
+          "frames": 464,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "study-repos",
+                "kind": "hook",
+                "at": 0,
+                "end": 11.6,
+                "narrAt": 2,
+                "narrEnd": 10.8,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 271.228,
+                  "to": 281.126
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 11.6,
+                "t1": 11.95,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 11.95,
+              "t1": 15.467,
+              "panelAt": 12.15
+            }
+          },
+          "notes": [],
+          "hash": "4cf1d838fce4e7ac021abb0d56c9239d0d7c0ffdd52796d2330c88256b927d94"
+        },
+        {
+          "id": "rademaker-ayaan",
+          "member": "ayaan",
+          "name": "Ayaan",
+          "archetype": "learner",
+          "status": "ready",
+          "hook": {
+            "beat": "bedroom-sources",
+            "kind": "title",
+            "text": "A source that cannot vanish",
+            "rule": "flagged"
+          },
+          "beats": [
+            "bedroom-sources"
+          ],
+          "captions": [
+            "Ayaan saves each source for his history project in Linkwarden. It keeps a screenshot and a PDF of the page, so a page that disappears is still there."
+          ],
+          "chips": [
+            "Linkwarden",
+            "alternative to Raindrop.io"
+          ],
+          "apps": [
+            {
+              "id": "linkwarden",
+              "replaces": [
+                "Raindrop.io"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 17.866666666666667,
+          "frames": 536,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "bedroom-sources",
+                "kind": "hook",
+                "at": 0,
+                "end": 14,
+                "narrAt": 2,
+                "narrEnd": 13.2,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 321.296,
+                  "to": 333.594
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 14,
+                "t1": 14.35,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 14.35,
+              "t1": 17.867,
+              "panelAt": 14.55
+            }
+          },
+          "notes": [],
+          "hash": "5734cf637357c56fab81ac0e871177c684dcf95eff1a79c66ec17621e9983b98"
+        },
+        {
+          "id": "rademaker-dmitri",
+          "member": "dmitri",
+          "name": "Dmitri",
+          "archetype": "gamer",
+          "status": "ready",
+          "hook": {
+            "beat": "living-session",
+            "kind": "title",
+            "text": "The game runs by the door",
+            "rule": "flagged"
+          },
+          "beats": [
+            "living-session"
+          ],
+          "captions": [
+            "Dmitri signs in with his own Valve account, and Steam runs on the Core by the front door. He plays in a browser tab on his laptop."
+          ],
+          "chips": [
+            "Steam Headless",
+            "alternative to Xbox Cloud Gaming"
+          ],
+          "apps": [
+            {
+              "id": "steam-headless",
+              "replaces": [
+                "Xbox Cloud Gaming"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 17.466666666666665,
+          "frames": 524,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "living-session",
+                "kind": "hook",
+                "at": 0,
+                "end": 13.6,
+                "narrAt": 2,
+                "narrEnd": 12.8,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 71.458,
+                  "to": 85.058
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 13.6,
+                "t1": 13.95,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
+            }
+          },
+          "notes": [],
+          "hash": "cba42cace3afe4e1d4f6a8a9ee37e16837683520e35a96c563da059f418d45f8"
+        }
+      ]
+    },
     "rahimi": {
       "bake": "estimated",
       "cuts": [
@@ -6195,6 +6793,418 @@
           },
           "notes": [],
           "hash": "9ef687acb73a74d0e77cb20a0bf2a131f75a687e09df98ab3655e8fddc9fb877"
+        }
+      ]
+    },
+    "steyn": {
+      "bake": "estimated",
+      "cuts": [
+        {
+          "id": "steyn-lindiwe",
+          "member": "lindiwe",
+          "name": "Lindiwe",
+          "archetype": "marketer",
+          "status": "ready",
+          "hook": {
+            "beat": "alcove-list",
+            "kind": "title",
+            "text": "The supporter list comes home",
+            "rule": "flagged"
+          },
+          "beats": [
+            "alcove-list"
+          ],
+          "captions": [
+            "Lindiwe brings the charity’s supporter list in from the old mailing tool. Listmonk on the Core now holds the list and the draft of Thursday’s newsletter."
+          ],
+          "chips": [
+            "Listmonk",
+            "alternative to Mailchimp"
+          ],
+          "apps": [
+            {
+              "id": "listmonk",
+              "replaces": [
+                "Mailchimp"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 17.066666666666666,
+          "frames": 512,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "alcove-list",
+                "kind": "hook",
+                "at": 0,
+                "end": 13.2,
+                "narrAt": 2,
+                "narrEnd": 12.4,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 340.277,
+                  "to": 351.775
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 13.2,
+                "t1": 13.55,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
+            }
+          },
+          "notes": [],
+          "hash": "570be49c3eed2712e0ef95f461a0cfb397317018075c9a0accd79573ff793a77"
+        },
+        {
+          "id": "steyn-matthias",
+          "member": "matthias",
+          "name": "Matthias",
+          "archetype": "journalist",
+          "status": "ready",
+          "hook": {
+            "beat": "dining-clip",
+            "kind": "title",
+            "text": "The council reworded its minutes",
+            "rule": "flagged"
+          },
+          "beats": [
+            "dining-clip"
+          ],
+          "captions": [
+            "A council page was reworded overnight, but Matthias had saved it earlier. Linkwarden on the Core kept a screenshot and a PDF of the original wording."
+          ],
+          "chips": [
+            "Linkwarden",
+            "alternative to Raindrop.io"
+          ],
+          "apps": [
+            {
+              "id": "linkwarden",
+              "replaces": [
+                "Raindrop.io"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 17.066666666666666,
+          "frames": 512,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "dining-clip",
+                "kind": "hook",
+                "at": 0,
+                "end": 13.2,
+                "narrAt": 2,
+                "narrEnd": 12.4,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 128.024,
+                  "to": 139.522
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 13.2,
+                "t1": 13.55,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
+            }
+          },
+          "notes": [],
+          "hash": "c69a3c4f371e145c45f28b6f61ebfaa908214be3becab528503b0a344a35e60c"
+        },
+        {
+          "id": "steyn-tamsin",
+          "member": "tamsin",
+          "name": "Tamsin",
+          "archetype": "maker",
+          "status": "ready",
+          "hook": {
+            "beat": "living-story",
+            "kind": "title",
+            "text": "Tamsin’s story waits where she stopped",
+            "rule": "flagged"
+          },
+          "beats": [
+            "living-story"
+          ],
+          "captions": [
+            "Tamsin curls up on the sofa with a story from the family’s own files. Audiobookshelf on the Core remembers where she stopped, so tomorrow starts there."
+          ],
+          "chips": [
+            "Audiobookshelf",
+            "alternative to Audible"
+          ],
+          "apps": [
+            {
+              "id": "audiobookshelf",
+              "replaces": [
+                "Audible"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 17.066666666666666,
+          "frames": 512,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "living-story",
+                "kind": "hook",
+                "at": 0,
+                "end": 13.2,
+                "narrAt": 2,
+                "narrEnd": 12.4,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 86.885,
+                  "to": 98.383
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 13.2,
+                "t1": 13.55,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
+            }
+          },
+          "notes": [],
+          "hash": "440633c27c6a62390dd44b421671a2d37de7bed7cd0382831aeb79601b09c124"
+        }
+      ]
+    },
+    "tehrani": {
+      "bake": "estimated",
+      "cuts": [
+        {
+          "id": "tehrani-nasrin",
+          "member": "nasrin",
+          "name": "Nasrin",
+          "archetype": "business-owner",
+          "status": "ready",
+          "hook": {
+            "beat": "living-invoice",
+            "kind": "title",
+            "text": "Sumac drafts the school's invoice",
+            "rule": "flagged"
+          },
+          "beats": [
+            "living-invoice"
+          ],
+          "captions": [
+            "A school orders notebooks. Sumac drafts the invoice in Invoice Ninja from Nasrin's list, and she reads every line first."
+          ],
+          "chips": [
+            "Invoice Ninja",
+            "alternative to QuickBooks"
+          ],
+          "apps": [
+            {
+              "id": "invoice-ninja",
+              "replaces": [
+                "QuickBooks"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners",
+            "attribution-agents"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15,
+          "frames": 450,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "living-invoice",
+                "kind": "hook",
+                "at": 0,
+                "end": 10.8,
+                "narrAt": 2,
+                "narrEnd": 10,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 182.603,
+                  "to": 193.403
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 10.8,
+                "t1": 11.15,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 11.15,
+              "t1": 15,
+              "panelAt": 11.35
+            }
+          },
+          "notes": [],
+          "hash": "115fa8bdad2e58af6294fba92dc18974cb515ed3d21c7911710f188b42a46056"
+        },
+        {
+          "id": "tehrani-saeed",
+          "member": "saeed",
+          "name": "Saeed",
+          "archetype": "journalist",
+          "status": "ready",
+          "hook": {
+            "beat": "nook-vault",
+            "kind": "title",
+            "text": "Barberry lists what is unchecked",
+            "rule": "flagged"
+          },
+          "beats": [
+            "nook-vault"
+          ],
+          "captions": [
+            "A long investigation's notes sit in Obsidian as plain files. Barberry lists the claims with no source, and Saeed checks each one."
+          ],
+          "chips": [
+            "Obsidian",
+            "alternative to Evernote"
+          ],
+          "apps": [
+            {
+              "id": "obsidian",
+              "replaces": [
+                "Evernote"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners",
+            "attribution-agents"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15.466666666666667,
+          "frames": 464,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "nook-vault",
+                "kind": "hook",
+                "at": 0,
+                "end": 11.6,
+                "narrAt": 2,
+                "narrEnd": 10.8,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 114.533,
+                  "to": 124.431
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 11.6,
+                "t1": 11.95,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 11.95,
+              "t1": 15.467,
+              "panelAt": 12.15
+            }
+          },
+          "notes": [],
+          "hash": "e5c81affc7d60021b3f19868a3221225154047cae0a010dc6d0102961cc89f7f"
         }
       ]
     },
@@ -6685,6 +7695,489 @@
           },
           "notes": [],
           "hash": "3e4be792be23f9ed4463fe890bd94c74141117e1ff96ebf357f142aafb0ab96b"
+        }
+      ]
+    },
+    "valdivia": {
+      "bake": "estimated",
+      "cuts": [
+        {
+          "id": "valdivia-zaid",
+          "member": "zaid",
+          "name": "Zaid",
+          "archetype": "marketer",
+          "status": "ready",
+          "hook": {
+            "beat": "bar-posts",
+            "kind": "title",
+            "text": "Friday's posts wait as drafts",
+            "rule": "flagged"
+          },
+          "beats": [
+            "bar-posts"
+          ],
+          "captions": [
+            "Zaid lines up a client's week of posts in Postiz on the Core. Each one stays a draft until he approves it."
+          ],
+          "chips": [
+            "Postiz",
+            "alternative to Buffer"
+          ],
+          "apps": [
+            {
+              "id": "postiz",
+              "replaces": [
+                "Buffer"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15.466666666666667,
+          "frames": 464,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "bar-posts",
+                "kind": "hook",
+                "at": 0,
+                "end": 11.6,
+                "narrAt": 2,
+                "narrEnd": 10.8,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 165.853,
+                  "to": 175.828
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 11.6,
+                "t1": 11.95,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 11.95,
+              "t1": 15.467,
+              "panelAt": 12.15
+            }
+          },
+          "notes": [],
+          "hash": "a63ac82f2628d24296a0278762f9543a03a4004bfd9c6eadfa77bdb90f170e5f"
+        },
+        {
+          "id": "valdivia-ximena",
+          "member": "ximena",
+          "name": "Ximena",
+          "archetype": "creative",
+          "status": "ready",
+          "hook": {
+            "beat": "studio-lines",
+            "kind": "title",
+            "text": "Three screens from one drawing",
+            "rule": "flagged"
+          },
+          "beats": [
+            "studio-lines"
+          ],
+          "captions": [
+            "Ximena draws the line art for a three-colour print in Inkscape on the Core. Each colour gets its own layer, saved beside the shoot."
+          ],
+          "chips": [
+            "Inkscape",
+            "alternative to Adobe Illustrator"
+          ],
+          "apps": [
+            {
+              "id": "inkscape",
+              "replaces": [
+                "Adobe Illustrator"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 16.266666666666666,
+          "frames": 488,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "studio-lines",
+                "kind": "hook",
+                "at": 0,
+                "end": 12.4,
+                "narrAt": 2,
+                "narrEnd": 11.6,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 61.903,
+                  "to": 72.601
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 12.4,
+                "t1": 12.75,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 12.75,
+              "t1": 16.267,
+              "panelAt": 12.95
+            }
+          },
+          "notes": [],
+          "hash": "de2a019635ac1c8eaac7d1ff3d9cbb36edc88622b3099f99fe22193fb851390a"
+        }
+      ]
+    },
+    "voss": {
+      "bake": "estimated",
+      "cuts": [
+        {
+          "id": "voss-esperanza",
+          "member": "esperanza",
+          "name": "Esperanza",
+          "archetype": "lawyer",
+          "status": "ready",
+          "hook": {
+            "beat": "kitchen-draft",
+            "kind": "title",
+            "text": "Paprika drafts, Esperanza checks",
+            "rule": "flagged"
+          },
+          "beats": [
+            "kitchen-draft"
+          ],
+          "captions": [
+            "At the counter, Paprika drafts a first summary of a client's letters from the folder Esperanza connected in Companion Memory. She checks it line by line against the letters."
+          ],
+          "chips": [
+            "Companion Memory"
+          ],
+          "apps": [
+            {
+              "id": "ci-memory",
+              "replaces": []
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "attribution-agents"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 18.266666666666666,
+          "frames": 548,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "kitchen-draft",
+                "kind": "hook",
+                "at": 0,
+                "end": 14.4,
+                "narrAt": 2,
+                "narrEnd": 13.6,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 197.959,
+                  "to": 210.657
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 14.4,
+                "t1": 14.75,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 14.75,
+              "t1": 18.267,
+              "panelAt": 14.95
+            }
+          },
+          "notes": [],
+          "hash": "716ebad6fa52794066cd2db94b4ba19b013c4283c63345d59abf9fed789ec314"
+        },
+        {
+          "id": "voss-takumi",
+          "member": "takumi",
+          "name": "Takumi",
+          "archetype": "business-owner",
+          "status": "ready",
+          "hook": {
+            "beat": "nook-invoice",
+            "kind": "title",
+            "text": "Repair invoices, printed at the desk",
+            "rule": "flagged"
+          },
+          "beats": [
+            "nook-invoice"
+          ],
+          "captions": [
+            "Takumi turns the day's repair tags into invoices in Invio. He prints each one to hand over at the shop counter."
+          ],
+          "chips": [
+            "Invio",
+            "alternative to FreshBooks"
+          ],
+          "apps": [
+            {
+              "id": "invio",
+              "replaces": [
+                "FreshBooks"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15.066666666666666,
+          "frames": 452,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "nook-invoice",
+                "kind": "hook",
+                "at": 0,
+                "end": 11.2,
+                "narrAt": 2,
+                "narrEnd": 10.4,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 213.456,
+                  "to": 222.954
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 11.2,
+                "t1": 11.55,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 11.55,
+              "t1": 15.067,
+              "panelAt": 11.75
+            }
+          },
+          "notes": [],
+          "hash": "ef377ea93c430f7ce304d1de26f58dc482a800ea98fa345063a5367b0c95ad68"
+        },
+        {
+          "id": "voss-anouk",
+          "member": "anouk",
+          "name": "Anouk",
+          "archetype": "gamer",
+          "status": "ready",
+          "hook": {
+            "beat": "living-game",
+            "kind": "title",
+            "text": "The match starts on the sofa",
+            "rule": "flagged"
+          },
+          "beats": [
+            "living-game"
+          ],
+          "captions": [
+            "Anouk's game runs on the Core, and her laptop shows it in a browser tab. She signs in with her own Valve account."
+          ],
+          "chips": [
+            "Steam Headless"
+          ],
+          "apps": [
+            {
+              "id": "steam-headless",
+              "replaces": []
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15.866666666666667,
+          "frames": 476,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "living-game",
+                "kind": "hook",
+                "at": 0,
+                "end": 12,
+                "narrAt": 2,
+                "narrEnd": 11.2,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 116.058,
+                  "to": 128.058
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 12,
+                "t1": 12.35,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 12.35,
+              "t1": 15.867,
+              "panelAt": 12.55
+            }
+          },
+          "notes": [],
+          "hash": "a4209e0c6ad167e8bfa5202c3573419e4b5d53ab8550046ecd044c9bc7beb93b"
+        },
+        {
+          "id": "voss-yara",
+          "member": "yara",
+          "name": "Yara",
+          "archetype": "learner",
+          "status": "ready",
+          "hook": {
+            "beat": "terrace-read",
+            "kind": "title",
+            "text": "Book club out on the terrace",
+            "rule": "flagged"
+          },
+          "beats": [
+            "terrace-read"
+          ],
+          "captions": [
+            "Yara's book club picks a novel as an ebook. She keeps it in BookLore on the Core and reads it on the terrace."
+          ],
+          "chips": [
+            "BookLore",
+            "alternative to Apple Books"
+          ],
+          "apps": [
+            {
+              "id": "booklore",
+              "replaces": [
+                "Apple Books"
+              ]
+            }
+          ],
+          "disclosures": [
+            "fictional-family",
+            "scripted-scenes",
+            "stylised-art",
+            "names-owners"
+          ],
+          "cta": {
+            "label": "See Companion Core",
+            "url": "https://ci.computer/core"
+          },
+          "aspects": [
+            "9x16",
+            "1x1",
+            "4x5",
+            "16x9"
+          ],
+          "durationS": 15.866666666666667,
+          "frames": 476,
+          "timeline": {
+            "parts": [
+              {
+                "beat": "terrace-read",
+                "kind": "hook",
+                "at": 0,
+                "end": 12,
+                "narrAt": 2,
+                "narrEnd": 11.2,
+                "sentences": "2/2",
+                "tour": {
+                  "from": 353.741,
+                  "to": 365.039
+                }
+              }
+            ],
+            "pads": [
+              {
+                "t0": 12,
+                "t1": 12.35,
+                "to": "end"
+              }
+            ],
+            "end": {
+              "t0": 12.35,
+              "t1": 15.867,
+              "panelAt": 12.55
+            }
+          },
+          "notes": [],
+          "hash": "b86c132309cb24172687bebb4ab440d2f02ce366ef1d43677ed2ab555e7f611f"
         }
       ]
     },
