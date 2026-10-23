@@ -765,7 +765,7 @@ html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:
    row), and a text field is 16 px so a phone does not zoom in on it. portal-tests/mobile-site.mts holds all of it. */
 @media (max-width: 700px), (max-height: 500px) and (hover: none) {
   .lede-families, .homes-count, .proof-limit { font-size: 16px; }
-  .hero-hint, .hero-noscript, .beta-chip, .chip, .pair span, .home-line, .home-note, .crumbs, .fact, .home-facts .fact, .card .style, .siblings, .go { font-size: 14px; }
+  .hero-hint, .hero-noscript, .chip, .pair span, .home-line, .home-note, .crumbs, .fact, .home-facts .fact, .card .style, .siblings, .go { font-size: 14px; }
   .home-facts .fact { height: 32px; }
   .pair b { font-size: 16px; }
   .card h3 { font-size: 16px; }
