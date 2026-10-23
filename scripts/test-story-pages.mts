@@ -602,9 +602,16 @@ test('the tour\'s cards are the light glass: two corners (5 px on a card, 3 px o
   assert.deepEqual(literal(view).filter(([sel]) => !/slider-thumb|range-thumb/.test(sel)), [], 'viewer.css: every border-radius but the scrubber\'s thumb is a token');
   // (the two rows that scroll sideways on a phone are control rows, judged by their own box like the dock's chips: the family's person chips on the start sheet (`.st-member`) and the apps of a
   // beat sheet (`.st-chip`); each keeps its one line. Nothing else may be nowrap, and no text is ever cut with an ellipsis.)
-  const reading = sc.replace(/\.st-live-region[^}]*\}/, '').replace(/[^{}]*\.st-(members?|chips?)\b[^{}]*\{[^{}]*\}/g, '');
-  assert.ok(!/white-space:\s*nowrap|text-overflow:\s*ellipsis/.test(reading), 'story.css: no reading text is nowrap or cut with an ellipsis (the live region is off screen; the phone\'s person chips and app chips are rows that scroll sideways)');
-  assert.ok(/\.st-member[^{]*\{[^}]*white-space:\s*nowrap/.test(sc) && !/text-overflow:\s*ellipsis/.test(sc), 'the person chips are one line each and nothing is cut with an ellipsis');
+  // (exactly these three rules, by their whole selector: the live region (off screen), the phone's person chips on the start sheet and the apps of a beat sheet. A rule that names `.st-member` or
+  // `.st-chip` for another reason is not exempt, and a rule that cuts with an ellipsis never is.)
+  const nowrapRules = [...sc.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(m => /white-space:\s*nowrap|text-overflow:\s*ellipsis/.test(m[2])).map(m => m[1].trim().replace(/\s+/g, ' ')).sort();
+  assert.deepEqual(nowrapRules, ['.st-card[data-mode="sheet"] .st-chip', '.st-live-region', '.st-start-card[data-layout="sheet"] .st-member, .st-start-card[data-layout="panel"] .st-member'], 'story.css: no reading text is nowrap or cut with an ellipsis (the live region is off screen; the phone\'s person chips and app chips are rows that scroll sideways, judged by their own box)');
+  assert.ok(!/text-overflow:\s*ellipsis/.test(sc), 'nothing in the tour is cut with an ellipsis');
+  // the home's name in the top bar: the tour wraps it (a whole name beats an ellipsis on a phone), the plain player keeps its one line, and the player's own 14 px is not made smaller at any width
+  assert.ok(/html\[data-story\] \.vh-name \{[^}]*white-space:\s*normal/.test(sc), 'the tour lets the home\'s name wrap');
+  assert.ok(![...view.matchAll(/\.vh-name\s*\{([^}]*)\}/g)].some(m => /white-space:\s*normal/.test(m[1])), 'viewer.css: the plain player\'s name stays on one line with an ellipsis (the tour\'s wrap is story.css\'s, behind html[data-story])');
+  assert.ok([...view.matchAll(/\.vh-name\s*\{[^}]*font-size:\s*(\d+(?:\.\d+)?)px/g)].every(m => Number(m[1]) >= 14) && !/\.vh-name[^{]*\{[^}]*font-size/.test(sc), 'the home\'s name is 14 px or more at every width: no rule makes it smaller');
+  assert.ok(/@media \(max-width: 760px\) and \(orientation: portrait\) \{[^@]*\[data-act="prev"\][^@]*vh-show-tour/.test(sc.replace(/\s+/g, ' ')), 'Previous and Next home move into the More sheet on a phone held upright only: on its side the sheet is short and the bar is wide');
   assert.ok(/\.st \{[^}]*overflow-wrap:\s*anywhere/.test(sc), 'the tour\'s layer wraps any word');
   assert.deepEqual([...sc.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/g)].map(m => m[0]), [], 'story.css has no hex or rgb colour: tokens only');
   // the glass and its text are tokens of viewer.css, in the canon's light set (room-creator.html's light token block)

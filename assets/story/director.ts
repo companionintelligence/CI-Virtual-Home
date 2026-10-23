@@ -506,7 +506,7 @@ export class Director {
     const bars = this.barRects();
     // a phone on its side takes the side panel (whatever its width: 740 px is the phone's type scale but not a layout for a sheet), a phone upright the sheet
     const side = sidePhone(o.w, o.h);
-    const out: ReturnType<typeof placePopup> & { type: number } | SheetOut & { type: number } = !side && sheetLayout(o.w, o.h) ? this.placeSheetFor(o, focus, core, bars) : this.placePanelFor(o, focus, core, bars, side);
+    const out: ReturnType<typeof placePopup> & { type: number } | SheetOut & { type: number } =!side && sheetLayout(o.w, o.h) ? this.placeSheetFor(o, focus, core, bars) : this.placePanelFor(o, focus, core, bars, side);
     this.card.put(out.rect, out.mode, 'where' in out ? (out as SheetOut).where : undefined);
     this.place_ = { rect: out.rect, mode: out.mode, subject: focus, ok: out.ok, overlapFocus: out.overlapFocus, slot: out.slot, variant: out.variant, scrolls: out.scrolls, type: out.type, refused: out.refused };
   }
@@ -717,6 +717,7 @@ export class Director {
     let r: Rect;
     const side = sidePhone(o.w, o.h), sheet = !side && sheetLayout(o.w, o.h), ins = this.insets();
     this.end.el.dataset.mode = sheet ? 'sheet' : 'card';
+    this.end.setSide(side);          // (on its side the call to action is a bar that sticks to the panel's bottom edge: popup.ts EndCard.setSide)
     if (sheet) {
       // a phone: a sheet above the dock, up to 55 % of the height, scrolling inside beyond that, in the room the Core leaves (as a beat's sheet takes the room under or over its subject:
       // the end frame's camera composes the Core for a smaller sheet, so a taller one goes under the Core or over it, never on it; tighter padding before a scroll)
@@ -776,6 +777,8 @@ export class Director {
         return { visible: self.end.visible, card: c, solvedW: Number(self.end.el.dataset.solvedW) || null, core, vw: o.w, vh: o.h, overlapCore: core ? (x * y) / Math.max(1, core.w * core.h) : 0, bars: self.barRects().reduce((a, r) => a + Math.max(0, Math.min(c.x + c.w, r.x + r.w) - Math.max(c.x, r.x)) * Math.max(0, Math.min(c.y + c.h, r.y + r.h) - Math.max(c.y, r.y)), 0) };
       },
       goBeat: (i: number) => self.goBeat(i),
+      /** the card's follow-scroll at `frac` of the beat (0 to 1), and where the card's scroll is after it (phone.mts: a sheet follows the beat's time down its words) */
+      follow(frac: number) { self.card.follow(frac); return self.card.el.scrollTop; },
       /** story v2: open or close the card's "More" and wait for the card to be placed again; false when the beat has none */
       async setMore(open: boolean) {
         if (!self.card.hasMore) return false;

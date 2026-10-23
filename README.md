@@ -604,10 +604,9 @@ with `performance.getEntriesByType('navigation')[0].name`, not `page.url()`.
 
 **Time to ready** (the mobile pass, 2026-10): on the heaviest home (`mediterranean`) a CPU profile of the load put about 75 % of the main thread's time in `getUniforms` inside three's `renderer.render`, which is the first
 frame the page's own `animate()` draws before the player has mounted: it links every shader program (about 70) one after another and blocks on the driver for each, and it holds the thread so that the player's module, which
-compiles them with `compileAsync` on the driver's own threads, cannot even start. `?mode=view&hold=1` makes `animate()` draw nothing until the viewer has mounted (the loading card covers the page until then anyway). It is an
-experiment, off by default, because it was not a win everywhere on the loaded machine it was measured on (median of interleaved pairs, load average 14 to 17): mediterranean 39.7 s to 10.0 s, cutestarter 22.2 s to 7.6 s, aurora
+compiles them with `compileAsync` on the driver's own threads, cannot even start. A one-line guard in `animate()` that drew nothing until the viewer had mounted was tried and is not in the tree: it was not a win everywhere on the loaded machine it was measured on (median of interleaved pairs, load average 14 to 17): mediterranean 39.7 s to 10.0 s, cutestarter 22.2 s to 7.6 s, aurora
 30.5 s to 44.5 s, seraphine 34.5 s to 36.6 s (noisy), so the cost it moves, not removes, is probably the extra programs `compileAsync` links (it compiles every mesh's material, hidden wall and roof states included, where the first
-frame links only what it draws). Time it with `pnpm run perf:player -- --mode load --query hold=1`, interleaved with and without, and on the device that matters, before making it the default. The numbers are in
+frame links only what it draws). If it is tried again, time it with `pnpm run perf:player -- --mode load --query <flag>`, interleaved with and without, and on the device that matters, before making it the default. The numbers are in
 `reference/story/player.md`, "On a phone".
 
 How to take a number that means something:

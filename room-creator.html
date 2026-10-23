@@ -10160,12 +10160,6 @@
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
       if (viewer) { viewer.frame(delta); return; }
-      // EXPERIMENT, off unless ?hold=1 (README, "Player performance", Time to ready). The player has not mounted yet (its module is still downloading, or the house is still being built): a
-      // frame drawn now is hidden behind the loading card, and the first one with the house in the scene links every shader program one after another inside renderer.render (about 70 on a
-      // furnished home; three blocks in getUniforms on each until the driver has finished), which on the heaviest home was three quarters of the time to ready and held the main thread, so
-      // the player's own module could not start. With ?hold=1 nothing is drawn here and the player compiles with compileAsync (the driver's own threads) before its first frame. Measured
-      // against the default on a loaded machine it took mediterranean from 39.7 s to 10.0 s and cutestarter from 22.2 s to 7.6 s, and aurora from 30.5 s to 44.5 s: not a default yet.
-      if (VIEW_MODE && urlParams.get('hold') === '1') return;
       if (recording) return;   // a still or a film owns the canvas (the Record and Still buttons)
 
       // Live playback of camera motion spline (loop-beat: round the beat, or v1 phase, the playhead is in)

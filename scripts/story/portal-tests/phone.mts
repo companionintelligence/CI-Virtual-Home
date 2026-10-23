@@ -4,12 +4,16 @@
 //   Each criterion of reference/story/player.md "On a phone" is a check here, at 390 x 844, 360 x 640 and 320 x 568 (touch) and on its side at 844 x 390 and 740 x 360:
 //   P1  the start sheet: at most half the window, the home in view above it (the top half is only the player's own bars), the title and the tagline, the primary action 44 px or taller
 //       in the bottom third, the family as ONE row of 44 px chips (sideways scroll, one line each), the long copy behind "About this family" (a <details>, 44 px summary) with every
-//       line the fine print owes still in the page (and shown when it is opened), no sideways scroll, no text past its card; on its side a panel of at most 45 % of the width
+//       line the fine print owes still in the page (and shown when it is opened, with the primary action still in view under it), no sideways scroll, no text past its card; the scrim
+//       veils the player's own bars (the dialog takes every tap, so they must look put away); on its side a panel of at most 45 % of the width
 //   P2  the beat sheet: for every beat of the tour, at most 40 % of the window (a panel at most 45 % of the width on its side), clear of what the beat is about (under 2 %), of the
 //       bars and of the window's edges; as tall as its words (no dead space: within 8 px, or it scrolls); a one-line kicker; "More" a 44 px target in the card; the agent's line grows the
-//       sheet downward and moves nothing that is being read
-//   P3  the dock and the top bar: while the tour runs the hour chips and the speed control are away and the dock is one row; the home's name is shown whole (wraps, never an ellipsis)
-//       for every home's display name; Previous and Next home are in the More sheet; none of it is true of the plain player (and all of it is back when the tour's flag is)
+//       sheet downward and moves nothing that is being read; a sheet taller than its room follows the beat's time down its words, with "More" in reach
+//   P3  the dock and the top bar: while the tour runs the hour chips and the speed control are away and the dock is one row; the home's name is shown whole (wraps, never an ellipsis,
+//       no word broken, always the player's own 14 px) for every home's display name; on a phone held upright Previous and Next home are in the More sheet, on its side they stay in the
+//       top bar; none of it is true of the plain player (and all of it is back when the tour's flag is)
+//   P10 the More sheet is inside the window and every row of it can be reached, at every size (a phone on its side as short as 320 px); the end card's call to action is on screen without a
+//       scroll and a tap on it lands on it, and Download Companion can be scrolled to, at every size (the narrowest phones on their side included)
 //   P4  every control a 44 px target (chips that scroll sideways are judged by their own row), focus order (the action, the family, the disclosure) and a visible focus ring
 //   P5  safe areas: with the notch's insets set (CDP Emulation.setSafeAreaInsetsOverride) no bar, sheet or panel is under them
 //   P6  prefers-reduced-motion: no transition or animation on the sheet, and a sheet taller than its room does not scroll by itself
@@ -74,17 +78,26 @@ export default async function phone(ctx: TestCtx): Promise<void> {
   };
 
   // ================================================================== P1 to P4 at each phone size
-  const sizes: Array<{ w: number; h: number; side: boolean; label: string }> = [
+  // (`light`: the two narrowest phones on their side, which the end card's call to action and the More sheet are tightest at: every check but the sweep of all the beats, which is five beats there)
+  const sizes: Array<{ w: number; h: number; side: boolean; label: string; light?: boolean }> = [
     { w: 390, h: 844, side: false, label: '390 x 844' }, { w: 360, h: 640, side: false, label: '360 x 640' }, { w: 320, h: 568, side: false, label: '320 x 568' },
     { w: 844, h: 390, side: true, label: '844 x 390 (on its side)' }, { w: 740, h: 360, side: true, label: '740 x 360 (on its side)' },
+    { w: 667, h: 375, side: true, label: '667 x 375 (on its side)', light: true }, { w: 568, h: 320, side: true, label: '568 x 320 (on its side)', light: true },
   ];
   let first = true;
   const shifted: number[] = [];    // beat 6's subject centre and the window's height at 390 x 844, for the kill switch's check below
-  for (const sz of sizes) {
+  // (PHONE_SIZES=390x844,568x320 runs only those sizes of this loop, for work on one of them; the other sections run as ever)
+  const only = (process.env.PHONE_SIZES || '').split(',').filter(Boolean);
+  for (const sz of sizes.filter(s => !only.length || only.includes(`${s.w}x${s.h}`))) {
     const slug = sz.w === 390 || sz.w === 844 ? FAM : LONG;
     console.log(`\nP1-P4 the tour on a phone: ${sz.label}, ${slug}`);
     const { page, errors, close } = await ctx.open({ width: sz.w, height: sz.h }, true, ua ? { userAgent: ua } : {});
-    await page.addInitScript(() => { (window as any).__cls = []; try { new PerformanceObserver(l => { for (const e of l.getEntries()) (window as any).__cls.push({ v: (e as any).value, t: e.startTime }); }).observe({ type: 'layout-shift', buffered: true } as any); } catch { /* no layout-shift entries here */ } });
+    // (each shift is kept with the element that moved, so a failure says what shifted and from where to where)
+    await page.addInitScript(() => {
+      (window as any).__cls = [];
+      const d = (n: any) => { const e = n as HTMLElement | null; return e && e.tagName ? `${e.tagName.toLowerCase()}.${(e.className || '').toString().split(' ')[0]}` : '?'; };
+      try { new PerformanceObserver(l => { for (const e of l.getEntries() as any[]) (window as any).__cls.push({ v: e.value, t: e.startTime, input: !!e.hadRecentInput, src: (e.sources || []).slice(0, 2).map((s: any) => `${d(s.node)} y ${Math.round(s.previousRect.y)} to ${Math.round(s.currentRect.y)}, h ${Math.round(s.previousRect.height)} to ${Math.round(s.currentRect.height)}`).join('; ') }); }).observe({ type: 'layout-shift', buffered: true } as any); } catch { /* no layout-shift entries here */ }
+    });
     await page.goto(link(slug)); await wait(page);
     const quiet = await page.evaluate(() => { const bar = (document.querySelector('.vh-top') as HTMLElement).getBoundingClientRect(), d = (document.querySelector('.vh-dock') as HTMLElement).getBoundingClientRect(); return { bar: [bar.left, bar.top, bar.width, bar.height], dock: [d.left, d.top, d.width, d.height], t: performance.now() }; });
     // ---- P1 the start sheet
@@ -104,6 +117,9 @@ export default async function phone(ctx: TestCtx): Promise<void> {
         hasDetails: !!det, detOpen: det?.open, sumH: sum ? sum.getBoundingClientRect().height : 0, fine, meta, home: document.querySelector('.st-start-home')?.textContent || '',
         kick: kick?.textContent, title: h?.textContent, tag: p?.textContent, titleShown: visibleText(h), tagShown: visibleText(p),
         label: document.querySelector('#st-members-h')?.textContent || '', scrim: getComputedStyle(document.querySelector('.st-start')!).backgroundImage,
+        // the player's own bars under the scrim: the bottom of the top bar and of the home's label chip, and what the scrim's hit test gives at the top bar's buttons (the dialog takes every tap)
+        barsBottom: Math.max(...Array.from(document.querySelectorAll('.vh-top > *, .vh-fiction')).map(e => e.getBoundingClientRect().bottom)),
+        hits: Array.from(document.querySelectorAll('.vh-top button')).filter(b => b.getBoundingClientRect().width > 0).map(b => { const q = b.getBoundingClientRect(), x = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return !!x && !!x.closest('.st-start'); }),
         // the home is in view: the area of the window the sheet does not cover, minus the player's own bars at the top
         bodyScrolls: c.scrollHeight > c.clientHeight + 1,
       };
@@ -122,18 +138,32 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     ok(st.rowOverflowX === 'auto' || st.rowOverflowX === 'scroll', `${label}: the row scrolls sideways when the family is wider than the sheet (${st.rowOverflowX})`);
     ok(st.label.startsWith('Or start with one person') && st.chips.every((c: any) => c.ws === 'nowrap'), `${label}: the row's label is "${st.label}" and each chip keeps one line`);
     ok(st.hasDetails && st.detOpen === false && st.sumH >= 43.5, `${label}: the long copy is behind "About this family", a closed <details> with a ${Math.round(st.sumH)} px summary`);
-    const owed = ['Scenes are written for this site.', 'They are not recordings of a real session.', 'The Companion Core is drawn as a stylised illustration, not a photograph.', 'Companion OS, Companion Memory and Companion Agents are in beta.'];
+    // (the lines the claims owe this card today; a line that claims.json stops owing, as the beta sentence was by #49, is not listed here: the count printed below is whatever the page carries)
+    const owed = ['Scenes are written for this site.', 'They are not recordings of a real session.', 'The Companion Core is drawn as a stylised illustration, not a photograph.'];
     ok(owed.every(t => st.fine.some((l: string) => l.includes(t))) && /Fictional family\. Real software\./.test(st.meta) && /\d+ stops, about \d+ minutes?/.test(st.meta) && st.home.length > 20, `${label}: nothing is cut: the facts, the home's line and all ${st.fine.length} lines of fine print are in the page behind the disclosure`);
+    // (the scrim is a dialog's: it takes every tap, so the player's own bars under it are veiled and do not look live)
+    const alpha0 = Number((/\/ ([\d.]+)\)/.exec(st.scrim) || [])[1]), band = Number((/\/ [\d.]+\) ([\d.]+)px/.exec(st.scrim) || [])[1]);
+    ok(alpha0 >= 0.2 && band >= st.barsBottom - 0.5 && st.hits.length > 0 && st.hits.every(Boolean), `${label}: the dialog takes the taps over the top bar and the scrim veils it (${(alpha0 * 100).toFixed(0)} % to ${band} px, where the bar and the home's label end at ${Math.round(st.barsBottom)} px), so the bar does not look live while it is dead`);
     const v1 = await page.evaluate(VIEW);
     ok(!v1.hOverflow && v1.clip.length === 0, `${label}: no sideways scroll and no text past its card on the start sheet${v1.clip.length ? ': ' + v1.clip.slice(0, 2).join(' | ') : ''}`);
     const small1 = await page.evaluate(SMALL, '.st-start');
     ok(small1.length === 0, `${label}: every control of the start sheet is a 44 px target${small1.length ? ': ' + small1.join(', ') : ''}`);
     // the disclosure opens, and its words are in view (the sheet scrolls to them), still inside the limit
     await page.locator('.st-about-sum').tap();
-    // (the sheet scrolls to the opened words smoothly, in steps a loaded machine spaces out: wait for the last line to be in view, up to six seconds, rather than for a fixed time)
-    for (let k = 0; k < 40; k++) { await sleep(150); if (await page.evaluate(() => { const c = document.querySelector('.st-start-card') as HTMLElement, cr = c.getBoundingClientRect(), f = (document.querySelector('.st-fine li:last-child') as HTMLElement).getBoundingClientRect(); return f.bottom <= cr.bottom + 1 && f.top >= cr.top - 1; })) break; }
-    const op = await page.evaluate(() => { const c = document.querySelector('.st-start-card') as HTMLElement, cr = c.getBoundingClientRect(), f = (document.querySelector('.st-fine li:last-child') as HTMLElement).getBoundingClientRect(); return { open: (document.querySelector('.st-about') as HTMLDetailsElement).open, h: cr.height, vh: innerHeight, lastIn: f.bottom <= cr.bottom + 1 && f.top >= cr.top - 1, scrolls: c.scrollHeight > c.clientHeight + 1 }; });
+    // (the sheet scrolls to the opened words smoothly, in steps a loaded machine spaces out: wait for the last line to be in view and clear of the action bar that sticks under it, up to six seconds, rather than for a fixed time)
+    for (let k = 0; k < 40; k++) { await sleep(150); if (await page.evaluate(() => { const c = document.querySelector('.st-start-card') as HTMLElement, cr = c.getBoundingClientRect(), f = (document.querySelector('.st-fine li:last-child') as HTMLElement).getBoundingClientRect(), p = (document.querySelector('.st-start .st-primary') as HTMLElement).getBoundingClientRect(); return f.bottom <= Math.min(cr.bottom, p.top) + 1 && f.top >= cr.top - 1; })) break; }
+    const op = await page.evaluate(() => {
+      const c = document.querySelector('.st-start-card') as HTMLElement, cr = c.getBoundingClientRect(), f = (document.querySelector('.st-fine li:last-child') as HTMLElement).getBoundingClientRect();
+      const p = document.querySelector('.st-start .st-primary') as HTMLElement, pr = p.getBoundingClientRect(), hit = document.elementFromPoint(pr.left + pr.width / 2, pr.top + pr.height / 2);
+      return { open: (document.querySelector('.st-about') as HTMLDetailsElement).open, h: cr.height, vh: innerHeight, lastIn: f.bottom <= cr.bottom + 1 && f.top >= cr.top - 1, scrolls: c.scrollHeight > c.clientHeight + 1,
+        primIn: pr.top >= cr.top - 1 && pr.bottom <= cr.bottom + 1 && pr.height >= 43.5, primHit: hit === p || p.contains(hit), primBelowFine: pr.top >= f.bottom - 1,
+        order: Array.from(document.querySelectorAll('.st-start button, .st-start summary, .st-start a')).filter(e => e.getBoundingClientRect().height > 0).map(e => (e as HTMLElement).className.split(' ')[0]) };
+    });
     ok(op.open && op.lastIn && (sz.side || op.h <= op.vh * START_SHEET + 1), `${label}: "About this family" opens and its last line is in view inside the sheet (${Math.round(op.h / op.vh * 100)} % of the height)`);
+    // (the action bar goes to the end of the sheet while the disclosure is open and sticks to its bottom edge: the primary action is in view and tappable while the long copy is read)
+    ok(op.primIn && op.primHit && op.primBelowFine, `${label}: with "About this family" open the primary action is still in view, under the words, and a tap on it lands on it`);
+    { const at = op.order.lastIndexOf('st-about-sum'), tail = op.order.slice(at + 1);
+      ok(op.order[0] === 'st-member' && at > 0 && tail.length >= 1 && tail.every((c: string) => c === 'st-btn'), `${label}: and the focus order is the order on screen (the family, the disclosure, the action: ${op.order.join(', ')})`); }
     await page.locator('.st-about-sum').tap(); await sleep(250);
 
     // ---- P4 the keyboard: the action, the family, the disclosure, each with a visible ring
@@ -168,30 +198,43 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     });
     ok(!chrome.tods && !chrome.shots && !chrome.speed && chrome.play && chrome.scrub && chrome.chapters, `${label}: the dock keeps play, the seek bar and the chapters button; the hour chips, the shot chips and the speed control are away while the tour runs`);
     ok(chrome.rowsVisible === 1 && chrome.dockH <= 70, `${label}: the dock is one row (${Math.round(chrome.dockH)} px tall)`);
-    if (!sz.side || sz.w <= 760) ok(!chrome.topPrev && !chrome.topNext, `${label}: Previous home and Next home have left the top bar (the name has the room)`);
-    // the name: whole, wrapping, never an ellipsis, for the longest names there are
+    // (a phone held upright sends Previous and Next home to the More sheet to give the name room; on its side the bar is wide and the sheet short, so they stay in the bar and are not rows of the sheet)
+    if (!sz.side) ok(!chrome.topPrev && !chrome.topNext, `${label}: Previous home and Next home have left the top bar (the name has the room)`);
+    else ok(chrome.topPrev && chrome.topNext && !chrome.toolPrev && !chrome.toolNext, `${label}: on its side Previous home and Next home stay in the top bar, which is wide, and are not rows of the More sheet, which is short`);
+    // the name: whole, wrapping, never an ellipsis, no word broken, the player's own 14 px, for the longest names there are
     if (names.length) {
       const bad = await page.evaluate((list: string[]) => {
-        const el = document.querySelector('.vh-name') as HTMLElement, was = el.textContent, out: string[] = [];
+        const el = document.querySelector('.vh-name') as HTMLElement, was = el.textContent, out: string[] = [], bar = document.querySelector('.vh-top') as HTMLElement;
+        const fs = getComputedStyle(el).fontSize, wrap = getComputedStyle(el).whiteSpace;
         for (const n of list.slice(0, 8)) {
-          el.textContent = n; const cs = getComputedStyle(el), lines = Math.round(el.getBoundingClientRect().height / (parseFloat(cs.lineHeight) || 17));
-          if (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1 || cs.textOverflow === 'ellipsis' && cs.whiteSpace === 'nowrap' || lines > 2) out.push(`${n}: ${lines} lines, ${el.scrollWidth} in ${el.clientWidth}`);
+          el.textContent = n; const cs = getComputedStyle(el), lines = Math.round((el.getBoundingClientRect().height) / (parseFloat(cs.lineHeight) || 17));
+          // (and the bar stays the 46 px the player's other chrome (the label chip, the free-camera bar, the toast, About) is positioned from: a taller bar would put them under it)
+          const over = el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1 || cs.textOverflow === 'ellipsis' && cs.whiteSpace === 'nowrap' || lines > 2 || bar.getBoundingClientRect().height > 46.5, sw = el.scrollWidth, cw = el.clientWidth;
+          // (a word wider than the box is broken in the middle by overflow-wrap: a name may wrap between its words and after a hyphen, never inside one)
+          const probe = document.createElement('span'); probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;left:0;top:0'; el.append(probe);
+          const broken = n.split(/(?<=-)|\s+/).filter(Boolean).filter(t => { probe.textContent = t; return probe.getBoundingClientRect().width > cw + 0.5; });
+          probe.remove();
+          if (over || broken.length) out.push(`${n}: ${lines} lines, ${sw} in ${cw}, the bar ${Math.round(bar.getBoundingClientRect().height)} px${broken.length ? ', would break ' + broken.join('/') : ''}`);
         }
-        el.textContent = was; return out;
+        el.textContent = was;
+        return { out, fs, wrap, barH: bar.getBoundingClientRect().height };
       }, names);
-      ok(bad.length === 0, `${label}: the longest home names (${names.slice(0, 3).join(', ')} ...) show whole in the top bar on at most two lines, no ellipsis${bad.length ? ': ' + bad.join(' | ') : ''}`);
+      ok(bad.out.length === 0, `${label}: the longest home names (${names.slice(0, 3).join(', ')} ...) show whole in the top bar on at most two lines, no ellipsis, no word broken, the bar no taller than 46 px${bad.out.length ? ': ' + bad.out.join(' | ') : ''}`);
+      ok(bad.fs === '14px' && bad.wrap === 'normal', `${label}: the name is the player's own ${bad.fs} (not made smaller at any width) and wraps in the tour (${bad.wrap})`);
     }
 
     // ---- start the tour: the first beat's sheet
     await page.locator('.st-start .st-primary').tap(); await sleep(600);
     await page.waitForFunction(() => { const c = document.querySelector('.st-card') as HTMLElement | null; return !!c && !c.hidden && c.classList.contains('st-in'); }, null, { timeout: 60000 }).catch(() => {});
     // ---- P7 the sheets opened: from the page being ready to the first beat's sheet on screen the layout did not shift (the card moving from one beat to the next is placed anew each beat, by design)
-    const opened = await page.evaluate(() => ((window as any).__cls || []).reduce((a: number, e: any) => a + e.v, 0));
-    ok(opened < 0.02, `${label}: layout shift while the start sheet and the first beat's sheet open: ${opened.toFixed(4)} (under 0.02)`);
+    // (the standard measure: a shift within half a second of a tap or a key is the person's own, as opening "About this family" is; every other one counts)
+    const shifts: Array<{ v: number; t: number; input: boolean; src: string }> = (await page.evaluate(() => (window as any).__cls || [])).filter((e: any) => !e.input), opened = shifts.reduce((a, e) => a + e.v, 0);
+    ok(opened < 0.02, `${label}: layout shift while the start sheet and the first beat's sheet open: ${opened.toFixed(4)} (under 0.02)${opened >= 0.02 ? ': ' + shifts.filter(e => e.v > 0.002).slice(0, 3).map(e => `${e.v.toFixed(3)} at ${Math.round(e.t)} ms, ${e.src}`).join(' | ') : ''}`);
     // ---- P2 every beat
     const n: number = await page.evaluate(() => (window as any).__houseStory.rs.beats.length);
     const rows: any[] = [];
-    for (let i = 0; i < n; i++) {
+    // (the two narrowest phones on their side: five beats, the first, the family's rooms and the last; every other size, every beat)
+    for (const i of sz.light ? [0, 5, 12, 20, n - 1] : Array.from({ length: n }, (_, k) => k)) {
       rows.push(await page.evaluate(async (i: number) => {
         const api = (window as any).__houseStory, m = await api.measure(i), c = document.querySelector('.st-card') as HTMLElement, vh = innerHeight, vw = innerWidth, r = c.getBoundingClientRect(), cs = getComputedStyle(c);
         // (what a person can see: a line held a room but not drawn, visibility hidden or opacity 0, is dead space, and is what this check is for)
@@ -209,20 +252,20 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     if (!sz.side) {
       // the picture is shifted up (a camera view offset, `?no=shift` kills it) so that what a beat is about stands in the room above the sheet: its centre is under the top bar and over the sheet
       const seen = rows.filter(r => r.liveC !== null);
-      ok(seen.length > n * 0.8 && seen.every(r => r.liveC > r.barB && r.liveC < r.top), `${label}: in ${seen.length} of ${n} beats the subject's centre is below the top bar and above the sheet (the highest at ${Math.round(Math.min(...seen.map(r => r.liveC)))} px, the lowest ${Math.round(Math.max(...seen.map(r => r.liveC - r.top)))} px above the sheet's top)`);
+      ok(seen.length > rows.length * 0.8 && seen.every(r => r.liveC > r.barB && r.liveC < r.top), `${label}: in ${seen.length} of ${rows.length} beats the subject's centre is below the top bar and above the sheet (the highest at ${Math.round(Math.min(...seen.map(r => r.liveC)))} px, the lowest ${Math.round(Math.max(...seen.map(r => r.liveC - r.top)))} px above the sheet's top)`);
       if (sz.w === 390) shifted.push(rows[5].liveC, sz.h);
-      ok(rows.every(r => r.mode === 'sheet') && maxH <= cap + 0.004, `${label}: all ${n} beats are a sheet of at most 40 % of the height (the tallest is ${(maxH * 100).toFixed(1)} %)`);
+      ok(rows.every(r => r.mode === 'sheet') && maxH <= cap + 0.004, `${label}: all ${rows.length} beats are a sheet of at most 40 % of the height (the tallest is ${(maxH * 100).toFixed(1)} %)`);
       const fat = rows.filter(r => !r.scrolls && r.dead > 8);
       ok(fat.length === 0, `${label}: a sheet is as tall as its words, within 8 px (${rows.filter(r => !r.scrolls).length} beats fit, the most dead space is ${Math.round(Math.max(0, ...rows.filter(r => !r.scrolls).map(r => r.dead)))} px; ${rows.filter(r => r.scrolls).length} beats are taller than their room and scroll inside)${fat.length ? ': ' + fat.slice(0, 3).map(r => `${r.id} ${Math.round(r.dead)}`).join(', ') : ''}`);
       // (a person's kicker, the monogram and the name: one line. A beat with no person has its chapter's title there, in capitals and tracked, and a long title is allowed its second line)
       const people = rows.filter(r => r.disc > 0), twoLine = people.filter(r => r.kick > r.disc * 1.25 + 2);
       ok(people.length > 0 && twoLine.length === 0, `${label}: a person's kicker is one line in ${people.length - twoLine.length} of ${people.length} beats (${rows.length - people.length} beats carry a chapter's title there${rows.some(r => r.disc === 0 && r.kick > 40) ? ', ' + rows.filter(r => r.disc === 0 && r.kick > 40).length + ' of them on two lines' : ''})`);
     } else {
-      ok(rows.every(r => r.mode === 'card' && r.w <= r.vw * SIDE_PANEL + 0.5), `${label}: all ${n} beats are a side panel of at most 45 % of the width (the widest is ${(Math.max(...rows.map(r => r.w / r.vw)) * 100).toFixed(1)} %), never a sheet over the scene's height`);
+      ok(rows.every(r => r.mode === 'card' && r.w <= r.vw * SIDE_PANEL + 0.5), `${label}: all ${rows.length} beats are a side panel of at most 45 % of the width (the widest is ${(Math.max(...rows.map(r => r.w / r.vw)) * 100).toFixed(1)} %), never a sheet over the scene's height`);
     }
     const unplaced = rows.filter(r => r.planned && !r.planned.ok);
-    ok(rows.every(r => r.overlapLive <= MAX_OVERLAP + 1e-9 || (r.planned && !r.planned.ok)), `${label}: no card covers more than 2 % of what its beat is about (the worst is ${(Math.max(...rows.map(r => r.overlapLive)) * 100).toFixed(2)} %; the solver found no clear place for ${unplaced.length} of ${n}${unplaced.length ? ': ' + unplaced.slice(0, 4).map(r => r.id).join(', ') : ''})`);
-    if (!sz.side) ok(unplaced.length === 0, `${label}: the solver found a clear place for all ${n} beats`);
+    ok(rows.every(r => r.overlapLive <= MAX_OVERLAP + 1e-9 || (r.planned && !r.planned.ok)), `${label}: no card covers more than 2 % of what its beat is about (the worst is ${(Math.max(...rows.map(r => r.overlapLive)) * 100).toFixed(2)} %; the solver found no clear place for ${unplaced.length} of ${rows.length}${unplaced.length ? ': ' + unplaced.slice(0, 4).map(r => r.id).join(', ') : ''})`);
+    if (!sz.side) ok(unplaced.length === 0, `${label}: the solver found a clear place for all ${rows.length} beats`);
     ok(rows.every(r => r.overlapBars === 0), `${label}: no card touches the top bar or the dock`);
     ok(rows.every(r => r.left >= -0.5 && r.right <= r.vw + 0.5 && r.top >= -0.5 && r.bottom <= r.vh + 0.5), `${label}: every card is inside the window`);
     const withMore = rows.filter(r => r.more);
@@ -239,11 +282,35 @@ export default async function phone(ctx: TestCtx): Promise<void> {
       return { top0: t0.top, top1: t1.top, h0: t0.height, h1: t1.height, titleMoved: Math.abs(k1 - k0), vh: innerHeight, bottom1: t1.bottom, mode: c.dataset.mode };
     });
     if (grow && grow.mode === 'sheet') ok(Math.abs(grow.top1 - grow.top0) < 0.5 && grow.titleMoved < 0.5 && grow.h1 >= grow.h0 && grow.h1 <= grow.vh * PHONE_SHEET + 1, `${label}: the agent's line grows the sheet downward (${Math.round(grow.h0)} to ${Math.round(grow.h1)} px) and the words above it do not move`);
-    // the More sheet of the player: Previous and Next home are in it, 44 px targets
-    if (!sz.side || sz.w <= 760) {
-      await page.locator('[data-act="more"]').tap(); await sleep(400);
-      const mt = await page.evaluate(() => { const t = (a: string) => { const e = document.querySelector(`.vh-tools [data-act="${a}"]`) as HTMLElement; if (!e) return null; const r = e.getBoundingClientRect(); return r.height > 0 ? { h: r.height, w: r.width, text: (e.textContent || '').trim() } : null; }; return { prev: t('prev'), next: t('next') }; });
-      ok(!!mt.prev && !!mt.next && mt.prev.h >= 43.5 && mt.next.h >= 43.5, `${label}: the More sheet has Previous home and Next home, ${mt.next ? Math.round(mt.next.h) : 0} px tall`);
+    // a sheet taller than its room follows the beat's time down its words when no voice does (and not before the first third of the beat; the stuck head keeps "More" in reach as it goes)
+    if (!sz.side) {
+      const idx = rows.find(r => r.scrolls);
+      if (idx) {
+        const f = await page.evaluate(async (i: number) => {
+          const api = (window as any).__houseStory; await api.measure(i); const c = document.querySelector('.st-card') as HTMLElement;
+          c.scrollTop = 0; const early = api.follow(0.1), late = api.follow(0.9), max = c.scrollHeight - c.clientHeight;
+          const mb = c.querySelector('.st-more-btn') as HTMLElement | null, mr = mb ? mb.getBoundingClientRect() : null, cr = c.getBoundingClientRect();
+          return { early, late, max, moreIn: !mr || (mr.top >= cr.top - 1 && mr.bottom <= cr.bottom + 1) };
+        }, idx.i);
+        ok(f.early === 0 && f.late >= f.max - 2 && f.max > 2 && f.moreIn, `${label}: the sheet of beat ${idx.id} follows the beat down its words (at 10 % of the beat at ${Math.round(f.early)} px, at 90 % at ${Math.round(f.late)} of ${Math.round(f.max)} px) and "More" is still in reach`);
+      } else ok(true, `${label}: no beat's sheet scrolls here (nothing to follow)`);
+    }
+    // the More sheet of the player (P10): inside the window with every row reachable (a phone on its side is 360 px tall or less: if the rows are more than that holds, the sheet scrolls, it does not
+    // run off the top of the window), the rows 44 px targets; on a phone held upright Previous and Next home are rows of it, on its side they are not (they stay in the top bar)
+    {
+      await page.locator('[data-act="more"]').tap(); await sleep(500);
+      const mt = await page.evaluate(() => {
+        const t = document.querySelector('.vh-tools') as HTMLElement;
+        const rowEls = Array.from(t.querySelectorAll('.vh-tool')).filter(e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden'; }) as HTMLElement[];
+        const unreachable: string[] = [];
+        for (const e of rowEls) { t.scrollTop = Math.max(0, e.offsetTop - 6); const r = e.getBoundingClientRect(), q = t.getBoundingClientRect(); if (r.top < q.top - 1 || r.bottom > q.bottom + 1 || r.top < -0.5 || r.bottom > innerHeight + 0.5) unreachable.push(String(e.dataset.act)); }
+        t.scrollTop = 0;
+        const q = t.getBoundingClientRect(), row = (a: string) => { const e = rowEls.find(x => x.dataset.act === a); return e ? { h: e.getBoundingClientRect().height } : null; };
+        return { top: q.top, bottom: q.bottom, left: q.left, right: q.right, vw: innerWidth, vh: innerHeight, acts: rowEls.map(e => e.dataset.act), scrolls: t.scrollHeight > t.clientHeight + 1, unreachable, prev: row('prev'), next: row('next') };
+      });
+      ok(mt.top >= -0.5 && mt.bottom <= mt.vh + 0.5 && mt.left >= -0.5 && mt.right <= mt.vw + 0.5 && mt.unreachable.length === 0, `${label}: the More sheet (${mt.acts.length} rows${mt.scrolls ? ', scrolling inside' : ''}) is inside the window, ${Math.round(mt.top)} to ${Math.round(mt.bottom)} px of ${mt.vh}, and every row can be reached${mt.unreachable.length ? ': not ' + mt.unreachable.join(', ') : ''}`);
+      if (!sz.side) ok(!!mt.prev && !!mt.next && mt.prev.h >= 43.5 && mt.next.h >= 43.5, `${label}: the More sheet has Previous home and Next home, ${mt.next ? Math.round(mt.next.h) : 0} px tall`);
+      else ok(!mt.prev && !mt.next, `${label}: the More sheet on its side has ${mt.acts.length} rows and not Previous home and Next home (${mt.acts.join(', ')})`);
       const small = await page.evaluate(SMALL, '.vh-tools');
       ok(small.length === 0, `${label}: every row of the More sheet is a 44 px target${small.length ? ': ' + small.join(', ') : ''}`);
       await page.locator('[data-act="more"]').tap(); await sleep(300);
@@ -259,9 +326,30 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     ok(smallC.length === 0, `${label}: every chapter row is a 44 px target${smallC.length ? ': ' + smallC.slice(0, 3).join(', ') : ''}`);
     await page.locator('.st-btn-chapters').tap(); await sleep(400);
     // the end card is a sheet (a panel on its side) that never covers the Core
-    const end = await page.evaluate(async () => { const api = (window as any).__houseStory, m = await api.measureEnd(); return { overlapCore: m.overlapCore, card: m.card, vw: m.vw, vh: m.vh, visible: m.visible, mode: (document.querySelector('.st-end') as HTMLElement).dataset.mode, bars: m.bars }; });
+    const end = await page.evaluate(async () => {
+      const api = (window as any).__houseStory, m = await api.measureEnd(); await new Promise(r => setTimeout(r, 600));    // (the card fades in over 0.3 s)
+      const card = document.querySelector('.st-end') as HTMLElement, cr = card.getBoundingClientRect();
+      const share = (b: DOMRect) => Math.max(0, Math.min(b.bottom, cr.bottom) - Math.max(b.top, cr.top)) / Math.max(1, b.height);
+      const cta = card.querySelector('.st-primary') as HTMLElement, cb = cta.getBoundingClientRect(), chit = document.elementFromPoint(cb.left + cb.width / 2, cb.top + cb.height / 2);
+      // Download Companion is scrolled to the top of the card's own room (the call to action's bar, which sticks to the bottom on its side, is under the rest)
+      const dl = Array.from(card.querySelectorAll('a.st-btn')).find(a => /Download/.test(a.textContent || '')) as HTMLElement;
+      card.scrollTop = Math.max(0, dl.offsetTop - 8); await new Promise(r => requestAnimationFrame(r));
+      const db = dl.getBoundingClientRect(), dhit = document.elementFromPoint(db.left + db.width / 2, db.top + db.height / 2), dlSeen = share(db);
+      const bar = card.querySelector('.st-go') as HTMLElement | null;
+      const rest = Array.from(card.querySelectorAll('.st-btn')).map(b => b.getBoundingClientRect().height);
+      card.scrollTop = 0;
+      return { overlapCore: m.overlapCore, card: m.card, vw: m.vw, vh: m.vh, visible: m.visible, mode: card.dataset.mode, side: card.dataset.side, bars: m.bars,
+        ctaSeen: share(cb), ctaHit: chit === cta || cta.contains(chit), ctaH: cb.height, ctaText: (cta.textContent || '').trim(), ctaInBar: !!bar && bar.contains(cta), barSticky: bar ? getComputedStyle(bar).position : '',
+        dlSeen, dlHit: dhit === dl || dl.contains(dhit), dlH: db.height, minBtn: Math.min(...rest), scrolls: card.scrollHeight > card.clientHeight + 1 };
+    });
     ok(end.visible && end.overlapCore < 0.05 && end.card.x >= -0.5 && end.card.x + end.card.w <= end.vw + 0.5 && end.card.y >= -0.5 && end.card.y + end.card.h <= end.vh + 0.5 && end.bars === 0, `${label}: the end card (${end.mode}) is inside the window, covers ${(end.overlapCore * 100).toFixed(1)} % of the Core and touches no bar`);
     if (sz.side) ok(end.mode === 'card' && end.card.w <= end.vw * SIDE_PANEL + 0.5, `${label}: and on its side it is a panel of ${(end.card.w / end.vw * 100).toFixed(1)} % of the width`);
+    // P10 the end card's call to action is on screen without a scroll and a tap lands on it (on its side it is a bar that sticks to the panel's bottom edge); Download Companion can be scrolled to
+    ok(end.ctaSeen >= 0.99 && end.ctaHit && end.ctaH >= 43.5, `${label}: the end card's call to action ("${end.ctaText}") is ${Math.round(end.ctaSeen * 100)} % on screen without a scroll, ${Math.round(end.ctaH)} px tall, and a tap on its middle lands on it`);
+    ok(end.dlSeen >= 0.99 && end.dlHit && end.dlH >= 43.5, `${label}: Download Companion can be scrolled to and tapped (${Math.round(end.dlSeen * 100)} % in view, ${Math.round(end.dlH)} px tall${end.scrolls ? ', the card scrolls' : ''})`);
+    ok(end.minBtn >= 43.5, `${label}: every button of the end card is a 44 px target (the smallest is ${Math.round(end.minBtn)} px)`);
+    if (sz.side) ok(end.side === '1' && end.ctaInBar && end.barSticky === 'sticky', `${label}: on its side the call to action is the bar that sticks to the bottom edge of the panel (${end.barSticky})`);
+    else ok(end.side !== '1' && !end.ctaInBar, `${label}: held upright the call to action is the first button of the row, as it always was`);
     // no layout shift on the way in: the player's own bars stayed where they were (the sheets are over the scene, not in the page's flow)
     const after = await page.evaluate(() => { const bar = (document.querySelector('.vh-top') as HTMLElement).getBoundingClientRect(), d = (document.querySelector('.vh-dock') as HTMLElement).getBoundingClientRect(); return { bar: [bar.left, bar.top, bar.width, bar.height], dock: [d.left, d.top, d.width, d.height], cls: ((window as any).__cls || []).filter((e: any) => e.t >= 0).reduce((a: number, e: any) => a + e.v, 0) }; });
     ok(JSON.stringify(after.bar.map(Math.round)) === JSON.stringify(quiet.bar.map(Math.round)) && JSON.stringify(after.dock.map(Math.round)) === JSON.stringify(quiet.dock.map(Math.round)), `${label}: the top bar and the dock did not move from the start sheet to the end card`);
@@ -277,6 +365,13 @@ export default async function phone(ctx: TestCtx): Promise<void> {
     await page.waitForFunction(() => document.documentElement.dataset.viewer === 'ready', null, { timeout: 240000 }); await sleep(500);
     const vis = (sel: string) => page.evaluate((s: string) => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.display !== 'none' && c.visibility !== 'hidden'; }, sel);
     ok(await vis('.vh-tods') && await vis('.vh-actions [data-act="next"]') && await vis('.vh-actions [data-act="prev"]') && !(await vis('.vh-tools [data-act="next"]')), 'the plain player (?no=story) keeps the hour chips and the top bar\'s Previous and Next home');
+    // the plain player's top bar is the player's: its name is one line with an ellipsis, at the player's own 14 px, as it was before the tour's phone pass (the tour's wrap is behind html[data-story])
+    const pn = await page.evaluate((list: string[]) => {
+      const el = document.querySelector('.vh-name') as HTMLElement, bar = document.querySelector('.vh-top') as HTMLElement, was = el.textContent, h0 = bar.getBoundingClientRect().height;
+      el.textContent = list[0] || was; const cs = getComputedStyle(el), h1 = bar.getBoundingClientRect().height, lines = Math.round(el.getBoundingClientRect().height / (parseFloat(cs.lineHeight) || 17));
+      const out = { ws: cs.whiteSpace, to: cs.textOverflow, ov: cs.overflow, fs: cs.fontSize, lines, h0, h1 }; el.textContent = was; return out;
+    }, names);
+    ok(pn.ws === 'nowrap' && pn.to === 'ellipsis' && pn.ov === 'hidden' && pn.fs === '14px' && pn.lines === 1 && pn.h1 <= pn.h0 + 0.5, `the plain player's name is unchanged: one line, an ellipsis, ${pn.fs}, and the top bar does not grow for a long name (${Math.round(pn.h0)} px with the home's own name, ${Math.round(pn.h1)} px with the longest)`);
     ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.slice(0, 2).join(' | ') : ''}`);
     await close();
     // and the same page with the tour: the tour's stylesheet puts them away, and the flag it sets on <html> (which goes when the tour does) is all that holds them there

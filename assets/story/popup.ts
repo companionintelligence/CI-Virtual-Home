@@ -539,7 +539,14 @@ export class StartCard {
     this.aboutBody = el('div', 'st-about-body');
     about.append(sum, this.aboutBody);
     // (an opened disclosure brings its words into view: the body scrolls to the end of them)
-    about.addEventListener('toggle', () => { if (about.open) this.card.scrollTo({ top: this.card.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); this.markScroll(); });
+    // (an open disclosure also moves the action bar to the end of the card, below the words, where it sticks to the sheet's bottom edge for as long as they are read: a bar that stays after the
+    // tagline scrolls out of the sheet with it, and the primary action would be off screen while the long copy is. Shut, it is after the tagline again, where it is first reached. The same
+    // node moves, so the reading and the focus order are the order on screen; a wide dialog has no disclosure and does not move it)
+    about.addEventListener('toggle', () => {
+      if (this.layoutNow !== 'wide') { if (about.open) this.card.append(this.acts); else this.p.after(this.acts); }
+      if (about.open) this.card.scrollTo({ top: this.card.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      this.markScroll();
+    });
     this.card.addEventListener('scroll', () => this.markScroll(), { passive: true });
     for (const q of [PHONE_Q, SIDE_Q]) { const m = matchMedia(q); try { m.addEventListener('change', this.onMq); this.mqs.push(m); } catch { /* an old engine: the director's resize observer fits it */ } }
     this.layout();
@@ -569,9 +576,12 @@ export class StartCard {
       this.card.replaceChildren(this.copy, this.more);
     } else {
       this.aboutBody.replaceChildren(this.meta); if (this.home) this.aboutBody.append(this.home); this.aboutBody.append(this.fine);
-      this.card.replaceChildren(this.kick, this.h, this.p, this.acts);
+      // (the action bar is first reached after the tagline; with the disclosure open it is the last thing in the sheet, see the toggle in the constructor)
+      this.card.replaceChildren(this.kick, this.h, this.p);
+      if (!this.about.open) this.card.append(this.acts);
       if (this.members) this.card.append(this.members);
       this.card.append(this.about);
+      if (this.about.open) this.card.append(this.acts);
     }
     if (keep && keep.isConnected) { try { keep.focus({ preventScroll: true }); } catch { /* gone */ } }
     return m;
@@ -613,6 +623,8 @@ export class EndCard {
   readonly el: HTMLElement;
   readonly body: HTMLElement;
   private karaoke: Karaoke;
+  // (a phone on its side: the story's call to action is moved out of the row of buttons into `go`, a bar at the end of the card that sticks to the bottom edge of the panel: setSide)
+  private cta!: HTMLElement; private acts!: HTMLElement; private go = el('div', 'st-go');
   constructor(host: HTMLElement, rs: RuntimeStory, opts: { timings: [string, number, number][] | null; durMs: number; onReplay: () => void; onNext: () => void; onShare: () => void; hasNext: boolean }) {
     const c = (this.el = el('div', 'st-end'));
     c.hidden = true;
@@ -624,6 +636,7 @@ export class EndCard {
     const acts = el('div', 'st-actions');
     const link = (label: string, href: string, cls: string) => { const a = el('a', cls, label) as HTMLAnchorElement; a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; };
     const cta = link(rs.closing.cta.label, rs.closing.cta.url, 'st-btn st-primary');
+    this.cta = cta; this.acts = acts;
     const mk = (label: string, fn: () => void) => { const b = el('button', 'st-btn', label); b.type = 'button'; b.addEventListener('click', fn); return b; };
     // (the one story call to action, the one download link, then the ways on inside the site. At this size the buttons are tall, so they come before the closing words: a card
     // that scrolls shows the way on first and the words, which the voice also says, after them)
@@ -636,6 +649,22 @@ export class EndCard {
   setNarration(ms: number | null): void { this.karaoke.set(ms); }
   /** the card with its padding and gaps tighter (the type is never touched): for a window too short for the card at its full padding */
   setTight(on: boolean): void { this.el.classList.toggle('st-tight', on); }
+  /**
+   * A phone on its side: the panel is at most 45 % of the width and 250 px or so tall, which the heading alone (three lines at the heading's size) all but fills, so the story's call to
+   * action, which is the point of the card, may not be left to the end of a scroll. It is moved out of the row of buttons into a bar at the END of the card (`.st-go`), which sticks to
+   * the bottom edge of the panel for as long as the words above it are read, as a sheet's action bar does on the start sheet; the other buttons (Download Companion, Replay, Next family,
+   * Share this family) are the stack above it, reached by scrolling. In every other window it is the first button of the row, as it always was. The same node moves: a focused call to
+   * action keeps its focus, and nothing is rebuilt.
+   */
+  setSide(on: boolean): void {
+    const c = this.el;
+    if ((c.dataset.side === '1') === on) return;
+    const act = document.activeElement as HTMLElement | null, keep = act && c.contains(act) ? act : null;
+    c.dataset.side = on ? '1' : '0';
+    if (on) { this.go.append(this.cta); c.append(this.go); }
+    else { this.acts.prepend(this.cta); this.go.remove(); }
+    if (keep && keep.isConnected) { try { keep.focus({ preventScroll: true }); } catch { /* gone */ } }
+  }
   /** place the card; a wide window's panel is then trimmed to its widest line (a phone's sheet is full width by contract) */
   put(r: Rect, mode: 'card' | 'sheet' = 'card'): void {
     const c = this.el;

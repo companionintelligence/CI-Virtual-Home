@@ -299,7 +299,7 @@ html[data-mode="view"] .vh-fail-actions > :first-child:hover { background: var(-
 }
 /* shown only in the compact layout (phones, and short landscape screens) */
 .vh .vh-show-compact { display: none; }
-/* shown only on a phone while a family tour runs (portal/story.css): Previous home and Next home leave the top bar for the More sheet, so the bar has room for the home's name */
+/* shown only on a phone held upright while a family tour runs (portal/story.css): Previous home and Next home leave the top bar for the More sheet, so the bar has room for the home's name */
 .vh .vh-show-tour { display: none; }
 
 /* the one glass: the floor colour (what the contrast audit stacks), the sheen over it, the blur and the edge (a rule below that sets its own background keeps the sheen by setting background-color only) */
@@ -716,9 +716,7 @@ html[data-mode="view"] .vh-scrub input {
 @media (max-width: 760px), (max-height: 500px) {
   html[data-mode="view"] { --vh-gap: 8px; --vh-radius: 5px; --vh-top-h: 46px; }
   .vh-title { max-width: none; flex: 1 1 auto; padding: 5px 12px 6px; }
-  /* the home's name is shown in full: it wraps to a second line before it is ever cut (every display name is two lines at the width a phone's bar leaves it), and the meta line under it
-     is the only thing that may be cut with an ellipsis (a tour drops it on a narrow phone: portal/story.css) */
-  .vh-name { font-size: 14px; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.2; }
+  .vh-name { font-size: 14px; }
   .vh-meta { font-size: 11px; }
   .vh-actions { margin-left: 0; flex: none; }
   .vh-sep { display: none; }
@@ -743,6 +741,11 @@ html[data-mode="view"] .vh-scrub input {
   .vh-tools {
     position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 2;
     width: 228px;
+    /* never taller than the window: a phone on its side has 360 px of height or less, where the sheet stands over the top bar (as it always did) and scrolls inside when its rows are more than the
+       height holds, never off the top of the window. The dock is one row, 56 px, in this compact layout of a tour and of a phone on its side. */
+    max-height: calc(100vh - 2 * var(--vh-gap) - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - 2 * var(--vh-gap) - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
     flex-direction: column; align-items: stretch; gap: 2px;
     padding: 6px; border: 0;
     border-radius: var(--vh-radius);
@@ -782,11 +785,6 @@ html[data-mode="view"] .vh-scrub input {
   .vh-dock { flex-direction: row; align-items: center; gap: 6px; }
   .vh-row-chips { flex: 0 1 46%; }
   .vh-transport { flex: 1 1 54%; }
-}
-/* the narrowest phones (320 px): the bar holds back, the title and up to three buttons, so the title gives up a little padding and a point of type before a word is ever broken */
-@media (max-width: 340px) {
-  .vh-title { padding-inline: 8px; }
-  .vh-name { font-size: 13px; }
 }
 @media (max-width: 480px) {
   .vh-flybar-label b { display: none; }
