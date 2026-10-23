@@ -76,9 +76,16 @@ export const PORTAL_CAPTION_HEAD = 'Real screenshot of the Companion account pag
 /** The three first-party apps every family may meet. */
 export const FIRST_PARTY = ['ci-hermes', 'ci-memory', 'ci-openclaw'];
 
-/** Every app id the 30 families use (`beat.app.id` and `beat.with`), the persona pools, the plan's signature apps and the first-party trio: the apps that should have media. */
+/**
+ * Apps no story names yet whose screenshot passed a look ahead of the stories that will tell them (the 2026-10 store-media audit's shortlist: ComfyUI's node
+ * graph, the Convert to it page). They get their logo and screenshot now, so the story that names one finds its media ready; delete an id when the app is
+ * dropped from the plan. An app's capture that was looked at and left out is recorded in the manifest whether the app is listed here or not.
+ */
+export const PREPARED_APPS = ['comfyui', 'convert'];
+
+/** Every app id the 30 families use (`beat.app.id` and `beat.with`), the persona pools, the plan's signature apps, the first-party trio and the prepared apps: the apps that should have media. */
 export function usedAppIds(root: string = ROOT): string[] {
-  const ids = new Set<string>(FIRST_PARTY);
+  const ids = new Set<string>([...FIRST_PARTY, ...PREPARED_APPS]);
   const dir = path.join(root, 'content', 'families');
   if (fs.existsSync(dir)) {
     for (const f of fs.readdirSync(dir)) {

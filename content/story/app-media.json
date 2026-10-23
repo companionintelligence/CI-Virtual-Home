@@ -259,6 +259,42 @@
       "name": "Code Server",
       "shot": null
     },
+    "comfyui": {
+      "logo": {
+        "alt": "ComfyUI logo",
+        "file": "portal/apps/comfyui/logo.49a82a07ab.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/comfyui/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "ComfyUI",
+      "shot": {
+        "alt": "ComfyUI node graph editor with its default workflow in a browser",
+        "caption": "Real screenshot of ComfyUI from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/comfyui/shot.04a496acdf.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/comfyui.png@e94772196695",
+        "w": 960
+      }
+    },
+    "convert": {
+      "logo": {
+        "alt": "Convert to it logo",
+        "file": "portal/apps/convert/logo.483fcc315b.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/convert/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Convert to it",
+      "shot": {
+        "alt": "Convert to it file converter page in a browser",
+        "caption": "Real screenshot of Convert to it from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/convert/shot.24be9ffac0.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/convert.png@e94772196695",
+        "w": 960
+      }
+    },
     "cryptgeon": {
       "logo": {
         "alt": "Cryptgeon logo",
@@ -3825,7 +3861,7 @@
     {
       "id": "archivebox",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A sign-in page (a login wall) with username and password fields and the shell commands that reset a password or create an administrator.",
       "source": "CI-Marketplace e2e/screenshots/archivebox.png@e94772196695"
     },
     {
@@ -3849,7 +3885,7 @@
     {
       "id": "baserow",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A create-account form (a login wall): the first administrator.",
       "source": "CI-Marketplace e2e/screenshots/baserow.png@e94772196695"
     },
     {
@@ -3919,6 +3955,12 @@
       "source": "CI-Marketplace e2e/screenshots/ci-planning.png@e94772196695"
     },
     {
+      "id": "ci-web-xr-scan",
+      "kind": "shot",
+      "reason": "A scan viewer that prints a latitude and longitude in its corner (a real place in the San Francisco Bay area) beside named scans of rooms (\"Kids Room\", \"Home Office\"): coordinates are not shown. A candidate for a fresh capture with the position hidden.",
+      "source": "CI-Marketplace e2e/screenshots/ci-web-xr-scan.png@e94772196695"
+    },
+    {
       "id": "code-server",
       "kind": "shot",
       "reason": "The source has none: e2e/screenshots/code-server.png does not exist.",
@@ -3927,7 +3969,7 @@
     {
       "id": "cryptgeon",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A clean empty note form, but its first line reads \"Easily send fully encrypted, secure notes or files\": a vendor security claim the site does not make (the Nextcloud precedent), above an empty text box.",
       "source": "CI-Marketplace e2e/screenshots/cryptgeon.png@e94772196695"
     },
     {
@@ -3963,13 +4005,13 @@
     {
       "id": "element",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A sign-in splash over a third-party landscape photograph, with the vendor line \"Decentralised, encrypted chat & collaboration powered by\" and the Matrix brand: a login wall and a claim the site does not make.",
       "source": "CI-Marketplace e2e/screenshots/element.png@e94772196695"
     },
     {
       "id": "endurain",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A sign-in page beside a photograph of a cyclist (a person), with the Strava and Garmin Connect brand marks in its footer: a login wall and third-party brands.",
       "source": "CI-Marketplace e2e/screenshots/endurain.png@e94772196695"
     },
     {
@@ -3993,7 +4035,7 @@
     {
       "id": "freecut",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A real editing session: its clip names are films, shows and songs by named artists, and the preview is a stock footage frame: third-party titles and real people's names.",
       "source": "CI-Marketplace e2e/screenshots/freecut.png@e94772196695"
     },
     {
@@ -4005,7 +4047,7 @@
     {
       "id": "ghost",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "The blog's front page with an example email address in its subscribe box and a \"Coming soon\" placeholder post: an example address, and nothing of the writing tool at work.",
       "source": "CI-Marketplace e2e/screenshots/ghost.png@e94772196695"
     },
     {
@@ -4023,8 +4065,20 @@
     {
       "id": "habitica",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A sign-up page with a cookie banner over the vendor's marketing page and its pixel-art characters: a login wall and marketing.",
       "source": "CI-Marketplace e2e/screenshots/habitica.png@e94772196695"
+    },
+    {
+      "id": "heimdall",
+      "kind": "shot",
+      "reason": "An empty dashboard (\"There are currently no pinned applications\") over a stock photograph of a hot air balloon: an empty state and a stock photograph.",
+      "source": "CI-Marketplace e2e/screenshots/heimdall.png@e94772196695"
+    },
+    {
+      "id": "homarr",
+      "kind": "shot",
+      "reason": "The first-run setup chooser (start from scratch, import, restore): a setup page.",
+      "source": "CI-Marketplace e2e/screenshots/homarr.png@e94772196695"
     },
     {
       "id": "homebox",
@@ -4041,13 +4095,13 @@
     {
       "id": "invio",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A login page (a login wall).",
       "source": "CI-Marketplace e2e/screenshots/invio.png@e94772196695"
     },
     {
       "id": "invoice-ninja",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A login page with a build date (a login wall).",
       "source": "CI-Marketplace e2e/screenshots/invoice-ninja.png@e94772196695"
     },
     {
@@ -4081,9 +4135,15 @@
       "source": "CI-Marketplace e2e/screenshots/kitchenowl.png@e94772196695"
     },
     {
+      "id": "kiwix",
+      "kind": "shot",
+      "reason": "An empty library (\"No result. Would you like to reset filter?\"), not a working Kiwix.",
+      "source": "CI-Marketplace e2e/screenshots/kiwix.png@e94772196695"
+    },
+    {
       "id": "kokoro",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "The page header carries the GitHub mark with a live star count and a \"powered by\" banner naming the model author's handle, above an empty text box: third-party brand marks, a count, and nothing at work.",
       "source": "CI-Marketplace e2e/screenshots/kokoro.png@e94772196695"
     },
     {
@@ -4113,26 +4173,32 @@
     {
       "id": "linkwarden",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A login page (a login wall).",
       "source": "CI-Marketplace e2e/screenshots/linkwarden.png@e94772196695"
     },
     {
       "id": "listmonk",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "The public landing page: a Login button and two links, nothing of the app at work.",
       "source": "CI-Marketplace e2e/screenshots/listmonk.png@e94772196695"
     },
     {
       "id": "logseq",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "The demo graph: a warning banner (\"changes will not be saved\") and the vendor line \"a privacy-first, open-source platform\", a claim the site does not make (the Nextcloud precedent), over a tutorial page.",
       "source": "CI-Marketplace e2e/screenshots/logseq.png@e94772196695"
     },
     {
       "id": "lubelogger",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "An empty garage with one plus button: an empty state.",
       "source": "CI-Marketplace e2e/screenshots/lubelogger.png@e94772196695"
+    },
+    {
+      "id": "mattermost",
+      "kind": "shot",
+      "reason": "A \"Where would you like to view this?\" chooser with a download link: not the app.",
+      "source": "CI-Marketplace e2e/screenshots/mattermost.png@e94772196695"
     },
     {
       "id": "mealie",
@@ -4149,7 +4215,7 @@
     {
       "id": "memos",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A create-account form (a login wall).",
       "source": "CI-Marketplace e2e/screenshots/memos.png@e94772196695"
     },
     {
@@ -4161,7 +4227,7 @@
     {
       "id": "mixpost",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A login page (a login wall).",
       "source": "CI-Marketplace e2e/screenshots/mixpost.png@e94772196695"
     },
     {
@@ -4173,7 +4239,7 @@
     {
       "id": "mstream",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "An empty player and an empty library folder, with the Discord and GitHub marks in the header: an empty state and third-party brand marks.",
       "source": "CI-Marketplace e2e/screenshots/mstream.png@e94772196695"
     },
     {
@@ -4217,6 +4283,12 @@
       "kind": "shot",
       "reason": "Shows a container id and a docker command that prints the JWT secret.",
       "source": "CI-Marketplace e2e/screenshots/onlyoffice.png@e94772196695"
+    },
+    {
+      "id": "open-notebook",
+      "kind": "shot",
+      "reason": "A populated notebook about \"Superintelligence\": notes tagged \"AI Generated\" that make claims about what AI can do, a third-party product name (AlphaGo), source ids and an exclamation-marked headline: content that makes claims the site must not make.",
+      "source": "CI-Marketplace e2e/screenshots/open-notebook.png@e94772196695"
     },
     {
       "id": "open-webui",
@@ -4263,7 +4335,7 @@
     {
       "id": "pingvin-share",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "Its home page names WeTransfer, a third-party company, and claims \"your files ... will never be accessed by third parties\": a competitor's name and a claim the site does not make.",
       "source": "CI-Marketplace e2e/screenshots/pingvin-share.png@e94772196695"
     },
     {
@@ -4275,8 +4347,26 @@
     {
       "id": "plausible",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A registration form with a placeholder name and email address and the vendor line \"privacy-friendly analytics\": a login wall and a claim the site does not make.",
       "source": "CI-Marketplace e2e/screenshots/plausible.png@e94772196695"
+    },
+    {
+      "id": "prestashop",
+      "kind": "shot",
+      "reason": "A demo storefront with stock photographs, lorem ipsum text and discount tags (-20%): stock photography, placeholder text and prices.",
+      "source": "CI-Marketplace e2e/screenshots/prestashop.png@e94772196695"
+    },
+    {
+      "id": "privatebin",
+      "kind": "shot",
+      "reason": "An empty editor under the vendor line \"Because ignorance is bliss\" and the claim that the server has \"zero knowledge\" and uses \"256 bits AES\": security claims the site does not make, over a blank page.",
+      "source": "CI-Marketplace e2e/screenshots/privatebin.png@e94772196695"
+    },
+    {
+      "id": "project-nomad",
+      "kind": "shot",
+      "reason": "A menu of tiles under a badge that reads \"Node for offline media, archives, and data\" and \"View offline maps\": offline claims the site does not make, and no content at work.",
+      "source": "CI-Marketplace e2e/screenshots/project-nomad.png@e94772196695"
     },
     {
       "id": "radicale",
@@ -4287,14 +4377,20 @@
     {
       "id": "razzia",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "A game lobby that prints the address localhost:3000, a game PIN and a QR code: a localhost address.",
       "source": "CI-Marketplace e2e/screenshots/razzia.png@e94772196695"
     },
     {
       "id": "readeck",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "The first-run installation form (username, password, email): a setup wall.",
       "source": "CI-Marketplace e2e/screenshots/readeck.png@e94772196695"
+    },
+    {
+      "id": "searxng",
+      "kind": "shot",
+      "reason": "The search landing page: an empty search box under the vendor line \"a privacy-respecting, open metasearch engine\", a claim the site does not make; nothing at work.",
+      "source": "CI-Marketplace e2e/screenshots/searxng.png@e94772196695"
     },
     {
       "id": "solidtime",
@@ -4321,6 +4417,18 @@
       "source": "CI-Marketplace e2e/screenshots/stirling-pdf.png@e94772196695"
     },
     {
+      "id": "super-productivity",
+      "kind": "shot",
+      "reason": "The first-run chooser (\"How do you want to use Super Productivity?\") with the line \"Your data stays securely on your device\": a setup page and a security word the site does not use.",
+      "source": "CI-Marketplace e2e/screenshots/super-productivity.png@e94772196695"
+    },
+    {
+      "id": "synapse",
+      "kind": "shot",
+      "reason": "A server status page (\"It works! Synapse is running\") with the Matrix brand: not an app screen.",
+      "source": "CI-Marketplace e2e/screenshots/synapse.png@e94772196695"
+    },
+    {
       "id": "syncthing",
       "kind": "shot",
       "reason": "The source has none: e2e/screenshots/syncthing.png does not exist.",
@@ -4335,7 +4443,7 @@
     {
       "id": "trip",
       "kind": "shot",
-      "reason": "Not looked at by eye yet, so not used: the capture exists at the pinned commit; it ships only after someone vets it (SHOT_SHOWS and VETTED).",
+      "reason": "Not a QA run capture: the project's own marketing picture, a street map of London with a collage of screens that name real places (a college, an Amsterdam weekend) and pins of real photographs, so the \"Companion Hub QA run\" caption would not be true.",
       "source": "CI-Marketplace e2e/screenshots/trip.png@e94772196695"
     },
     {
@@ -4357,6 +4465,12 @@
       "source": "CI-Marketplace e2e/screenshots/vaultwarden.png@e94772196695"
     },
     {
+      "id": "vert",
+      "kind": "shot",
+      "reason": "The landing page: it claims \"lightning-fast servers\", \"no file size limit\" and that all processing is \"done on your device\", and links a Discord server: performance and privacy claims the site does not make.",
+      "source": "CI-Marketplace e2e/screenshots/vert.png@e94772196695"
+    },
+    {
       "id": "vikunja",
       "kind": "shot",
       "reason": "Shows the local address 127.0.0.1:19997.",
@@ -4367,6 +4481,12 @@
       "kind": "shot",
       "reason": "Rejected by the v3 media review: Create-an-account form.",
       "source": "CI-Marketplace e2e/screenshots/wallos.png@e94772196695"
+    },
+    {
+      "id": "wealthfolio",
+      "kind": "shot",
+      "reason": "The first-run chooser with investment wording (\"total return\", \"performance analytics\", TWR and IRR): finance claims the site does not make, on a setup page.",
+      "source": "CI-Marketplace e2e/screenshots/wealthfolio.png@e94772196695"
     },
     {
       "id": "whisper-webui",

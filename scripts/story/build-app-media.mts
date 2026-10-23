@@ -58,6 +58,7 @@ const SHOT_SHOWS: Record<string, string> = {
   'kitchenowl': 'first user setup page', 'libreoffice': 'start centre', 'librephotos': 'sign-in page', 'mazanoke': 'image upload page',
   'monetr': 'sign-in page', 'n8n': 'owner account setup page', 'nextcloud': 'setup page', 'open-webui': 'welcome screen', 'pairdrop': 'device discovery page',
   'paperless': 'sign-in page', 'photoprism': 'sign-in page', 'pi-hole': 'sign-in page', 
+  'comfyui': 'node graph editor with its default workflow', 'convert': 'file converter page',
   'uptime-kuma': 'admin account setup page', 'vaultwarden': 'sign-in page', 'wallos': 'account registration page', 'wanderer': 'welcome page', 'yuvomi': 'administrator setup page',
 };
 
@@ -66,7 +67,7 @@ const VETTED: Record<string, string> = {
   'activepieces': '64dcc3ed38c1', 'airtrail': 'd61060ac696d', 'akaunting': '8cd356b171bb',
   'anything-llm': '49b40b6cff72', 'audiobookshelf': 'ed992477f135', 'audiomass': '7fc4298c4661',
   'baikal': 'df9b4184c7a5', 'booklore': '490c7d4915b5', 'bookstack': '33dd72817842',
-  'ci-spellbook': '1fd18e2d9466',
+  'ci-spellbook': '1fd18e2d9466', 'comfyui': '906653ecbf5e', 'convert': 'c3cd95ba9d53',
   'donetick': 'db7411cc9354', 'drawio': '02bb35b443b9', 'duplicati': '7e438facd6ce',
   'espocrm': '17fb561972fc', 'excalidraw': 'c973046321fd', 'firefly-iii': 'ca2c0f16507e',
   'foldergram': 'b6f37a310412', 'forgejo': '6ce0f2738350', 'glasshome': 'b56ac0881d40',
@@ -144,6 +145,43 @@ const REJECT_SHOT: Record<string, string> = {
   'vikunja': 'Shows the local address 127.0.0.1:19997.',
   'wingfit': 'Shows an error toast ("You must be authenticated"), a photograph of people and a personal GitHub handle.',
   'wordpress': 'The install language list, with the WordPress logo cut off at the top.',
+  // ---- the 2026-10 look at the QA captures nobody had vetted, and at the audit's tier A and B shortlist (each at full size, at the pinned commit)
+  'archivebox': 'A sign-in page (a login wall) with username and password fields and the shell commands that reset a password or create an administrator.',
+  'baserow': 'A create-account form (a login wall): the first administrator.',
+  'cryptgeon': 'A clean empty note form, but its first line reads "Easily send fully encrypted, secure notes or files": a vendor security claim the site does not make (the Nextcloud precedent), above an empty text box.',
+  'element': 'A sign-in splash over a third-party landscape photograph, with the vendor line "Decentralised, encrypted chat & collaboration powered by" and the Matrix brand: a login wall and a claim the site does not make.',
+  'endurain': 'A sign-in page beside a photograph of a cyclist (a person), with the Strava and Garmin Connect brand marks in its footer: a login wall and third-party brands.',
+  'freecut': 'A real editing session: its clip names are films, shows and songs by named artists, and the preview is a stock footage frame: third-party titles and real people\'s names.',
+  'ghost': 'The blog\'s front page with an example email address in its subscribe box and a "Coming soon" placeholder post: an example address, and nothing of the writing tool at work.',
+  'habitica': 'A sign-up page with a cookie banner over the vendor\'s marketing page and its pixel-art characters: a login wall and marketing.',
+  'invio': 'A login page (a login wall).',
+  'invoice-ninja': 'A login page with a build date (a login wall).',
+  'kokoro': 'The page header carries the GitHub mark with a live star count and a "powered by" banner naming the model author\'s handle, above an empty text box: third-party brand marks, a count, and nothing at work.',
+  'linkwarden': 'A login page (a login wall).',
+  'listmonk': 'The public landing page: a Login button and two links, nothing of the app at work.',
+  'logseq': 'The demo graph: a warning banner ("changes will not be saved") and the vendor line "a privacy-first, open-source platform", a claim the site does not make (the Nextcloud precedent), over a tutorial page.',
+  'lubelogger': 'An empty garage with one plus button: an empty state.',
+  'memos': 'A create-account form (a login wall).',
+  'mixpost': 'A login page (a login wall).',
+  'mstream': 'An empty player and an empty library folder, with the Discord and GitHub marks in the header: an empty state and third-party brand marks.',
+  'pingvin-share': 'Its home page names WeTransfer, a third-party company, and claims "your files ... will never be accessed by third parties": a competitor\'s name and a claim the site does not make.',
+  'plausible': 'A registration form with a placeholder name and email address and the vendor line "privacy-friendly analytics": a login wall and a claim the site does not make.',
+  'razzia': 'A game lobby that prints the address localhost:3000, a game PIN and a QR code: a localhost address.',
+  'readeck': 'The first-run installation form (username, password, email): a setup wall.',
+  'trip': 'Not a QA run capture: the project\'s own marketing picture, a street map of London with a collage of screens that name real places (a college, an Amsterdam weekend) and pins of real photographs, so the "Companion Hub QA run" caption would not be true.',
+  'open-notebook': 'A populated notebook about "Superintelligence": notes tagged "AI Generated" that make claims about what AI can do, a third-party product name (AlphaGo), source ids and an exclamation-marked headline: content that makes claims the site must not make.',
+  'privatebin': 'An empty editor under the vendor line "Because ignorance is bliss" and the claim that the server has "zero knowledge" and uses "256 bits AES": security claims the site does not make, over a blank page.',
+  'searxng': 'The search landing page: an empty search box under the vendor line "a privacy-respecting, open metasearch engine", a claim the site does not make; nothing at work.',
+  'vert': 'The landing page: it claims "lightning-fast servers", "no file size limit" and that all processing is "done on your device", and links a Discord server: performance and privacy claims the site does not make.',
+  'mattermost': 'A "Where would you like to view this?" chooser with a download link: not the app.',
+  'super-productivity': 'The first-run chooser ("How do you want to use Super Productivity?") with the line "Your data stays securely on your device": a setup page and a security word the site does not use.',
+  'wealthfolio': 'The first-run chooser with investment wording ("total return", "performance analytics", TWR and IRR): finance claims the site does not make, on a setup page.',
+  'ci-web-xr-scan': 'A scan viewer that prints a latitude and longitude in its corner (a real place in the San Francisco Bay area) beside named scans of rooms ("Kids Room", "Home Office"): coordinates are not shown. A candidate for a fresh capture with the position hidden.',
+  'project-nomad': 'A menu of tiles under a badge that reads "Node for offline media, archives, and data" and "View offline maps": offline claims the site does not make, and no content at work.',
+  'synapse': 'A server status page ("It works! Synapse is running") with the Matrix brand: not an app screen.',
+  'homarr': 'The first-run setup chooser (start from scratch, import, restore): a setup page.',
+  'heimdall': 'An empty dashboard ("There are currently no pinned applications") over a stock photograph of a hot air balloon: an empty state and a stock photograph.',
+  'prestashop': 'A demo storefront with stock photographs, lorem ipsum text and discount tags (-20%): stock photography, placeholder text and prices.',
 };
 
 /**
@@ -343,7 +381,8 @@ function build(): Built {
   const apps: Record<string, AppMedia> = {};
   const noMedia: string[] = [];
   for (const id of wanted) {
-    const name = names.get(id) || id.replace(/(^|-)([a-z])/g, (_m, s: string, c: string) => `${s ? ' ' : ''}${c.toUpperCase()}`);
+    // the name an alt text and a caption use: the voice rule bars an exclamation mark there, so "Convert to it!" is written "Convert to it"
+    const name = (names.get(id) || id.replace(/(^|-)([a-z])/g, (_m, s: string, c: string) => `${s ? ' ' : ''}${c.toUpperCase()}`)).replace(/\s*!+/g, '');
     if (!names.has(id)) log.push(`${id}: not in content/story/catalog-apps.json, named ${JSON.stringify(name)}`);
     // the logo: the app's own mark from the store listing, the PNG (transparency) before the others
     let logo: MediaImage | null = null;
@@ -394,6 +433,11 @@ function build(): Built {
     if (!logo && !shot) noMedia.push(id); else apps[id] = { name, logo, shot };
   }
 
+  // a capture looked at and left out for an app no story names (yet) is on record all the same: the next story that names it finds the answer
+  const wantedSet = new Set(wanted);
+  for (const [id, reason] of Object.entries(REJECT_SHOT)) {
+    if (!wantedSet.has(id)) rejected.push({ kind: 'shot', id, source: `CI-Marketplace e2e/screenshots/${id}.png@${sha12('marketplace')}`, reason });
+  }
   // the logos held back by eye (every one, whether a story names the app yet or not: the rule must already hold when one does)
   for (const [id, reason] of Object.entries(REJECT_LOGO)) {
     const logoFile = LOGO_FILES.map(f => `apps/${id}/metadata/${f}`).find(p => hasBlob('marketplace', SOURCES.marketplace, p)) || `apps/${id}/metadata/logo.png`;
