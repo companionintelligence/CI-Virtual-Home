@@ -749,3 +749,25 @@ on top of #202–#227. What changed in the move: paths (every script resolves fr
 cut down to what it uses, and the CAD sheets were regenerated (CI-Common's were a layout pass behind the specs).
 The Companion Core's own reference docs (`CHASSIS-INTERIOR.md`, `MAINBOARD-DRAWING.md`, `CAUTIONS.md`) and its
 published glTF stay in CI-Common.
+
+<!-- companion-hub-readme-deep-review -->
+
+## Runtime layers
+
+| Layer | Role |
+|---|---|
+| Editor | Create and modify the virtual home and its content |
+| Web portal | User-facing access and family stories |
+| Player | Renders the interior and manages in-world interaction |
+| Geometry detectors | Supply the scene analysis described in the detector section |
+
+```mermaid
+flowchart LR
+  Editor[Home editor] --> Content[Home and story data]
+  Content --> Portal[Web portal]
+  Content --> Player[Virtual home player]
+  Player --> Detectors[Geometry detectors]
+```
+
+Use the repository's existing [Quickstart](#quickstart), [Commands](#commands), and [Layout](#layout) sections for the executable setup and folder map; this overview summarizes how the named product surfaces relate.
+
