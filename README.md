@@ -1,4 +1,17 @@
-# Companion Core Virtual Homes
+<h1 align="center">Companion Core Virtual Homes</h1>
+
+<p align="center"><strong>Companion Intelligence virtual homes: HouseSpec JSON → live 3D worlds, CAD floor plans, isometrics and product-shot videos, plus a web portal to fly them</strong></p>
+
+[![release](https://img.shields.io/badge/release-not%20published-757575?style=flat-square)](https://github.com/companionintelligence/CI-Virtual-Home/releases)
+[![platform](https://img.shields.io/badge/platform-Web%20%C2%B7%20macOS%20Metal%20verification-0a6358?style=flat-square)](https://github.com/companionintelligence/CI-Virtual-Home)
+[![License](https://img.shields.io/badge/license-Not%20specified-757575?style=flat-square)](https://github.com/companionintelligence/CI-Virtual-Home?tab=readme-ov-file#license)
+[![Discord](https://img.shields.io/badge/chat-Discord-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.com/invite/yQp9hwpzAa)
+
+<p align="center"><a href="https://homes.ci.computer">Website</a> · <a href="README.md#runtime-layers">Documentation</a> · <a href="https://docs.ci.computer/docs/reference/open-source-systems">Systems map</a></p>
+
+<p align="center">
+  <a href="https://homes.ci.computer"><img src="https://img.shields.io/badge/Open%20Home%20Portal-Open%20Home%20Portal-0a6358?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Home Portal" height="30"></a>
+</p>
 
 > **Private & Confidential — Property of Lifescope Inc. Do not distribute.** See [NOTICE.md](NOTICE.md).
 
@@ -20,6 +33,34 @@ compiled from it:
 of where each one came from: they stay in the repository and are never shown or shipped (see [Credits](#credits-none-on-the-site)); the
 apartments' author is the company's own name, which the credit guard knows is not a builder (`scripts/own-authors.mts`).
 Every home is also the home of a fictional family (see [The family stories](#the-family-stories)): the 30 houses and the six apartments each have their story (the cast plan names a family for each).
+
+## Features
+
+| Feature | What it provides |
+|---|---|
+| **HouseSpec source** | Keep each home's structure and content in validated JSON. |
+| **3D editor and portal** | Build the room editor, home gallery and player from the same house data. |
+| **Generated deliverables** | Produce CAD floor plans, isometric SVG/Lottie scenes and shot videos. |
+| **Verification** | Validate content and compare rendered outputs with committed visual baselines. |
+
+## How it fits together
+
+Validated house data feeds the interactive 3D editor and portal alongside the generated floor plans, isometric scenes and deterministic video outputs.
+
+```mermaid
+flowchart LR
+  Spec[HouseSpec JSON] --> Validate[Schema and content checks]
+  Validate --> Model[Shared house model]
+  Model --> Builder[Three.js scene builder]
+  Builder --> Player[3D player and editor]
+  Model --> Plans[Floor-plan generator]
+  Plans --> SVG[SVG and PNG plans]
+  Model --> Iso[Isometric scene generator]
+  Iso --> Lottie[SVG and Lottie outputs]
+  Model --> Render[Deterministic shot renderer]
+  Render --> Video[H.264 videos and posters]
+  Model --> Portal[Home portal]
+```
 
 ## Quickstart
 
@@ -745,3 +786,25 @@ on top of #202–#227. What changed in the move: paths (every script resolves fr
 cut down to what it uses, and the CAD sheets were regenerated (CI-Common's were a layout pass behind the specs).
 The Companion Core's own reference docs (`CHASSIS-INTERIOR.md`, `MAINBOARD-DRAWING.md`, `CAUTIONS.md`) and its
 published glTF stay in CI-Common.
+
+<!-- companion-hub-readme-deep-review -->
+
+## Runtime layers
+
+| Layer | Role |
+|---|---|
+| Editor | Create and modify the virtual home and its content |
+| Web portal | User-facing access and family stories |
+| Player | Renders the interior and manages in-world interaction |
+| Geometry detectors | Supply the scene analysis described in the detector section |
+
+```mermaid
+flowchart LR
+  Editor[Home editor] --> Content[Home and story data]
+  Content --> Portal[Web portal]
+  Content --> Player[Virtual home player]
+  Player --> Detectors[Geometry detectors]
+```
+
+Use the repository's existing [Quickstart](#quickstart), [Commands](#commands), and [Layout](#layout) sections for the executable setup and folder map; this overview summarizes how the named product surfaces relate.
+
