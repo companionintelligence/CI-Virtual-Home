@@ -1,4 +1,8 @@
-# Companion Core Virtual Homes
+<h1 align="center">Companion Core Virtual Homes</h1>
+
+<p align="center"><strong>Companion Intelligence virtual homes: HouseSpec JSON → live 3D worlds, CAD floor plans, isometrics and product-shot videos, plus a web portal to fly them</strong></p>
+
+<p align="center"><a href="https://homes.ci.computer">Website</a></p>
 
 > **Private & Confidential — Property of Lifescope Inc. Do not distribute.** See [NOTICE.md](NOTICE.md).
 
