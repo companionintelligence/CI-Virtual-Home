@@ -1,0 +1,1661 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "hartnoll-joinery",
+ "wave": 3,
+ "sizeLabel": "Medium business",
+ "company": {
+  "name": "Hartnoll Joinery",
+  "tagline": "A joinery firm of about ninety, and one office block with its own Core.",
+  "sector": "Joinery and shopfitting firm",
+  "size": "medium",
+  "scope": "site",
+  "headcount": 90,
+  "floor": 22,
+  "story": "Hartnoll Joinery builds fitted interiors for shops and restaurants. About ninety people work for the firm, most of them in the workshop. This story is the office block, where planning, estimating and accounts keep their own tools on one Companion Core.",
+  "address": {
+   "line": "4 Sawpit Lane",
+   "place": "Hollowmere"
+  },
+  "narrator": "v-steady-m"
+ },
+ "hookLine": "One office block keeps its own tools.",
+ "arc": "The medium business, told as one site of a firm of about ninety. The office block (planning, estimating, accounts) runs its own tools on one Core; the workshop and the rest of the company stay on their own. The systems administrator owns the Core and is the respected sceptic: he reads a status page each morning, closes sign-up on day one, and writes down what runs where. Edge: one machine is one machine; the company suites, the main accounts package and the pay service stay where they are.",
+ "honestEdge": "The office block's tools run on one Core; the company's own suites, the main accounts package and the pay service stay where they are. IT decides what the block runs.",
+ "building": {
+  "id": "contractor-yard",
+  "display": "Timber Yard Works",
+  "concept": "Corrugated steel workshop shed (high bay 5.2 m) plus a two-storey office block: two roller doors, a van in the yard. Needs per-volume roofs and clip (untested), the business lot context (2 d), a blank fascia board.",
+  "exterior": "yard and office block",
+  "storeys": 2,
+  "areaSqm": 310,
+  "seats": 24,
+  "core": {
+   "room": "Comms Room",
+   "surface": "rack shelf (steel), chalk Core, no books",
+   "note": "Comms Room 3.6 x 3.6 m on level one of the office block beside Reception. No windows. The workshop is a hand-pinned garage-program room reached by story walks only."
+  },
+  "route": "street door to Reception, short corridor, the Comms Room door, orbit.",
+  "rooms": [
+   {
+    "name": "Reception",
+    "sqm": 12,
+    "level": 1,
+    "roles": [
+     "reception"
+    ],
+    "program": "reception"
+   },
+   {
+    "name": "Open Office",
+    "sqm": 56,
+    "level": 1,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 14
+   },
+   {
+    "name": "Break Room",
+    "sqm": 14,
+    "level": 1,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Comms Room",
+    "sqm": 13,
+    "level": 1,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   },
+   {
+    "name": "Estimating Office",
+    "sqm": 24,
+    "level": 2,
+    "roles": [
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 5
+   },
+   {
+    "name": "Meeting Room",
+    "sqm": 16,
+    "level": 2,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 8
+   },
+   {
+    "name": "Supply Room",
+    "sqm": 6,
+    "level": 2,
+    "roles": [
+     "store"
+    ],
+    "program": "supply"
+   },
+   {
+    "name": "Workshop",
+    "sqm": 120,
+    "level": 1,
+    "roles": [
+     "workshop"
+    ],
+    "program": "garage",
+    "note": "high bay, benches, tool wall, racks (P2 trades set)"
+   },
+   {
+    "name": "Stockroom",
+    "sqm": 30,
+    "level": 1,
+    "roles": [
+     "store"
+    ],
+    "program": "supply"
+   }
+  ]
+ },
+ "objectProps": "planning wall and printed job board, a rack shelf in a windowless comms room, tender drawings on a plan table, the workshop window",
+ "members": [
+  {
+   "id": "cormac",
+   "name": "Cormac",
+   "function": "owner",
+   "title": "Managing director",
+   "colour": "chart-1",
+   "room": "Estimating Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": null,
+   "beats": [
+    "open-chat",
+    "est-sign",
+    "kitchen-notes"
+   ],
+   "apps": [
+    "mattermost",
+    "documenso",
+    "ci-memory"
+   ]
+  },
+  {
+   "id": "wei",
+   "name": "Wei",
+   "function": "it",
+   "title": "Systems administrator",
+   "colour": "chart-2",
+   "room": "Comms Room",
+   "ownsCore": true,
+   "lens": {
+    "role": "it_admin",
+    "personaResearch": "new research, builder household chores",
+    "comfort": 5,
+    "tone": "Laconic, sceptical, log-line. Dry about users. \"Who got paged?\"",
+    "aiStance": "Uses it for scripts and ticket summaries, distrusts anything with admin rights.",
+    "honestLimit": "One box is one machine; \"This Machine Only\" opens an app's port to the whole network; no uptime, failover or support claim."
+   },
+   "companion": {
+    "name": "Lathe",
+    "runtime": "OpenClaw",
+    "job": "Reads vendor pages Wei points it at and lists what changed.",
+    "personality": [
+     "literal",
+     "patient",
+     "dry"
+    ],
+    "voice": "v-clear-f",
+    "memory": false,
+    "limits": "Reads and lists only. Wei decides every update."
+   },
+   "beats": [
+    "ftue-hello",
+    "comms-status",
+    "comms-dns",
+    "comms-lathe",
+    "meet-where"
+   ],
+   "apps": [
+    "ci-openclaw",
+    "uptime-kuma",
+    "pi-hole",
+    "docmost"
+   ]
+  },
+  {
+   "id": "stellan",
+   "name": "Stellan",
+   "function": "operations",
+   "title": "Production planner",
+   "colour": "chart-3",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "office_manager",
+    "personaResearch": "organiser",
+    "comfort": 3,
+    "tone": "Brisk, list-making, kind. Triages out loud. Humour about the printer.",
+    "aiStance": "Quiet user for notices and summaries. Not proud, not hiding. [?] no role survey",
+    "honestLimit": "Accounts are made app by app by whoever looks after each app; the Core is not a managed service."
+   },
+   "companion": null,
+   "beats": [
+    "open-board",
+    "open-sheet",
+    "workshop-print"
+   ],
+   "apps": [
+    "vikunja",
+    "grist"
+   ]
+  },
+  {
+   "id": "lucia",
+   "name": "Lucia",
+   "function": "legal",
+   "title": "Contracts manager",
+   "colour": "chart-4",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "legal_contracts",
+    "personaResearch": "lawyer",
+    "comfort": 3,
+    "tone": "Precise, dry, guarded. Allergic to promises.",
+    "aiStance": "Split. Useful for a first pass; checks every cite.",
+    "honestLimit": "No legal, compliance or privilege claim; never a statement that a signature is valid."
+   },
+   "companion": null,
+   "beats": [
+    "open-scan",
+    "open-drawings",
+    "kitchen-first-day"
+   ],
+   "apps": [
+    "paperless",
+    "bentopdf",
+    "docmost"
+   ]
+  },
+  {
+   "id": "tariq",
+   "name": "Tariq",
+   "function": "sales",
+   "title": "Estimator",
+   "colour": "chart-5",
+   "room": "Estimating Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "sales_bd",
+    "personaResearch": "business-owner and marketer",
+    "comfort": 3,
+    "tone": "Quick, numbers first, upbeat on the surface and dry underneath.",
+    "aiStance": "Heaviest adopter and proudest by reputation [?]; script slower than they talk.",
+    "honestLimit": "Reps away from the office are out of every scene; the CRM is the office's, not a per-rep platform account."
+   },
+   "companion": null,
+   "beats": [
+    "est-leads",
+    "est-sheet",
+    "est-hand-off"
+   ],
+   "apps": [
+    "espocrm",
+    "grist",
+    "n8n"
+   ]
+  },
+  {
+   "id": "una",
+   "name": "Una",
+   "function": "finance",
+   "title": "Finance manager",
+   "colour": "chart-1",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "finance_bookkeeping",
+    "personaResearch": "business-owner and organiser",
+    "comfort": 3,
+    "tone": "Exact, dry, deadline-led. Numbers are not adjectives.",
+    "aiStance": "Cautious. \"I read every line.\"",
+    "honestLimit": "Bookkeeping tools, never accounting, tax or legal advice; no payroll, no bank feeds; never tell anyone to leave their accountant."
+   },
+   "companion": null,
+   "beats": [
+    "open-hours",
+    "open-notes",
+    "open-books"
+   ],
+   "apps": [
+    "kimai",
+    "paperless",
+    "akaunting"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "comms",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Comms Room",
+   "title": "The comms room"
+  },
+  {
+   "id": "open",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office",
+   "title": "The open office"
+  },
+  {
+   "id": "est",
+   "kind": "room",
+   "room": "office",
+   "roomName": "Estimating Office",
+   "title": "The estimating office"
+  },
+  {
+   "id": "meet",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Meeting Room",
+   "title": "The meeting room"
+  },
+  {
+   "id": "workshop",
+   "kind": "room",
+   "room": "workshop",
+   "roomName": "Workshop",
+   "title": "The workshop window"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Break Room",
+   "title": "The break room"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel at the yard gate",
+   "seed": "A parcel waits by the office block door, beside the van. Lucia carries it past reception to the comms room, where Wei has cleared a rack shelf.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Stellan lifts the Core out, and Wei reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Wei plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Wei opens the Wi-Fi settings on his phone and joins the Core's own network. Then he chooses the office block network.",
+   "limit": "phone rows: Join the Core's own network; Choose the office block network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Wei picks OpenClaw, and the office block adds Mattermost and Paperless-ngx. Then the planners go back to work.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "paperless",
+    "mattermost"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "wei",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-openclaw",
+   "replaces": [],
+   "chips": [
+    "OpenClaw"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Lathe says hello",
+   "seed": "Wei messages the agent he named Lathe from the comms room. Lathe answers from the Core, and Wei checks what it can reach.",
+   "limit": "note (office variant, needs a claims row): OpenClaw reaches websites over the office internet.",
+   "say": {
+    "speaker": "wei",
+    "text": "Hello, Wei. I read pages. You decide."
+   },
+   "agent": "wei",
+   "approval": "wei",
+   "capabilityHint": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS and Android apps you pair by QR code."
+  },
+  {
+   "id": "comms-status",
+   "chapter": "comms",
+   "member": "wei",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "uptime-kuma",
+   "replaces": [],
+   "chips": [
+    "Uptime Kuma"
+   ],
+   "category": "it",
+   "film": true,
+   "title": "A status page, read each morning",
+   "seed": "Uptime Kuma checks the office tools and the printer. Wei reads its page each morning before the planners arrive.",
+   "limit": "Monitors, does not prevent. No uptime, failover or support claim. Notifications leave through an outside channel only if set. Do not describe the screen. No replaces chip: the market review marks Datadog and New Relic a stretch (full observability suites), and a sceptic would not say it.",
+   "capabilityHint": "Watch your sites and services and get an alert when one goes down."
+  },
+  {
+   "id": "comms-dns",
+   "chapter": "comms",
+   "member": "wei",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "pi-hole",
+   "replaces": [
+    "AdGuard",
+    "NextDNS"
+   ],
+   "chips": [
+    "Pi-hole",
+    "replaces AdGuard",
+    "replaces NextDNS"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "Wei's block list",
+   "seed": "Pi-hole blocks known ad and tracker domains for the devices pointed at it. Wei makes no promise beyond that.",
+   "limit": "No safety or protection promise. Blocks ad and tracker domains only. The package publishes DNS on port 8053, not 53: never \"sits beside the router\", never the office block's lookups. If the Core is off those devices lose lookups.",
+   "capabilityHint": "Block ads, trackers and bad domains for every device on your network at the DNS level."
+  },
+  {
+   "id": "comms-lathe",
+   "chapter": "comms",
+   "member": "wei",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-openclaw",
+   "replaces": [],
+   "chips": [
+    "OpenClaw"
+   ],
+   "category": "it",
+   "film": true,
+   "title": "A firmware page, read for him",
+   "seed": "Lathe opens the router maker's firmware page and lists what changed. Wei reads the list before he updates anything.",
+   "limit": "Agent prepares, person approves. OpenClaw reaches websites over the office internet (disclosure). Errands, not coding. Hub, Settings, AI may hold cloud keys: never mention a key. Beta.",
+   "agent": "wei",
+   "approval": "wei",
+   "capabilityHint": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS and Android apps you pair by QR code."
+  },
+  {
+   "id": "open-chat",
+   "chapter": "open",
+   "member": "cormac",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "mattermost",
+   "replaces": [
+    "Slack",
+    "Discord"
+   ],
+   "chips": [
+    "Mattermost",
+    "replaces Slack",
+    "replaces Discord"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The office block's channel",
+   "seed": "The office block talks in Mattermost. Wei closes the open sign-up on the first day, and each person has an account inside the app.",
+   "limit": "Email sign-up ships open: the admin closes it (a stated limit, not a claim of lock-down). Do not repeat \"secure collaboration\". Per-app accounts are Mattermost's own feature. The workshop floor is not on it.",
+   "bringHome": {
+    "from": "Slack",
+    "carries": "users, channels, direct messages, threads, files and reactions via mmetl then mmctl",
+    "doesNot": "Slack Connect channels; canvases; custom emoji images; integrations and workflows"
+   },
+   "capabilityHint": "Team chat with channels, threads and files that stays on your Core."
+  },
+  {
+   "id": "open-board",
+   "chapter": "open",
+   "member": "stellan",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "vikunja",
+   "replaces": [
+    "Todoist",
+    "Asana"
+   ],
+   "chips": [
+    "Vikunja",
+    "replaces Todoist",
+    "replaces Asana"
+   ],
+   "category": "projects",
+   "film": true,
+   "title": "Every job on one board",
+   "seed": "Stellan runs the job board in Vikunja on the Core. Each card is a job, and it moves when the drawings are released to the workshop.",
+   "limit": "Its QA capture is a sign-in wall: show nothing. Asana import is not Vikunja's: no importer claim. The workshop floor does not use it.",
+   "capabilityHint": "Lists, boards and calendars for tasks, with reminders and recurring jobs."
+  },
+  {
+   "id": "open-sheet",
+   "chapter": "open",
+   "member": "stellan",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "grist",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Grist",
+    "replaces Airtable"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The cutting list, one table",
+   "seed": "Stellan keeps each job's cutting list in a Grist table on the Core. Every board has a row, a finish and a note.",
+   "limit": "No weight or measurement claim (use \"parcel size\" style wording if size is mentioned). Airtable import is Baserow's, not Grist's: say what was rebuilt. In this Hub package Grist has one default sign-in (GRIST_DEFAULT_EMAIL) and no login provider: never per-person Grist accounts, never who sees which rows.",
+   "bringHome": {
+    "from": "Airtable",
+    "carries": "tables rebuilt by hand or by CSV; no importer claimed for Grist",
+    "doesNot": "automations and interfaces; row comments; revision history"
+   },
+   "capabilityHint": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+  },
+  {
+   "id": "open-scan",
+   "chapter": "open",
+   "member": "lucia",
+   "anchor": {
+    "role": "printer",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "paperless",
+   "replaces": [
+    "Evernote"
+   ],
+   "chips": [
+    "Paperless-ngx",
+    "replaces Evernote"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Delivery notes, scanned and found",
+   "seed": "Lucia scans the day's delivery notes and permits into Paperless-ngx. A search for a job name finds every paper behind it.",
+   "limit": "Never bare \"Paperless\". PDFs and scans only. No compliance or archive-of-record claim.",
+   "capabilityHint": "Scan and file your paperwork. It reads every page, tags it and makes the lot searchable."
+  },
+  {
+   "id": "open-drawings",
+   "chapter": "open",
+   "member": "lucia",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "bentopdf",
+   "replaces": [
+    "Adobe Acrobat",
+    "Smallpdf"
+   ],
+   "chips": [
+    "BentoPDF",
+    "replaces Adobe Acrobat",
+    "replaces Smallpdf"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "One pack of tender drawings",
+   "seed": "Lucia merges the tender drawings into one pack with BentoPDF. The pack goes to the estimator's desk.",
+   "limit": "Name the app exactly. No claim that redaction is complete.",
+   "capabilityHint": "A PDF toolkit that runs in your browser. Nothing is uploaded."
+  },
+  {
+   "id": "open-hours",
+   "chapter": "open",
+   "member": "una",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "kimai",
+   "replaces": [],
+   "chips": [
+    "Kimai"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "Hours, logged by the job",
+   "seed": "Each person in the office block logs their own hours against the job in Kimai. The pay service stays outside.",
+   "limit": "Each person logs their own hours; never \"tracks every employee\". Do not say payroll. Not a billing or tax tool. No replaces chip.",
+   "capabilityHint": "Track time per project and client, with reports."
+  },
+  {
+   "id": "open-notes",
+   "chapter": "open",
+   "member": "una",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "paperless",
+   "replaces": [
+    "Google Drive"
+   ],
+   "chips": [
+    "Paperless-ngx",
+    "replaces Google Drive"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "The note behind an invoice",
+   "seed": "Una looks up the delivery note behind a supplier's invoice query in Paperless-ngx. The paper and the scan sit side by side.",
+   "limit": "Never bare \"Paperless\". No accuracy or matching claim.",
+   "capabilityHint": "Scan and file your paperwork. It reads every page, tags it and makes the lot searchable."
+  },
+  {
+   "id": "open-books",
+   "chapter": "open",
+   "member": "una",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "akaunting",
+   "replaces": [
+    "QuickBooks"
+   ],
+   "chips": [
+    "Akaunting",
+    "replaces QuickBooks"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "Job costs, for the accountant",
+   "seed": "Una keeps one site's job costs in Akaunting. The firm's main accounts package stays where it is.",
+   "limit": "Bookkeeping only: no accounting, tax or legal advice. Source-available (Business Source License): never \"open source\". State the edge: the main accounts package is not moved. Akaunting free production use is limited to two users, one company and one thousand invoices (BSL 1.1 Additional Use Grant, upstream LICENSE.txt): show one person in it, never a team.",
+   "bringHome": {
+    "from": "QuickBooks",
+    "carries": "customers, transactions and bank transactions from CSV or Excel (Akaunting import)",
+    "doesNot": "the full books; the pay service; bank feeds"
+   },
+   "capabilityHint": "Invoicing, expenses, customers and profit and loss for a small business."
+  },
+  {
+   "id": "est-leads",
+   "chapter": "est",
+   "member": "tariq",
+   "anchor": {
+    "role": "workstation",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "espocrm",
+   "replaces": [
+    "Salesforce"
+   ],
+   "chips": [
+    "EspoCRM",
+    "replaces Salesforce"
+   ],
+   "category": "customers",
+   "film": true,
+   "title": "Every tender in one list",
+   "seed": "Tariq keeps every tender in EspoCRM on the Core. Each row is a shop or restaurant fit-out, with a date and a next call.",
+   "limit": "Web interface only. Teams and roles are EspoCRM's own: say nothing about who sees what. Never show a real-looking list.",
+   "bringHome": {
+    "from": "Salesforce",
+    "carries": "accounts and contacts as CSV rows with fields mapped",
+    "doesNot": "automations and reports; sharing rules; activity history"
+   },
+   "capabilityHint": "Manage customers, sales pipelines, campaigns and support cases in a CRM you host."
+  },
+  {
+   "id": "est-sheet",
+   "chapter": "est",
+   "member": "tariq",
+   "anchor": {
+    "role": "desk",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "grist",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Grist",
+    "replaces Airtable"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The estimating sheet, kept",
+   "seed": "Tariq keeps the estimating sheet in Grist. Each new estimate starts from the last one, and the changes are visible in a column.",
+   "limit": "No amounts, rates or totals anywhere. Same app as open-sheet by design. In this Hub package Grist has one default sign-in (GRIST_DEFAULT_EMAIL) and no login provider: never per-person Grist accounts, never who sees which rows.",
+   "capabilityHint": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+  },
+  {
+   "id": "est-hand-off",
+   "chapter": "est",
+   "member": "tariq",
+   "anchor": {
+    "role": "workstation",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "n8n",
+   "replaces": [
+    "Zapier",
+    "Make"
+   ],
+   "chips": [
+    "n8n",
+    "replaces Zapier",
+    "replaces Make"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "A won tender becomes a card",
+   "seed": "When Tariq marks a tender won in EspoCRM, n8n adds a job card to the board. Wei built each step by hand.",
+   "limit": "Say \"source-available\", never \"open source\". Automations are rebuilt by hand; connections authorised again. Never \"emails customers automatically\".",
+   "bringHome": {
+    "from": "Zapier",
+    "carries": "the idea of each automation, rebuilt",
+    "doesNot": "Zap definitions, run history, connection tokens"
+   },
+   "with": [
+    "espocrm"
+   ],
+   "capabilityHint": "Connect your apps with workflows. 400 plus integrations, with the data staying on your Core."
+  },
+  {
+   "id": "est-sign",
+   "chapter": "est",
+   "member": "cormac",
+   "anchor": {
+    "role": "desk",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "documenso",
+   "replaces": [
+    "DocuSign"
+   ],
+   "chips": [
+    "Documenso",
+    "replaces DocuSign"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "A variation, signed at the desk",
+   "seed": "Cormac and a site manager sign a variation order at the estimating desk. Documenso keeps the signed copy on the Core.",
+   "limit": "Never \"legally binding\" (its manifest says so: do not repeat). Signing email needs SMTP, or the bundled catcher delivers nothing. Both signers are in the room.",
+   "capabilityHint": "A document signing platform you host yourself, with signing workflows."
+  },
+  {
+   "id": "meet-where",
+   "chapter": "meet",
+   "member": "wei",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "docmost",
+   "replaces": [
+    "Notion",
+    "Confluence"
+   ],
+   "chips": [
+    "Docmost",
+    "replaces Notion",
+    "replaces Confluence"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "What runs where",
+   "seed": "Wei writes one page in Docmost. It lists what the office block runs on the Core and what stays on the company's own tools. He reads it aloud.",
+   "limit": "The sceptic's scene: state limits calmly, do not win the argument. Say what stays on the company's suites. Name no SSO, roles or audit words.",
+   "bringHome": {
+    "from": "Notion",
+    "carries": "page text and nested structure; images and files in the export",
+    "doesNot": "comments and page history; sharing; databases (arrive as CSV)"
+   },
+   "capabilityHint": "A collaborative wiki for notes and documentation."
+  },
+  {
+   "id": "workshop-print",
+   "chapter": "workshop",
+   "member": "stellan",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "printer",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "grist",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Grist",
+    "replaces Airtable"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The list, printed for the bench",
+   "seed": "The cutting list prints at the workshop office window. The workshop works from the paper, and Stellan changes the Grist table when the day changes.",
+   "limit": "The workshop floor does not use the Core: only the printed paper reaches it. Same app by design. In this Hub package Grist has one default sign-in (GRIST_DEFAULT_EMAIL) and no login provider: never per-person Grist accounts, never who sees which rows.",
+   "capabilityHint": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+  },
+  {
+   "id": "kitchen-first-day",
+   "chapter": "kitchen",
+   "member": "lucia",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "docmost",
+   "replaces": [
+    "Notion"
+   ],
+   "chips": [
+    "Docmost",
+    "replaces Notion"
+   ],
+   "category": "people",
+   "film": false,
+   "title": "The new starter's first week",
+   "seed": "A new starter's first week is a set of Docmost pages. Lucia walks her through them at the break room table.",
+   "limit": "Docmost overlaps BookStack: name one wiki per office. No HR or payroll claim.",
+   "capabilityHint": "A collaborative wiki for notes and documentation."
+  },
+  {
+   "id": "kitchen-notes",
+   "chapter": "kitchen",
+   "member": "cormac",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "ci-memory",
+   "replaces": [],
+   "chips": [
+    "Companion Memory"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "His own notes, his own file",
+   "seed": "Cormac keeps his own notes in Companion Memory (beta). It is one person's file, and the rest of the firm stays on its own tools.",
+   "limit": "Beta, first mention \"(beta)\". One person's context; never \"company brain\". Imports opt-in; crash reports on by default.",
+   "capabilityHint": "Companion Memory keeps your digital life on your own disk, so your agents know your context and a cloud does not."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to your office block",
+   "seed": "The planning, estimating and accounts desks now share one Core in the comms room. The rest of the company stays on its own tools. Browse the Companion Hub store.",
+   "limit": "closing body: the second sentence is the honest edge; no capacity or headcount claim."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Cormac"
+   ],
+   "rows": [
+    {
+     "app": "mattermost",
+     "name": "Mattermost",
+     "replaces": [
+      "Slack",
+      "Discord"
+     ],
+     "beats": [
+      "open-chat"
+     ]
+    },
+    {
+     "app": "documenso",
+     "name": "Documenso",
+     "replaces": [
+      "DocuSign"
+     ],
+     "beats": [
+      "est-sign"
+     ]
+    },
+    {
+     "app": "ci-memory",
+     "name": "Companion Memory",
+     "replaces": [],
+     "beats": [
+      "kitchen-notes"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "it",
+   "people": [
+    "Wei"
+   ],
+   "rows": [
+    {
+     "app": "ci-openclaw",
+     "name": "OpenClaw WebCLI",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "comms-lathe"
+     ]
+    },
+    {
+     "app": "uptime-kuma",
+     "name": "Uptime Kuma",
+     "replaces": [],
+     "beats": [
+      "comms-status"
+     ]
+    },
+    {
+     "app": "pi-hole",
+     "name": "Pi-hole",
+     "replaces": [
+      "AdGuard",
+      "NextDNS"
+     ],
+     "beats": [
+      "comms-dns"
+     ]
+    },
+    {
+     "app": "docmost",
+     "name": "Docmost",
+     "replaces": [
+      "Notion",
+      "Confluence"
+     ],
+     "beats": [
+      "meet-where"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "operations",
+   "people": [
+    "Stellan"
+   ],
+   "rows": [
+    {
+     "app": "vikunja",
+     "name": "Vikunja",
+     "replaces": [
+      "Todoist",
+      "Asana"
+     ],
+     "beats": [
+      "open-board"
+     ]
+    },
+    {
+     "app": "grist",
+     "name": "Grist",
+     "replaces": [
+      "Airtable"
+     ],
+     "beats": [
+      "open-sheet",
+      "workshop-print"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "legal",
+   "people": [
+    "Lucia"
+   ],
+   "rows": [
+    {
+     "app": "paperless",
+     "name": "Paperless-ngx",
+     "replaces": [
+      "Evernote"
+     ],
+     "beats": [
+      "open-scan"
+     ]
+    },
+    {
+     "app": "bentopdf",
+     "name": "BentoPDF",
+     "replaces": [
+      "Adobe Acrobat",
+      "Smallpdf"
+     ],
+     "beats": [
+      "open-drawings"
+     ]
+    },
+    {
+     "app": "docmost",
+     "name": "Docmost",
+     "replaces": [
+      "Notion"
+     ],
+     "beats": [
+      "kitchen-first-day"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "sales",
+   "people": [
+    "Tariq"
+   ],
+   "rows": [
+    {
+     "app": "espocrm",
+     "name": "EspoCRM",
+     "replaces": [
+      "Salesforce"
+     ],
+     "beats": [
+      "est-leads"
+     ]
+    },
+    {
+     "app": "grist",
+     "name": "Grist",
+     "replaces": [
+      "Airtable"
+     ],
+     "beats": [
+      "est-sheet"
+     ]
+    },
+    {
+     "app": "n8n",
+     "name": "n8n",
+     "replaces": [
+      "Zapier",
+      "Make"
+     ],
+     "beats": [
+      "est-hand-off"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "finance",
+   "people": [
+    "Una"
+   ],
+   "rows": [
+    {
+     "app": "kimai",
+     "name": "Kimai",
+     "replaces": [],
+     "beats": [
+      "open-hours"
+     ]
+    },
+    {
+     "app": "paperless",
+     "name": "Paperless-ngx",
+     "replaces": [
+      "Google Drive"
+     ],
+     "beats": [
+      "open-notes"
+     ]
+    },
+    {
+     "app": "akaunting",
+     "name": "Akaunting",
+     "replaces": [
+      "QuickBooks"
+     ],
+     "beats": [
+      "open-books"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "open-chat",
+   "member": "cormac",
+   "app": "mattermost",
+   "from": "Slack",
+   "carries": "users, channels, direct messages, threads, files and reactions via mmetl then mmctl",
+   "doesNot": "Slack Connect channels; canvases; custom emoji images; integrations and workflows"
+  },
+  {
+   "beat": "open-sheet",
+   "member": "stellan",
+   "app": "grist",
+   "from": "Airtable",
+   "carries": "tables rebuilt by hand or by CSV; no importer claimed for Grist",
+   "doesNot": "automations and interfaces; row comments; revision history"
+  },
+  {
+   "beat": "open-books",
+   "member": "una",
+   "app": "akaunting",
+   "from": "QuickBooks",
+   "carries": "customers, transactions and bank transactions from CSV or Excel (Akaunting import)",
+   "doesNot": "the full books; the pay service; bank feeds"
+  },
+  {
+   "beat": "est-leads",
+   "member": "tariq",
+   "app": "espocrm",
+   "from": "Salesforce",
+   "carries": "accounts and contacts as CSV rows with fields mapped",
+   "doesNot": "automations and reports; sharing rules; activity history"
+  },
+  {
+   "beat": "est-hand-off",
+   "member": "tariq",
+   "app": "n8n",
+   "from": "Zapier",
+   "carries": "the idea of each automation, rebuilt",
+   "doesNot": "Zap definitions, run history, connection tokens"
+  },
+  {
+   "beat": "meet-where",
+   "member": "wei",
+   "app": "docmost",
+   "from": "Notion",
+   "carries": "page text and nested structure; images and files in the export",
+   "doesNot": "comments and page history; sharing; databases (arrive as CSV)"
+  }
+ ],
+ "rentedBefore": [
+  "AdGuard",
+  "NextDNS",
+  "Slack",
+  "Discord",
+  "Todoist",
+  "Asana",
+  "Airtable",
+  "Evernote",
+  "Adobe Acrobat",
+  "Smallpdf",
+  "Google Drive",
+  "QuickBooks",
+  "Salesforce",
+  "Zapier",
+  "Make",
+  "DocuSign",
+  "Notion",
+  "Confluence"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "uptime-kuma",
+    "name": "Uptime Kuma",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "pi-hole",
+    "name": "Pi-hole",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "mattermost",
+    "name": "Mattermost",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "vikunja",
+    "name": "Vikunja",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "grist",
+    "name": "Grist",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "paperless",
+    "name": "Paperless-ngx",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "bentopdf",
+    "name": "BentoPDF",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Dual licence: AGPL-3.0 for internal use, or a paid commercial licence; its heavier engines load from a public CDN on first use"
+   },
+   {
+    "id": "kimai",
+    "name": "Kimai",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "akaunting",
+    "name": "Akaunting",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Business Source License 1.1 (source-available): free production use only up to two users, one company and one thousand invoices"
+   },
+   {
+    "id": "espocrm",
+    "name": "EspoCRM",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "n8n",
+    "name": "n8n",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Sustainable Use (fair-code): say \"source-available\""
+   },
+   {
+    "id": "documenso",
+    "name": "Documenso",
+    "storySafe": "with-caveat",
+    "qa": "screenshot"
+   },
+   {
+    "id": "docmost",
+    "name": "Docmost",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   }
+  ],
+  "firstParty": [
+   "ci-openclaw",
+   "ci-memory"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "comms-status",
+   "comms-lathe",
+   "open-board",
+   "est-leads",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 189,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Hartnoll Joinery",
+   "address": "4 Sawpit Lane, Hollowmere",
+   "tagline": "A joinery firm of about ninety, and one office block with its own Core.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "wei",
+    "name": "Wei",
+    "title": "Systems administrator",
+    "hookBeat": "comms-status",
+    "hookTitle": "A status page, read each morning",
+    "chips": [
+     "Uptime Kuma"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "stellan",
+    "name": "Stellan",
+    "title": "Production planner",
+    "hookBeat": "open-board",
+    "hookTitle": "Every job on one board",
+    "chips": [
+     "Vikunja",
+     "replaces Todoist",
+     "replaces Asana"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "tariq",
+    "name": "Tariq",
+    "title": "Estimator",
+    "hookBeat": "est-leads",
+    "hookTitle": "Every tender in one list",
+    "chips": [
+     "EspoCRM",
+     "replaces Salesforce"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "openclaw-office-internet (new claims row: OpenClaw reaches websites over the office internet.)",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms",
+  "not-advice"
+ ],
+ "doNotSay": [
+  "the whole company runs on one Core",
+  "single sign-on, audit or roles",
+  "a headcount served",
+  "failover or uptime",
+  "a second site"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 26,
+  "ftue": 6,
+  "roomBeats": 19,
+  "film": 8,
+  "members": 6,
+  "apps": 15,
+  "thirdPartyApps": 13,
+  "replacedServices": 18,
+  "bringHomeBeats": 6,
+  "categories": [
+   "setup",
+   "it",
+   "communication",
+   "projects",
+   "documents",
+   "money",
+   "customers",
+   "people"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "comms-status: dropped \"replaces Datadog\" and \"replaces New Relic\" on the IT sceptic's own beat and cut (stretched pair)",
+   "comms-dns: \"answers the office block's name lookups ... beside the router\" removed (port 8053); a sceptic admin would not say it; title \"The office block's name lookups\" -> \"Wei's block list\"",
+   "open-books: \"for the accountant to read\" removed; two-user cap carried",
+   "Grist one-sign-in limit; BentoPDF dual-licence note (heavier engines load from a public CDN on first use)"
+  ],
+  "unverified": [
+   "Mattermost free-edition limits for a 22-person floor not verified from here (image mattermost-team-edition:latest)",
+   "a floor of 22 people on one Core is not backed by any capacity statement; never printed (O3)"
+  ]
+ }
+}

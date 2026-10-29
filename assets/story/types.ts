@@ -30,6 +30,15 @@ export const SERVICE_ID_PATTERN = '^[a-z0-9][a-z0-9-]{1,38}$' as const;
 export const CHIP_MAX_LENGTH = 48 as const;
 export const ALTERNATIVE_CHIP_PREFIX = 'alternative to ' as const;
 
+// ---- office enumerations (office-build-contract.md section 3) -------------------------------------------
+export const SIZES = ['startup', 'small', 'medium'] as const;
+export const SCOPES = ['company', 'site', 'department'] as const;
+export const FUNCTIONS = ['owner', 'operations', 'finance', 'sales', 'marketing', 'support', 'engineering', 'design', 'projects', 'people', 'legal', 'it'] as const;
+export const CO_CATEGORIES = ['setup', 'documents', 'communication', 'customers', 'money', 'projects', 'engineering', 'design', 'marketing', 'people', 'it'] as const;
+export const CO_DAY_PARTS = ['arrival', 'morning', 'midday', 'afternoon', 'close'] as const;
+export const OFFICE_ROOM_ROLES = ['entry', 'living', 'kitchen', 'dining', 'office', 'bedroom', 'kids', 'garage', 'laundry', 'bath', 'garden', 'patio', 'street', 'reception', 'workfloor', 'meeting', 'server', 'workshop', 'store'] as const;
+export const OFFICE_ROLE_IDS = ['street', 'front-door', 'core', 'room', 'couch', 'tv', 'fireplace', 'bookshelf', 'fridge', 'range', 'kitchen-island', 'counter', 'dining-table', 'desk', 'bed', 'crib', 'toys', 'music', 'laundry', 'bicycle', 'easel', 'telescope', 'patio-seat', 'garden', 'driveway', 'pool', 'deck', 'workstation', 'meeting-table', 'whiteboard', 'server-rack', 'reception-desk', 'printer', 'workbench'] as const;
+
 export type Id = string;
 export type AppId = string;
 export type VoiceKey = (typeof VOICE_KEYS)[number];
@@ -44,6 +53,14 @@ export type Colour = (typeof COLOURS)[number];
 export type Runtime = (typeof RUNTIMES)[number];
 export type Archetype = (typeof ARCHETYPES)[number];
 export type DayPart = (typeof DAY_PARTS)[number];
+
+export type CompanySize = (typeof SIZES)[number];
+export type CompanyScope = (typeof SCOPES)[number];
+export type CompanyFunction = (typeof FUNCTIONS)[number];
+export type CompanyCategory = (typeof CO_CATEGORIES)[number];
+export type CompanyDayPart = (typeof CO_DAY_PARTS)[number];
+export type OfficeRoomRole = (typeof OFFICE_ROOM_ROLES)[number];
+export type OfficeRoleId = (typeof OFFICE_ROLE_IDS)[number];
 
 // ---- the authored file: content/families/<slug>.json -------------------------------------------------------------------
 export interface AnchorLeaf { role: RoleId; room?: RoomRole; nth?: number }
@@ -102,11 +119,28 @@ export interface Story {
   family: FamilyInfo; members: Member[]; chapters: Chapter[]; beats: Beat[]; closing: Closing; notes?: string[];
 }
 
+// ---- company/v1 (office-build-contract.md section 3) -----------------------------------------------------
+export interface CompanyMember {
+  id: Id; name: string; function: CompanyFunction; title: string; colour: Colour; ownsCore?: boolean;
+  companion?: Companion; profile?: MemberProfile;
+}
+export interface CompanyInfo {
+  name: string; tagline: string; sector: string; size: CompanySize; scope: CompanyScope;
+  headcount: number; floor: number; story: string;
+  address: { line: string; place: string }; narrator: VoiceKey;
+  office?: FamilyHome; day?: DayEntry[];
+}
+export interface CompanyStory {
+  schema: 'company/v1'; slug: string; office: Id; fictional: true;
+  company: CompanyInfo; members: CompanyMember[]; chapters: Chapter[]; beats: Beat[]; closing: Closing; notes?: string[];
+}
+
 // ---- clips: what is spoken -----------------------------------------------------------------------------------------------
 /** ClipId: the beat id (narration = popup.body), `<beat id>.say` (agent line), or 'closing' (closing.body + ' ' + SIGNOFF). */
 export type ClipId = string;
 export const SIGNOFF = 'UnCloud your life.' as const;
 export const FICTIONAL_LINE = 'Fictional family. Real software.' as const;
+export const FICTIONAL_COMPANY_LINE = 'Fictional company. Real software.' as const;
 export const INTERNET_NOTE = 'Installing apps uses the internet.' as const;
 export const HERMES_NOTE = 'Messages pass through the chat service you choose.' as const;
 export const OPENCLAW_WEB_NOTE = 'OpenClaw reaches websites over your home internet.' as const;

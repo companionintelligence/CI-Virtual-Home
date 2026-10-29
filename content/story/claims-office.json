@@ -1,0 +1,324 @@
+{
+ "v": 1,
+ "$comment": "PROPOSED content/story/claims-office.json (w20 plan). The office extension of claims.json, merged for company stories and company pages ONLY (claimsFor(company)): 28 added rows (the 25 of the claims report plus biz-outcomes, biz-people-replaced, biz-hr-records), two base rules replaced for company copy (incumbent-attack, cap-autonomy), the disclosures. claims.json is not edited, so no film inputsSha moves and its 72-rule pin holds. cap-remote-access is NOT replaced: writers say \"at the office\". Run over the 30 family files these rows hit 34 strings (claims report 3.1), which is why they never load for a family.",
+ "replace": {
+  "incumbent-attack": {
+   "pattern": "\\b(Google|Alphabet|Amazon|Alexa|Ring|Apple|iCloud|Siri|Meta|Facebook|Instagram|WhatsApp|Microsoft|OpenAI|ChatGPT|Anthropic|Zoom|Dropbox|Slack|Spotify|Netflix|Nest|Samsung|Adobe|Notion|Evernote|LastPass|1Password|Salesforce|Shopify|Mailchimp|QuickBooks|Intuit|Xero|FreshBooks|DocuSign|HubSpot|Zendesk|Intercom|Atlassian|Confluence|Jira|Asana|Trello|Okta|GitHub|GitLab|Figma|Miro|Airtable|Zapier|Datadog|GeForce Now|Xbox Cloud|Stadia)\\b.{0,70}\\b(spies?|spying|steals?|stole|sells? (your|the) data|selling (your|the) data|harvests?|mines? your|snoops?|exploits?|listens? (to|in on)|watching you|stalks?|lies|lying|abuses?|scams?|extorts?|holds? (you|your \\w+) hostage|train(s|ed|ing)? (on|its models on) your)\\b",
+   "flags": "i",
+   "severity": "error",
+   "why": "No unsourced factual claim about a named company. The CI-Common matrix of such judgements is uncited. A Kickstarter-adjacent page is commercial speech; escalate comparative use to counsel. Company copy adds the business incumbents the chips name.",
+   "fix": "Say what the catalogue app does. Pair names only as \"instead of X\" in the Alternatives table sense."
+  },
+  "cap-autonomy": {
+   "pattern": "\\b(books?|orders?|buys?|pays?|purchases?|negotiates?|cancels?|calls?|emails?|texts?|schedules?|files?|submits?|invoices?|sends?|signs?|chases?|reminds?)\\b.{0,30}\\b(for you|on your behalf|automatically|by itself|on its own|without (asking|you))\\b",
+   "flags": "i",
+   "severity": "review",
+   "why": "Agents act inside permissions the family sets. No story may show an agent spending money, contacting a third party or cancelling something without the person approving. Company copy adds invoices, sends, signs and chases.",
+   "fix": "Show the agent preparing the action and the person approving it."
+  }
+ },
+ "bannedPhrases": [
+  {
+   "id": "biz-capacity",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:one|a single|the) (?:Companion )?Core (?:runs|serves|powers|hosts|handles|carries|supports|looks after) (?:the |our |their )?(?:whole|entire|all|every)\\b|\\b(?:serves?|supports?|handles?|hosts?|carries) (?:\\w+ ){0,3}(?:staff|employees|people|users|seats|team members|colleagues|clients|customers)\\b|\\bscal(?:e|es|ed|ing|able|ability)\\b|\\bseat limits?\\b|\\bper[- ]seat\\b|\\b(?:unlimited|any number of|as many) (?:users|seats|staff|people|employees)\\b|\\b(?:whole|entire) (?:company|business|office|firm|organi[sz]ation|team|studio|agency|practice)\\b[^.]{0,40}\\b(?:runs|run|lives|live|sits|sit|works|work|depends) (?:on|from|in)\\b",
+   "why": "No capacity, headcount or seat claim exists for a Core. Companion has published no figure for how many people one Core serves, and the sheet says the Core is one owner's machine.",
+   "fix": "Name the apps the team uses and where they sit. Never say how many people or how much of the company one Core carries."
+  },
+  {
+   "id": "biz-access-roles",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:roles|permissions|access (?:control|rights|levels?|policies)|user management|admin(?:istrator)? rights|single sign[- ]on|SSO|SAML|OIDC|LDAP|Active Directory|directory sync|SCIM|identity provider|least privilege|org(?:ani[sz]ation)? chart|team accounts?|user accounts|seats?|invite (?:the |your |your whole )?team|onboard(?:s|ed|ing)? (?:the |a )?(?:new )?(?:hire|starter|employee)s? (?:in|into|with|to) )\\b|\\b(?:only|just) (?:the )?(?:\\w+ ){0,2}(?:team|department|managers?|admins?|finance|HR|partners?|owners?|directors?) (?:can|may|are able to) (?:see|read|open|access|view|edit)\\b|\\b(?:locked|restricted|limited) to (?:the )?\\w+ (?:team|department)\\b|\\bprivate (?:folders?|channels?|spaces?|workspaces?|boards?|vaults?)\\b|\\bcan(?:not|'t) (?:see|read|open|access|view)\\b",
+   "why": "Multi-user is not on the box. Roles, permissions, SSO, directory sync and who-can-see-what are each app's own features, are not shown in the Hub listings, and some are paid editions upstream. A story that shows them reads as a platform claim.",
+   "fix": "Say what the app holds. If a sign-in must be mentioned, use the one sanctioned sentence: each app keeps its own sign-in."
+  },
+  {
+   "id": "biz-availability",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:uptime(?! kuma)|up[- ]time|high availability|always[- ](?:on|up|available)|24\\s?\\/\\s?7(?!-ready)|24[- ]hours? a day|around the clock|round the clock|SLAs?|service[- ]level|fail[- ]?over|redundan\\w+|five nines|99\\.\\d+|downtime|business continuity|disaster recovery|never (?:down|offline|stops?)|keeps? running|while (?:the team|everyone|we|they|you) (?:sleeps?|slept|is asleep|are asleep|is away|are away))\\b",
+   "why": "No uptime, availability or reliability figure exists. The sheet says only \"without you babysitting it\" and discloses beta. Uptime Kuma monitors; it does not prevent an outage.",
+   "fix": "Leave reliability out, or say where the app runs."
+  },
+  {
+   "id": "biz-backup",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:never lose|can(?:not|'t) lose|nothing (?:is |gets |was )?lost|(?:safe|protected|covered) (?:from|against) (?:loss|failure|ransomware|fire|theft)|disaster|ransomware|data loss|recover(?:s|ed)? (?:everything|in|within|fully)|restore[sd]? (?:in|within|everything|fully)|fully recoverable|point[- ]in[- ]time|off-?site|3-2-1|backed up|backs? up (?:the )?(?:whole|entire|everything|company|all|every)|backups? (?:protect|keep|guard|cover|secure)s?)\\b",
+   "why": "Backup is not a finished story. Hub backs up one app at a time to the same disk, stops the app while it does, leaves out data held in Docker volumes, and the person must copy the backups elsewhere. Duplicati on a stock install cannot see other apps' data.",
+   "fix": "Describe nothing as protected. If backups must be shown, use the sanctioned backup sentence in the team form."
+  },
+  {
+   "id": "biz-residency",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:data (?:residency|sovereignty|localisation|localization)|sovereign\\w*|(?:stays?|remains?|sits?) (?:\\w+ ){0,2}in (?:the |our |this )?(?:country|region|state|jurisdiction|EU|UK|US|building)|in-country|jurisdiction|cross-border|(?:never|does not|doesn't) (?:cross|leave) (?:the )?(?:border|country))\\b",
+   "why": "Data residency is a legal claim and an unmeasured one: installs, model downloads, crash reports and every connected service cross borders.",
+   "fix": "Say the app sits on the Core. Say where the Core sits in the story's room, not in a jurisdiction."
+  },
+  {
+   "id": "biz-encryption",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "(?<!full[- ]disk )\\b(?:encrypted|encrypts?|encrypting|encryption|cipher\\w*|TLS|SSL|zero[- ]trust|at rest|in transit|key management)\\b",
+   "why": "The only supported sentence is \"Full-disk encryption is supported, with your keys.\" (supported, not default). Anything else is a security claim the sheet does not make, and some listings (Paperless-ngx) say documents are stored in clear text.",
+   "fix": "Use the sanctioned sentence verbatim or say nothing."
+  },
+  {
+   "id": "biz-compliance-words",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:regulat\\w+ (?:requirements?|duties|bodies)|regulated|regulators?|data protection (?:law|act|officer|rules)|privacy (?:law|act|regulations?|rules)s?|breach notification|retention polic\\w+|legal hold|e-?discovery|audit trails?|audit logs?|audit-ready|inspection-ready|attestations?|due diligence|vendor questionnaires?|security questionnaires?|accreditation|licen[cs]ed (?:to practi[cs]e|professional)|professional (?:standards|obligations|duty|conduct)|ethics (?:rules?|opinion))\\b",
+   "why": "Extends sec-compliance to business wording. Nothing in the Hub makes a firm compliant with a rule, law or ethics opinion, and an audit log is one app's feature, not a record a regulator accepts.",
+   "fix": "Describe the document workflow. Leave the rule out."
+  },
+  {
+   "id": "biz-compliance-acronyms",
+   "severity": "error",
+   "flags": "",
+   "pattern": "\\b(?:ISO|SOC|PCI|DPA|DPO|NIS2|DORA|SOX|FINRA|eIDAS|ESIGN|UETA|SEC|FDA|CJIS|ITAR|GxP|MiFID|CMMC|NIST|CIS|FISMA|LGPD|PIPEDA|POPIA|HITECH|MTD)\\b",
+   "why": "Case-sensitive acronyms of standards and regimes that sec-compliance does not list. DORA and SEC are also common names or words, so the rule is case-sensitive and a hit is checked by eye.",
+   "fix": "Remove."
+  },
+  {
+   "id": "biz-privilege",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:attorney[- ]client|privileged|privilege|client confidentiality|confidential(?:ity)?|non-disclosure|NDAs?|trade secrets?|duty of confidence|professional secrecy|source protection|work product|chinese wall|ethical wall|conflict check\\w*)\\b",
+   "why": "Legal privilege and client confidentiality are duties of the professional, not properties of a tool. The sheet's own angle (\"client files cannot go to a cloud model\") is an ad angle, not a sanctioned site claim.",
+   "fix": "Say client files, and say where they sit."
+  },
+  {
+   "id": "biz-esign-valid",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:signatures?|signed|signing|e-?sign\\w*)\\b[^.]{0,40}\\b(?:valid\\w*|binding|enforceable|admissible|legal\\w*|official\\w*|proof|tamper\\w*|certified|authentic\\w*|holds? up|stands? up)\\b|\\b(?:valid|binding|enforceable|legal\\w*|official\\w*|tamper\\w*|certified|authentic\\w*)\\b[^.]{0,30}\\b(?:signatures?|signed|e-?signatures?)\\b|\\b(?:certificate of completion|non-repudiation|wet-ink)\\b",
+   "why": "Extends legal-claims. DocuSeal and Documenso sign documents; whether a signature is valid is not our statement, and Documenso's own listing says \"legally-binding\".",
+   "fix": "Say the document is sent, signed and filed. Say nothing about what the signature is worth."
+  },
+  {
+   "id": "biz-books-correct",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:books|ledgers?|accounts|figures|totals?|numbers|invoices?|entries|reports?|balances?)\\b[^.]{0,30}\\b(?:are|is|stay|stays|come out|comes out|always)\\s+(?:always\\s+)?(?:right|correct|accurate|balanced|exact|reconciled|audit\\w*|up to date|error-free|to the cent|never wrong)\\b|\\b(?:reconcil\\w+|balance sheet|profit and loss|P&L|GAAP|IFRS|double-entry|chart of accounts|general ledger)\\b",
+   "why": "Accounting correctness is not claimed. Akaunting and Invoice Ninja are bookkeeping and invoicing tools with no accounting, tax or legal advice; Invoice Ninja has no ledger.",
+   "fix": "Describe what the app holds (invoices, expenses, receipts) and who reads them (the accountant)."
+  },
+  {
+   "id": "biz-tax-payroll",
+   "severity": "review",
+   "flags": "i",
+   "pattern": "\\b(?:tax(?:es)?|VAT|GST|payroll|pay ?slips?|withholding|tax return|filing (?:taxes|a return)|bookkeeping rules|timesheet approvals?|expenses? (?:policy|claims? approved)|pension|benefits administration|HRIS|time off|leave requests?|holiday requests?)\\b",
+   "why": "The Hub has no payroll, tax, pension or HR app. A mention is only safe as something that happens elsewhere (the accountant, the payroll provider).",
+   "fix": "Keep it to \"the accountant\" or \"the payroll provider\" doing it elsewhere, or remove it. The owner clears the exact sentence in reviewed.json."
+  },
+  {
+   "id": "biz-surveillance",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:monitor\\w*|surveil\\w*|spy\\w*|keystrokes?|screen[- ]?captur\\w*|screenshots? (?:of )?(?:the |their |your )?(?:staff|team|employees?|desks?|screens?)|productivity (?:scores?|tracking|monitoring|reports?)|bossware|idle time|who(?:'s| is| was) (?:online|working|at (?:their|his|her) desk|idle|late|in the office)|attendance|clock(?:s|ed|ing)? (?:in|on|out)|time ?cards?)\\b|\\bcameras?\\b[^.]{0,40}\\b(?:staff|employees?|workers?|the team|floor|desks?|clock|break room|kitchen|bathrooms?)\\b|\\b(?:tracks?|logs?|records?|watch\\w*|supervis\\w+)\\b[^.]{0,30}\\b(?:staff|employees?|workers?|team members?|colleagues?|the team|crew|interns?|each employee|everyone)\\b",
+   "why": "Covert or blanket recording and tracking of people who have not agreed is never shown (cap-camera-capture, extended from the family to the workplace). Kimai and Solidtime are for a person logging their own hours; Frigate records the owner's own cameras on their own premises.",
+   "fix": "Show a person logging their own time, or a camera at a door. Never a person being watched."
+  },
+  {
+   "id": "biz-call-recording",
+   "severity": "review",
+   "flags": "i",
+   "pattern": "\\b(?:record\\w*|transcrib\\w*|listen\\w*)\\b[^.]{0,30}\\b(?:calls?|meetings?|conversations?|interviews?|stand-?ups?|one-to-ones?|1:1s?|voicemail)\\b",
+   "why": "Recording or transcribing a call needs the consent of the people on it. Whisper-WebUI transcribes a file the person already has; Jitsi recording is not claimed.",
+   "fix": "Show a person transcribing their own dictation or a recording they have the right to hold, with the consent in the sentence."
+  },
+  {
+   "id": "biz-remote-work",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:work(?:s|ing)? from home|WFH|hybrid|telework\\w*|telecommut\\w*|distributed (?:team|company|workforce)|remote[- ](?:first|work\\w*|team|staff|employees?|colleagues?|workers?|call|join)|(?:branch|satellite|second|other|regional|new) (?:office|site|location)s?|multiple (?:offices|sites|locations)|from (?:home|their (?:homes?|own offices?|desks at home)|a coffee shop|the (?:field|van|site|client'?s|airport|train|hotel|car))|(?:staff|team|employees?|clients?|customers?|guests?|vendors?|suppliers?|partners?|freelancers?|contractors?|auditors?|accountants?|investors?) (?:outside|away|off-?site|elsewhere|abroad|overseas|abroad)|(?:shared?|shares?|send|sends|sent) (?:\\w+ ){0,3}(?:with|to) (?:clients?|customers?|outsiders|external|partners|investors|the accountant)|external (?:users?|guests?|clients?|collaborators?)|guest (?:access|links?|accounts?|invites?)|client (?:portal|links?)|customer (?:portal|links?)|booking (?:page|link)|public (?:page|form|link|site|portal|survey|booking|URL)|join (?:the |a )?(?:call|meeting) from|(?:send|sends|sent|email|emails|text|texts|share|shares|shared) (?:the |a |an )?(?:client|customer|investor|accountant|guest|supplier|partner|candidate)s? (?:a |the )?(?:link|invite|invitation)|\\blinks? to (?:sign|view|book|pay|join|vote|upload)|from (?:another|a different|the other) (?:city|town|country|office|building|site)|(?:another|a different) (?:city|country|town|continent|time ?zone)|(?:across|between) (?:sites|offices|cities|time ?zones))\\b",
+   "why": "Extends cap-remote-access to work wording. Remote access is NOT finalised: no remote, hybrid or home working, no second site, and nobody outside the office network (client, signer, accountant, investor, guest) reaches the Core.",
+   "fix": "Keep every person in the room, on the office network. Hand things to outsiders on paper, by email attachment, or by the person leaving the room."
+  },
+  {
+   "id": "biz-mobile",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:(?:on|from|with) (?:their|your|his|her|every|each) (?:phones?|mobiles?|tablets?)\\b[^.]{0,30}\\b(?:app|apps|install\\w*|sign\\w*|open\\w*|log\\w*|scan\\w*)|install\\w* (?:the |an? )?apps? on (?:their|your|every|each|his|her)|(?:field|sales|delivery|care|site) (?:team|staff|reps?|crew|workers?)\\b[^.]{0,40}\\b(?:phones?|mobile|tablets?|apps?)|push notifications?|BYOD|MDM)\\b",
+   "why": "Extends cap-mobile-app. Mobile is closed preview; team stories do not put the Core in a phone, a van or a field team's hands.",
+   "fix": "Put the team at desks, on laptops, on the office network."
+  },
+  {
+   "id": "biz-support",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:Companion(?: Intelligence)?|CI)\\b[^.]{0,50}\\b(?:supports?|fix(?:es)?|repairs?|maintain\\w*|manage[sd]?|looks? after|hosts?|monitors?|updates?)\\b|\\b(?:support (?:team|desk|line|plan|contract)|premium support|priority support|replies? within|response times?|resolution times?|warranty|RMA|on-?site (?:support|repair)|managed service|MSP)\\b|\\b(?:no|without (?:an?|any)) (?:IT|sysadmin|admin|technical) (?:department|team|staff|person|help|skills?|expertise|knowledge)\\b|\\bno (?:maintenance|upkeep|admin work)\\b|\\bnothing to (?:maintain|manage|patch|update|administer)\\b",
+   "why": "No support, SLA or maintenance promise is on the fact sheet for the site. The 24-hour Discord reply is a Kickstarter backer term (campaign terms), and the warranty is campaign terms too. \"No IT person needed\" is an ease claim, unmeasured, and untrue of apps that need SMTP or a first-run admin.",
+   "fix": "Show a person doing the set-up step. Name who does it."
+  },
+  {
+   "id": "biz-licence",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:n8n|NocoDB|Invoice Ninja|Akaunting|Outline|Metabase|Twenty|Joplin Server|Fizzy|tldraw|NocoBase|monetr|Remotion Studio|Obsidian)\\b[^.]{0,60}\\bopen[- ]?source\\b|\\bopen[- ]?source\\b[^.]{0,60}\\b(?:n8n|NocoDB|Invoice Ninja|Akaunting|Outline|Metabase|Twenty|Joplin Server|Fizzy|tldraw|NocoBase|monetr|Remotion Studio|Obsidian)\\b|\\b(?:free (?:for|to use (?:for|at|in)) (?:work|business|commercial|companies|company|teams?|the team|your team|any company)|free forever|no licen[cs]e fees?|no licen[cs]ing|licen[cs]e-free|seat licen[cs]es?|per[- ]user|commercial use|business use|licen[cs]e[sd]? (?:for|to) (?:the )?(?:team|company|business|firm))\\b",
+   "why": "Several Hub apps carry licences that limit business use or are not open source: n8n and NocoDB (Sustainable Use, fair-code), Invoice Ninja (Elastic 2.0), Akaunting and Outline (Business Source 1.1), Metabase and Twenty (AGPL plus commercial files), Joplin Server (Personal Use License), Fizzy, tldraw, NocoBase, Remotion Studio (company licence for four or more people). No story calls them open source or free for business.",
+   "fix": "Say source-available where the catalog says so, or say nothing about the licence. Put the licence line in the credits disclosure."
+  },
+  {
+   "id": "biz-cost",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:cut|cuts|cutting|slash\\w*|reduc\\w+|lower\\w*|drop|drops|trim\\w*|eliminat\\w+|end|ends|stops?|no more|no longer pay\\w*) (?:\\w+ ){0,3}(?:costs?|bills?|spend|overheads?|fees|renewals?|subscriptions?|licen[cs]es?)\\b|\\b(?:costs?|bills?|spend|overhead|ROI|payback|budgets?|margins?|TCO|total cost)\\b[^.]{0,40}\\b(?:down|less|lower|falls?|fell|drops?|dropped|halved?|saved?|gone)\\b|\\bfree (?:software|apps?|tools?)\\b|\\bcheap\\w*|\\bafford\\w*|\\bcost[- ](?:effective|saving|free)\\b|\\bworth the money\\b|\\bbudget-friendly\\b|\\bno (?:more )?(?:renewal|renewals|monthly bills?)\\b|\\bstop(?:s|ped)? paying\\b|\\bpay(?:s|ing)? for (?:every|each) (?:user|seat|person|employee)\\b|\\b(?:renewals?|subscriptions?|bills?|licen[cs]es?|invoices from)\\b[^.]{0,20}\\b(?:gone|vanish\\w*|disappear\\w*|history|ended|cancell?ed)\\b",
+   "why": "Extends num-savings and num-dollar to cost wording with no digit. Hub Pro is a subscription, the year that ships with a Core is a campaign term, and no savings figure is signed off.",
+   "fix": "Describe the app and what it replaces. Leave money out."
+  },
+  {
+   "id": "biz-ai-claims",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:trained|trains|train|learn\\w*|fine-?tun\\w*) (?:on|from|with) (?:the |your |our |their )?(?:company|business|firm|team|office|client|customer)|\\b(?:knows|understands|remembers|reads|indexes|sees) (?:the |your |our |their )?(?:whole |entire |all )?(?:company|business|firm|team|office|inbox|drive|org)\\b|\\b(?:answers?|decisions?|analysis|forecasts?|predictions?|insights?|recommendations?|drafts?|summaries)\\b[^.]{0,30}\\b(?:accurate|reliable|correct|trusted|trustworthy|always right|never wrong)\\b|\\bcompany (?:brain|memory|intelligence|knowledge)\\b|\\bsmarter than\\b|\\bnever (?:wrong|hallucinat\\w+)|\\bhallucinat\\w+[- ](?:free|proof)\\b|\\b(?:replac\\w+|does the work of|automates? (?:the )?(?:job|role|department|team)|fewer (?:staff|hires|people)) (?:the |a |an |our )?(?:staff|employees?|team|analysts?|bookkeepers?|accountants?|receptionists?|paralegals?|developers?|marketers?|writers?|designers?|support)\\b|\\binstead of hiring\\b|\\bno need (?:to|for) hir\\w+\\b|\\bmodel\\b[^.]{0,40}\\b(?:in seconds|instantly|immediately|quickly|fast|real[- ]time)\\b",
+   "why": "AI on company data: the model is a capable open-weight one, not a frontier one; it can be wrong; no speed, accuracy or parity figure exists; Companion Memory is one person's beta memory file, not a company brain; and an agent prepares while a person approves. No story replaces a role with a model.",
+   "fix": "Say \"the model on the Core\" drafts, and a named person reads and sends it."
+  },
+  {
+   "id": "biz-migration",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:migrat\\w+|switch\\w*|mov(?:e|ed|ing)|import\\w*|transfer\\w*|exit\\w*)\\b[^.]{0,50}\\b(?:in (?:a|an|one|two|three|the) (?:\\w+ )?(?:day|days|hour|hours|afternoon|morning|weekend|week|weeks|evening)|overnight|over a weekend|painless\\w*|seamless\\w*|smooth\\w*|one-click|without (?:losing|a hitch|downtime|any loss|missing)|nothing (?:is )?(?:lost|missing|left behind)|everything (?:comes|came|moves|moved|carries|carried) (?:over|across)|all (?:of )?(?:your|the|its) (?:data|history|files|mail|messages))\\b|\\b(?:took|takes|needs?|needed|ran|runs) (?:a|an|one|two|three|the) (?:\\w+ )?(?:afternoon|weekend|day|days|week|weeks|evening)\\b|\\b(?:easy|easily|trivial|effortless\\w*) (?:to )?(?:move|switch|migrate|import|leave)\\b|\\b(?:carried|carries|carry|brought|brings|bring|moved|moves|took|takes) (?:over |across )?(?:everything|all (?:of )?(?:it|the \\w+))\\b",
+   "why": "Migration ease and duration are unmeasured. The bring-home map gives rough bands, not promises, and every importer drops something (comments, permissions, history, automations) or needs an OAuth link that talks to the old service during the import.",
+   "fix": "Say what moved and name one thing that did not."
+  },
+  {
+   "id": "biz-domain-contact",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "[\\w.+-]+@[\\w-]+\\.[\\w.-]+|\\bhttps?:\\/\\/(?!ci\\.computer|docs\\.ci\\.computer)\\S+|\\bwww\\.\\S+|\\b(?!ci\\.computer\\b|docs\\.ci\\.computer\\b|draw\\.io\\b)[a-z0-9-]+\\.(?:com|io|co|net|org|app|ai|dev|uk|ca|au|de|biz|shop|studio|agency|tech|cloud|systems)\\b|\\(?\\b\\d{3}\\)?[ .-]\\d{3}[ .-]\\d{4}\\b",
+   "why": "A fictional company with a domain, an email or a phone number can point at a real one. The fake-address-real rule covers street plus ZIP only.",
+   "fix": "No domain, email address or phone number in a business story. A name and a town that cannot resolve."
+  },
+  {
+   "id": "biz-testimonial",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:customers?|clients?|users?|teams?|companies|businesses|firms|studios|shops|agencies|startups|staff|colleagues)\\b[^.]{0,25}\\b(?:love|loved|loves|swear by|recommend\\w*|rave\\w*|made the switch|switched)\\b|\\b(?:joins?|joined) (?:hundreds|thousands|dozens|a growing number|many)\\b|\\b(?:more|many|thousands|hundreds|dozens) of (?:businesses|companies|teams|firms|studios|startups|offices|shops)\\b|\\bgrowing (?:number|community) of\\b|\\breal (?:clients?|companies|businesses|teams|studios|firms|staff|employees)\\b|\\b(?:everyone|the whole team|all of us|we all) (?:loves?|loved|swears?|raves?)\\b",
+   "why": "Extends fake-social-proof. fake-social-proof misses \"our enterprise customers love it\" (a word sits between \"our\" and \"customers\") and \"staff love it\". A fictional person praising the product is a testimonial in fiction clothes (CAMPAIGN.md 17).",
+   "fix": "Show the chore done. Let no character say the product is good."
+  },
+  {
+   "id": "biz-audience",
+   "severity": "review",
+   "flags": "i",
+   "pattern": "\\b(?:enterprises?|mid-?market|mid-?siz\\w+|medium(?:-sized)? (?:businesses|business|companies|company|firms?|enterprises?)|SMBs?|SMEs?|large (?:company|companies|organi[sz]ations?|enterprises?)|corporate|corporations?|big (?:business|companies|firms?)|Fortune ?\\d+|organi[sz]ation-wide|company-wide|firm-wide|across the (?:company|organi[sz]ation)|whole (?:organi[sz]ation|workforce)|startups? (?:and|or) (?:enterprises?|corporates?))\\b",
+   "why": "The sanctioned audience sentence is \"individuals, families and small teams\". Nothing is signed off for medium businesses, mid-market or enterprise, and \"SMB\" is the jargon the owner persona rolls their eyes at.",
+   "fix": "Say team, studio, shop, firm or office. Any sentence about who Companion is for is the sanctioned one, verbatim."
+  },
+  {
+   "id": "biz-secure-private",
+   "severity": "error",
+   "flags": "i",
+   "pattern": "\\b(?:secure|securely|security|private|privately|privacy|safe|safely|safety|protected|protects?|confidential|trusted|trustworthy|reliable|reliability|robust|bulletproof)\\b(?! channel)",
+   "why": "Bare \"private\", \"secure\", \"safe\" and \"protected\" are not caught by any rule today (it is a prose rule in personas.md) and they are the words a business buyer takes as a promise.",
+   "fix": "Say where it sits: on the Core, on the office network, stays on your Core by default."
+  },
+  {
+   "id": "biz-outcomes",
+   "pattern": "\\b(productivity (gains?|boost)|boosts? (productivity|sales|revenue)|ROI|cost[- ]effective|reduc(es?|ing) (costs?|overhead|headcount)|revenue (grew|growth|increase[sd]?)|more profit|grows? (revenue|sales)|closes? (more )?deals? faster|faster (sales|growth|onboarding|hiring))\\b",
+   "flags": "i",
+   "severity": "error",
+   "why": "Business outcomes are unmeasured and unsourced: no productivity, revenue, cost or speed result may be claimed or implied.",
+   "fix": "Show the task the app does, not what it did for the business."
+  },
+  {
+   "id": "biz-people-replaced",
+   "pattern": "\\b(replaces?|replacing|instead of) (your |the |a )?(staff|employees|bookkeeper|accountant|lawyer|receptionist|designer|developers?|team)\\b|\\bno need for (an? |your )?(accountant|lawyer|bookkeeper|IT|designer|developer|receptionist)\\b|\\b(fewer|less) (staff|people|hires)\\b|\\bcuts? (staff|headcount|jobs)\\b",
+   "flags": "i",
+   "severity": "error",
+   "why": "The stories never imply the Core replaces a person, a profession or an adviser. The agent prepares; a person approves.",
+   "fix": "Show the person doing the work with the app, and the approval."
+  },
+  {
+   "id": "biz-hr-records",
+   "pattern": "\\b(HR (system|records)|personnel files?|employee (records|files|data)|background checks?|applicant tracking)\\b",
+   "flags": "i",
+   "severity": "error",
+   "why": "No app in the Companion Hub store holds personnel records or runs applicant tracking, and a records claim reads as a privacy or compliance claim.",
+   "fix": "Name the document (the handbook, the signed letter) and where it sits."
+  }
+ ],
+ "disclosures": [
+  {
+   "id": "fictional-company",
+   "text": "Fictional company. Real software.",
+   "where": "Hero of /office, every company page header, the player chrome, the first two seconds and last card of every film and cut, the corner mark, og:description. Replaces fictional-family on office surfaces. Owner wording needed.",
+   "required": true
+  },
+  {
+   "id": "fictional-company-long",
+   "text": "{company} is a fictional company. The people in it are characters, not customers. The software is real.",
+   "where": "Company page and share pages. Answers CAMPAIGN 17 and the T15 question in words; owner sign-off.",
+   "required": true
+  },
+  {
+   "id": "not-customers",
+   "text": "The companies on this site are made up. They are not customers.",
+   "where": "Footers.",
+   "required": true
+  },
+  {
+   "id": "core-back-room",
+   "text": "One Companion Core sits on a shelf in the back room. The team's apps run on it. Each app keeps its own sign-ins.",
+   "where": "The strip of a company page and the tour start card. HOLD until the owner rules on Organizations (D1).",
+   "required": false,
+   "hold": true
+  },
+  {
+   "id": "team-sign-ins",
+   "text": "One Companion Core belongs to one owner. The apps on it keep their own sign-ins.",
+   "where": "Footer and About. HOLD with D1.",
+   "required": false,
+   "hold": true
+  },
+  {
+   "id": "office-scope",
+   "text": "Every scene stays on the office network.",
+   "where": "Footer and end card. HOLD with D3 (remote access).",
+   "required": false,
+   "hold": true
+  },
+  {
+   "id": "openclaw-office-internet",
+   "text": "OpenClaw reaches websites over the office internet.",
+   "where": "Any beat where OpenClaw opens a website (replaces the home wording for offices).",
+   "required": true
+  },
+  {
+   "id": "first-party-crash",
+   "text": "First-party apps send crash reports to Companion Intelligence unless you switch that off.",
+   "where": "Footer and end card when a first-party app is named.",
+   "required": true
+  },
+  {
+   "id": "not-advice",
+   "text": "Nothing here is professional advice. Ask your accountant or your adviser.",
+   "where": "Footer of a company page that names an invoicing or bookkeeping app.",
+   "required": true
+  },
+  {
+   "id": "licence-terms",
+   "text": "Some apps carry their own licence terms. Read an app's licence before the team relies on it.",
+   "where": "Credits and any beat naming a licence-limited app (n8n, Invoice Ninja, Akaunting, Twenty).",
+   "required": true
+  },
+  {
+   "id": "apps-by-others",
+   "text": "Apart from the first-party apps, the apps in these stories are made by other people. Companion Intelligence did not make them.",
+   "where": "Credits. Replaces third-party-apps for offices (that text says open-source projects, untrue of n8n, Invoice Ninja, Akaunting, Twenty).",
+   "required": true
+  },
+  {
+   "id": "owner-backups",
+   "text": "A second copy of the files, kept somewhere else, is still the company's job.",
+   "where": "HOLD, not printed by default (backup is banned until the owner rules, claims row biz-backup).",
+   "required": false,
+   "hold": true
+  }
+ ]
+}

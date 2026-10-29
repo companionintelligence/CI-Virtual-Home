@@ -1,0 +1,1583 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "curatory",
+ "wave": 3,
+ "sizeLabel": "Startup",
+ "company": {
+  "name": "Curatory",
+  "tagline": "Visitor guides for small museums, and one Companion Core behind glass.",
+  "sector": "Visitor guides for small museums",
+  "size": "startup",
+  "scope": "company",
+  "headcount": 11,
+  "floor": 11,
+  "story": "Curatory makes audio and text guides for small museums. Eleven people share one business-park unit. The code, the help pages, the device tests and the logins sit on one Companion Core behind a glass wall.",
+  "address": {
+   "line": "6 Cartwheel Park",
+   "place": "Sallowfold"
+  },
+  "narrator": "v-warm-f"
+ },
+ "hookLine": "The support lead owns the Core.",
+ "arc": "A startup of eleven where the person who answers the museums owns the Core: support is the thin role, and here it is the one who installs the apps. The Core room has a glass wall onto the floor, so everyone can see where the work sits. Edge: the guides themselves are hosted elsewhere; nothing on the Core faces the museums.",
+ "honestEdge": "Museums reach the guides on hosting the company already uses. The Core holds the company's own working memory and the help pages the support lead answers from.",
+ "building": {
+  "id": "dev-shop-unit",
+  "display": "The Steel Unit",
+  "concept": "Business-park unit: corrugated steel and glass front, flat roof, covered deck, bike store. Needs the business lot context (2 d) and a blank fascia board (0.5 d); no curtain wall.",
+  "exterior": "business-park unit",
+  "storeys": 1,
+  "areaSqm": 260,
+  "seats": 14,
+  "core": {
+   "room": "Comms Room",
+   "surface": "rack shelf (steel), chalk Core, no books",
+   "note": "Comms Room 12 m2 with a glass wall onto the Open Office so the establishing walk sees the Core room; but no windows to the street (office-comms-blind)."
+  },
+  "route": "street door, Reception, along the Open Office bench, the glass wall, the Comms Room door, orbit. Short route.",
+  "rooms": [
+   {
+    "name": "Reception",
+    "sqm": 12,
+    "roles": [
+     "reception"
+    ],
+    "program": "reception"
+   },
+   {
+    "name": "Open Office",
+    "sqm": 110,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 14
+   },
+   {
+    "name": "Meeting Room",
+    "sqm": 18,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 8
+   },
+   {
+    "name": "Huddle Room",
+    "sqm": 8,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 4
+   },
+   {
+    "name": "Phone Booth",
+    "sqm": 4,
+    "roles": [
+     "meeting"
+    ]
+   },
+   {
+    "name": "Kitchenette",
+    "sqm": 22,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen",
+    "note": "long table"
+   },
+   {
+    "name": "Device Lab",
+    "sqm": 14,
+    "roles": [
+     "workshop"
+    ],
+    "note": "bench, device shelves, monitors (P2 dev set)"
+   },
+   {
+    "name": "Comms Room",
+    "sqm": 13,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   }
+  ]
+ },
+ "objectProps": "glass wall onto the floor, a shelf of test devices, wall screen, the long kitchenette table",
+ "members": [
+  {
+   "id": "yara",
+   "name": "Yara",
+   "function": "owner",
+   "title": "Founder and chief executive",
+   "colour": "chart-1",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": null,
+   "beats": [
+    "open-books",
+    "meet-ask",
+    "kitchen-first-day"
+   ],
+   "apps": [
+    "akaunting",
+    "open-webui",
+    "bookstack"
+   ]
+  },
+  {
+   "id": "ilse",
+   "name": "Ilse",
+   "function": "support",
+   "title": "Customer success lead",
+   "colour": "chart-2",
+   "room": "Comms Room",
+   "ownsCore": true,
+   "lens": {
+    "role": "customer_support",
+    "personaResearch": "new research",
+    "comfort": 3,
+    "tone": "Warm, patient, scripted when tired.",
+    "aiStance": "Mixed; the job is shrinking in forecasts.",
+    "honestLimit": "Internal help on the office network is honest; customer-facing chat and phone are not shown."
+   },
+   "companion": {
+    "name": "Tally",
+    "runtime": "Hermes",
+    "job": "Drafts replies to museum staff from help text Ilse pastes to it.",
+    "personality": [
+     "calm",
+     "brisk",
+     "organised"
+    ],
+    "voice": "v-steady-m",
+    "memory": false,
+    "limits": "Drafts only. Ilse reads and sends every reply."
+   },
+   "beats": [
+    "ftue-hello",
+    "comms-vault",
+    "comms-draft",
+    "open-wiki"
+   ],
+   "apps": [
+    "ci-hermes",
+    "vaultwarden",
+    "bookstack"
+   ]
+  },
+  {
+   "id": "dmitri",
+   "name": "Dmitri",
+   "function": "engineering",
+   "title": "Backend engineer",
+   "colour": "chart-3",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "software_engineer",
+    "personaResearch": "builder",
+    "comfort": 4,
+    "tone": "Fragments, jargon, deadpan. \"Repo is on the Core.\"",
+    "aiStance": "Uses it most days, does not brag, wants the diff.",
+    "honestLimit": "Whether work code moves is the company's decision; no CI run; no hosted-model parity."
+   },
+   "companion": null,
+   "beats": [
+    "open-repos",
+    "open-chat",
+    "lab-trace"
+   ],
+   "apps": [
+    "forgejo",
+    "rocketchat",
+    "jupyterlab"
+   ]
+  },
+  {
+   "id": "naledi",
+   "name": "Naledi",
+   "function": "engineering",
+   "title": "App engineer",
+   "colour": "chart-4",
+   "room": "Device Lab",
+   "ownsCore": false,
+   "lens": {
+    "role": "software_engineer",
+    "personaResearch": "builder",
+    "comfort": 4,
+    "tone": "Fragments, jargon, deadpan. \"Repo is on the Core.\"",
+    "aiStance": "Uses it most days, does not brag, wants the diff.",
+    "honestLimit": "Whether work code moves is the company's decision; no CI run; no hosted-model parity."
+   },
+   "companion": null,
+   "beats": [
+    "open-review",
+    "lab-matrix",
+    "lab-text"
+   ],
+   "apps": [
+    "forgejo",
+    "baserow",
+    "libretranslate"
+   ]
+  },
+  {
+   "id": "rashida",
+   "name": "Rashida",
+   "function": "design",
+   "title": "Product designer",
+   "colour": "chart-5",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "open-design",
+    "open-icons",
+    "meet-wall"
+   ],
+   "apps": [
+    "penpot",
+    "inkscape"
+   ]
+  },
+  {
+   "id": "joaquin",
+   "name": "Joaquin",
+   "function": "sales",
+   "title": "Partnerships manager",
+   "colour": "chart-1",
+   "room": "Meeting Room",
+   "ownsCore": false,
+   "lens": {
+    "role": "sales_bd",
+    "personaResearch": "business-owner and marketer",
+    "comfort": 3,
+    "tone": "Quick, numbers first, upbeat on the surface and dry underneath.",
+    "aiStance": "Heaviest adopter and proudest by reputation [?]; script slower than they talk.",
+    "honestLimit": "Reps away from the office are out of every scene; the CRM is the office's, not a per-rep platform account."
+   },
+   "companion": null,
+   "beats": [
+    "open-crm",
+    "meet-paper",
+    "kitchen-follow"
+   ],
+   "apps": [
+    "twenty",
+    "papra",
+    "open-webui"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "comms",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Comms Room",
+   "title": "Behind the glass wall"
+  },
+  {
+   "id": "open",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office",
+   "title": "The open office"
+  },
+  {
+   "id": "lab",
+   "kind": "room",
+   "room": "workshop",
+   "roomName": "Device Lab",
+   "title": "The device lab"
+  },
+  {
+   "id": "meet",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Meeting Room",
+   "title": "The meeting room"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Kitchenette",
+   "title": "The kitchenette"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel at the glass door",
+   "seed": "A parcel waits at the glass door of the unit. Joaquin signs for it and carries it to the comms room, the one with the glass wall.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Dmitri lifts the Core out, and Ilse reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Ilse plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Ilse opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the office network.",
+   "limit": "phone rows: Join the Core's own network; Choose the office network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Ilse picks Hermes, and the team adds Forgejo and BookStack. Then they get back to the guides.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "forgejo",
+    "bookstack"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "ilse",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Tally says hello",
+   "seed": "Ilse messages the agent she named Tally from her desk. Tally answers from the Core behind the glass wall.",
+   "limit": "note: Messages pass through the chat service you choose.",
+   "say": {
+    "speaker": "ilse",
+    "text": "Hello, Ilse. I draft the replies. You send them."
+   },
+   "agent": "ilse",
+   "approval": "ilse",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "comms-vault",
+   "chapter": "comms",
+   "member": "ilse",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "vaultwarden",
+   "replaces": [
+    "1Password"
+   ],
+   "chips": [
+    "VaultWarden",
+    "replaces 1Password"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "Shared logins, one vault",
+   "seed": "The shared logins leave the browser and move into VaultWarden on the Core. Ilse exports once, imports once and deletes the file.",
+   "limit": "Say \"the Bitwarden apps\". Importing twice makes duplicates. Business plans can switch exports off. Attachments and one-time-code seeds do not move.",
+   "bringHome": {
+    "from": "1Password",
+    "carries": "logins, cards, identities and notes the import maps",
+    "doesNot": "some item types; item history; shared-vault structure; attachments added again by hand"
+   },
+   "capabilityHint": "Store every password in a vault you host. Works with the Bitwarden apps."
+  },
+  {
+   "id": "comms-draft",
+   "chapter": "comms",
+   "member": "ilse",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "communication",
+   "film": true,
+   "title": "A reply, drafted",
+   "seed": "Tally drafts the reply to a museum's question from the help text Ilse gives it. Ilse edits two lines and sends it herself.",
+   "limit": "Agent prepares, person approves. The message passes through the chat service the person picks; email stays with the mail provider. Hermes trusts one messaging ID: Ilse's. Hermes is isolated from BookStack: it works from text Ilse gives it, never \"reads the help pages\".",
+   "agent": "ilse",
+   "approval": "ilse",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "open-repos",
+   "chapter": "open",
+   "member": "dmitri",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "forgejo",
+   "replaces": [
+    "GitHub"
+   ],
+   "chips": [
+    "Forgejo",
+    "replaces GitHub"
+   ],
+   "category": "engineering",
+   "film": true,
+   "title": "The guide player moves in",
+   "seed": "Dmitri moves the guide player's repositories into Forgejo on the Core. The museums' own content stays where it is hosted.",
+   "limit": "Say where the repositories are. Never \"syncs with\" or \"compatible with\" GitHub. No runner ships: never show a CI run. One Git host per office.",
+   "bringHome": {
+    "from": "GitHub",
+    "carries": "repository code and history; issues and pull requests with a token",
+    "doesNot": "Actions workflows; stars and followers; Discussions, Projects, Pages"
+   },
+   "capabilityHint": "Host your own Git repositories, issues and pull requests on your Core."
+  },
+  {
+   "id": "open-review",
+   "chapter": "open",
+   "member": "naledi",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "forgejo",
+   "replaces": [
+    "GitHub"
+   ],
+   "chips": [
+    "Forgejo",
+    "replaces GitHub"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "A pull request, read closely",
+   "seed": "Naledi opens a pull request in Forgejo. Dmitri reads it line by line and leaves a note beside each change.",
+   "limit": "Same app as open-repos by design (one Git host). Do not show a CI run or a runner.",
+   "capabilityHint": "Host your own Git repositories, issues and pull requests on your Core."
+  },
+  {
+   "id": "open-design",
+   "chapter": "open",
+   "member": "rashida",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "penpot",
+   "replaces": [
+    "Figma"
+   ],
+   "chips": [
+    "Penpot",
+    "replaces Figma"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "Gallery maps, drawn here",
+   "seed": "Rashida draws the gallery maps in Penpot on the Core. The files sit in the same room as the guide player they belong to.",
+   "limit": "No verified Figma importer: rebuilt by hand. Five containers. Do not describe the screen.",
+   "bringHome": {
+    "from": "Figma",
+    "carries": "nothing automatic; components rebuilt by hand",
+    "doesNot": "plugins; prototypes; comment history"
+   },
+   "capabilityHint": "Design and prototype in a web-based design tool you host."
+  },
+  {
+   "id": "open-icons",
+   "chapter": "open",
+   "member": "rashida",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "inkscape",
+   "replaces": [
+    "Adobe Illustrator"
+   ],
+   "chips": [
+    "Inkscape",
+    "replaces Adobe Illustrator"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The icon set, in a browser",
+   "seed": "Rashida draws the exhibit icons in Inkscape, in a browser tab. The finished files go into the repository.",
+   "limit": "A browser session. No Photoshop equivalent.",
+   "capabilityHint": "Draw logos, diagrams and line art as vector graphics, in your browser."
+  },
+  {
+   "id": "open-crm",
+   "chapter": "open",
+   "member": "joaquin",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "twenty",
+   "replaces": [
+    "Salesforce"
+   ],
+   "chips": [
+    "Twenty",
+    "replaces Salesforce"
+   ],
+   "category": "customers",
+   "film": true,
+   "title": "Museum partners, one table",
+   "seed": "Joaquin keeps every museum partner in Twenty on the Core. The list is a table the whole floor can read, not a spreadsheet in someone's drive.",
+   "limit": "Never show Twenty's QA capture (real company names). AGPL plus commercial files: never \"open source\". Automations and reports do not move. Avoid the word \"twenty\" as a number in nearby text (app matcher).",
+   "bringHome": {
+    "from": "Salesforce",
+    "carries": "accounts, contacts and opportunities as CSV rows with relations mapped",
+    "doesNot": "flows and triggers; reports and dashboards; sharing rules; activity history"
+   },
+   "capabilityHint": "Keep customers, deals and custom fields in a CRM you host yourself."
+  },
+  {
+   "id": "open-chat",
+   "chapter": "open",
+   "member": "dmitri",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "rocketchat",
+   "replaces": [
+    "Slack",
+    "Discord"
+   ],
+   "chips": [
+    "Rocket.Chat",
+    "replaces Slack",
+    "replaces Discord"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The floor's own channel",
+   "seed": "The floor talks in Rocket.Chat on the office network. Each person has an account inside Rocket.Chat, which is its own feature.",
+   "limit": "Do not quote \"end-to-end encryption\" or user counts from its listing. One chat app per office. No importer claim.",
+   "capabilityHint": "Team chat with channels and calls, hosted on your Core."
+  },
+  {
+   "id": "open-books",
+   "chapter": "open",
+   "member": "yara",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "akaunting",
+   "replaces": [
+    "Xero"
+   ],
+   "chips": [
+    "Akaunting",
+    "replaces Xero"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "The annual invoices",
+   "seed": "Yara raises the annual guide invoices in Akaunting at her desk. A printout goes to the accountant each quarter.",
+   "limit": "Bookkeeping only: no accounting, tax or legal advice, no payroll, no payments. Source-available: never \"open source\". Xero has no verified route: say nothing about a move. Akaunting free production use is limited to two users, one company and one thousand invoices (BSL 1.1 Additional Use Grant, upstream LICENSE.txt): show one person in it, never a team.",
+   "capabilityHint": "Invoicing, expenses, customers and profit and loss for a small business."
+  },
+  {
+   "id": "open-wiki",
+   "chapter": "open",
+   "member": "ilse",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "bookstack",
+   "replaces": [
+    "Confluence"
+   ],
+   "chips": [
+    "BookStack",
+    "replaces Confluence"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "The help pages she answers from",
+   "seed": "The help pages Ilse answers from are a BookStack book on the Core. The museums read Ilse's emails.",
+   "limit": "Internal pages only: no help centre for outsiders (needs reach). Change the default credentials. No verified Confluence importer. Say \"help pages\", never \"knowledge base\".",
+   "bringHome": {
+    "from": "Confluence",
+    "carries": "HTML or Word pages by hand",
+    "doesNot": "macros; page history and comments; the old space settings"
+   },
+   "capabilityHint": "Write a wiki or a set of manuals in books, chapters and pages, with search and history."
+  },
+  {
+   "id": "lab-matrix",
+   "chapter": "lab",
+   "member": "naledi",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "baserow",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Baserow",
+    "replaces Airtable"
+   ],
+   "category": "engineering",
+   "film": true,
+   "title": "Every test device, one table",
+   "seed": "Naledi keeps the device test table in Baserow on the Core. Each row is a phone or tablet on the shelf, with its last run.",
+   "limit": "The Airtable importer reads a shared base link, so the server talks to Airtable while it runs. Automations and interfaces are rebuilt. MIT core plus premium parts.",
+   "bringHome": {
+    "from": "Airtable",
+    "carries": "tables, rows, field types, links and grid views",
+    "doesNot": "automations and interfaces; row comments; revision history"
+   },
+   "capabilityHint": "Build a no-code database for orders, inventory or projects."
+  },
+  {
+   "id": "lab-trace",
+   "chapter": "lab",
+   "member": "dmitri",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "jupyterlab",
+   "replaces": [],
+   "chips": [
+    "JupyterLab"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "A crash trace, in a notebook",
+   "seed": "Dmitri reads a crash trace from a shelf device in a notebook on the Core. The code runs on the Core, beside the shelf.",
+   "limit": "No replaces chip. One password at install. Installing a package reaches the internet. Do not use the word \"mobile\" for the Core.",
+   "capabilityHint": "Write and run notebooks, code and data in a browser, on your Core."
+  },
+  {
+   "id": "lab-text",
+   "chapter": "lab",
+   "member": "naledi",
+   "anchor": {
+    "role": "workstation",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workfloor",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "libretranslate",
+   "replaces": [
+    "Google Translate",
+    "DeepL"
+   ],
+   "chips": [
+    "LibreTranslate",
+    "replaces Google Translate",
+    "replaces DeepL"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Guide text in four languages",
+   "seed": "Naledi translates the guide text with LibreTranslate on the Core. A museum's own translator reads every line before it ships.",
+   "limit": "Language models download first (installing uses the internet). No accuracy claim. Do not say \"offline\".",
+   "capabilityHint": "Translate text and documents on your own Core. Your words are not sent to a third party."
+  },
+  {
+   "id": "meet-paper",
+   "chapter": "meet",
+   "member": "joaquin",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "papra",
+   "replaces": [
+    "Evernote",
+    "Google Drive"
+   ],
+   "chips": [
+    "Papra",
+    "replaces Evernote",
+    "replaces Google Drive"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "The agreement, signed on paper",
+   "seed": "Joaquin and a museum director sign the partner agreement on paper at the meeting table. Ilse scans it into Papra before the director leaves.",
+   "limit": "No e-signature claim: paper, scanned. The director is in the room; nobody outside reaches the Core. Write \"Papra\" exactly.",
+   "capabilityHint": "Archive the receipts, warranties and contracts you rarely look at, until you need them."
+  },
+  {
+   "id": "meet-wall",
+   "chapter": "meet",
+   "member": "rashida",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "penpot",
+   "replaces": [
+    "Figma"
+   ],
+   "chips": [
+    "Penpot",
+    "replaces Figma"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The layout, on the wall screen",
+   "seed": "Rashida opens the guide layout on the wall screen. The team talks it through from the Penpot file on the Core.",
+   "limit": "Do not describe the screen. Show the room and the people.",
+   "capabilityHint": "Design and prototype in a web-based design tool you host."
+  },
+  {
+   "id": "meet-ask",
+   "chapter": "meet",
+   "member": "yara",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "open-webui",
+   "replaces": [
+    "ChatGPT"
+   ],
+   "chips": [
+    "Open WebUI",
+    "replaces ChatGPT"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "A summary, then the clause",
+   "seed": "Yara asks a model on the Core to summarise a museum agreement. She reads the summary, then the clause itself, before she signs.",
+   "limit": "Local model only; the install form has a cloud-key field: never mention a key. No accuracy, speed or parity claim.",
+   "capabilityHint": "Chat with models running on your own Core, from any browser."
+  },
+  {
+   "id": "kitchen-first-day",
+   "chapter": "kitchen",
+   "member": "yara",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "bookstack",
+   "replaces": [
+    "Notion"
+   ],
+   "chips": [
+    "BookStack",
+    "replaces Notion"
+   ],
+   "category": "people",
+   "film": false,
+   "title": "A first day, as a page",
+   "seed": "A new starter's first day is a BookStack page. Yara walks her through it over coffee at the long table.",
+   "limit": "No verified Notion importer for BookStack (Docmost has one). Say what was typed in fresh.",
+   "capabilityHint": "Write a wiki or a set of manuals in books, chapters and pages, with search and history."
+  },
+  {
+   "id": "kitchen-follow",
+   "chapter": "kitchen",
+   "member": "joaquin",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "open-webui",
+   "replaces": [
+    "ChatGPT",
+    "Claude"
+   ],
+   "chips": [
+    "Open WebUI",
+    "replaces ChatGPT",
+    "replaces Claude"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "A follow-up note, tightened",
+   "seed": "Joaquin asks a model on the Core to tighten his follow-up note. He reads it, changes a word and sends it himself.",
+   "limit": "Local model only. The person sends; nothing is sent alone.",
+   "capabilityHint": "Chat with models running on your own Core, from any browser."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to your floor",
+   "seed": "The code, the help pages, the test table and the logins now sit behind one glass wall. Browse the Companion Hub store and pick your first apps.",
+   "limit": "closing body."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Yara"
+   ],
+   "rows": [
+    {
+     "app": "akaunting",
+     "name": "Akaunting",
+     "replaces": [
+      "Xero"
+     ],
+     "beats": [
+      "open-books"
+     ]
+    },
+    {
+     "app": "open-webui",
+     "name": "Open WebUI",
+     "replaces": [
+      "ChatGPT"
+     ],
+     "beats": [
+      "meet-ask"
+     ]
+    },
+    {
+     "app": "bookstack",
+     "name": "BookStack",
+     "replaces": [
+      "Notion"
+     ],
+     "beats": [
+      "kitchen-first-day"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "support",
+   "people": [
+    "Ilse"
+   ],
+   "rows": [
+    {
+     "app": "ci-hermes",
+     "name": "Hermes",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "comms-draft"
+     ]
+    },
+    {
+     "app": "vaultwarden",
+     "name": "VaultWarden",
+     "replaces": [
+      "1Password"
+     ],
+     "beats": [
+      "comms-vault"
+     ]
+    },
+    {
+     "app": "bookstack",
+     "name": "BookStack",
+     "replaces": [
+      "Confluence"
+     ],
+     "beats": [
+      "open-wiki"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "engineering",
+   "people": [
+    "Dmitri",
+    "Naledi"
+   ],
+   "rows": [
+    {
+     "app": "forgejo",
+     "name": "Forgejo",
+     "replaces": [
+      "GitHub"
+     ],
+     "beats": [
+      "open-repos",
+      "open-review"
+     ]
+    },
+    {
+     "app": "rocketchat",
+     "name": "Rocket.Chat",
+     "replaces": [
+      "Slack",
+      "Discord"
+     ],
+     "beats": [
+      "open-chat"
+     ]
+    },
+    {
+     "app": "baserow",
+     "name": "Baserow",
+     "replaces": [
+      "Airtable"
+     ],
+     "beats": [
+      "lab-matrix"
+     ]
+    },
+    {
+     "app": "jupyterlab",
+     "name": "JupyterLab",
+     "replaces": [],
+     "beats": [
+      "lab-trace"
+     ]
+    },
+    {
+     "app": "libretranslate",
+     "name": "LibreTranslate",
+     "replaces": [
+      "Google Translate",
+      "DeepL"
+     ],
+     "beats": [
+      "lab-text"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "design",
+   "people": [
+    "Rashida"
+   ],
+   "rows": [
+    {
+     "app": "penpot",
+     "name": "Penpot",
+     "replaces": [
+      "Figma"
+     ],
+     "beats": [
+      "open-design",
+      "meet-wall"
+     ]
+    },
+    {
+     "app": "inkscape",
+     "name": "Inkscape",
+     "replaces": [
+      "Adobe Illustrator"
+     ],
+     "beats": [
+      "open-icons"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "sales",
+   "people": [
+    "Joaquin"
+   ],
+   "rows": [
+    {
+     "app": "twenty",
+     "name": "Twenty",
+     "replaces": [
+      "Salesforce"
+     ],
+     "beats": [
+      "open-crm"
+     ]
+    },
+    {
+     "app": "papra",
+     "name": "Papra",
+     "replaces": [
+      "Evernote",
+      "Google Drive"
+     ],
+     "beats": [
+      "meet-paper"
+     ]
+    },
+    {
+     "app": "open-webui",
+     "name": "Open WebUI",
+     "replaces": [
+      "ChatGPT",
+      "Claude"
+     ],
+     "beats": [
+      "kitchen-follow"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "comms-vault",
+   "member": "ilse",
+   "app": "vaultwarden",
+   "from": "1Password",
+   "carries": "logins, cards, identities and notes the import maps",
+   "doesNot": "some item types; item history; shared-vault structure; attachments added again by hand"
+  },
+  {
+   "beat": "open-repos",
+   "member": "dmitri",
+   "app": "forgejo",
+   "from": "GitHub",
+   "carries": "repository code and history; issues and pull requests with a token",
+   "doesNot": "Actions workflows; stars and followers; Discussions, Projects, Pages"
+  },
+  {
+   "beat": "open-design",
+   "member": "rashida",
+   "app": "penpot",
+   "from": "Figma",
+   "carries": "nothing automatic; components rebuilt by hand",
+   "doesNot": "plugins; prototypes; comment history"
+  },
+  {
+   "beat": "open-crm",
+   "member": "joaquin",
+   "app": "twenty",
+   "from": "Salesforce",
+   "carries": "accounts, contacts and opportunities as CSV rows with relations mapped",
+   "doesNot": "flows and triggers; reports and dashboards; sharing rules; activity history"
+  },
+  {
+   "beat": "open-wiki",
+   "member": "ilse",
+   "app": "bookstack",
+   "from": "Confluence",
+   "carries": "HTML or Word pages by hand",
+   "doesNot": "macros; page history and comments; the old space settings"
+  },
+  {
+   "beat": "lab-matrix",
+   "member": "naledi",
+   "app": "baserow",
+   "from": "Airtable",
+   "carries": "tables, rows, field types, links and grid views",
+   "doesNot": "automations and interfaces; row comments; revision history"
+  }
+ ],
+ "rentedBefore": [
+  "1Password",
+  "GitHub",
+  "Figma",
+  "Adobe Illustrator",
+  "Salesforce",
+  "Slack",
+  "Discord",
+  "Xero",
+  "Confluence",
+  "Airtable",
+  "Google Translate",
+  "DeepL",
+  "Evernote",
+  "Google Drive",
+  "ChatGPT",
+  "Notion",
+  "Claude"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "vaultwarden",
+    "name": "VaultWarden",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "forgejo",
+    "name": "Forgejo",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "penpot",
+    "name": "Penpot",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "inkscape",
+    "name": "Inkscape",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "twenty",
+    "name": "Twenty",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "AGPL plus commercial files: never \"open source\" near Twenty (rule biz-licence)"
+   },
+   {
+    "id": "rocketchat",
+    "name": "Rocket.Chat",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "akaunting",
+    "name": "Akaunting",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Business Source License 1.1 (source-available): free production use only up to two users, one company and one thousand invoices"
+   },
+   {
+    "id": "bookstack",
+    "name": "BookStack",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "baserow",
+    "name": "Baserow",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "jupyterlab",
+    "name": "JupyterLab",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "libretranslate",
+    "name": "LibreTranslate",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "papra",
+    "name": "Papra",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "open-webui",
+    "name": "Open WebUI",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   }
+  ],
+  "firstParty": [
+   "ci-hermes"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "comms-draft",
+   "open-repos",
+   "open-crm",
+   "lab-matrix",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 190,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Curatory",
+   "address": "6 Cartwheel Park, Sallowfold",
+   "tagline": "Visitor guides for small museums, and one Companion Core behind glass.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "ilse",
+    "name": "Ilse",
+    "title": "Customer success lead",
+    "hookBeat": "comms-draft",
+    "hookTitle": "A reply, drafted",
+    "chips": [
+     "Hermes"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "joaquin",
+    "name": "Joaquin",
+    "title": "Partnerships manager",
+    "hookBeat": "open-crm",
+    "hookTitle": "Museum partners, one table",
+    "chips": [
+     "Twenty",
+     "replaces Salesforce"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "naledi",
+    "name": "Naledi",
+    "title": "App engineer",
+    "hookBeat": "lab-matrix",
+    "hookTitle": "Every test device, one table",
+    "chips": [
+     "Baserow",
+     "replaces Airtable"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms",
+  "not-advice"
+ ],
+ "doNotSay": [
+  "help centre for museums",
+  "live chat",
+  "customer portal",
+  "the guides are served from the Core",
+  "a mobile app on the Core"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 25,
+  "ftue": 6,
+  "roomBeats": 18,
+  "film": 8,
+  "members": 6,
+  "apps": 14,
+  "thirdPartyApps": 13,
+  "replacedServices": 17,
+  "bringHomeBeats": 6,
+  "categories": [
+   "setup",
+   "it",
+   "communication",
+   "engineering",
+   "design",
+   "customers",
+   "money",
+   "documents",
+   "people"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "tagline: \"Eleven people ... on one Companion Core\" put a head count and the Core together; now a list of things",
+   "Comms Room 12 m2 -> 13 m2: rule office-core needs at least 3.6 x 3.6 m = 12.96 m2",
+   "comms-draft, open-wiki, Tally's job: Hermes \"drafts from the help pages\" implied an integration; now pasted text",
+   "open-books: \"The accountant reads the same books\" implied an outsider on the Core; Akaunting two-user cap carried"
+  ],
+  "unverified": [
+   "Rocket.Chat free-edition limits (users, apps, push gateway) not checked against the image in the store",
+   "Baserow row comments are a premium feature upstream: no beat uses them"
+  ]
+ }
+}

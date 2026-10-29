@@ -1072,6 +1072,72 @@ function runnerGroup(c: C): Group | null {
   };
 }
 
+
+// ---- SPIKE (w20 engine report): the office's two first groups ----------------------------------------------------------
+/** Desk pods: rows of `k` desks back to back with their chairs, laid out on a grid that fills the floor with 1.5 m aisles and
+ *  1.0 m off the walls; `seats` desks in all (the room's `seats`). One candidate per (axis, pod length, alignment); every desk
+ *  but the first is optional, so a pod that meets a window or a pillar gives up its last desks, not the room its desks. */
+function deskPods(c: C, seats: number): Group | null {
+  const dt = c.pick('office-desk'), ct = c.pick('office-chair'); if (!dt || !ct) return null;
+  const b = c.geo.b, DW = 1.4, DD = 0.7, RUN = 0.62, AISLE = 1.5, MARGIN = 1.0, GAP = 0.0;
+  const cands: Pose[] = [];
+  for (const along of ['x', 'z']) for (const k of [4, 3, 2]) for (const align of ['c', 'a', 'b']) cands.push({ key: `${along}${k}${align}`, along, k, align });
+  return {
+    name: 'pods', gid: 0, movable: false, cands,
+    build: p => {
+      const L = p.k * DW + (p.k - 1) * GAP, W = 2 * DD + 2 * RUN, ax = p.along === 'x';
+      const lenA = ax ? b.w : b.d, lenB = ax ? b.d : b.w;
+      const nA = Math.max(0, Math.floor((lenA - 2 * MARGIN + 0.6) / (L + 0.6))), nB = Math.max(0, Math.floor((lenB - 2 * MARGIN + AISLE) / (W + AISLE)));
+      const need = Math.ceil(seats / (2 * p.k)); if (nA < 1 || nB < 1) return null;
+      const pods: Array<[number, number]> = [];   // (index along the rows, index across them)
+      for (let j = 0; j < nB && pods.length < need; j++) for (let i = 0; i < nA && pods.length < need; i++) pods.push([i, j]);
+      const usedA = Math.min(nA, need), usedB = Math.ceil(need / nA);
+      const spanA = usedA * L + (usedA - 1) * 0.6, spanB = usedB * W + (usedB - 1) * AISLE;
+      const a0 = p.align === 'c' ? (lenA - spanA) / 2 : p.align === 'a' ? MARGIN : lenA - MARGIN - spanA, b0 = (lenB - spanB) / 2;
+      const out: CItem[] = []; let desks = 0;
+      for (const [i, j] of pods) {
+        const pa = a0 + i * (L + 0.6) + L / 2, pb = b0 + j * (W + AISLE) + W / 2;   // the pod's centre, in the room's own axes
+        for (const row of [-1, 1]) for (let q = 0; q < p.k && desks < seats; q++) {
+          const ta = pa - L / 2 + DW / 2 + q * (DW + GAP), tb = pb + row * (DD / 2 + 0.025);
+          const [x, z] = ax ? [b.x + ta, b.z + tb] : [b.x + tb, b.z + ta];
+          // (an item faces +z at rot 0: the user sits on its front side, so the row on the −b side faces −b: rot 180 along x, 90 along z)
+          const rot = ax ? (row < 0 ? 180 : 0) : (row < 0 ? 270 : 90);
+          const desk = c.item(dt, x, z, rot, { w: DW, d: DD, screen: true }); if (desks > 0) desk.opt = true;
+          const [cx, cz] = turn(0, DD / 2 + 0.2, rot), chair = c.item(ct, x + cx, z + cz, mm(rot + 180)); chair.opt = true; chair.base = desk; chair.access = [[x + cx * 2.6, z + cz * 2.6]];
+          out.push(desk, chair);
+          const arm = c.on('dual-monitor-arm', desk, 0, -0.2); out.push(arm);
+          if ((q + row + i + j) % 2 === 0) out.push(c.on('laptop', desk, 0.45, 0.1));
+          desks++;
+        }
+      }
+      return out;
+    },
+    score: (p, items) => items.filter(i => i.type === dt).length * 10 - (p.align === 'c' ? 0 : 0.5) - p.k * 0.01,
+  };
+}
+/** A meeting table on the room's long axis, centred, with a chair every 0.75 m along each side and one at each end. */
+function conferenceGroup(c: C): Group | null {
+  const tt = c.pick('meeting-table'), ct = c.pick('office-chair'); if (!tt || !ct) return null;
+  const g = c.geo, b = g.b, alongX2 = b.w >= b.d, L = alongX2 ? b.w : b.d, T = alongX2 ? b.d : b.w;
+  const len = Math.max(1.6, Math.min(4.4, L - 2.2)), wid = len > 2.6 ? 1.2 : 1.0, [mx, mz] = c.mid(), cands: Pose[] = [];
+  for (let ox = -0.6; ox <= 0.6 + 1e-6; ox += 0.2) for (let oz = -0.6; oz <= 0.6 + 1e-6; oz += 0.2) cands.push({ key: `t${mm(ox)}:${mm(oz)}`, ox, oz });
+  void T;
+  return {
+    name: 'meeting-table', gid: 0, movable: false, cands,
+    build: p => {
+      const x = mx + p.ox, z = mz + p.oz, rot = alongX2 ? 0 : 90, t = c.item(tt, x, z, rot, { w: mm(len), d: mm(wid) }), out: CItem[] = [t];
+      const n = Math.max(2, Math.floor(len / 0.75));
+      for (const side of [-1, 1]) for (let i = 0; i < n; i++) {
+        const u = (i - (n - 1) / 2) * (len - 0.5) / Math.max(1, n - 1), off = side * (wid / 2 + 0.16);
+        const [px, pz] = alongX2 ? [x + u, z + off] : [x + off, z + u];
+        const ch = c.item(ct, px, pz, alongX2 ? (side < 0 ? 0 : 180) : (side < 0 ? 270 : 90)); ch.opt = true; ch.base = t; out.push(ch);
+      }
+      return out;
+    },
+    score: p => -Math.hypot(p.ox, p.oz),
+  };
+}
+
 // ================================================================================================================
 // Programs
 // ================================================================================================================
@@ -1080,7 +1146,7 @@ function runnerGroup(c: C): Group | null {
 export type Make = ((attempt: number) => Group | null) & { label?: string; tries?: number; unless?: () => boolean };
 /** how much a room misses an essential (when a pass must leave one out, it leaves the least important): a toilet, a bed, a lounge, the
  *  kitchen before the sink beside it or a plant; the bathing before the vanity */
-const WEIGHT: Record<string, number> = { toilet: 3, kitchen: 3, bed: 3, lounge: 3, bathing: 2.5, dining: 2, desk: 2, bookcases: 2, vanity: 1.5, washer: 1.5, dryer: 1, shelves: 1 };
+const WEIGHT: Record<string, number> = { toilet: 3, kitchen: 3, bed: 3, lounge: 3, bathing: 2.5, dining: 2, desk: 2, desks: 2.5, 'meeting-table': 3, bookcases: 2, vanity: 1.5, washer: 1.5, dryer: 1, shelves: 1 };
 const weightOf = (labels: string[]) => labels.reduce((a, l) => a + (WEIGHT[l] ?? 1), 0);
 export function named(label: string, f: (attempt: number) => Group | null, tries = 4, unless?: () => boolean): Make { return Object.assign(f, { label, tries, unless }); }
 function program(c: C): Make[] {
@@ -1184,6 +1250,11 @@ function program(c: C): Make[] {
       if (P === 'sunroom' && g.area >= 12 && !has(...SOFA)) list.push(k => { const fs = chooseFoci(c, 'view'), fc = fs[k % Math.min(3, fs.length || 1)]; return fc ? loungeGroup(c, fc, { big: false }) : null; });
       return list;
     }
+    case 'workspace': {
+      const seats = Math.max(2, Math.round(typeof c.room.seats === 'number' ? c.room.seats : g.area / 9));
+      return [named('desks', () => deskPods(c, seats)), () => storageGroup(c, 'filing', { dress: false }), () => wallGroup(c, 'board', 'whiteboard', { w: 1.8 }), () => storageGroup(c, 'bookcase', { dress: false }), ...plants(g.area >= 30 ? 3 : 1)];
+    }
+    case 'meeting': return [named('meeting-table', () => conferenceGroup(c)), () => wallGroup(c, 'board', 'whiteboard', { w: 1.6 }), () => wallGroup(c, 'tv', 'wall-tv', {}), ...plants(1)];
     case 'outdoor': return g.area >= 5 ? [() => freeGroup(c, c.rng() < 0.5 ? 'patio-set' : 'outdoor-sofa'), () => (g.area >= 9 ? freeGroup(c, 'fire-bowl') : null)] : [];
     default: return [];
   }

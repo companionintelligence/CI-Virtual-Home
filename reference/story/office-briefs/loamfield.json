@@ -1,0 +1,1704 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "loamfield",
+ "wave": 2,
+ "sizeLabel": "Medium business",
+ "company": {
+  "name": "Loamfield",
+  "tagline": "The product department of a sensor maker keeps its own tools on one Core.",
+  "sector": "Soil-moisture sensor maker",
+  "size": "medium",
+  "scope": "department",
+  "headcount": 110,
+  "floor": 24,
+  "story": "Loamfield makes soil-moisture sensors for market gardens. About a hundred people work for the firm. This story is the product department, in its own timber building. Firmware, test notes and manuals sit on one Companion Core.",
+  "address": {
+   "line": "12 Furrow Lane",
+   "place": "Ruddock Vale"
+  },
+  "narrator": "v-storyteller-m"
+ },
+ "hookLine": "IT agreed to the department's Core on one condition.",
+ "arc": "The second medium: a department inside a company of about a hundred. The department head wanted its own tools; the systems administrator agreed on one condition, reads a status page each morning and approves the list of what the Core runs. The engineering lead owns the Core. Edge: the company keeps its own suites; one department, one Core; no capacity or headcount claim.",
+ "honestEdge": "The department keeps its own tools; the company keeps its own suites. IT agreed to the Core, reads its page each morning and decides what runs.",
+ "building": {
+  "id": "hub-courtyard",
+  "display": "The Courtyard Building",
+  "concept": "Two-storey vertical-timber building on a stone plinth, mono-pitch roof, sliding glass to a planted courtyard, pergola, bike store (garden-flat pattern, APARTMENTS section 6), scaled down from the engine's 520 m2 coworking hub to about 380 m2 and about 30 seats. No curtain wall, no business context: a timber building in a landscaped plot.",
+  "exterior": "timber hub",
+  "storeys": 2,
+  "areaSqm": 380,
+  "seats": 30,
+  "core": {
+   "room": "Comms Room",
+   "surface": "rack shelf (steel), chalk Core, no books",
+   "note": "Comms Room 3.6 x 3.6 m beside Reception, no windows. The courtyard route is long: keep the courtyard path under 8 m."
+  },
+  "route": "street gate, courtyard path, the glass slider into Reception, the Comms Room door beside it, orbit.",
+  "rooms": [
+   {
+    "name": "Reception",
+    "sqm": 24,
+    "level": 1,
+    "roles": [
+     "reception"
+    ],
+    "program": "reception"
+   },
+   {
+    "name": "Open Office",
+    "sqm": 96,
+    "level": 1,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 16
+   },
+   {
+    "name": "Meeting Room A",
+    "sqm": 18,
+    "level": 1,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 8
+   },
+   {
+    "name": "Meeting Room B",
+    "sqm": 12,
+    "level": 1,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 4
+   },
+   {
+    "name": "Test Lab",
+    "sqm": 24,
+    "level": 1,
+    "roles": [
+     "workshop"
+    ],
+    "note": "benches, device shelves, monitors (P2 dev set)"
+   },
+   {
+    "name": "Kitchen",
+    "sqm": 22,
+    "level": 1,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Supply Room",
+    "sqm": 9,
+    "level": 1,
+    "roles": [
+     "store"
+    ],
+    "program": "supply"
+   },
+   {
+    "name": "Comms Room",
+    "sqm": 13,
+    "level": 1,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   },
+   {
+    "name": "Open Office Gallery",
+    "sqm": 40,
+    "level": 2,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 8
+   },
+   {
+    "name": "Team Room One",
+    "sqm": 14,
+    "level": 2,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 4
+   },
+   {
+    "name": "Team Room Two",
+    "sqm": 14,
+    "level": 2,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 4
+   },
+   {
+    "name": "Courtyard",
+    "sqm": 0,
+    "roles": [],
+    "note": "outdoor, planting, pergola"
+   }
+  ]
+ },
+ "objectProps": "timber courtyard with a pergola, glass slider into reception, test lab bench with sensors, a printed sprint board, a status page read at a desk",
+ "members": [
+  {
+   "id": "chiara",
+   "name": "Chiara",
+   "function": "engineering",
+   "title": "Firmware lead",
+   "colour": "chart-1",
+   "room": "Open Office",
+   "ownsCore": true,
+   "lens": {
+    "role": "cto_eng_lead",
+    "personaResearch": "builder",
+    "comfort": 5,
+    "tone": "A bug report: short, exact, a little dry. Distrusts adjectives, respects a stated limit.",
+    "aiStance": "Heavy daily use, conditional trust. Wants checkable chores; fears the almost-right answer.",
+    "honestLimit": "He is the Core's admin on top of the job; never a CI run on screen; no parity or speed claims."
+   },
+   "companion": {
+    "name": "Sprocket",
+    "runtime": "Hermes",
+    "job": "Drafts the Friday test summary from the notes Chiara types to it.",
+    "personality": [
+     "steady",
+     "plain",
+     "exact"
+    ],
+    "voice": "v-warm-f",
+    "memory": false,
+    "limits": "Drafts only. Chiara reads and sends every summary."
+   },
+   "beats": [
+    "ftue-hello",
+    "open-repos",
+    "lab-notebook",
+    "lab-diagram",
+    "meet-summary"
+   ],
+   "apps": [
+    "ci-hermes",
+    "forgejo",
+    "jupyterlab",
+    "drawio"
+   ]
+  },
+  {
+   "id": "yusuf",
+   "name": "Yusuf",
+   "function": "engineering",
+   "title": "Test engineer",
+   "colour": "chart-2",
+   "room": "Test Lab",
+   "ownsCore": false,
+   "lens": {
+    "role": "software_engineer",
+    "personaResearch": "builder",
+    "comfort": 4,
+    "tone": "Fragments, jargon, deadpan. \"Repo is on the Core.\"",
+    "aiStance": "Uses it most days, does not brag, wants the diff.",
+    "honestLimit": "Whether work code moves is the company's decision; no CI run; no hosted-model parity."
+   },
+   "companion": null,
+   "beats": [
+    "open-ask",
+    "open-hand-off",
+    "lab-results"
+   ],
+   "apps": [
+    "open-webui",
+    "n8n",
+    "baserow"
+   ]
+  },
+  {
+   "id": "oona",
+   "name": "Oona",
+   "function": "design",
+   "title": "Product designer",
+   "colour": "chart-3",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "open-sketch",
+    "meet-demo",
+    "gal-diagrams"
+   ],
+   "apps": [
+    "excalidraw",
+    "drawio"
+   ]
+  },
+  {
+   "id": "dilnoza",
+   "name": "Dilnoza",
+   "function": "design",
+   "title": "Technical writer",
+   "colour": "chart-4",
+   "room": "Open Office Gallery",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "gal-manual",
+    "gal-translate",
+    "kitchen-first-week"
+   ],
+   "apps": [
+    "docmost",
+    "libretranslate"
+   ]
+  },
+  {
+   "id": "ewa",
+   "name": "Ewa",
+   "function": "it",
+   "title": "Company systems administrator",
+   "colour": "chart-5",
+   "room": "Comms Room",
+   "ownsCore": false,
+   "lens": {
+    "role": "it_admin",
+    "personaResearch": "new research, builder household chores",
+    "comfort": 5,
+    "tone": "Laconic, sceptical, log-line. Dry about users. \"Who got paged?\"",
+    "aiStance": "Uses it for scripts and ticket summaries, distrusts anything with admin rights.",
+    "honestLimit": "One box is one machine; \"This Machine Only\" opens an app's port to the whole network; no uptime, failover or support claim."
+   },
+   "companion": null,
+   "beats": [
+    "comms-status",
+    "comms-nudge",
+    "meet-list"
+   ],
+   "apps": [
+    "uptime-kuma",
+    "ntfy",
+    "docmost"
+   ]
+  },
+  {
+   "id": "hester",
+   "name": "Hester",
+   "function": "projects",
+   "title": "Programme manager",
+   "colour": "chart-1",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "field_project_lead",
+    "personaResearch": "contractor",
+    "comfort": 3,
+    "tone": "Plain, dry, unhurried. Fragments: \"Quote done. Photos in.\"",
+    "aiStance": "Pragmatic: the paperwork, not the trade.",
+    "honestLimit": "The site and the van are out of every scene; the office, the yard and the bench are the story."
+   },
+   "companion": null,
+   "beats": [
+    "open-chat",
+    "open-board",
+    "kitchen-wall",
+    "kitchen-rents"
+   ],
+   "apps": [
+    "mattermost",
+    "vikunja",
+    "wallos"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "comms",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Comms Room",
+   "title": "The comms room"
+  },
+  {
+   "id": "open",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office",
+   "title": "The open office"
+  },
+  {
+   "id": "lab",
+   "kind": "room",
+   "room": "workshop",
+   "roomName": "Test Lab",
+   "title": "The test lab"
+  },
+  {
+   "id": "meet",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Meeting Room A",
+   "title": "The meeting room"
+  },
+  {
+   "id": "gallery",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office Gallery",
+   "title": "The gallery desks"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Kitchen",
+   "title": "The kitchen"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel in the courtyard",
+   "seed": "A parcel waits under the courtyard pergola. Yusuf carries it past reception to the comms room, where Chiara has cleared a rack shelf.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Hester lifts the Core out, and Chiara reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Chiara plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Chiara opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the department network.",
+   "limit": "phone rows: Join the Core's own network; Choose the department network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Chiara picks Hermes, and the department adds Forgejo and Mattermost. Ewa watches each install.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "mattermost",
+    "forgejo"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "chiara",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Sprocket says hello",
+   "seed": "Chiara messages the agent she named Sprocket from her desk. Sprocket answers from the Core in the comms room.",
+   "limit": "note: Messages pass through the chat service you choose.",
+   "say": {
+    "speaker": "chiara",
+    "text": "Hello, Chiara. I draft the summaries. You send them."
+   },
+   "agent": "chiara",
+   "approval": "chiara",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "comms-status",
+   "chapter": "comms",
+   "member": "ewa",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "uptime-kuma",
+   "replaces": [],
+   "chips": [
+    "Uptime Kuma"
+   ],
+   "category": "it",
+   "film": true,
+   "title": "Her condition for the Core",
+   "seed": "Ewa agreed to the department's Core on one condition. Uptime Kuma checks its apps, and she reads its page each morning.",
+   "limit": "The sceptic is respected, not won over. Monitors, does not prevent. No uptime, failover or support claim. Do not describe the screen. No replaces chip: the market review marks Datadog and New Relic a stretch (full observability suites), and a sceptic would not say it. Uptime Kuma runs on the Core, so it cannot report the Core itself being down: it checks the apps; never \"monitors the Core\".",
+   "capabilityHint": "Watch your sites and services and get an alert when one goes down."
+  },
+  {
+   "id": "comms-nudge",
+   "chapter": "comms",
+   "member": "ewa",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ntfy",
+   "replaces": [],
+   "chips": [
+    "ntfy"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "A nudge when a check fails",
+   "seed": "ntfy puts a nudge on Ewa's laptop when a check fails. She reads it, walks to the comms room and looks.",
+   "limit": "Laptop only: no phone, no push, no remote. ntfy has no replaces chip. Do not claim anything about delivery. ntfy has no sign-in in this package: anyone on the network can read the topic. Browser notifications need a secure address; whether the Core's local address gives one is unverified: show a nudge, claim no delivery.",
+   "capabilityHint": "Send a push notification to your phone from any script or automation with one request."
+  },
+  {
+   "id": "open-repos",
+   "chapter": "open",
+   "member": "chiara",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "forgejo",
+   "replaces": [
+    "GitHub",
+    "GitLab (SaaS)"
+   ],
+   "chips": [
+    "Forgejo",
+    "replaces GitHub",
+    "replaces GitLab (SaaS)"
+   ],
+   "category": "engineering",
+   "film": true,
+   "title": "The firmware sits on the Core",
+   "seed": "Chiara moves the sensor firmware into Forgejo on the Core. The company's other code stays where its owners keep it.",
+   "limit": "The department moves its own repositories by the department head's decision, told as the department's. Never \"syncs with\" GitHub. No CI runner ships: never show a CI run.",
+   "bringHome": {
+    "from": "GitHub",
+    "carries": "repository code and history; issues and pull requests with a token",
+    "doesNot": "Actions workflows; stars; Discussions; Projects; Pages"
+   },
+   "capabilityHint": "Host your own Git repositories, issues and pull requests on your Core."
+  },
+  {
+   "id": "open-chat",
+   "chapter": "open",
+   "member": "hester",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "mattermost",
+   "replaces": [
+    "Slack",
+    "Discord"
+   ],
+   "chips": [
+    "Mattermost",
+    "replaces Slack",
+    "replaces Discord"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The department's own channel",
+   "seed": "The department talks in Mattermost on the office network. The rest of the company keeps its own chat, and Ewa knows which is which.",
+   "limit": "Email sign-up ships open: the admin closes it. Per-app accounts are Mattermost's own feature. Do not repeat \"secure collaboration\". The edge is the department, not the company.",
+   "capabilityHint": "Team chat with channels, threads and files that stays on your Core."
+  },
+  {
+   "id": "open-board",
+   "chapter": "open",
+   "member": "hester",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "vikunja",
+   "replaces": [
+    "Todoist",
+    "Asana"
+   ],
+   "chips": [
+    "Vikunja",
+    "replaces Todoist",
+    "replaces Asana"
+   ],
+   "category": "projects",
+   "film": true,
+   "title": "The sprint wall board",
+   "seed": "Hester runs the sprint board in Vikunja on the Core. A card is a sensor change, and it moves when the test run passes.",
+   "limit": "Its QA capture is a sign-in wall: show nothing. No importer claim for Asana.",
+   "capabilityHint": "Lists, boards and calendars for tasks, with reminders and recurring jobs."
+  },
+  {
+   "id": "open-sketch",
+   "chapter": "open",
+   "member": "oona",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "excalidraw",
+   "replaces": [
+    "Miro",
+    "Mural"
+   ],
+   "chips": [
+    "Excalidraw",
+    "replaces Miro",
+    "replaces Mural"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The enclosure, sketched first",
+   "seed": "Oona sketches the sensor enclosure in Excalidraw before she draws it properly. The sketch is a first pass, and nothing needs keeping.",
+   "limit": "amd64 only. Miro boards are redrawn, not converted. Excalidraw here is the editor plus a collaboration relay with no storage volume: it keeps nothing on the Core. Never \"saved\", \"kept\" or \"sits on the Core\"; no bring-your-data-home beat for it.",
+   "capabilityHint": "A whiteboard with a hand-drawn look. Sketch ideas together."
+  },
+  {
+   "id": "open-ask",
+   "chapter": "open",
+   "member": "yusuf",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "open-webui",
+   "replaces": [
+    "ChatGPT"
+   ],
+   "chips": [
+    "Open WebUI",
+    "replaces ChatGPT"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "A log line, explained",
+   "seed": "Yusuf asks a model on the Core to explain an odd line in a test log. He checks the answer against the code before he trusts it.",
+   "limit": "Local model only; the install form has a cloud-key field: never mention a key. No accuracy, speed or parity claim.",
+   "capabilityHint": "Chat with models running on your own Core, from any browser."
+  },
+  {
+   "id": "open-hand-off",
+   "chapter": "open",
+   "member": "yusuf",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "n8n",
+   "replaces": [
+    "Zapier",
+    "Make"
+   ],
+   "chips": [
+    "n8n",
+    "replaces Zapier",
+    "replaces Make"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "A finished run, a new row",
+   "seed": "When a test run finishes, n8n adds a row to the results table. Yusuf rebuilt each step by hand and reads the first rows himself.",
+   "limit": "Say \"source-available\", never \"open source\". Automations are rebuilt by hand; connections authorised again.",
+   "bringHome": {
+    "from": "Zapier",
+    "carries": "the idea of each automation, rebuilt",
+    "doesNot": "Zap definitions, run history, connection tokens"
+   },
+   "capabilityHint": "Connect your apps with workflows. 400 plus integrations, with the data staying on your Core."
+  },
+  {
+   "id": "lab-results",
+   "chapter": "lab",
+   "member": "yusuf",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "baserow",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Baserow",
+    "replaces Airtable"
+   ],
+   "category": "engineering",
+   "film": true,
+   "title": "Every test run, one table",
+   "seed": "Yusuf keeps every test run in a Baserow table on the Core. Each row is a sensor on the bench, with its last result.",
+   "limit": "The Airtable importer reads a shared base link, so the server talks to Airtable while it runs. Automations and interfaces are rebuilt. No measurement claim for the sensors.",
+   "bringHome": {
+    "from": "Airtable",
+    "carries": "tables, rows, field types, links and grid views",
+    "doesNot": "automations and interfaces; row comments; revision history"
+   },
+   "capabilityHint": "Build a no-code database for orders, inventory or projects."
+  },
+  {
+   "id": "lab-notebook",
+   "chapter": "lab",
+   "member": "chiara",
+   "anchor": {
+    "role": "workstation",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workbench",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "jupyterlab",
+   "replaces": [],
+   "chips": [
+    "JupyterLab"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "Field data, in a notebook",
+   "seed": "Chiara reads a season of field data in a notebook on the Core. The code runs on the Core, a few steps from the bench.",
+   "limit": "No replaces chip. One password at install. Installing a package reaches the internet. No result claim.",
+   "capabilityHint": "Write and run notebooks, code and data in a browser, on your Core."
+  },
+  {
+   "id": "lab-diagram",
+   "chapter": "lab",
+   "member": "chiara",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "drawio",
+   "replaces": [
+    "Lucidchart"
+   ],
+   "chips": [
+    "draw.io",
+    "replaces Lucidchart"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "The sensor wiring, drawn",
+   "seed": "Chiara draws the sensor wiring in draw.io and saves the file into the repository. The firmware and its diagram stay together.",
+   "limit": "draw.io is stateless: the file lives in the repository, never \"sits on the Core\" as an app.",
+   "bringHome": {
+    "from": "Lucidchart",
+    "carries": "shapes, connectors and text in most diagrams",
+    "doesNot": "data-linked shapes; comments and revision history; draw.io keeps no copy, the file is saved by the person"
+   },
+   "capabilityHint": "Draw flowcharts, floor plans and network maps in the browser."
+  },
+  {
+   "id": "meet-list",
+   "chapter": "meet",
+   "member": "ewa",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "docmost",
+   "replaces": [
+    "Notion",
+    "Confluence"
+   ],
+   "chips": [
+    "Docmost",
+    "replaces Notion",
+    "replaces Confluence"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "Ewa reads every line",
+   "seed": "The department keeps one page in Docmost of what its Core runs. Ewa reads every line and says yes or no to it.",
+   "limit": "IT decides what the floor runs: show the approval as a person reading, not a platform control. No SSO, roles or audit words. Say what stays on the company's suites.",
+   "bringHome": {
+    "from": "Notion",
+    "carries": "page text and nested structure; images and files in the export",
+    "doesNot": "comments and page history; sharing; databases (arrive as CSV)"
+   },
+   "capabilityHint": "A collaborative wiki for notes and documentation."
+  },
+  {
+   "id": "meet-summary",
+   "chapter": "meet",
+   "member": "chiara",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "communication",
+   "film": true,
+   "title": "Friday's summary, drafted",
+   "seed": "Sprocket drafts Friday's test summary from Chiara's notes. She reads it, trims a line and sends it herself.",
+   "limit": "Agent prepares, person approves. The channel is not local; email stays with the mail provider. Hermes trusts one messaging ID: Chiara's.",
+   "agent": "chiara",
+   "approval": "chiara",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "meet-demo",
+   "chapter": "meet",
+   "member": "oona",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "excalidraw",
+   "replaces": [
+    "Miro"
+   ],
+   "chips": [
+    "Excalidraw",
+    "replaces Miro"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The design, walked through",
+   "seed": "Oona walks the department through the new enclosure on the wall screen. The sketch behind it is the one she made that morning.",
+   "limit": "Do not describe the screen. Same app as open-sketch by design. Excalidraw here is the editor plus a collaboration relay with no storage volume: it keeps nothing on the Core. Never \"saved\", \"kept\" or \"sits on the Core\"; no bring-your-data-home beat for it.",
+   "capabilityHint": "A whiteboard with a hand-drawn look. Sketch ideas together."
+  },
+  {
+   "id": "gal-manual",
+   "chapter": "gallery",
+   "member": "dilnoza",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "docmost",
+   "replaces": [
+    "Confluence",
+    "Notion"
+   ],
+   "chips": [
+    "Docmost",
+    "replaces Confluence",
+    "replaces Notion"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The manual, as pages",
+   "seed": "Dilnoza writes the sensor manual as pages in Docmost on the Core. Each page is checked against the bench before it is saved.",
+   "limit": "Overlaps BookStack: one wiki per office. Never \"knowledge base\". No compliance, safety or certification claim in the manual text.",
+   "capabilityHint": "A collaborative wiki for notes and documentation."
+  },
+  {
+   "id": "gal-translate",
+   "chapter": "gallery",
+   "member": "dilnoza",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "libretranslate",
+   "replaces": [
+    "Google Translate",
+    "DeepL"
+   ],
+   "chips": [
+    "LibreTranslate",
+    "replaces Google Translate",
+    "replaces DeepL"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The manual in three languages",
+   "seed": "Dilnoza translates each manual page with LibreTranslate on the Core. A reader of each language checks the page before it ships.",
+   "limit": "Language models download first (installing uses the internet). No accuracy claim. Do not say \"offline\".",
+   "capabilityHint": "Translate text and documents on your own Core. Your words are not sent to a third party."
+  },
+  {
+   "id": "gal-diagrams",
+   "chapter": "gallery",
+   "member": "oona",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "drawio",
+   "replaces": [
+    "Microsoft Visio"
+   ],
+   "chips": [
+    "draw.io",
+    "replaces Microsoft Visio"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "Diagrams for the manual",
+   "seed": "Oona redraws the manual's diagrams in draw.io. The files sit next to the pages that use them.",
+   "limit": "draw.io is stateless: files live with the person or in the folder. VSDX imports; some stencils differ.",
+   "bringHome": {
+    "from": "Microsoft Visio",
+    "carries": "shapes, connectors and text in most diagrams",
+    "doesNot": "data graphics, macros and some stencils; layers and page behaviour; draw.io keeps no copy, the file is saved by the person"
+   },
+   "capabilityHint": "Draw flowcharts, floor plans and network maps in the browser."
+  },
+  {
+   "id": "kitchen-first-week",
+   "chapter": "kitchen",
+   "member": "dilnoza",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "docmost",
+   "replaces": [
+    "Notion"
+   ],
+   "chips": [
+    "Docmost",
+    "replaces Notion"
+   ],
+   "category": "people",
+   "film": false,
+   "title": "The first week, as pages",
+   "seed": "A new engineer's first week is a set of Docmost pages. Dilnoza walks him through them over coffee.",
+   "limit": "No HR or payroll claim. Same app by design.",
+   "capabilityHint": "A collaborative wiki for notes and documentation."
+  },
+  {
+   "id": "kitchen-wall",
+   "chapter": "kitchen",
+   "member": "hester",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "vikunja",
+   "replaces": [
+    "Todoist"
+   ],
+   "chips": [
+    "Vikunja",
+    "replaces Todoist"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The sprint, printed for the wall",
+   "seed": "The sprint board prints for the kitchen wall on Monday. Hester pins it up, and the pen marks are the team's own.",
+   "limit": "Printed paper reaches the wall; the Core does not. Same app as open-board by design.",
+   "capabilityHint": "Lists, boards and calendars for tasks, with reminders and recurring jobs."
+  },
+  {
+   "id": "kitchen-rents",
+   "chapter": "kitchen",
+   "member": "hester",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "wallos",
+   "replaces": [],
+   "chips": [
+    "Wallos"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "What the department rents",
+   "seed": "Hester keeps the list of the department's rented tools in Wallos, with the renewal dates. A printed copy sits by the coffee machine.",
+   "limit": "No price, no saving, no total. Wallos fetches logos from outside: do not show logos. No replaces chip.",
+   "capabilityHint": "Track every subscription you pay for and get a reminder before it renews."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to your department",
+   "seed": "One department keeps its firmware, test notes and manuals on one Core. The company keeps its own tools, and IT decides what runs where. Browse the Companion Hub store.",
+   "limit": "closing body: the honest edge; no capacity or headcount claim."
+  }
+ ],
+ "stack": [
+  {
+   "function": "engineering",
+   "people": [
+    "Chiara",
+    "Yusuf"
+   ],
+   "rows": [
+    {
+     "app": "ci-hermes",
+     "name": "Hermes",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "meet-summary"
+     ]
+    },
+    {
+     "app": "forgejo",
+     "name": "Forgejo",
+     "replaces": [
+      "GitHub",
+      "GitLab (SaaS)"
+     ],
+     "beats": [
+      "open-repos"
+     ]
+    },
+    {
+     "app": "open-webui",
+     "name": "Open WebUI",
+     "replaces": [
+      "ChatGPT"
+     ],
+     "beats": [
+      "open-ask"
+     ]
+    },
+    {
+     "app": "n8n",
+     "name": "n8n",
+     "replaces": [
+      "Zapier",
+      "Make"
+     ],
+     "beats": [
+      "open-hand-off"
+     ]
+    },
+    {
+     "app": "baserow",
+     "name": "Baserow",
+     "replaces": [
+      "Airtable"
+     ],
+     "beats": [
+      "lab-results"
+     ]
+    },
+    {
+     "app": "jupyterlab",
+     "name": "JupyterLab",
+     "replaces": [],
+     "beats": [
+      "lab-notebook"
+     ]
+    },
+    {
+     "app": "drawio",
+     "name": "draw.io",
+     "replaces": [
+      "Lucidchart"
+     ],
+     "beats": [
+      "lab-diagram"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "design",
+   "people": [
+    "Oona",
+    "Dilnoza"
+   ],
+   "rows": [
+    {
+     "app": "excalidraw",
+     "name": "Excalidraw",
+     "replaces": [
+      "Miro"
+     ],
+     "beats": [
+      "open-sketch",
+      "meet-demo"
+     ]
+    },
+    {
+     "app": "docmost",
+     "name": "Docmost",
+     "replaces": [
+      "Notion"
+     ],
+     "beats": [
+      "gal-manual",
+      "kitchen-first-week"
+     ]
+    },
+    {
+     "app": "libretranslate",
+     "name": "LibreTranslate",
+     "replaces": [
+      "Google Translate",
+      "DeepL"
+     ],
+     "beats": [
+      "gal-translate"
+     ]
+    },
+    {
+     "app": "drawio",
+     "name": "draw.io",
+     "replaces": [
+      "Microsoft Visio"
+     ],
+     "beats": [
+      "gal-diagrams"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "it",
+   "people": [
+    "Ewa"
+   ],
+   "rows": [
+    {
+     "app": "uptime-kuma",
+     "name": "Uptime Kuma",
+     "replaces": [],
+     "beats": [
+      "comms-status"
+     ]
+    },
+    {
+     "app": "ntfy",
+     "name": "ntfy",
+     "replaces": [],
+     "beats": [
+      "comms-nudge"
+     ]
+    },
+    {
+     "app": "docmost",
+     "name": "Docmost",
+     "replaces": [
+      "Notion",
+      "Confluence"
+     ],
+     "beats": [
+      "meet-list"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "projects",
+   "people": [
+    "Hester"
+   ],
+   "rows": [
+    {
+     "app": "mattermost",
+     "name": "Mattermost",
+     "replaces": [
+      "Slack",
+      "Discord"
+     ],
+     "beats": [
+      "open-chat"
+     ]
+    },
+    {
+     "app": "vikunja",
+     "name": "Vikunja",
+     "replaces": [
+      "Todoist"
+     ],
+     "beats": [
+      "open-board",
+      "kitchen-wall"
+     ]
+    },
+    {
+     "app": "wallos",
+     "name": "Wallos",
+     "replaces": [],
+     "beats": [
+      "kitchen-rents"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "open-repos",
+   "member": "chiara",
+   "app": "forgejo",
+   "from": "GitHub",
+   "carries": "repository code and history; issues and pull requests with a token",
+   "doesNot": "Actions workflows; stars; Discussions; Projects; Pages"
+  },
+  {
+   "beat": "open-hand-off",
+   "member": "yusuf",
+   "app": "n8n",
+   "from": "Zapier",
+   "carries": "the idea of each automation, rebuilt",
+   "doesNot": "Zap definitions, run history, connection tokens"
+  },
+  {
+   "beat": "lab-results",
+   "member": "yusuf",
+   "app": "baserow",
+   "from": "Airtable",
+   "carries": "tables, rows, field types, links and grid views",
+   "doesNot": "automations and interfaces; row comments; revision history"
+  },
+  {
+   "beat": "lab-diagram",
+   "member": "chiara",
+   "app": "drawio",
+   "from": "Lucidchart",
+   "carries": "shapes, connectors and text in most diagrams",
+   "doesNot": "data-linked shapes; comments and revision history; draw.io keeps no copy, the file is saved by the person"
+  },
+  {
+   "beat": "meet-list",
+   "member": "ewa",
+   "app": "docmost",
+   "from": "Notion",
+   "carries": "page text and nested structure; images and files in the export",
+   "doesNot": "comments and page history; sharing; databases (arrive as CSV)"
+  },
+  {
+   "beat": "gal-diagrams",
+   "member": "oona",
+   "app": "drawio",
+   "from": "Microsoft Visio",
+   "carries": "shapes, connectors and text in most diagrams",
+   "doesNot": "data graphics, macros and some stencils; layers and page behaviour; draw.io keeps no copy, the file is saved by the person"
+  }
+ ],
+ "rentedBefore": [
+  "GitHub",
+  "GitLab (SaaS)",
+  "Slack",
+  "Discord",
+  "Todoist",
+  "Asana",
+  "Miro",
+  "Mural",
+  "ChatGPT",
+  "Zapier",
+  "Make",
+  "Airtable",
+  "Lucidchart",
+  "Notion",
+  "Confluence",
+  "Google Translate",
+  "DeepL",
+  "Microsoft Visio"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "uptime-kuma",
+    "name": "Uptime Kuma",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "ntfy",
+    "name": "ntfy",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "forgejo",
+    "name": "Forgejo",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "mattermost",
+    "name": "Mattermost",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "vikunja",
+    "name": "Vikunja",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "excalidraw",
+    "name": "Excalidraw",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "open-webui",
+    "name": "Open WebUI",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "n8n",
+    "name": "n8n",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Sustainable Use (fair-code): say \"source-available\""
+   },
+   {
+    "id": "baserow",
+    "name": "Baserow",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "jupyterlab",
+    "name": "JupyterLab",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "drawio",
+    "name": "draw.io",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "docmost",
+    "name": "Docmost",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "libretranslate",
+    "name": "LibreTranslate",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "wallos",
+    "name": "Wallos",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   }
+  ],
+  "firstParty": [
+   "ci-hermes"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "comms-status",
+   "open-repos",
+   "open-board",
+   "lab-results",
+   "meet-summary",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 205,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Loamfield",
+   "address": "12 Furrow Lane, Ruddock Vale",
+   "tagline": "The product department of a sensor maker keeps its own tools on one Core.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "ewa",
+    "name": "Ewa",
+    "title": "Company systems administrator",
+    "hookBeat": "comms-status",
+    "hookTitle": "Her condition for the Core",
+    "chips": [
+     "Uptime Kuma"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "chiara",
+    "name": "Chiara",
+    "title": "Firmware lead",
+    "hookBeat": "open-repos",
+    "hookTitle": "The firmware sits on the Core",
+    "chips": [
+     "Forgejo",
+     "replaces GitHub",
+     "replaces GitLab (SaaS)"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "yusuf",
+    "name": "Yusuf",
+    "title": "Test engineer",
+    "hookBeat": "lab-results",
+    "hookTitle": "Every test run, one table",
+    "chips": [
+     "Baserow",
+     "replaces Airtable"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms"
+ ],
+ "doNotSay": [
+  "single sign-on",
+  "audit trail",
+  "support contract",
+  "the company runs on it",
+  "uptime or failover",
+  "a certification"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 27,
+  "ftue": 6,
+  "roomBeats": 20,
+  "film": 9,
+  "members": 6,
+  "apps": 15,
+  "thirdPartyApps": 14,
+  "replacedServices": 18,
+  "bringHomeBeats": 6,
+  "categories": [
+   "setup",
+   "it",
+   "engineering",
+   "communication",
+   "projects",
+   "design",
+   "documents",
+   "people",
+   "money"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "comms-status: \"Uptime Kuma checks it [the Core]\" cannot work (the monitor lives on the machine it would report down); now \"checks its apps\"; Datadog chip dropped",
+   "open-sketch, meet-demo: \"saved on the Core\" removed (Excalidraw keeps nothing on the Core)",
+   "draw.io bring-your-data-home rows say draw.io keeps no copy"
+  ],
+  "unverified": [
+   "ntfy notification on a local HTTP address (secure-context rule) unverified",
+   "Mattermost free-edition limits not verified (see Hartnoll)"
+  ]
+ }
+}

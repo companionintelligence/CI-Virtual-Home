@@ -41,7 +41,7 @@ const server = http.createServer((req, res) => { const f = path.join(ROOT, decod
 await new Promise<void>(resolve => server.listen(0, () => resolve()));
 const port = (server.address() as import('node:net').AddressInfo).port;
 const pw = await loadPlaywright();
-const browser = await pw.chromium.launch({ headless: true, args: ['--use-angle=metal', '--ignore-gpu-blocklist'] });
+const browser = await pw.chromium.launch({ headless: true, executablePath: fs.existsSync('/snap/bin/chromium') ? '/snap/bin/chromium' : undefined, args: ['--use-angle=metal', '--ignore-gpu-blocklist', '--no-sandbox'] });
 const page = await (await browser.newContext({ viewport: { width: 800, height: 600 } })).newPage();
 await page.goto(`http://localhost:${port}/room-creator.html`, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => typeof window.__housePropSheet === 'function');

@@ -22,7 +22,8 @@ export type RoomProgram =
   | 'bed-primary' | 'bed-kid' | 'bed-guest' | 'nursery'
   | 'bath' | 'ensuite' | 'powder'
   | 'study' | 'library' | 'den' | 'media' | 'playroom' | 'sunroom' | 'greenhouse'
-  | 'foyer' | 'hall' | 'laundry' | 'studio' | 'bar' | 'gym' | 'garage' | 'outdoor';
+  | 'foyer' | 'hall' | 'laundry' | 'studio' | 'bar' | 'gym' | 'garage' | 'outdoor'
+  | 'workspace' | 'meeting';
 
 /** A furniture style bundle (assets/house-styles.ts, published as content/house-styles.json). */
 export type StyleKey = 'modern' | 'farmhouse' | 'cottage' | 'mediterranean' | 'mid-century' | 'industrial' | 'scandi' | 'tropical' | 'craftsman';
@@ -73,7 +74,7 @@ export interface ComposeSpec {
   styleKey?: StyleKey;
   /** `use: 'office'` only (reference/office/office-contract-m0.md): `headcount`, the people on the floor the building is drawn for (the office
    *  validator holds the desks to it); `company`, the slug of the fictional company that works there. Not a story word: nothing prints either. */
-  office?: { headcount?: number; company?: string };
+  office?: { headcount?: number; company?: string; building?: string };
 }
 export interface ComposeLot {}
 export interface ComposePalette {}

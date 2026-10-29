@@ -1,0 +1,1513 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "posy-and-pail",
+ "wave": 2,
+ "sizeLabel": "Small business",
+ "company": {
+  "name": "Posy & Pail",
+  "tagline": "A flower shop and a wedding workroom, with one Core on the back-office desk.",
+  "sector": "Florist and wedding workroom",
+  "size": "small",
+  "scope": "company",
+  "headcount": 10,
+  "floor": 10,
+  "story": "Posy & Pail is a florist with a workroom behind the shop. Ten people sell flowers, arrange weddings and keep the books. The orders, the supplier papers and the contracts sit on one Companion Core in the back office.",
+  "address": {
+   "line": "14 Market Parade",
+   "place": "Tarnmouth"
+  },
+  "narrator": "v-clear-f"
+ },
+ "hookLine": "The newsletter list sits on the Core, in the shop.",
+ "arc": "The visual small business: a florist whose Core stands on a desk in the back office. Orders by phone and email, contracts at the consultation table, supplier papers scanned, the newsletter list kept in the shop. The person who \"holds the list\" owns the Core. Edge: no web shop, no online booking, no payments, no deliveries on screen; the van and the street are out of frame.",
+ "honestEdge": "Nothing is sold, booked or paid online in these scenes. Orders come by phone and email, and the mail leaves through the provider the shop already uses.",
+ "building": {
+  "id": "shop-backoffice",
+  "display": "Awning Corner",
+  "concept": "High-street brick terrace unit: glazed shop front with green awnings, a fascia strip (blank, no lettering), a closed neighbour unit (spike exists, reads as a shop from the street). Interior needs retail props (P2, about 3 d); fans off.",
+  "exterior": "shopfront",
+  "storeys": 1,
+  "areaSqm": 125,
+  "seats": 8,
+  "core": {
+   "room": "Back Office",
+   "surface": "desk (hero.surface: desk), chalk Core, no books",
+   "note": "The contract's office-rooms rule must accept a Back Office holding the Core for retail (engine decision 4). 3.6 x 3.6 m minimum. The spike's back office reads as a home study: dress it as a desk with files and a printer."
+  },
+  "route": "double glazed door under the awning, Shop Floor, the Back Office door, orbit.",
+  "rooms": [
+   {
+    "name": "Shop Floor",
+    "sqm": 52,
+    "roles": [
+     "workfloor"
+    ],
+    "program": "shop",
+    "note": "wall shelving, display tables, cash counter near the door"
+   },
+   {
+    "name": "Consultation Room",
+    "sqm": 12,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 4,
+    "note": "glass partition from the shop floor"
+   },
+   {
+    "name": "Back Office",
+    "sqm": 14,
+    "roles": [
+     "server",
+     "office"
+    ],
+    "core": true,
+    "program": "study"
+   },
+   {
+    "name": "Workroom",
+    "sqm": 22,
+    "roles": [
+     "workshop"
+    ],
+    "program": "garage",
+    "note": "workbench run, buckets, recipe sheets"
+   },
+   {
+    "name": "Stockroom",
+    "sqm": 10,
+    "roles": [
+     "store"
+    ],
+    "program": "supply"
+   },
+   {
+    "name": "Staff Kitchenette",
+    "sqm": 12,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Neighbour Unit",
+    "sqm": 48,
+    "roles": [],
+    "note": "closed, blinds"
+   }
+  ]
+ },
+ "objectProps": "buckets of stems, wall shelving, a bench with recipe sheets, the consultation table, a green awning",
+ "members": [
+  {
+   "id": "rosa",
+   "name": "Rosa",
+   "function": "owner",
+   "title": "Owner and head florist",
+   "colour": "chart-1",
+   "room": "Workroom",
+   "ownsCore": false,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": null,
+   "beats": [
+    "consult-sign",
+    "work-recipes",
+    "work-board"
+   ],
+   "apps": [
+    "docuseal",
+    "libreoffice",
+    "planka"
+   ]
+  },
+  {
+   "id": "katya",
+   "name": "Katya",
+   "function": "marketing",
+   "title": "Shop and newsletter lead",
+   "colour": "chart-2",
+   "room": "Back Office",
+   "ownsCore": true,
+   "lens": {
+    "role": "marketing",
+    "personaResearch": "marketer",
+    "comfort": 3,
+    "tone": "Practical, sceptical of gurus, short. \"Who holds the list?\"",
+    "aiStance": "Pragmatic, quietly pleased, careful who is told.",
+    "honestLimit": "Posts still go out to the platform; mail still leaves through a sender; no result, time or money claim."
+   },
+   "companion": {
+    "name": "Pennant",
+    "runtime": "Hermes",
+    "job": "Drafts notes to growers and the shop's newsletter intro from what Katya types to it.",
+    "personality": [
+     "bright",
+     "brisk",
+     "tidy"
+    ],
+    "voice": "v-storyteller-m",
+    "memory": false,
+    "limits": "Drafts only. Katya reads and sends every note."
+   },
+   "beats": [
+    "ftue-hello",
+    "back-dns",
+    "back-pennant",
+    "shop-list",
+    "kitchen-season"
+   ],
+   "apps": [
+    "ci-hermes",
+    "pi-hole",
+    "listmonk",
+    "ci-planning"
+   ]
+  },
+  {
+   "id": "olu",
+   "name": "Olu",
+   "function": "operations",
+   "title": "Shop manager",
+   "colour": "chart-3",
+   "room": "Shop Floor",
+   "ownsCore": false,
+   "lens": {
+    "role": "office_manager",
+    "personaResearch": "organiser",
+    "comfort": 3,
+    "tone": "Brisk, list-making, kind. Triages out loud. Humour about the printer.",
+    "aiStance": "Quiet user for notices and summaries. Not proud, not hiding. [?] no role survey",
+    "honestLimit": "Accounts are made app by app by whoever looks after each app; the Core is not a managed service."
+   },
+   "companion": null,
+   "beats": [
+    "shop-orders",
+    "shop-stock",
+    "kitchen-rota"
+   ],
+   "apps": [
+    "grist",
+    "baikal"
+   ]
+  },
+  {
+   "id": "eamon",
+   "name": "Eamon",
+   "function": "sales",
+   "title": "Events consultant",
+   "colour": "chart-4",
+   "room": "Consultation Room",
+   "ownsCore": false,
+   "lens": {
+    "role": "sales_bd",
+    "personaResearch": "business-owner and marketer",
+    "comfort": 3,
+    "tone": "Quick, numbers first, upbeat on the surface and dry underneath.",
+    "aiStance": "Heaviest adopter and proudest by reputation [?]; script slower than they talk.",
+    "honestLimit": "Reps away from the office are out of every scene; the CRM is the office's, not a per-rep platform account."
+   },
+   "companion": null,
+   "beats": [
+    "shop-clients",
+    "shop-follow",
+    "consult-quote",
+    "consult-letter",
+    "consult-diary"
+   ],
+   "apps": [
+    "espocrm",
+    "invoice-ninja",
+    "libreoffice",
+    "baikal"
+   ]
+  },
+  {
+   "id": "maren",
+   "name": "Maren",
+   "function": "finance",
+   "title": "Part-time bookkeeper",
+   "colour": "chart-5",
+   "room": "Back Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "finance_bookkeeping",
+    "personaResearch": "business-owner and organiser",
+    "comfort": 3,
+    "tone": "Exact, dry, deadline-led. Numbers are not adjectives.",
+    "aiStance": "Cautious. \"I read every line.\"",
+    "honestLimit": "Bookkeeping tools, never accounting, tax or legal advice; no payroll, no bank feeds; never tell anyone to leave their accountant."
+   },
+   "companion": null,
+   "beats": [
+    "back-invoices",
+    "back-statement",
+    "stock-notes"
+   ],
+   "apps": [
+    "papra",
+    "invoice-ninja"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "back",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Back Office",
+   "title": "The back office"
+  },
+  {
+   "id": "shop",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Shop Floor",
+   "title": "The shop floor"
+  },
+  {
+   "id": "consult",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Consultation Room",
+   "title": "The consultation room"
+  },
+  {
+   "id": "work",
+   "kind": "room",
+   "room": "workshop",
+   "roomName": "Workroom",
+   "title": "The workroom"
+  },
+  {
+   "id": "stock",
+   "kind": "room",
+   "room": "store",
+   "roomName": "Stockroom",
+   "title": "The stockroom"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Staff Kitchenette",
+   "title": "The staff kitchenette"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel between the buckets",
+   "seed": "A parcel waits inside the shop door, between the buckets. Olu carries it through the workroom to the back office, where Katya clears the desk.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Rosa lifts the Core out, and Katya reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Katya plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Katya opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the shop network.",
+   "limit": "phone rows: Join the Core's own network; Choose the shop network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Katya picks Hermes, and the shop adds EspoCRM and Grist. Then the morning order gets placed.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "espocrm",
+    "grist"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "katya",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Pennant says hello",
+   "seed": "Katya messages the agent she named Pennant from the back office. Pennant answers from the Core on the desk beside her.",
+   "limit": "note: Messages pass through the chat service you choose.",
+   "say": {
+    "speaker": "katya",
+    "text": "Hello, Katya. I draft the notes. You send them."
+   },
+   "agent": "katya",
+   "approval": "katya",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "back-dns",
+   "chapter": "back",
+   "member": "katya",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "pi-hole",
+   "replaces": [
+    "AdGuard",
+    "NextDNS"
+   ],
+   "chips": [
+    "Pi-hole",
+    "replaces AdGuard",
+    "replaces NextDNS"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "Known trackers, blocked at the shop",
+   "seed": "Pi-hole blocks known ad and tracker domains for the devices pointed at it. Katya makes no promise beyond that.",
+   "limit": "No safety or protection promise. Blocks ad and tracker domains only. The package publishes DNS on port 8053, not 53: never say the shop network uses it or \"answers the shop's name lookups\". If the Core is off those devices lose lookups.",
+   "capabilityHint": "Block ads, trackers and bad domains for every device on your network at the DNS level."
+  },
+  {
+   "id": "back-pennant",
+   "chapter": "back",
+   "member": "katya",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "communication",
+   "film": true,
+   "title": "A note to the grower",
+   "seed": "Pennant drafts the standing-order note to the grower. Katya reads it, changes a line and sends it herself.",
+   "limit": "Agent prepares, person approves; contacting a supplier needs the approval in the beat. The channel is not local. No result claim.",
+   "agent": "katya",
+   "approval": "katya",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "back-invoices",
+   "chapter": "back",
+   "member": "maren",
+   "anchor": {
+    "role": "desk",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "papra",
+   "replaces": [
+    "Evernote",
+    "Google Drive"
+   ],
+   "chips": [
+    "Papra",
+    "replaces Evernote",
+    "replaces Google Drive"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "Supplier invoices, scanned",
+   "seed": "Maren scans the supplier invoices into Papra on the Core. A search for a grower's name finds every invoice in one list.",
+   "limit": "Write \"Papra\" exactly. PDFs and scans; no text-recognition quality claim. Email, the bank and the pay service stay with the services that run them.",
+   "capabilityHint": "Archive the receipts, warranties and contracts you rarely look at, until you need them."
+  },
+  {
+   "id": "back-statement",
+   "chapter": "back",
+   "member": "maren",
+   "anchor": {
+    "role": "desk",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "invoice-ninja",
+   "replaces": [
+    "QuickBooks",
+    "FreshBooks"
+   ],
+   "chips": [
+    "Invoice Ninja",
+    "replaces QuickBooks",
+    "replaces FreshBooks"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "The hotel's monthly statement",
+   "seed": "Maren raises the monthly statement for the hotel account in Invoice Ninja. The statement is a PDF she prints and posts.",
+   "limit": "Invoicing, not payment processing; no card payments. Emailing needs SMTP. No ledger. Elastic License 2.0: never \"open source\".",
+   "bringHome": {
+    "from": "QuickBooks",
+    "carries": "customers and invoices as CSV per data type",
+    "doesNot": "the full books; the pay service; bank feeds"
+   },
+   "capabilityHint": "Send invoices and quotes, track expenses and time, and get paid."
+  },
+  {
+   "id": "shop-orders",
+   "chapter": "shop",
+   "member": "olu",
+   "anchor": {
+    "role": "counter",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "grist",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Grist",
+    "replaces Airtable"
+   ],
+   "category": "projects",
+   "film": true,
+   "title": "The week's order, one table",
+   "seed": "Olu keeps the week's flower order in a Grist table on the Core. Every grower has a column, and Monday's counts go in beside it.",
+   "limit": "Airtable import is Baserow's, not Grist's: say what was rebuilt. Grist is sentence-initial safe only as the app. In this Hub package Grist has one default sign-in (GRIST_DEFAULT_EMAIL) and no login provider: never per-person Grist accounts, never who sees which rows.",
+   "bringHome": {
+    "from": "Airtable",
+    "carries": "tables rebuilt by hand or by CSV; no importer claimed for Grist",
+    "doesNot": "automations and interfaces; row comments; revision history"
+   },
+   "capabilityHint": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+  },
+  {
+   "id": "shop-stock",
+   "chapter": "shop",
+   "member": "olu",
+   "anchor": {
+    "role": "counter",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "grist",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Grist",
+    "replaces Airtable"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "Monday's stem counts",
+   "seed": "On Monday Olu counts the stems by the cold door and types the counts into the same Grist table. Gaps show before the order goes.",
+   "limit": "Do not claim accuracy or waste reduction. No figure for money or time. In this Hub package Grist has one default sign-in (GRIST_DEFAULT_EMAIL) and no login provider: never per-person Grist accounts, never who sees which rows.",
+   "capabilityHint": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+  },
+  {
+   "id": "shop-list",
+   "chapter": "shop",
+   "member": "katya",
+   "anchor": {
+    "role": "counter",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "listmonk",
+   "replaces": [
+    "Mailchimp"
+   ],
+   "chips": [
+    "Listmonk",
+    "replaces Mailchimp"
+   ],
+   "category": "marketing",
+   "film": true,
+   "title": "The list sits on the Core",
+   "seed": "Katya keeps the shop's newsletter list in Listmonk on the Core. The mail itself leaves through the sender she picks.",
+   "limit": "Never promise delivery or opens. An SMTP provider is set inside the app. Mailchimp campaigns, templates and automations do not move.",
+   "bringHome": {
+    "from": "Mailchimp",
+    "carries": "subscriber emails and CSV fields",
+    "doesNot": "campaigns and templates; automations and segments; reports; sending reputation starts again"
+   },
+   "capabilityHint": "Write and send newsletters to your own mailing list."
+  },
+  {
+   "id": "shop-clients",
+   "chapter": "shop",
+   "member": "eamon",
+   "anchor": {
+    "role": "counter",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "espocrm",
+   "replaces": [
+    "Salesforce"
+   ],
+   "chips": [
+    "EspoCRM",
+    "replaces Salesforce"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "Each wedding, one row",
+   "seed": "Eamon keeps every wedding enquiry in EspoCRM on the Core. Each couple has a row, a date and the notes from the tasting.",
+   "limit": "Web interface only. Enquiries arrive by phone and email: no booking page or public form. Never show a real-looking list.",
+   "bringHome": {
+    "from": "Salesforce",
+    "carries": "accounts and contacts as CSV rows with fields mapped",
+    "doesNot": "automations and reports; sharing rules; activity history"
+   },
+   "capabilityHint": "Manage customers, sales pipelines, campaigns and support cases in a CRM you host."
+  },
+  {
+   "id": "shop-follow",
+   "chapter": "shop",
+   "member": "eamon",
+   "anchor": {
+    "role": "counter",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "espocrm",
+   "replaces": [
+    "Salesforce"
+   ],
+   "chips": [
+    "EspoCRM",
+    "replaces Salesforce"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "After the tasting, a note",
+   "seed": "After a tasting Eamon adds a note to the couple's row. The next call starts from what they chose.",
+   "limit": "Same app by design. No claim about conversion or results.",
+   "capabilityHint": "Manage customers, sales pipelines, campaigns and support cases in a CRM you host."
+  },
+  {
+   "id": "consult-sign",
+   "chapter": "consult",
+   "member": "rosa",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "docuseal",
+   "replaces": [
+    "DocuSign"
+   ],
+   "chips": [
+    "Docuseal",
+    "replaces DocuSign"
+   ],
+   "category": "customers",
+   "film": true,
+   "title": "The contract, signed at the table",
+   "seed": "Rosa and a couple sign the wedding contract at the consultation table. DocuSeal keeps the signed copy on the Core.",
+   "limit": "Never \"legally binding\" or \"valid\". The couple is in the room; signers outside the office cannot reach the Core.",
+   "capabilityHint": "Fill and sign PDF forms on any device, from your own Core."
+  },
+  {
+   "id": "consult-quote",
+   "chapter": "consult",
+   "member": "eamon",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "invoice-ninja",
+   "replaces": [
+    "QuickBooks",
+    "FreshBooks"
+   ],
+   "chips": [
+    "Invoice Ninja",
+    "replaces QuickBooks",
+    "replaces FreshBooks"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "A quote, written while they choose",
+   "seed": "Eamon writes the wedding quote in Invoice Ninja while the couple choose. The quote sits on the Core with the contract.",
+   "limit": "No amounts anywhere. Invoicing, not payment processing.",
+   "capabilityHint": "Send invoices and quotes, track expenses and time, and get paid."
+  },
+  {
+   "id": "consult-letter",
+   "chapter": "consult",
+   "member": "eamon",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "libreoffice",
+   "replaces": [
+    "Microsoft Office"
+   ],
+   "chips": [
+    "LibreOffice",
+    "replaces Microsoft Office"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The order of the day, typed",
+   "seed": "Eamon types the order of the day for the wedding in LibreOffice on the Core. A printed copy goes into the couple's folder.",
+   "limit": "One streamed desktop session, not co-editing. Name the suite, not features.",
+   "capabilityHint": "The LibreOffice suite (Writer, Calc and more) in your browser."
+  },
+  {
+   "id": "consult-diary",
+   "chapter": "consult",
+   "member": "eamon",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "baikal",
+   "replaces": [
+    "Google Calendar",
+    "iCloud Calendar"
+   ],
+   "chips": [
+    "Baikal",
+    "replaces Google Calendar",
+    "replaces iCloud Calendar"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The consultation diary",
+   "seed": "The consultation diary is a Baikal calendar the whole shop reads. Eamon adds each tasting, and nobody books the table twice.",
+   "limit": "A CalDAV client is the way in; invitations from outside people stay with the mail provider. Overlaps Radicale: name one. No public booking.",
+   "bringHome": {
+    "from": "Google Calendar",
+    "carries": "events, times, recurrence and attendees from the .ics file",
+    "doesNot": "sharing settings; Meet links; Tasks"
+   },
+   "capabilityHint": "A small CalDAV and CardDAV server for your calendars and contacts."
+  },
+  {
+   "id": "work-recipes",
+   "chapter": "work",
+   "member": "rosa",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "printer",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "libreoffice",
+   "replaces": [
+    "Microsoft Office"
+   ],
+   "chips": [
+    "LibreOffice",
+    "replaces Microsoft Office"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Each arrangement, a recipe sheet",
+   "seed": "Rosa writes each arrangement as a recipe sheet in LibreOffice. The printed sheet hangs above the bench while the stems go in.",
+   "limit": "Name the suite, not features. Layout can differ from Office files.",
+   "capabilityHint": "The LibreOffice suite (Writer, Calc and more) in your browser."
+  },
+  {
+   "id": "work-board",
+   "chapter": "work",
+   "member": "rosa",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workbench",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "planka",
+   "replaces": [
+    "Trello"
+   ],
+   "chips": [
+    "Planka",
+    "replaces Trello"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The wedding week, on a board",
+   "seed": "Each wedding is a card on a Planka board above the workbench. Rosa moves it as the flowers arrive and the bouquets are done.",
+   "limit": "Trello JSON carries lists, cards, labels, checklists and comments; attachments and members unverified. Licence unasserted: never \"open source\".",
+   "bringHome": {
+    "from": "Trello",
+    "carries": "lists, cards, labels, checklists, comments",
+    "doesNot": "Power-Ups and automations; attachments and members (check one board first)"
+   },
+   "capabilityHint": "A real-time Kanban board for a team or a family project."
+  },
+  {
+   "id": "stock-notes",
+   "chapter": "stock",
+   "member": "maren",
+   "anchor": {
+    "role": "bookshelf",
+    "room": "store",
+    "fallback": [
+     {
+      "role": "counter",
+      "room": "store"
+     },
+     {
+      "role": "room",
+      "room": "store"
+     }
+    ]
+   },
+   "app": "papra",
+   "replaces": [
+    "Evernote"
+   ],
+   "chips": [
+    "Papra",
+    "replaces Evernote"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Delivery notes, filed by grower",
+   "seed": "Maren files each delivery note in Papra when the boxes come in. The paper copy goes in the stockroom tray.",
+   "limit": "Write \"Papra\" exactly. No claim about matching or checking.",
+   "capabilityHint": "Archive the receipts, warranties and contracts you rarely look at, until you need them."
+  },
+  {
+   "id": "kitchen-rota",
+   "chapter": "kitchen",
+   "member": "olu",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "baikal",
+   "replaces": [
+    "Google Calendar"
+   ],
+   "chips": [
+    "Baikal",
+    "replaces Google Calendar"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The delivery rota, by the kettle",
+   "seed": "The delivery rota is a Baikal calendar, and a printed copy hangs by the kettle. Olu changes it when a driver swaps a day.",
+   "limit": "The van and the roads are out of frame: only the rota is shown. No mobile or tracking claim.",
+   "capabilityHint": "A small CalDAV and CardDAV server for your calendars and contacts."
+  },
+  {
+   "id": "kitchen-season",
+   "chapter": "kitchen",
+   "member": "katya",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "ci-planning",
+   "replaces": [],
+   "chips": [
+    "Companion Planning"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The season, on one page",
+   "seed": "Katya lays the season out on one page in Companion Planning on the Core. Mother's Day and the wedding weeks get their time first.",
+   "limit": "An owner's planner, not a team calendar (one owner account). Google sync is off by default; do not say it never touches Google. Crash-report disclosure applies.",
+   "capabilityHint": "Plan tasks and time blocks in one local file on your Core. Briefings from a local model are optional."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to your shop",
+   "seed": "The orders, the supplier papers and the wedding contracts now sit on one desk in the back office. Browse the Companion Hub store and pick your first apps.",
+   "limit": "closing body."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Rosa"
+   ],
+   "rows": [
+    {
+     "app": "docuseal",
+     "name": "Docuseal",
+     "replaces": [
+      "DocuSign"
+     ],
+     "beats": [
+      "consult-sign"
+     ]
+    },
+    {
+     "app": "libreoffice",
+     "name": "LibreOffice",
+     "replaces": [
+      "Microsoft Office"
+     ],
+     "beats": [
+      "work-recipes"
+     ]
+    },
+    {
+     "app": "planka",
+     "name": "Planka",
+     "replaces": [
+      "Trello"
+     ],
+     "beats": [
+      "work-board"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "marketing",
+   "people": [
+    "Katya"
+   ],
+   "rows": [
+    {
+     "app": "ci-hermes",
+     "name": "Hermes",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "back-pennant"
+     ]
+    },
+    {
+     "app": "pi-hole",
+     "name": "Pi-hole",
+     "replaces": [
+      "AdGuard",
+      "NextDNS"
+     ],
+     "beats": [
+      "back-dns"
+     ]
+    },
+    {
+     "app": "listmonk",
+     "name": "Listmonk",
+     "replaces": [
+      "Mailchimp"
+     ],
+     "beats": [
+      "shop-list"
+     ]
+    },
+    {
+     "app": "ci-planning",
+     "name": "Companion Planning",
+     "replaces": [],
+     "beats": [
+      "kitchen-season"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "operations",
+   "people": [
+    "Olu"
+   ],
+   "rows": [
+    {
+     "app": "grist",
+     "name": "Grist",
+     "replaces": [
+      "Airtable"
+     ],
+     "beats": [
+      "shop-orders",
+      "shop-stock"
+     ]
+    },
+    {
+     "app": "baikal",
+     "name": "Baikal",
+     "replaces": [
+      "Google Calendar"
+     ],
+     "beats": [
+      "kitchen-rota"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "sales",
+   "people": [
+    "Eamon"
+   ],
+   "rows": [
+    {
+     "app": "espocrm",
+     "name": "EspoCRM",
+     "replaces": [
+      "Salesforce"
+     ],
+     "beats": [
+      "shop-clients",
+      "shop-follow"
+     ]
+    },
+    {
+     "app": "invoice-ninja",
+     "name": "Invoice Ninja",
+     "replaces": [
+      "QuickBooks",
+      "FreshBooks"
+     ],
+     "beats": [
+      "consult-quote"
+     ]
+    },
+    {
+     "app": "libreoffice",
+     "name": "LibreOffice",
+     "replaces": [
+      "Microsoft Office"
+     ],
+     "beats": [
+      "consult-letter"
+     ]
+    },
+    {
+     "app": "baikal",
+     "name": "Baikal",
+     "replaces": [
+      "Google Calendar",
+      "iCloud Calendar"
+     ],
+     "beats": [
+      "consult-diary"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "finance",
+   "people": [
+    "Maren"
+   ],
+   "rows": [
+    {
+     "app": "papra",
+     "name": "Papra",
+     "replaces": [
+      "Evernote"
+     ],
+     "beats": [
+      "back-invoices",
+      "stock-notes"
+     ]
+    },
+    {
+     "app": "invoice-ninja",
+     "name": "Invoice Ninja",
+     "replaces": [
+      "QuickBooks",
+      "FreshBooks"
+     ],
+     "beats": [
+      "back-statement"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "back-statement",
+   "member": "maren",
+   "app": "invoice-ninja",
+   "from": "QuickBooks",
+   "carries": "customers and invoices as CSV per data type",
+   "doesNot": "the full books; the pay service; bank feeds"
+  },
+  {
+   "beat": "shop-orders",
+   "member": "olu",
+   "app": "grist",
+   "from": "Airtable",
+   "carries": "tables rebuilt by hand or by CSV; no importer claimed for Grist",
+   "doesNot": "automations and interfaces; row comments; revision history"
+  },
+  {
+   "beat": "shop-list",
+   "member": "katya",
+   "app": "listmonk",
+   "from": "Mailchimp",
+   "carries": "subscriber emails and CSV fields",
+   "doesNot": "campaigns and templates; automations and segments; reports; sending reputation starts again"
+  },
+  {
+   "beat": "shop-clients",
+   "member": "eamon",
+   "app": "espocrm",
+   "from": "Salesforce",
+   "carries": "accounts and contacts as CSV rows with fields mapped",
+   "doesNot": "automations and reports; sharing rules; activity history"
+  },
+  {
+   "beat": "consult-diary",
+   "member": "eamon",
+   "app": "baikal",
+   "from": "Google Calendar",
+   "carries": "events, times, recurrence and attendees from the .ics file",
+   "doesNot": "sharing settings; Meet links; Tasks"
+  },
+  {
+   "beat": "work-board",
+   "member": "rosa",
+   "app": "planka",
+   "from": "Trello",
+   "carries": "lists, cards, labels, checklists, comments",
+   "doesNot": "Power-Ups and automations; attachments and members (check one board first)"
+  }
+ ],
+ "rentedBefore": [
+  "AdGuard",
+  "NextDNS",
+  "Evernote",
+  "Google Drive",
+  "QuickBooks",
+  "FreshBooks",
+  "Airtable",
+  "Mailchimp",
+  "Salesforce",
+  "DocuSign",
+  "Microsoft Office",
+  "Google Calendar",
+  "iCloud Calendar",
+  "Trello"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "pi-hole",
+    "name": "Pi-hole",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "papra",
+    "name": "Papra",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "invoice-ninja",
+    "name": "Invoice Ninja",
+    "storySafe": "with-caveat",
+    "qa": "screenshot",
+    "licence": "Elastic License 2.0 (source-available)"
+   },
+   {
+    "id": "grist",
+    "name": "Grist",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "listmonk",
+    "name": "Listmonk",
+    "storySafe": "with-caveat",
+    "qa": "screenshot"
+   },
+   {
+    "id": "espocrm",
+    "name": "EspoCRM",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "docuseal",
+    "name": "Docuseal",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "libreoffice",
+    "name": "LibreOffice",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "baikal",
+    "name": "Baikal",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "planka",
+    "name": "Planka",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "PLANKA Community License, Fair Use License 1.1 (source-available): internal use in an organisation is permitted; accounts may not be shared with outside parties"
+   }
+  ],
+  "firstParty": [
+   "ci-hermes",
+   "ci-planning"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "back-pennant",
+   "back-invoices",
+   "shop-orders",
+   "shop-list",
+   "consult-sign",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 204,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Posy & Pail",
+   "address": "14 Market Parade, Tarnmouth",
+   "tagline": "A flower shop and a wedding workroom, with one Core on the back-office desk.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "katya",
+    "name": "Katya",
+    "title": "Shop and newsletter lead",
+    "hookBeat": "shop-list",
+    "hookTitle": "The list sits on the Core",
+    "chips": [
+     "Listmonk",
+     "replaces Mailchimp"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "rosa",
+    "name": "Rosa",
+    "title": "Owner and head florist",
+    "hookBeat": "consult-sign",
+    "hookTitle": "The contract, signed at the table",
+    "chips": [
+     "Docuseal",
+     "replaces DocuSign"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "maren",
+    "name": "Maren",
+    "title": "Part-time bookkeeper",
+    "hookBeat": "back-invoices",
+    "hookTitle": "Supplier invoices, scanned",
+    "chips": [
+     "Papra",
+     "replaces Evernote",
+     "replaces Google Drive"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms",
+  "not-advice"
+ ],
+ "doNotSay": [
+  "web shop",
+  "online booking",
+  "payments",
+  "delivery tracking",
+  "prices or totals"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 25,
+  "ftue": 6,
+  "roomBeats": 18,
+  "film": 9,
+  "members": 5,
+  "apps": 12,
+  "thirdPartyApps": 10,
+  "replacedServices": 14,
+  "bringHomeBeats": 6,
+  "categories": [
+   "setup",
+   "it",
+   "communication",
+   "money",
+   "projects",
+   "marketing",
+   "customers",
+   "documents"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "tagline: \"Ten people ... on one Core\" put a head count and the Core together; reworded",
+   "back-dns: same Pi-hole correction as Gutterfold; title \"The shop's name lookups\" -> \"Known trackers, blocked at the shop\"",
+   "work-recipes: dropped \"replaces Google Workspace\"",
+   "Grist one-sign-in limit and the Planka licence note added",
+   "hook line and titles: \"stay in the office/studio/shop\" is a place claim wider than the canon's \"sits on the Core\" (and a sent newsletter hands its addresses to the mail provider); now \"sit on the Core\""
+  ],
+  "unverified": [
+   "Listmonk subscriber consent: a moved list carries addresses, not proof of consent; no beat claims otherwise",
+   "Papra cut chips \"replaces Evernote, replaces Google Drive\" are the store's pairs but the market review calls them a loose fit: O13"
+  ]
+ }
+}

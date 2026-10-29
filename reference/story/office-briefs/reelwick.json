@@ -1,0 +1,1629 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "reelwick",
+ "wave": 1,
+ "sizeLabel": "Startup",
+ "company": {
+  "name": "Reelwick",
+  "tagline": "Six people, one product, and one Companion Core in the comms room.",
+  "sector": "Software for independent cinemas",
+  "size": "startup",
+  "scope": "company",
+  "headcount": 6,
+  "floor": 6,
+  "story": "Reelwick writes schedule and rota software for independent cinemas. Six people share one brick bay. The code, the handbook, the contact list and the logins all sit on one Companion Core.",
+  "address": {
+   "line": "2 Maltings Yard",
+   "place": "Ostley Wick"
+  },
+  "narrator": "v-clear-f"
+ },
+ "hookLine": "Where does your customer list live?",
+ "arc": "Six people, one list. The founder writes what the company rents on the whiteboard; the CTO, who is the one who installs the apps, moves the working memory of the company (code, contacts, handbook, logins) onto one shelf. Edge: the product itself runs where it runs; a security questionnaire from a first big customer is a different problem and is not touched.",
+ "honestEdge": "The product runs in a cloud account that the Core does not replace. What moved is the company's own working memory.",
+ "building": {
+  "id": "startup-loft",
+  "display": "Brickworks Bay",
+  "concept": "Converted brick warehouse bay: red brick, arched steel windows, parapet, closed neighbour bay (spike exists, 0 shot errors).",
+  "exterior": "brick bay",
+  "storeys": 1,
+  "areaSqm": 96,
+  "seats": 8,
+  "core": {
+   "room": "Comms Room",
+   "surface": "wall shelf, chalk Core on a blue-grey wall, no books on the shelf",
+   "note": "Make the Comms Room 3.6 x 3.6 m (the spike's 3 x 3 m gave foreground-occluder 31 percent and a 51.5 degree finale lens). No openings on its perimeter walls."
+  },
+  "route": "street door (double leaf with transom), Entry Lobby, along the bench of the Open Office, a glimpse of the glass Meeting Room, the Comms Room door, orbit.",
+  "rooms": [
+   {
+    "name": "Entry Lobby",
+    "sqm": 9,
+    "roles": [
+     "entry"
+    ]
+   },
+   {
+    "name": "Phone Booth",
+    "sqm": 6,
+    "roles": [
+     "meeting"
+    ]
+   },
+   {
+    "name": "Comms Room",
+    "sqm": 13,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   },
+   {
+    "name": "Open Office",
+    "sqm": 44,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 8
+   },
+   {
+    "name": "Meeting Room",
+    "sqm": 10.5,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 6,
+    "note": "glass partition"
+   },
+   {
+    "name": "Kitchenette",
+    "sqm": 13.5,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Neighbour Workshop",
+    "sqm": 48,
+    "roles": [],
+    "note": "closed bay, blinds, party wall door null"
+   }
+  ]
+ },
+ "objectProps": "whiteboard list of rented tools, brick bay with bike, device shelf in the comms room",
+ "members": [
+  {
+   "id": "marit",
+   "name": "Marit",
+   "function": "owner",
+   "title": "Founder and chief executive",
+   "colour": "chart-1",
+   "room": "Meeting Room",
+   "ownsCore": false,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": null,
+   "beats": [
+    "meet-list",
+    "kitchen-week",
+    "kitchen-notes"
+   ],
+   "apps": [
+    "wallos",
+    "ci-planning",
+    "ci-memory"
+   ]
+  },
+  {
+   "id": "anselm",
+   "name": "Anselm",
+   "function": "engineering",
+   "title": "Chief technology officer",
+   "colour": "chart-2",
+   "room": "Comms Room",
+   "ownsCore": true,
+   "lens": {
+    "role": "cto_eng_lead",
+    "personaResearch": "builder",
+    "comfort": 5,
+    "tone": "A bug report: short, exact, a little dry. Distrusts adjectives, respects a stated limit.",
+    "aiStance": "Heavy daily use, conditional trust. Wants checkable chores; fears the almost-right answer.",
+    "honestLimit": "He is the Core's admin on top of the job; never a CI run on screen; no parity or speed claims."
+   },
+   "companion": {
+    "name": "Rivet",
+    "runtime": "Hermes",
+    "job": "Drafts pull request notes from commit messages Anselm pastes in.",
+    "personality": [
+     "terse",
+     "steady",
+     "exact"
+    ],
+    "voice": "v-steady-m",
+    "memory": false,
+    "limits": "Drafts only. Anselm reads every line before it is used."
+   },
+   "beats": [
+    "ftue-hello",
+    "comms-status",
+    "comms-vault",
+    "open-repos"
+   ],
+   "apps": [
+    "ci-hermes",
+    "uptime-kuma",
+    "vaultwarden",
+    "forgejo"
+   ]
+  },
+  {
+   "id": "femi",
+   "name": "Femi",
+   "function": "engineering",
+   "title": "Software engineer",
+   "colour": "chart-3",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "software_engineer",
+    "personaResearch": "builder",
+    "comfort": 4,
+    "tone": "Fragments, jargon, deadpan. \"Repo is on the Core.\"",
+    "aiStance": "Uses it most days, does not brag, wants the diff.",
+    "honestLimit": "Whether work code moves is the company's decision; no CI run; no hosted-model parity."
+   },
+   "companion": null,
+   "beats": [
+    "open-review",
+    "open-board",
+    "open-hand-off"
+   ],
+   "apps": [
+    "ci-hermes",
+    "planka",
+    "n8n"
+   ]
+  },
+  {
+   "id": "anika",
+   "name": "Anika",
+   "function": "design",
+   "title": "Product designer",
+   "colour": "chart-4",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "open-design",
+    "open-drive",
+    "meet-draw"
+   ],
+   "apps": [
+    "penpot",
+    "nextcloud",
+    "excalidraw"
+   ]
+  },
+  {
+   "id": "kofi",
+   "name": "Kofi",
+   "function": "sales",
+   "title": "Sales and partnerships",
+   "colour": "chart-5",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "sales_bd",
+    "personaResearch": "business-owner and marketer",
+    "comfort": 3,
+    "tone": "Quick, numbers first, upbeat on the surface and dry underneath.",
+    "aiStance": "Heaviest adopter and proudest by reputation [?]; script slower than they talk.",
+    "honestLimit": "Reps away from the office are out of every scene; the CRM is the office's, not a per-rep platform account."
+   },
+   "companion": null,
+   "beats": [
+    "open-crm",
+    "meet-sign",
+    "meet-ask"
+   ],
+   "apps": [
+    "twenty",
+    "docuseal",
+    "anything-llm"
+   ]
+  },
+  {
+   "id": "odile",
+   "name": "Odile",
+   "function": "people",
+   "title": "People and office lead",
+   "colour": "chart-1",
+   "room": "Kitchenette",
+   "ownsCore": false,
+   "lens": {
+    "role": "office_manager",
+    "personaResearch": "organiser",
+    "comfort": 3,
+    "tone": "Brisk, list-making, kind. Triages out loud. Humour about the printer.",
+    "aiStance": "Quiet user for notices and summaries. Not proud, not hiding. [?] no role survey",
+    "honestLimit": "Accounts are made app by app by whoever looks after each app; the Core is not a managed service."
+   },
+   "companion": null,
+   "beats": [
+    "open-chat",
+    "meet-wiki",
+    "kitchen-paper"
+   ],
+   "apps": [
+    "campfire",
+    "docmost",
+    "paperless"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "comms",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Comms Room",
+   "title": "The comms room"
+  },
+  {
+   "id": "open",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office",
+   "title": "The open office"
+  },
+  {
+   "id": "meet",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Meeting Room",
+   "title": "The meeting room"
+  },
+  {
+   "id": "booth",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Phone Booth",
+   "title": "The phone booth"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Kitchenette",
+   "title": "The kitchenette"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel at the brick door",
+   "seed": "A parcel waits by the bike rack outside the brick bay. Kofi carries it past the open office to the comms room, where Anselm clears a shelf.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Femi lifts the Core out, and Anselm reads the guide.",
+   "limit": "Show exactly the box contents (claims core-in-box), nothing else."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Anselm plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Anselm opens the Wi-Fi settings on his phone and joins the Core's own network. Then he chooses the office network.",
+   "limit": "phone rows: Join the Core's own network; Choose the office network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Anselm picks Hermes, and the team adds Forgejo and Docmost. Then they get back to work.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "forgejo",
+    "docmost"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "anselm",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Rivet says hello",
+   "seed": "Anselm messages the agent he named Rivet from his desk. Rivet answers from the Core in the comms room.",
+   "limit": "note: Messages pass through the chat service you choose.",
+   "say": {
+    "speaker": "anselm",
+    "text": "Hello, Anselm. I draft, and you decide."
+   },
+   "agent": "anselm",
+   "approval": "anselm",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "comms-status",
+   "chapter": "comms",
+   "member": "anselm",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "uptime-kuma",
+   "replaces": [],
+   "chips": [
+    "Uptime Kuma"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "A status page by the router",
+   "seed": "Uptime Kuma checks the office printer and the staging site. Anselm reads its page each morning before the others arrive.",
+   "limit": "Monitors, does not prevent. No uptime claim. Notifications leave through an outside channel only if set. Do not describe the screen. No replaces chip: the market review marks Datadog and New Relic a stretch (full observability suites), and a sceptic would not say it.",
+   "capabilityHint": "Watch your sites and services and get an alert when one goes down."
+  },
+  {
+   "id": "comms-vault",
+   "chapter": "comms",
+   "member": "anselm",
+   "anchor": {
+    "role": "server-rack",
+    "room": "server",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "server"
+     },
+     {
+      "role": "room",
+      "room": "server"
+     }
+    ]
+   },
+   "app": "vaultwarden",
+   "replaces": [
+    "1Password"
+   ],
+   "chips": [
+    "VaultWarden",
+    "replaces 1Password"
+   ],
+   "category": "it",
+   "film": true,
+   "title": "One vault for shared logins",
+   "seed": "The shared logins leave a sticky note under a keyboard and move into VaultWarden. Anselm deletes the export file afterwards.",
+   "limit": "Say \"the Bitwarden apps\". Attachments and one-time-code seeds do not move; importing twice duplicates; delete the export file.",
+   "bringHome": {
+    "from": "1Password",
+    "carries": "logins, notes and cards the import maps",
+    "doesNot": "file attachments; item history; shared-vault structure"
+   },
+   "capabilityHint": "Store every password in a vault you host. Works with the Bitwarden apps."
+  },
+  {
+   "id": "open-repos",
+   "chapter": "open",
+   "member": "anselm",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "forgejo",
+   "replaces": [
+    "GitHub"
+   ],
+   "chips": [
+    "Forgejo",
+    "replaces GitHub"
+   ],
+   "category": "engineering",
+   "film": true,
+   "title": "The code moves in",
+   "seed": "Anselm moves the company's repositories into Forgejo on the Core. The product still runs where it runs; the code now sits in the comms room.",
+   "limit": "Say where the repositories are. Never \"syncs with\" or \"compatible with\" GitHub. No CI runner ships: never show a CI run. Actions workflows do not carry over. One Git host per office.",
+   "bringHome": {
+    "from": "GitHub",
+    "carries": "repository code and history; issues and pull requests when a token allows",
+    "doesNot": "Actions workflows; stars and followers; Discussions, Projects, Pages"
+   },
+   "capabilityHint": "Host your own Git repositories, issues and pull requests on your Core."
+  },
+  {
+   "id": "open-review",
+   "chapter": "open",
+   "member": "femi",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "The note and the diff",
+   "seed": "Rivet drafts the pull request note from the commit messages Femi pastes to it. Anselm reads the diff, edits the note and posts it himself.",
+   "limit": "Agent prepares, person approves (beat needs agent + approval). Hermes is beta; the chat channel is not local. No parity or speed claim. Hermes is isolated from Forgejo: it works from pasted text only.",
+   "agent": "anselm",
+   "approval": "anselm",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "open-design",
+   "chapter": "open",
+   "member": "anika",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "penpot",
+   "replaces": [
+    "Figma"
+   ],
+   "chips": [
+    "Penpot",
+    "replaces Figma"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The screens sit on the Core",
+   "seed": "Anika draws the schedule screens in Penpot on the Core. The design files sit in the same room as the code.",
+   "limit": "No verified Figma importer: components were rebuilt by hand. Five containers. Do not describe the screen.",
+   "bringHome": {
+    "from": "Figma",
+    "carries": "nothing automatic; Anika rebuilt the components by hand",
+    "doesNot": "Figma files, plugins, prototypes"
+   },
+   "capabilityHint": "Design and prototype in a web-based design tool you host."
+  },
+  {
+   "id": "open-crm",
+   "chapter": "open",
+   "member": "kofi",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "twenty",
+   "replaces": [
+    "Salesforce"
+   ],
+   "chips": [
+    "Twenty",
+    "replaces Salesforce"
+   ],
+   "category": "customers",
+   "film": true,
+   "title": "Every lead in one list",
+   "seed": "Kofi loads last quarter's cinema contacts into Twenty from a spreadsheet. The pipeline now sits on the Core, not in a rented CRM.",
+   "limit": "Never show Twenty's own QA capture (real company names). AGPL plus commercial files: never \"open source\". Automations, reports, sharing rules do not move. HubSpot users: no route, say nothing.",
+   "bringHome": {
+    "from": "Salesforce",
+    "carries": "accounts, contacts and opportunities as CSV rows with relations mapped",
+    "doesNot": "flows and triggers; reports and dashboards; sharing rules; activity history"
+   },
+   "capabilityHint": "Keep customers, deals and custom fields in a CRM you host yourself."
+  },
+  {
+   "id": "open-board",
+   "chapter": "open",
+   "member": "femi",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "planka",
+   "replaces": [
+    "Trello"
+   ],
+   "chips": [
+    "Planka",
+    "replaces Trello"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The sprint board",
+   "seed": "The sprint board is a Planka board on the Core. Femi moves a card to done when the review closes.",
+   "limit": "Trello board JSON carries lists, cards, labels, checklists, comments; attachments and members unverified. Licence unasserted: do not call it open source.",
+   "bringHome": {
+    "from": "Trello",
+    "carries": "lists, cards, labels, checklists, comments",
+    "doesNot": "Power-Ups and automations; attachments and members (check one board first)"
+   },
+   "capabilityHint": "A real-time Kanban board for a team or a family project."
+  },
+  {
+   "id": "open-chat",
+   "chapter": "open",
+   "member": "odile",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "campfire",
+   "replaces": [
+    "Slack",
+    "Microsoft Teams"
+   ],
+   "chips": [
+    "Campfire",
+    "replaces Slack",
+    "replaces Microsoft Teams"
+   ],
+   "category": "communication",
+   "film": true,
+   "title": "The office channel",
+   "seed": "The team talks in Campfire on the office network. Each person has an account inside Campfire, which is Campfire's own feature.",
+   "limit": "Write \"integrations\", never \"bot API\". First run creates an account in the app. The old channel history stays where it was (no verified importer): say what did not come along.",
+   "bringHome": {
+    "from": "Slack",
+    "carries": "nothing: no verified importer for Campfire",
+    "doesNot": "channel history stays at the old service"
+   },
+   "capabilityHint": "Simple team chat with rooms, direct messages and a bot API."
+  },
+  {
+   "id": "open-drive",
+   "chapter": "open",
+   "member": "anika",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "nextcloud",
+   "replaces": [
+    "Google Drive",
+    "Dropbox"
+   ],
+   "chips": [
+    "Nextcloud",
+    "replaces Google Drive",
+    "replaces Dropbox"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The shared drive moves in",
+   "seed": "Anika copies the shared drive into Nextcloud on the Core. Pitch decks and the logo folder come across; the share links do not.",
+   "limit": "No co-editing claim; sharing with outsiders not claimed; the importer talks to the old service while it runs. Share links and version history do not come across.",
+   "bringHome": {
+    "from": "Google Drive",
+    "carries": "files and folders with names and structure",
+    "doesNot": "sharing settings; comments and suggestion history; version history"
+   },
+   "capabilityHint": "Your files, calendar and contacts on your own Core, synced to your devices."
+  },
+  {
+   "id": "open-hand-off",
+   "chapter": "open",
+   "member": "femi",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "n8n",
+   "replaces": [
+    "Zapier"
+   ],
+   "chips": [
+    "n8n",
+    "replaces Zapier"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "A hand-off, built by hand",
+   "seed": "When Kofi marks a lead won in Twenty, n8n adds a card to the onboarding board. Femi rebuilt each step by hand.",
+   "limit": "Say \"source-available\", never \"open source\". Zaps are rebuilt by hand; connections are authorised again. Never \"emails customers automatically\".",
+   "bringHome": {
+    "from": "Zapier",
+    "carries": "the idea of each automation, rebuilt",
+    "doesNot": "Zap definitions, run history, connection tokens"
+   },
+   "with": [
+    "twenty"
+   ],
+   "capabilityHint": "Connect your apps with workflows. 400 plus integrations, with the data staying on your Core."
+  },
+  {
+   "id": "meet-list",
+   "chapter": "meet",
+   "member": "marit",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "wallos",
+   "replaces": [],
+   "chips": [
+    "Wallos"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "Everything the company rents",
+   "seed": "Marit writes every rented tool on the whiteboard. Odile keeps the same list in Wallos on the Core, with the renewal dates.",
+   "limit": "No price, no saving, no total. Wallos fetches service logos from outside: do not show logos. No chip beyond the app name.",
+   "capabilityHint": "Track every subscription you pay for and get a reminder before it renews."
+  },
+  {
+   "id": "meet-wiki",
+   "chapter": "meet",
+   "member": "odile",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "docmost",
+   "replaces": [
+    "Notion"
+   ],
+   "chips": [
+    "Docmost",
+    "replaces Notion"
+   ],
+   "category": "people",
+   "film": false,
+   "title": "Day one, one handbook",
+   "seed": "The handbook lives in Docmost. A new starter reads it on her first morning, at her own desk, with Odile beside her.",
+   "limit": "Overlaps BookStack (name one wiki per office). Notion export carries pages and structure; comments, history, sharing and databases do not.",
+   "bringHome": {
+    "from": "Notion",
+    "carries": "page text and nested structure; images and files in the export",
+    "doesNot": "comments and page history; sharing; databases (arrive as CSV)"
+   },
+   "capabilityHint": "A collaborative wiki for notes and documentation."
+  },
+  {
+   "id": "meet-draw",
+   "chapter": "meet",
+   "member": "anika",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "excalidraw",
+   "replaces": [
+    "Miro"
+   ],
+   "chips": [
+    "Excalidraw",
+    "replaces Miro"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The flow, sketched",
+   "seed": "Anika and Femi sketch the schedule flow in Excalidraw on the wall screen. Anika exports a picture when they are done.",
+   "limit": "amd64 only.Miro boards are redrawn, not converted: a picture and the text of the sticky notes come across. Excalidraw here is the editor plus a collaboration relay with no storage volume: it keeps nothing on the Core. Never \"saved\", \"kept\" or \"sits on the Core\"; no bring-your-data-home beat for it.",
+   "capabilityHint": "A whiteboard with a hand-drawn look. Sketch ideas together."
+  },
+  {
+   "id": "meet-sign",
+   "chapter": "meet",
+   "member": "kofi",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "docuseal",
+   "replaces": [
+    "DocuSign"
+   ],
+   "chips": [
+    "Docuseal",
+    "replaces DocuSign"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "Signed at the table",
+   "seed": "Kofi and a cinema owner sign the pilot letter at the meeting table. DocuSeal keeps the signed copy on the Core.",
+   "limit": "Never \"legally binding\" or \"valid\". The signer is in the room: signers outside the office cannot reach the Core.",
+   "capabilityHint": "Fill and sign PDF forms on any device, from your own Core."
+  },
+  {
+   "id": "meet-ask",
+   "chapter": "booth",
+   "member": "kofi",
+   "anchor": {
+    "role": "desk",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "anything-llm",
+   "replaces": [
+    "ChatGPT"
+   ],
+   "chips": [
+    "AnythingLLM",
+    "replaces ChatGPT"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "A question for the files",
+   "seed": "Kofi asks a model on the Core what the pilot letter says about notice. AnythingLLM answers from the files, and he reads the clause himself.",
+   "limit": "Local model only; never mention a key. No accuracy, speed or parity claim. Avoid the listing's \"multi-user\" and \"privacy-first\" words.",
+   "capabilityHint": "Chat with your own documents and run agents with web browsing, with several users and permissions."
+  },
+  {
+   "id": "kitchen-paper",
+   "chapter": "kitchen",
+   "member": "odile",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "paperless",
+   "replaces": [
+    "Evernote"
+   ],
+   "chips": [
+    "Paperless-ngx",
+    "replaces Evernote"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "Receipts, searchable",
+   "seed": "Odile feeds the month's receipts through the scanner into Paperless-ngx. Every page is read, and she finds a supplier's invoice by one word.",
+   "limit": "PDFs and scans only. AI features off by default. Never bare \"Paperless\". Email, the bank and the pay service stay with the services that run them.",
+   "capabilityHint": "Scan and file your paperwork. It reads every page, tags it and makes the lot searchable."
+  },
+  {
+   "id": "kitchen-week",
+   "chapter": "kitchen",
+   "member": "marit",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "ci-planning",
+   "replaces": [],
+   "chips": [
+    "Companion Planning"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The week by the kettle",
+   "seed": "Marit lays the week out in Companion Planning on the Core. Stand-up is at nine, and the printed week hangs by the kettle.",
+   "limit": "An owner's planner, not a team calendar (one owner account). Google sync is off by default; do not say it never touches Google. Crash-report disclosure applies.",
+   "capabilityHint": "Plan tasks and time blocks in one local file on your Core. Briefings from a local model are optional."
+  },
+  {
+   "id": "kitchen-notes",
+   "chapter": "kitchen",
+   "member": "marit",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "ci-memory",
+   "replaces": [],
+   "chips": [
+    "Companion Memory"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "Her own notes, her own file",
+   "seed": "Marit keeps her own notes and calendar in Companion Memory (beta). It is one person's file, and she chooses what goes in.",
+   "limit": "Beta, first mention reads \"(beta)\". One person's context; imports opt-in; crash reports on by default; never \"company brain\".",
+   "capabilityHint": "Companion Memory keeps your digital life on your own disk, so your agents know your context and a cloud does not."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Your turn next",
+   "seed": "The company's code, notes, contacts and logins now sit in one comms room. Browse the Companion Hub store and pick your first apps.",
+   "limit": "closing body; the site and the film add the sign-off and the CTA."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Marit"
+   ],
+   "rows": [
+    {
+     "app": "wallos",
+     "name": "Wallos",
+     "replaces": [],
+     "beats": [
+      "meet-list"
+     ]
+    },
+    {
+     "app": "ci-planning",
+     "name": "Companion Planning",
+     "replaces": [],
+     "beats": [
+      "kitchen-week"
+     ]
+    },
+    {
+     "app": "ci-memory",
+     "name": "Companion Memory",
+     "replaces": [],
+     "beats": [
+      "kitchen-notes"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "engineering",
+   "people": [
+    "Anselm",
+    "Femi"
+   ],
+   "rows": [
+    {
+     "app": "ci-hermes",
+     "name": "Hermes",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "open-review"
+     ]
+    },
+    {
+     "app": "uptime-kuma",
+     "name": "Uptime Kuma",
+     "replaces": [],
+     "beats": [
+      "comms-status"
+     ]
+    },
+    {
+     "app": "vaultwarden",
+     "name": "VaultWarden",
+     "replaces": [
+      "1Password"
+     ],
+     "beats": [
+      "comms-vault"
+     ]
+    },
+    {
+     "app": "forgejo",
+     "name": "Forgejo",
+     "replaces": [
+      "GitHub"
+     ],
+     "beats": [
+      "open-repos"
+     ]
+    },
+    {
+     "app": "planka",
+     "name": "Planka",
+     "replaces": [
+      "Trello"
+     ],
+     "beats": [
+      "open-board"
+     ]
+    },
+    {
+     "app": "n8n",
+     "name": "n8n",
+     "replaces": [
+      "Zapier"
+     ],
+     "beats": [
+      "open-hand-off"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "design",
+   "people": [
+    "Anika"
+   ],
+   "rows": [
+    {
+     "app": "penpot",
+     "name": "Penpot",
+     "replaces": [
+      "Figma"
+     ],
+     "beats": [
+      "open-design"
+     ]
+    },
+    {
+     "app": "nextcloud",
+     "name": "Nextcloud",
+     "replaces": [
+      "Google Drive",
+      "Dropbox"
+     ],
+     "beats": [
+      "open-drive"
+     ]
+    },
+    {
+     "app": "excalidraw",
+     "name": "Excalidraw",
+     "replaces": [
+      "Miro"
+     ],
+     "beats": [
+      "meet-draw"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "sales",
+   "people": [
+    "Kofi"
+   ],
+   "rows": [
+    {
+     "app": "twenty",
+     "name": "Twenty",
+     "replaces": [
+      "Salesforce"
+     ],
+     "beats": [
+      "open-crm"
+     ]
+    },
+    {
+     "app": "docuseal",
+     "name": "Docuseal",
+     "replaces": [
+      "DocuSign"
+     ],
+     "beats": [
+      "meet-sign"
+     ]
+    },
+    {
+     "app": "anything-llm",
+     "name": "AnythingLLM",
+     "replaces": [
+      "ChatGPT"
+     ],
+     "beats": [
+      "meet-ask"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "people",
+   "people": [
+    "Odile"
+   ],
+   "rows": [
+    {
+     "app": "campfire",
+     "name": "Campfire",
+     "replaces": [
+      "Slack",
+      "Microsoft Teams"
+     ],
+     "beats": [
+      "open-chat"
+     ]
+    },
+    {
+     "app": "docmost",
+     "name": "Docmost",
+     "replaces": [
+      "Notion"
+     ],
+     "beats": [
+      "meet-wiki"
+     ]
+    },
+    {
+     "app": "paperless",
+     "name": "Paperless-ngx",
+     "replaces": [
+      "Evernote"
+     ],
+     "beats": [
+      "kitchen-paper"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "comms-vault",
+   "member": "anselm",
+   "app": "vaultwarden",
+   "from": "1Password",
+   "carries": "logins, notes and cards the import maps",
+   "doesNot": "file attachments; item history; shared-vault structure"
+  },
+  {
+   "beat": "open-repos",
+   "member": "anselm",
+   "app": "forgejo",
+   "from": "GitHub",
+   "carries": "repository code and history; issues and pull requests when a token allows",
+   "doesNot": "Actions workflows; stars and followers; Discussions, Projects, Pages"
+  },
+  {
+   "beat": "open-design",
+   "member": "anika",
+   "app": "penpot",
+   "from": "Figma",
+   "carries": "nothing automatic; Anika rebuilt the components by hand",
+   "doesNot": "Figma files, plugins, prototypes"
+  },
+  {
+   "beat": "open-crm",
+   "member": "kofi",
+   "app": "twenty",
+   "from": "Salesforce",
+   "carries": "accounts, contacts and opportunities as CSV rows with relations mapped",
+   "doesNot": "flows and triggers; reports and dashboards; sharing rules; activity history"
+  },
+  {
+   "beat": "open-board",
+   "member": "femi",
+   "app": "planka",
+   "from": "Trello",
+   "carries": "lists, cards, labels, checklists, comments",
+   "doesNot": "Power-Ups and automations; attachments and members (check one board first)"
+  },
+  {
+   "beat": "open-chat",
+   "member": "odile",
+   "app": "campfire",
+   "from": "Slack",
+   "carries": "nothing: no verified importer for Campfire",
+   "doesNot": "channel history stays at the old service"
+  },
+  {
+   "beat": "open-drive",
+   "member": "anika",
+   "app": "nextcloud",
+   "from": "Google Drive",
+   "carries": "files and folders with names and structure",
+   "doesNot": "sharing settings; comments and suggestion history; version history"
+  },
+  {
+   "beat": "open-hand-off",
+   "member": "femi",
+   "app": "n8n",
+   "from": "Zapier",
+   "carries": "the idea of each automation, rebuilt",
+   "doesNot": "Zap definitions, run history, connection tokens"
+  },
+  {
+   "beat": "meet-wiki",
+   "member": "odile",
+   "app": "docmost",
+   "from": "Notion",
+   "carries": "page text and nested structure; images and files in the export",
+   "doesNot": "comments and page history; sharing; databases (arrive as CSV)"
+  }
+ ],
+ "rentedBefore": [
+  "1Password",
+  "GitHub",
+  "Figma",
+  "Salesforce",
+  "Trello",
+  "Slack",
+  "Microsoft Teams",
+  "Google Drive",
+  "Dropbox",
+  "Zapier",
+  "Notion",
+  "Miro",
+  "DocuSign",
+  "ChatGPT",
+  "Evernote"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "uptime-kuma",
+    "name": "Uptime Kuma",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "vaultwarden",
+    "name": "VaultWarden",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "forgejo",
+    "name": "Forgejo",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "penpot",
+    "name": "Penpot",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "twenty",
+    "name": "Twenty",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "AGPL plus commercial files"
+   },
+   {
+    "id": "planka",
+    "name": "Planka",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "PLANKA Community License, Fair Use License 1.1 (source-available): internal use in an organisation is permitted; accounts may not be shared with outside parties"
+   },
+   {
+    "id": "campfire",
+    "name": "Campfire",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "nextcloud",
+    "name": "Nextcloud",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "n8n",
+    "name": "n8n",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Sustainable Use (fair-code): say \"source-available\""
+   },
+   {
+    "id": "wallos",
+    "name": "Wallos",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "docmost",
+    "name": "Docmost",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "excalidraw",
+    "name": "Excalidraw",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "docuseal",
+    "name": "Docuseal",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "anything-llm",
+    "name": "AnythingLLM",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "paperless",
+    "name": "Paperless-ngx",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   }
+  ],
+  "firstParty": [
+   "ci-hermes",
+   "ci-planning",
+   "ci-memory"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "comms-vault",
+   "open-repos",
+   "open-crm",
+   "open-chat",
+   "meet-list",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 201,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Reelwick",
+   "address": "2 Maltings Yard, Ostley Wick",
+   "tagline": "Six people, one product, and one Companion Core in the comms room.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "marit",
+    "name": "Marit",
+    "title": "Founder and chief executive",
+    "hookBeat": "meet-list",
+    "hookTitle": "Everything the company rents",
+    "chips": [
+     "Wallos"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "kofi",
+    "name": "Kofi",
+    "title": "Sales and partnerships",
+    "hookBeat": "open-crm",
+    "hookTitle": "Every lead in one list",
+    "chips": [
+     "Twenty",
+     "replaces Salesforce"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "anselm",
+    "name": "Anselm",
+    "title": "Chief technology officer",
+    "hookBeat": "open-repos",
+    "hookTitle": "The code moves in",
+    "chips": [
+     "Forgejo",
+     "replaces GitHub"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms"
+ ],
+ "doNotSay": [
+  "hybrid, remote or distributed team",
+  "a security questionnaire answered",
+  "SSO, roles",
+  "the product is hosted on the Core"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 25,
+  "ftue": 6,
+  "roomBeats": 18,
+  "film": 9,
+  "members": 6,
+  "apps": 18,
+  "thirdPartyApps": 15,
+  "replacedServices": 15,
+  "bringHomeBeats": 9,
+  "categories": [
+   "setup",
+   "it",
+   "engineering",
+   "design",
+   "customers",
+   "projects",
+   "communication",
+   "documents",
+   "money",
+   "people"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "arc: \"Seven people become six\" read as a person replaced (biz-people-replaced by implication); now \"Six people, one list.\"",
+   "comms-status: dropped \"replaces Datadog\" (market review: stretched; a CTO would not say it)",
+   "open-review and Rivet's job: Hermes \"reads the commits\" implied an integration the store says does not exist (Hermes runs isolated from other apps); now pasted text",
+   "meet-draw: \"The sketch is saved on the Core\" is false (compose has editor + collaboration relay, no storage volume); seed rewritten, bring-your-data-home flag removed (Miro to Excalidraw has no home on the Core)",
+   "planka licence note: upstream LICENSE.md is the PLANKA Community License (Fair Use License 1.1), not \"unasserted\"",
+   "hook line and titles: \"stay in the office/studio/shop\" is a place claim wider than the canon's \"sits on the Core\" (and a sent newsletter hands its addresses to the mail provider); now \"sit on the Core\""
+  ],
+  "unverified": [
+   "Twenty/Planka/n8n licences read from upstream LICENSE files today; counsel has not"
+  ]
+ }
+}

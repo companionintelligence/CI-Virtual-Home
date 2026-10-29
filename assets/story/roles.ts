@@ -81,3 +81,36 @@ export async function sha256Hex(text: string | Uint8Array): Promise<string> {
 }
 /** rolesSha: what the bake depends on in roles.json (the whole table: a type list, a room pattern or a preference changes poses) */
 export const rolesSha = (table: RolesTable) => sha256Hex(canon(table));
+
+const HOME_ONLY_ROOM_ROLES = new Set([
+  'living', 'dining', 'bedroom', 'kids', 'garage', 'laundry', 'bath', 'garden', 'patio'
+]);
+
+/**
+ * Merges roles-office.json over roles.json for company stories and office buildings (office-build-contract.md 4.1).
+ * Home-only room roles are dropped so office rooms like workshops do not misfire.
+ */
+export function mergeRoles(base: RolesTable, ext: any): RolesTable {
+  const merged: RolesTable = {
+    ...base,
+    v: ext.v || base.v,
+    items: { ...base.items, ...(ext.items || {}) },
+    home: { ...(base.home || {}), ...(ext.home || {}) },
+    kindNames: { ...base.kindNames, ...(ext.kindNames || {}) },
+    rooms: {},
+  };
+
+  for (const [k, v] of Object.entries(base.rooms)) {
+    if (!HOME_ONLY_ROOM_ROLES.has(k)) {
+      merged.rooms[k] = v;
+    }
+  }
+  for (const [k, v] of Object.entries(ext.rooms || {})) {
+    merged.rooms[k] = v as any;
+  }
+
+  if (ext.universalBy?.office) {
+    merged.universal = ext.universalBy.office;
+  }
+  return merged;
+}

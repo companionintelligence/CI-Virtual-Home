@@ -68,6 +68,8 @@ export const ANCHORS: Record<string, Array<{ name: string; roles: string[]; n?: 
   powder: [{ name: 'toilet', roles: ['toilet'] }, { name: 'sink', roles: ['vanity', 'vanity-double'] }],
   library: [{ name: 'bookcases', roles: ['bookcase'], n: 2 }],
   study: [{ name: 'desk', roles: ['desk'] }],
+  workspace: [{ name: 'desks', roles: ['office-desk', 'desk'], n: 2 }],
+  meeting: [{ name: 'meeting table', roles: ['meeting-table', 'dining-table'] }, { name: 'chairs', roles: ['office-chair', 'dining-chair'], n: 2 }],
   laundry: [{ name: 'washer', roles: ['washer'] }, { name: 'dryer', roles: ['dryer'] }],
 };
 /** the anchors of a room's program that its items do not have (names). `heroDesk`: the Core's desk stands in the room */

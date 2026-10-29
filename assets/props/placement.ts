@@ -208,6 +208,10 @@ export const PLACEMENT: Record<string, Place> = {
   'pin-board': def('art', ['board'], ['study', 'studio', 'bed-kid', ...KITCHENS], [], { mountY: 1.4, colorRole: 'wood' }),
   'grand-piano': def('music', ['piano-grand'], ['living', 'library', 'studio'], [], { against: 'free', clear: C(0.6, 0.4, 0.4), colorRole: null }),
   'upright-piano': def('music', ['piano'], ['living', 'library', 'studio', 'den', 'playroom'], ['farmhouse', 'cottage', 'craftsman', 'traditional', 'mediterranean'], { clear: C(0.3), colorRole: 'wood' }),
+  // ---- SPIKE: office props (assets/props/office.ts, the w20 engine report). NEW roles, so no pick in any shipped house moves ----
+  'office-desk': def('desk', ['office-desk'], ['workspace'], ['modern', 'industrial', 'scandi'], { against: 'free', clear: C(0.7), colorRole: 'linen', top: 0.74 }),
+  'office-chair': def('chair', ['office-chair'], ['workspace', 'meeting'], [], { colorRole: 'fabric' }),
+  'conference-table': def('table', ['meeting-table'], ['meeting'], [], { against: 'center', clear: C(0.8, 0.8, 0.8), colorRole: 'wood', top: 0.75 }),
   // outdoor.ts (S4's props; only the composer's outdoor program places them)
   'patio-set': def('outdoor', ['outdoor-dining'], ['outdoor'], []),
   'lounger-set': def('outdoor', ['lounger'], ['outdoor'], []),
