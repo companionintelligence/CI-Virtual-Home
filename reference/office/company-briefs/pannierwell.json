@@ -1,0 +1,1557 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "pannierwell",
+ "wave": 2,
+ "sizeLabel": "Startup",
+ "company": {
+  "name": "Pannierwell",
+  "tagline": "Five people, one battery pack, and a Companion Core by the parts shelves.",
+  "sector": "Battery packs for cargo bikes",
+  "size": "startup",
+  "scope": "company",
+  "headcount": 5,
+  "floor": 5,
+  "story": "Pannierwell builds a swappable battery pack for cargo bikes. Five people share a converted garage, with the bench on one side and the desks on the other. Firmware, parts lists and supplier papers sit on one Companion Core.",
+  "address": {
+   "line": "5 Cooper's Row",
+   "place": "Brackenmere"
+  },
+  "narrator": "v-steady-m"
+ },
+ "hookLine": "The parts list, the firmware and the test photos, in one back room.",
+ "arc": "A hardware startup that is also a bench. The founder owns the Core and the errands; the parts list, the datasheets, the firmware and the test photos sit next to the rig that made them. Edge: supplier websites are on the internet, so the agent beats say so; the product is hardware and ships from the bench, not from the Core.",
+ "honestEdge": "Ordering parts means visiting supplier websites over the office internet. The agent fills forms; Haldis reads and sends.",
+ "building": {
+  "id": "garage-lab",
+  "display": "Tackroom",
+  "concept": "Converted two-bay garage with a side annex: a gable or flat garage volume, one garage opening 4.8 m wide, a side door, driveway, a cargo bike. No new engine construct, low risk (engine report section 4.1 \"garage startup\" variant).",
+  "exterior": "garage",
+  "storeys": 1,
+  "areaSqm": 90,
+  "seats": 6,
+  "core": {
+   "room": "Back Room",
+   "surface": "steel-topped shelf above the router and parts bins, no books, chalk Core",
+   "note": "Back Room 3.6 x 3.6 m, no windows on its perimeter walls, floor concrete. Beside the Workshop Bay so the route is short."
+  },
+  "route": "garage door and side door, Workshop Bay past the bench, the Back Room door, orbit.",
+  "rooms": [
+   {
+    "name": "Workshop Bay",
+    "sqm": 30,
+    "roles": [
+     "workshop"
+    ],
+    "program": "garage",
+    "note": "bench run, tool wall, parts rack, test rig (P2 trades set); two bench positions count as seats"
+   },
+   {
+    "name": "Desk Room",
+    "sqm": 20,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 4
+   },
+   {
+    "name": "Meeting Nook",
+    "sqm": 9,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 4,
+    "note": "glass partition"
+   },
+   {
+    "name": "Back Room",
+    "sqm": 13,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   },
+   {
+    "name": "Kitchenette",
+    "sqm": 9,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Entry",
+    "sqm": 7,
+    "roles": [
+     "entry"
+    ]
+   }
+  ]
+ },
+ "objectProps": "garage door with cargo bike, bench run and tool wall, parts bins, test rig, router beside the Core",
+ "members": [
+  {
+   "id": "haldis",
+   "name": "Haldis",
+   "function": "owner",
+   "title": "Founder and electrical engineer",
+   "colour": "chart-1",
+   "room": "Back Room",
+   "ownsCore": true,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": {
+    "name": "Gantry",
+    "runtime": "OpenClaw",
+    "job": "Looks up part numbers on supplier sites and fills the order form for Haldis to read.",
+    "personality": [
+     "patient",
+     "literal",
+     "tidy"
+    ],
+    "voice": "v-warm-f",
+    "memory": false,
+    "limits": "Fills forms only. Haldis reads and sends every order."
+   },
+   "beats": [
+    "ftue-hello",
+    "back-lookup",
+    "back-order",
+    "desk-letter",
+    "nook-sign",
+    "kitchen-books",
+    "kitchen-week"
+   ],
+   "apps": [
+    "ci-openclaw",
+    "libreoffice",
+    "papra",
+    "akaunting",
+    "ci-planning"
+   ]
+  },
+  {
+   "id": "teodor",
+   "name": "Teodor",
+   "function": "engineering",
+   "title": "Firmware engineer",
+   "colour": "chart-2",
+   "room": "Workshop Bay",
+   "ownsCore": false,
+   "lens": {
+    "role": "software_engineer",
+    "personaResearch": "builder",
+    "comfort": 4,
+    "tone": "Fragments, jargon, deadpan. \"Repo is on the Core.\"",
+    "aiStance": "Uses it most days, does not brag, wants the diff.",
+    "honestLimit": "Whether work code moves is the company's decision; no CI run; no hosted-model parity."
+   },
+   "companion": null,
+   "beats": [
+    "bench-firmware",
+    "bench-wiring",
+    "bench-notebook"
+   ],
+   "apps": [
+    "gitea",
+    "drawio",
+    "jupyterlab"
+   ]
+  },
+  {
+   "id": "saoirse",
+   "name": "Saoirse",
+   "function": "design",
+   "title": "Mechanical designer",
+   "colour": "chart-3",
+   "room": "Workshop Bay",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "bench-photos",
+    "bench-label",
+    "desk-pack"
+   ],
+   "apps": [
+    "immich",
+    "inkscape",
+    "stirling-pdf"
+   ]
+  },
+  {
+   "id": "lior",
+   "name": "Lior",
+   "function": "operations",
+   "title": "Supply and operations",
+   "colour": "chart-4",
+   "room": "Desk Room",
+   "ownsCore": false,
+   "lens": {
+    "role": "office_manager",
+    "personaResearch": "organiser",
+    "comfort": 3,
+    "tone": "Brisk, list-making, kind. Triages out loud. Humour about the printer.",
+    "aiStance": "Quiet user for notices and summaries. Not proud, not hiding. [?] no role survey",
+    "honestLimit": "Accounts are made app by app by whoever looks after each app; the Core is not a managed service."
+   },
+   "companion": null,
+   "beats": [
+    "back-vault",
+    "desk-parts",
+    "desk-datasheets"
+   ],
+   "apps": [
+    "vaultwarden",
+    "grist",
+    "papra"
+   ]
+  },
+  {
+   "id": "quentin",
+   "name": "Quentin",
+   "function": "support",
+   "title": "Test and support lead",
+   "colour": "chart-5",
+   "room": "Workshop Bay",
+   "ownsCore": false,
+   "lens": {
+    "role": "customer_support",
+    "personaResearch": "new research",
+    "comfort": 3,
+    "tone": "Warm, patient, scripted when tired.",
+    "aiStance": "Mixed; the job is shrinking in forecasts.",
+    "honestLimit": "Internal help on the office network is honest; customer-facing chat and phone are not shown."
+   },
+   "companion": null,
+   "beats": [
+    "bench-builds",
+    "nook-wiki",
+    "kitchen-calendar"
+   ],
+   "apps": [
+    "vikunja",
+    "bookstack",
+    "baikal"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "back",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Back Room",
+   "title": "The back room"
+  },
+  {
+   "id": "bench",
+   "kind": "room",
+   "room": "workshop",
+   "roomName": "Workshop Bay",
+   "title": "The workshop bay"
+  },
+  {
+   "id": "desks",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Desk Room",
+   "title": "The desk room"
+  },
+  {
+   "id": "nook",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Meeting Nook",
+   "title": "The meeting nook"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Kitchenette",
+   "title": "The kitchenette"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel at the garage door",
+   "seed": "A parcel waits inside the garage door, beside the cargo bike. Lior carries it past the workshop bay to the back room, where Haldis clears a shelf.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Teodor lifts the Core out, and Haldis reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Haldis plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Haldis opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the workshop network.",
+   "limit": "phone rows: Join the Core's own network; Choose the workshop network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Haldis picks OpenClaw, and the team adds Gitea and Grist. Then they get back to the bench.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "grist",
+    "gitea"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "haldis",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-openclaw",
+   "replaces": [],
+   "chips": [
+    "OpenClaw"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Gantry says hello",
+   "seed": "Haldis messages the agent she named Gantry from the back room. Gantry answers from the Core beside the parts shelves.",
+   "limit": "note (office variant of the OpenClaw line, needs a claims row): OpenClaw reaches websites over the office internet.",
+   "say": {
+    "speaker": "haldis",
+    "text": "Hello, Haldis. Send me a part number and I will look."
+   },
+   "agent": "haldis",
+   "approval": "haldis",
+   "capabilityHint": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS and Android apps you pair by QR code."
+  },
+  {
+   "id": "back-vault",
+   "chapter": "back",
+   "member": "lior",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "vaultwarden",
+   "replaces": [
+    "LastPass"
+   ],
+   "chips": [
+    "VaultWarden",
+    "replaces LastPass"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "Supplier logins, one vault",
+   "seed": "The supplier logins leave a notebook in the parts drawer and move into VaultWarden. Lior deletes the export file once the import is done.",
+   "limit": "Say \"the Bitwarden apps\". LastPass business exports may be switched off by an admin; attachments and one-time-code seeds do not move.",
+   "bringHome": {
+    "from": "LastPass",
+    "carries": "logins, notes and form data the CSV carries",
+    "doesNot": "attachments; one-time-code seeds; shared-folder structure"
+   },
+   "capabilityHint": "Store every password in a vault you host. Works with the Bitwarden apps."
+  },
+  {
+   "id": "back-lookup",
+   "chapter": "back",
+   "member": "haldis",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-openclaw",
+   "replaces": [],
+   "chips": [
+    "OpenClaw"
+   ],
+   "category": "projects",
+   "film": true,
+   "title": "A part number, looked up",
+   "seed": "Gantry opens a supplier's website and finds the connector Haldis described. It lists three part numbers, and Haldis picks one.",
+   "limit": "Agent prepares, person approves. OpenClaw reaches websites over the office internet (disclosure). Errands, not coding. Hub, Settings, AI may hold cloud keys: say \"a model on the Core\" only if none are saved, never mention a key.",
+   "agent": "haldis",
+   "approval": "haldis",
+   "capabilityHint": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS and Android apps you pair by QR code."
+  },
+  {
+   "id": "back-order",
+   "chapter": "back",
+   "member": "haldis",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-openclaw",
+   "replaces": [],
+   "chips": [
+    "OpenClaw"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "The order form, filled",
+   "seed": "Gantry fills in the supplier's order form from the part list. Haldis reads every line before she sends it herself.",
+   "limit": "Never \"books\", \"buys\" or \"sends\" on its own (cap-autonomy). Say what stays with the supplier: payment.",
+   "agent": "haldis",
+   "approval": "haldis",
+   "capabilityHint": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS and Android apps you pair by QR code."
+  },
+  {
+   "id": "bench-firmware",
+   "chapter": "bench",
+   "member": "teodor",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "gitea",
+   "replaces": [
+    "GitHub"
+   ],
+   "chips": [
+    "Gitea",
+    "replaces GitHub"
+   ],
+   "category": "engineering",
+   "film": true,
+   "title": "Firmware beside the test rig",
+   "seed": "Teodor keeps the firmware in Gitea on the Core, a few steps from the test rig. Each change is a commit he can read.",
+   "limit": "Say where the repositories are. Never \"syncs with\" GitHub. No runner ships: never show a CI run. One Git host per office. Registration is open by default: the admin closes it.",
+   "bringHome": {
+    "from": "GitHub",
+    "carries": "repository code and history; issues and pull requests with a token",
+    "doesNot": "Actions workflows; Discussions; Projects; Pages"
+   },
+   "capabilityHint": "Host private Git repositories, pull requests and issues on your Core."
+  },
+  {
+   "id": "bench-wiring",
+   "chapter": "bench",
+   "member": "teodor",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "drawio",
+   "replaces": [
+    "Lucidchart"
+   ],
+   "chips": [
+    "draw.io",
+    "replaces Lucidchart"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "Wiring, drawn once",
+   "seed": "Teodor draws the pack wiring in draw.io. He saves the file into the repository, next to the firmware it belongs to.",
+   "limit": "draw.io is stateless: the file lives with the person or in the repository, never \"sits on the Core\" as an app. VSDX and Lucidchart files import; data-linked shapes do not.",
+   "bringHome": {
+    "from": "Lucidchart",
+    "carries": "shapes, connectors and text in most diagrams",
+    "doesNot": "data-linked shapes; comments and revision history; draw.io keeps no copy, the file is saved by the person"
+   },
+   "capabilityHint": "Draw flowcharts, floor plans and network maps in the browser."
+  },
+  {
+   "id": "bench-notebook",
+   "chapter": "bench",
+   "member": "teodor",
+   "anchor": {
+    "role": "workstation",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "jupyterlab",
+   "replaces": [],
+   "chips": [
+    "JupyterLab"
+   ],
+   "category": "engineering",
+   "film": false,
+   "title": "The test logs, in a notebook",
+   "seed": "Teodor reads the night's test logs in a notebook on the Core. The code runs on the Core, beside the rig that made the data.",
+   "limit": "No replaces chip (none listed). One password set at install. Installing a package reaches the internet. Do not describe the screen.",
+   "capabilityHint": "Write and run notebooks, code and data in a browser, on your Core."
+  },
+  {
+   "id": "bench-photos",
+   "chapter": "bench",
+   "member": "saoirse",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "immich",
+   "replaces": [
+    "Google Photos"
+   ],
+   "chips": [
+    "Immich",
+    "replaces Google Photos"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "Every cracked casing, filed",
+   "seed": "Saoirse photographs each casing that cracks in the test rig. The pictures land in Immich on the Core, one album for each test.",
+   "limit": "First start takes a while (database and machine learning). Phones on the office network only. Google Takeout import is partial: untitled albums cannot be rebuilt.",
+   "bringHome": {
+    "from": "Google Photos",
+    "carries": "photos and videos with capture dates; named albums",
+    "doesNot": "sharing and comments; untitled albums; faces and memories"
+   },
+   "capabilityHint": "Back up, search and organise your family photos and videos on your own Core."
+  },
+  {
+   "id": "bench-label",
+   "chapter": "bench",
+   "member": "saoirse",
+   "anchor": {
+    "role": "workstation",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "inkscape",
+   "replaces": [
+    "Adobe Illustrator"
+   ],
+   "chips": [
+    "Inkscape",
+    "replaces Adobe Illustrator"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The pack label, drawn",
+   "seed": "Saoirse draws the pack label in Inkscape, in her browser. The finished file goes into the repository with the casing drawings.",
+   "limit": "A browser session; no Photoshop equivalent. Do not call it a replacement of Illustrator's whole ecosystem.",
+   "capabilityHint": "Draw logos, diagrams and line art as vector graphics, in your browser."
+  },
+  {
+   "id": "bench-builds",
+   "chapter": "bench",
+   "member": "quentin",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workbench",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "vikunja",
+   "replaces": [
+    "Todoist",
+    "Asana"
+   ],
+   "chips": [
+    "Vikunja",
+    "replaces Todoist",
+    "replaces Asana"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The build board",
+   "seed": "Quentin sorts the week's builds on a Vikunja board. A card is a pack, and it moves when the test is done.",
+   "limit": "No QA problem (screenshot exists) but its capture is a sign-in wall: show nothing. Asana importer is Taiga's, not Vikunja's: no importer claim.",
+   "capabilityHint": "Lists, boards and calendars for tasks, with reminders and recurring jobs."
+  },
+  {
+   "id": "desk-parts",
+   "chapter": "desks",
+   "member": "lior",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "grist",
+   "replaces": [
+    "Airtable"
+   ],
+   "chips": [
+    "Grist",
+    "replaces Airtable"
+   ],
+   "category": "documents",
+   "film": true,
+   "title": "The parts list in one table",
+   "seed": "Lior keeps the parts list in a Grist table on the Core. Every connector has a row, a supplier and a note.",
+   "limit": "Grist is the Airtable-style pick; Airtable import is Baserow's, not Grist's: say what was rebuilt. Name it \"Grist\", sentence-initial counts as the app. In this Hub package Grist has one default sign-in (GRIST_DEFAULT_EMAIL) and no login provider: never per-person Grist accounts, never who sees which rows.",
+   "bringHome": {
+    "from": "Airtable",
+    "carries": "tables rebuilt by hand or by CSV; no importer claimed for Grist",
+    "doesNot": "automations and interfaces; row comments; revision history"
+   },
+   "capabilityHint": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
+  },
+  {
+   "id": "desk-datasheets",
+   "chapter": "desks",
+   "member": "lior",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "papra",
+   "replaces": [
+    "Evernote",
+    "Google Drive"
+   ],
+   "chips": [
+    "Papra",
+    "replaces Evernote",
+    "replaces Google Drive"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Datasheets, searchable",
+   "seed": "Lior drops each supplier datasheet into Papra on the Core. A search for a connector name brings up the right page.",
+   "limit": "Name case matters to the matcher: write \"Papra\". PDFs; no claim about text recognition quality.",
+   "capabilityHint": "Archive the receipts, warranties and contracts you rarely look at, until you need them."
+  },
+  {
+   "id": "desk-pack",
+   "chapter": "desks",
+   "member": "saoirse",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "stirling-pdf",
+   "replaces": [
+    "Adobe Acrobat"
+   ],
+   "chips": [
+    "Stirling-PDF",
+    "replaces Adobe Acrobat"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "One assembly pack",
+   "seed": "Saoirse merges the drawings and the datasheets into one assembly pack with Stirling-PDF. The file goes into the repository.",
+   "limit": "Never show the sign-in wall (default credentials). No claim that redaction is complete.",
+   "capabilityHint": "Merge, split, compress and convert PDFs on your own Core."
+  },
+  {
+   "id": "desk-letter",
+   "chapter": "desks",
+   "member": "haldis",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "libreoffice",
+   "replaces": [
+    "Microsoft Office"
+   ],
+   "chips": [
+    "LibreOffice",
+    "replaces Microsoft Office"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The pilot letter, drafted",
+   "seed": "Haldis drafts the pilot letter in LibreOffice on the Core. It shows in her browser, and she saves it into the folder.",
+   "limit": "One streamed desktop session, not co-editing. Name the suite, not features. Layout and tracked changes can differ from Office files.",
+   "capabilityHint": "The LibreOffice suite (Writer, Calc and more) in your browser."
+  },
+  {
+   "id": "nook-wiki",
+   "chapter": "nook",
+   "member": "quentin",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "bookstack",
+   "replaces": [
+    "Confluence"
+   ],
+   "chips": [
+    "BookStack",
+    "replaces Confluence"
+   ],
+   "category": "people",
+   "film": true,
+   "title": "Assembly notes, in order",
+   "seed": "The assembly notes are a BookStack book on the Core. A new technician reads them in order, with Quentin beside her.",
+   "limit": "Change the default credentials shown at first start. No verified Confluence importer.",
+   "bringHome": {
+    "from": "Confluence",
+    "carries": "nothing automatic; HTML or Word pages can be brought in by hand",
+    "doesNot": "macros; page history; the old space settings"
+   },
+   "capabilityHint": "Write a wiki or a set of manuals in books, chapters and pages, with search and history."
+  },
+  {
+   "id": "nook-sign",
+   "chapter": "nook",
+   "member": "haldis",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "papra",
+   "replaces": [
+    "Evernote"
+   ],
+   "chips": [
+    "Papra",
+    "replaces Evernote"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "The pilot, signed on paper",
+   "seed": "Haldis and a courier manager sign the pilot letter on paper at the nook table. Lior scans it into Papra before the manager leaves.",
+   "limit": "No e-signature claim here: paper, scanned. The manager is in the room; nobody outside the office reaches the Core.",
+   "capabilityHint": "Archive the receipts, warranties and contracts you rarely look at, until you need them."
+  },
+  {
+   "id": "kitchen-calendar",
+   "chapter": "kitchen",
+   "member": "quentin",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "baikal",
+   "replaces": [
+    "Google Calendar"
+   ],
+   "chips": [
+    "Baikal",
+    "replaces Google Calendar"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The test rig, on a calendar",
+   "seed": "The test rig has a calendar by the kettle. Quentin adds each run in Baikal, and the team reads it on the office network.",
+   "limit": "A CalDAV client is the way in; invitations from outside people still arrive at the mail provider. Overlaps Radicale: name one.",
+   "bringHome": {
+    "from": "Google Calendar",
+    "carries": "events, times, recurrence and attendees from the .ics file",
+    "doesNot": "sharing settings; Meet links; Tasks"
+   },
+   "capabilityHint": "A small CalDAV and CardDAV server for your calendars and contacts."
+  },
+  {
+   "id": "kitchen-books",
+   "chapter": "kitchen",
+   "member": "haldis",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "akaunting",
+   "replaces": [
+    "QuickBooks"
+   ],
+   "chips": [
+    "Akaunting",
+    "replaces QuickBooks"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "Friday, the books",
+   "seed": "On Friday Haldis does the books at the kitchen table. Akaunting holds them on the Core.",
+   "limit": "Bookkeeping only: no accounting, tax or legal advice, no payroll. Source-available (Business Source License): never \"open source\". The accountant may require QuickBooks or Xero. Akaunting free production use is limited to two users, one company and one thousand invoices (BSL 1.1 Additional Use Grant, upstream LICENSE.txt): show one person in it, never a team.",
+   "bringHome": {
+    "from": "QuickBooks",
+    "carries": "customers, transactions, bank transactions from CSV or Excel",
+    "doesNot": "the full books; the pay service; bank feeds"
+   },
+   "capabilityHint": "Invoicing, expenses, customers and profit and loss for a small business."
+  },
+  {
+   "id": "kitchen-week",
+   "chapter": "kitchen",
+   "member": "haldis",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "ci-planning",
+   "replaces": [],
+   "chips": [
+    "Companion Planning"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The build weeks, on one page",
+   "seed": "Haldis lays the build weeks out on one page in Companion Planning on the Core. The printed page hangs by the kettle.",
+   "limit": "An owner's planner, not a team calendar (one owner account). Google sync is off by default; do not say it never touches Google. Crash-report disclosure applies.",
+   "capabilityHint": "Plan tasks and time blocks in one local file on your Core. Briefings from a local model are optional."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to you",
+   "seed": "The firmware, the parts list and the supplier papers now sit beside the bench. Browse the Companion Hub store and pick your first apps.",
+   "limit": "closing body."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Haldis"
+   ],
+   "rows": [
+    {
+     "app": "ci-openclaw",
+     "name": "OpenClaw WebCLI",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "back-lookup",
+      "back-order"
+     ]
+    },
+    {
+     "app": "libreoffice",
+     "name": "LibreOffice",
+     "replaces": [
+      "Microsoft Office"
+     ],
+     "beats": [
+      "desk-letter"
+     ]
+    },
+    {
+     "app": "papra",
+     "name": "Papra",
+     "replaces": [
+      "Evernote"
+     ],
+     "beats": [
+      "nook-sign"
+     ]
+    },
+    {
+     "app": "akaunting",
+     "name": "Akaunting",
+     "replaces": [
+      "QuickBooks"
+     ],
+     "beats": [
+      "kitchen-books"
+     ]
+    },
+    {
+     "app": "ci-planning",
+     "name": "Companion Planning",
+     "replaces": [],
+     "beats": [
+      "kitchen-week"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "engineering",
+   "people": [
+    "Teodor"
+   ],
+   "rows": [
+    {
+     "app": "gitea",
+     "name": "Gitea",
+     "replaces": [
+      "GitHub"
+     ],
+     "beats": [
+      "bench-firmware"
+     ]
+    },
+    {
+     "app": "drawio",
+     "name": "draw.io",
+     "replaces": [
+      "Lucidchart"
+     ],
+     "beats": [
+      "bench-wiring"
+     ]
+    },
+    {
+     "app": "jupyterlab",
+     "name": "JupyterLab",
+     "replaces": [],
+     "beats": [
+      "bench-notebook"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "design",
+   "people": [
+    "Saoirse"
+   ],
+   "rows": [
+    {
+     "app": "immich",
+     "name": "Immich",
+     "replaces": [
+      "Google Photos"
+     ],
+     "beats": [
+      "bench-photos"
+     ]
+    },
+    {
+     "app": "inkscape",
+     "name": "Inkscape",
+     "replaces": [
+      "Adobe Illustrator"
+     ],
+     "beats": [
+      "bench-label"
+     ]
+    },
+    {
+     "app": "stirling-pdf",
+     "name": "Stirling-PDF",
+     "replaces": [
+      "Adobe Acrobat"
+     ],
+     "beats": [
+      "desk-pack"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "operations",
+   "people": [
+    "Lior"
+   ],
+   "rows": [
+    {
+     "app": "vaultwarden",
+     "name": "VaultWarden",
+     "replaces": [
+      "LastPass"
+     ],
+     "beats": [
+      "back-vault"
+     ]
+    },
+    {
+     "app": "grist",
+     "name": "Grist",
+     "replaces": [
+      "Airtable"
+     ],
+     "beats": [
+      "desk-parts"
+     ]
+    },
+    {
+     "app": "papra",
+     "name": "Papra",
+     "replaces": [
+      "Evernote",
+      "Google Drive"
+     ],
+     "beats": [
+      "desk-datasheets"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "support",
+   "people": [
+    "Quentin"
+   ],
+   "rows": [
+    {
+     "app": "vikunja",
+     "name": "Vikunja",
+     "replaces": [
+      "Todoist",
+      "Asana"
+     ],
+     "beats": [
+      "bench-builds"
+     ]
+    },
+    {
+     "app": "bookstack",
+     "name": "BookStack",
+     "replaces": [
+      "Confluence"
+     ],
+     "beats": [
+      "nook-wiki"
+     ]
+    },
+    {
+     "app": "baikal",
+     "name": "Baikal",
+     "replaces": [
+      "Google Calendar"
+     ],
+     "beats": [
+      "kitchen-calendar"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "back-vault",
+   "member": "lior",
+   "app": "vaultwarden",
+   "from": "LastPass",
+   "carries": "logins, notes and form data the CSV carries",
+   "doesNot": "attachments; one-time-code seeds; shared-folder structure"
+  },
+  {
+   "beat": "bench-firmware",
+   "member": "teodor",
+   "app": "gitea",
+   "from": "GitHub",
+   "carries": "repository code and history; issues and pull requests with a token",
+   "doesNot": "Actions workflows; Discussions; Projects; Pages"
+  },
+  {
+   "beat": "bench-wiring",
+   "member": "teodor",
+   "app": "drawio",
+   "from": "Lucidchart",
+   "carries": "shapes, connectors and text in most diagrams",
+   "doesNot": "data-linked shapes; comments and revision history; draw.io keeps no copy, the file is saved by the person"
+  },
+  {
+   "beat": "bench-photos",
+   "member": "saoirse",
+   "app": "immich",
+   "from": "Google Photos",
+   "carries": "photos and videos with capture dates; named albums",
+   "doesNot": "sharing and comments; untitled albums; faces and memories"
+  },
+  {
+   "beat": "desk-parts",
+   "member": "lior",
+   "app": "grist",
+   "from": "Airtable",
+   "carries": "tables rebuilt by hand or by CSV; no importer claimed for Grist",
+   "doesNot": "automations and interfaces; row comments; revision history"
+  },
+  {
+   "beat": "nook-wiki",
+   "member": "quentin",
+   "app": "bookstack",
+   "from": "Confluence",
+   "carries": "nothing automatic; HTML or Word pages can be brought in by hand",
+   "doesNot": "macros; page history; the old space settings"
+  },
+  {
+   "beat": "kitchen-calendar",
+   "member": "quentin",
+   "app": "baikal",
+   "from": "Google Calendar",
+   "carries": "events, times, recurrence and attendees from the .ics file",
+   "doesNot": "sharing settings; Meet links; Tasks"
+  },
+  {
+   "beat": "kitchen-books",
+   "member": "haldis",
+   "app": "akaunting",
+   "from": "QuickBooks",
+   "carries": "customers, transactions, bank transactions from CSV or Excel",
+   "doesNot": "the full books; the pay service; bank feeds"
+  }
+ ],
+ "rentedBefore": [
+  "LastPass",
+  "GitHub",
+  "Lucidchart",
+  "Google Photos",
+  "Adobe Illustrator",
+  "Todoist",
+  "Asana",
+  "Airtable",
+  "Evernote",
+  "Google Drive",
+  "Adobe Acrobat",
+  "Microsoft Office",
+  "Confluence",
+  "Google Calendar",
+  "QuickBooks"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "vaultwarden",
+    "name": "VaultWarden",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "gitea",
+    "name": "Gitea",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "drawio",
+    "name": "draw.io",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "jupyterlab",
+    "name": "JupyterLab",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "immich",
+    "name": "Immich",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "inkscape",
+    "name": "Inkscape",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "vikunja",
+    "name": "Vikunja",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "grist",
+    "name": "Grist",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "papra",
+    "name": "Papra",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "stirling-pdf",
+    "name": "Stirling-PDF",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "libreoffice",
+    "name": "LibreOffice",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "bookstack",
+    "name": "BookStack",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "baikal",
+    "name": "Baikal",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "akaunting",
+    "name": "Akaunting",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "Business Source License 1.1 (source-available): free production use only up to two users, one company and one thousand invoices"
+   }
+  ],
+  "firstParty": [
+   "ci-openclaw",
+   "ci-planning"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "back-lookup",
+   "bench-firmware",
+   "desk-parts",
+   "nook-wiki",
+   "kitchen-books",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 199,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Pannierwell",
+   "address": "5 Cooper's Row, Brackenmere",
+   "tagline": "Five people, one battery pack, and a Companion Core by the parts shelves.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "haldis",
+    "name": "Haldis",
+    "title": "Founder and electrical engineer",
+    "hookBeat": "back-lookup",
+    "hookTitle": "A part number, looked up",
+    "chips": [
+     "OpenClaw"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "teodor",
+    "name": "Teodor",
+    "title": "Firmware engineer",
+    "hookBeat": "bench-firmware",
+    "hookTitle": "Firmware beside the test rig",
+    "chips": [
+     "Gitea",
+     "replaces GitHub"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "lior",
+    "name": "Lior",
+    "title": "Supply and operations",
+    "hookBeat": "desk-parts",
+    "hookTitle": "The parts list in one table",
+    "chips": [
+     "Grist",
+     "replaces Airtable"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "openclaw-office-internet (new claims row: OpenClaw reaches websites over the office internet.)",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms",
+  "not-advice"
+ ],
+ "doNotSay": [
+  "the product is sold online",
+  "a customer portal",
+  "the van or the courier reaching the Core",
+  "a CI run"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 25,
+  "ftue": 6,
+  "roomBeats": 18,
+  "film": 9,
+  "members": 5,
+  "apps": 16,
+  "thirdPartyApps": 14,
+  "replacedServices": 15,
+  "bringHomeBeats": 8,
+  "categories": [
+   "setup",
+   "it",
+   "projects",
+   "money",
+   "engineering",
+   "design",
+   "documents",
+   "people",
+   "customers",
+   "communication"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "kitchen-books: \"a form the accountant can read\" implied the accountant reaches the Core; now a printout. Akaunting's free production use is capped at two users, one company, one thousand invoices (upstream LICENSE.txt), now carried",
+   "desk-parts: Grist has one default sign-in in this package; limit added",
+   "bench-wiring: draw.io is stateless, so the bring-your-data-home row now says draw.io keeps no copy"
+  ],
+  "unverified": [
+   "Gitea: registration is open by default (compose DISABLE_REGISTRATION=false); closing it is the admin's step",
+   "OpenClaw WebCLI reaching supplier sites: terms of the supplier sites unchecked"
+  ]
+ }
+}

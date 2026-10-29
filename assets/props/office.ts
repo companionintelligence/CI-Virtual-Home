@@ -403,3 +403,65 @@ registerProps({
     iso: [{ shape: 'box', box: [-0.75, 0, -0.565, 0.75, 1.25, -0.265], color: 'role:wood' }, { shape: 'box', box: [-0.38, 0, 0.22, 0.38, 0.5, 0.565], color: 'role:wood' }],
   },
 });
+
+// =================================================================================================================
+// SPIKE (w20 engine report): three office props written to the kit contract, to measure what a prop costs.
+//   office-desk       a bench-style workstation desk: laminate top, steel side frames, modesty panel, cable tray,
+//                     optional back screen (the spine of a back-to-back pod)
+//   office-chair      a mesh-back task chair on a five-star base
+//   conference-table  a rounded-rectangle meeting table on two slab pedestals, with a power-grommet strip
+// =================================================================================================================
+registerProps({
+  'office-desk': {
+    footprint: [1.4, 0.7], height: 0.74, params: ['w', 'd', 'color', 'screen'], tags: ['office'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 1.4, d = it.d || 0.7, h = 0.74, screenOn = it.screen !== false && it.screen !== 'false' && it.screen !== undefined, g = group('Office Desk');
+      const top = std(it.color ? hex(it.color) : mix(colors.linen, colors.wood, 0.18), { roughness: 0.45 }), frame = steel(std, colors), tray = darkPlastic(std);
+      g.add(box(w, 0.03, d, top, 0, h - 0.015, 0));                                                // laminate top
+      for (const sx of [-1, 1]) {
+        g.add(box(0.04, h - 0.03, d - 0.1, frame, sx * (w / 2 - 0.05), (h - 0.03) / 2, 0));       // side frame, a plate
+        g.add(box(0.06, 0.03, d - 0.04, frame, sx * (w / 2 - 0.05), 0.015, 0));                   // floor runner
+      }
+      g.add(box(w - 0.16, 0.36, 0.018, top, 0, 0.5, -d / 2 + 0.12));                               // modesty panel
+      g.add(box(w - 0.4, 0.05, 0.1, tray, 0, h - 0.07, -d / 2 + 0.1));                             // cable tray
+      if (screenOn) g.add(box(w - 0.02, 0.38, 0.035, std(colors.accent, { roughness: 0.95 }), 0, h + 0.19, -d / 2 + 0.02));   // fabric privacy screen
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.7, 0.71, -0.35, 0.7, 0.74, 0.35], color: 'role:linen' }, { shape: 'box', box: [-0.68, 0, -0.3, -0.64, 0.71, 0.3], color: 'role:metal' }, { shape: 'box', box: [0.64, 0, -0.3, 0.68, 0.71, 0.3], color: 'role:metal' }],
+  },
+  'office-chair': {
+    footprint: [0.6, 0.6], height: 1.0, params: ['color'], tags: ['office'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const g = group('Office Chair'), fabric = std(it.color ? hex(it.color) : colors.fabric, { roughness: 0.9 }), dark = darkPlastic(std), base = steel(std, colors);
+      g.add(cyl(THREE, 0.022, 0.022, 0.3, base, 0, 0.23, 0.02, 10));                              // gas lift
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2;
+        g.add(strut(THREE, [0, 0.08, 0.02], [Math.sin(a) * 0.27, 0.06, 0.02 + Math.cos(a) * 0.27], 0.016, base));   // five-star leg
+        g.add(cyl(THREE, 0.025, 0.025, 0.045, dark, Math.sin(a) * 0.27, 0.03, 0.02 + Math.cos(a) * 0.27, 8));      // caster
+      }
+      g.add(box(0.48, 0.07, 0.46, fabric, 0, 0.45, 0.04));                                         // seat
+      g.add(box(0.12, 0.05, 0.1, dark, 0, 0.4, 0.02));                                             // mechanism
+      const back = box(0.46, 0.46, 0.04, std(0x1f2937, { roughness: 0.8 }), 0, 0.74, -0.2); back.rotation.x = -0.12; g.add(back);   // mesh back
+      g.add(box(0.4, 0.04, 0.04, fabric, 0, 0.52, -0.2));                                          // lumbar bar
+      for (const sx of [-1, 1]) { g.add(box(0.03, 0.2, 0.03, dark, sx * 0.26, 0.58, -0.02)); g.add(box(0.05, 0.025, 0.24, dark, sx * 0.26, 0.69, 0.06)); }   // arms
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.24, 0.42, -0.19, 0.24, 0.5, 0.27], color: 'role:fabric' }, { shape: 'box', box: [-0.23, 0.5, -0.22, 0.23, 1.0, -0.18], color: '#1f2937' }, { shape: 'cyl', box: [-0.27, 0, -0.25, 0.27, 0.4, 0.29], color: 'role:metal' }],
+  },
+  'conference-table': {
+    footprint: [3, 1.2], height: 0.75, params: ['w', 'd', 'color'], tags: ['office'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 3, d = it.d || 1.2, h = 0.75, g = group('Conference Table'), r = Math.min(0.2, d / 4);
+      const topMat = std(it.color ? hex(it.color) : mix(colors.wood, colors.linen, 0.25), { roughness: 0.4 }), frame = steel(std, colors);
+      const s = new THREE.Shape(); const hx = w / 2, hz = d / 2;
+      s.moveTo(-hx + r, -hz); s.lineTo(hx - r, -hz); s.quadraticCurveTo(hx, -hz, hx, -hz + r); s.lineTo(hx, hz - r); s.quadraticCurveTo(hx, hz, hx - r, hz); s.lineTo(-hx + r, hz); s.quadraticCurveTo(-hx, hz, -hx, hz - r); s.lineTo(-hx, -hz + r); s.quadraticCurveTo(-hx, -hz, -hx + r, -hz);
+      const geo = new THREE.ExtrudeGeometry(s, { depth: 0.04, bevelEnabled: false, curveSegments: 6 }); geo.rotateX(Math.PI / 2);
+      const top = new THREE.Mesh(geo, topMat); top.position.y = h; top.castShadow = true; top.receiveShadow = true; g.add(top);   // rotateX sends the depth down from h
+      for (const sx of [-1, 1]) { g.add(box(0.08, h - 0.04, d * 0.6, frame, sx * (w / 2 - 0.55), (h - 0.04) / 2, 0)); g.add(box(0.1, 0.03, d * 0.7, frame, sx * (w / 2 - 0.55), 0.015, 0)); }
+      g.add(box(w * 0.45, 0.012, 0.11, darkPlastic(std), 0, h + 0.006, 0));                         // cable cover down the middle
+      for (const x of [-0.5, 0.5].map(k => k * w * 0.3)) g.add(cyl(THREE, 0.03, 0.03, 0.012, std(0x0b1220, { roughness: 0.3 }), x, h + 0.014, 0, 12));   // grommets
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-1.5, 0.71, -0.6, 1.5, 0.75, 0.6], color: 'role:wood' }, { shape: 'box', box: [-0.95, 0, -0.35, -0.87, 0.71, 0.35], color: 'role:metal' }, { shape: 'box', box: [0.87, 0, -0.35, 0.95, 0.71, 0.35], color: 'role:metal' }],
+  },
+});

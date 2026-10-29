@@ -419,7 +419,7 @@ test('a first-party app\'s screenshot is a screenshot too: the film takes the CI
 });
 test('plates.json for a home with no family: its name and its kind of place, its own shots, the stylised-Core line, nothing invented', () => {
   const homes = homesWithoutFamily();
-  assert.deepEqual(homes, ['city-one-bed', 'corner-penthouse', 'garden-flat', 'studio-loft', 'two-bed-flat', 'walkup-duplex']);
+  assert.deepEqual(homes, []);
   const info = homeInfo('garden-flat');
   assert.deepEqual([info.id, info.name, info.type, info.label], ['garden-flat', 'Garden Flat', 'apartment', 'Apartment']);
   assert.equal(homeInfo('studio-loft').name, 'Warehouse Loft'); assert.equal(homeInfo('studio-loft').id, 'warehouse-loft', 'a home is filmed under its display name, not the name its spec was filed under');

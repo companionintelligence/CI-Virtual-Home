@@ -1,0 +1,1643 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "lintel-and-sill",
+ "wave": 1,
+ "sizeLabel": "Small business",
+ "company": {
+  "name": "Lintel & Sill",
+  "tagline": "Eleven people draw extensions and shopfronts. The paper lives on one Core.",
+  "sector": "Architecture practice",
+  "size": "small",
+  "scope": "company",
+  "headcount": 11,
+  "floor": 11,
+  "story": "Lintel & Sill is a small architecture practice in a Georgian terrace house. Eleven people draw house extensions and shopfronts across three floors. Drawings, the post, hours and fee invoices sit on one Companion Core.",
+  "address": {
+   "line": "9 Tanyard Terrace",
+   "place": "Quenby Green"
+  },
+  "narrator": "v-warm-f"
+ },
+ "hookLine": "Drawings sit on the Core, in the office.",
+ "arc": "The best-fit small business: one building, one network, an owner who decides and paper everywhere. The practice manager owns the Core in the old pantry; the story is the post scanned at the front desk, the appointment signed at the front-room table, the drawings that sit on the Core. Edge: the site visit, the planning authority and the clients are out of frame; email, the bank and the accountant stay with the services that run them.",
+ "honestEdge": "Email, the bank and the pay service stay with the services that run them. The site is out of frame; clients and consultants outside cannot reach the Core.",
+ "building": {
+  "id": "practice-townhouse",
+  "display": "Fanlight House",
+  "concept": "Georgian stone-coloured terrace house of three storeys: sash windows (grid 2x2), columned porch with fanlight (features.porch), hip roof, dormers, chimney. The house builder at its strongest: no new engine construct. Cheapest concept (about 2 d).",
+  "exterior": "Georgian terrace",
+  "storeys": 3,
+  "areaSqm": 215,
+  "seats": 12,
+  "core": {
+   "room": "Comms Room",
+   "surface": "wall shelf, chalk Core",
+   "note": "The former pantry off the hall on level one, enlarged to 3.6 x 3.6 m (the engine report's 6 m2 pantry is too small for the finale lens). No windows."
+  },
+  "route": "porch, hall, Reception, corridor, Comms Room (short; film length by the budget formula about 18 s, an estimate).",
+  "rooms": [
+   {
+    "name": "Reception",
+    "sqm": 14,
+    "level": 1,
+    "roles": [
+     "reception"
+    ],
+    "program": "reception"
+   },
+   {
+    "name": "Waiting Room",
+    "sqm": 8,
+    "level": 1,
+    "roles": [
+     "reception"
+    ],
+    "program": "living"
+   },
+   {
+    "name": "Meeting Room",
+    "sqm": 20,
+    "level": 1,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 8,
+    "note": "the front room"
+   },
+   {
+    "name": "Kitchenette",
+    "sqm": 10,
+    "level": 1,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Comms Room",
+    "sqm": 13,
+    "level": 1,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   },
+   {
+    "name": "Partner Office North",
+    "sqm": 16,
+    "level": 2,
+    "roles": [
+     "office"
+    ],
+    "program": "study"
+   },
+   {
+    "name": "Partner Office South",
+    "sqm": 16,
+    "level": 2,
+    "roles": [
+     "office"
+    ],
+    "program": "study",
+    "note": "the practice manager's office"
+   },
+   {
+    "name": "Open Office",
+    "sqm": 24,
+    "level": 2,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 4
+   },
+   {
+    "name": "Archive Room",
+    "sqm": 16,
+    "level": 3,
+    "roles": [
+     "store"
+    ],
+    "program": "library",
+    "note": "filing cabinets, plan chest"
+   },
+   {
+    "name": "Quiet Room",
+    "sqm": 12,
+    "level": 3,
+    "roles": [],
+    "program": "den"
+   },
+   {
+    "name": "Supply Room",
+    "sqm": 6,
+    "level": 3,
+    "roles": [
+     "store"
+    ],
+    "program": "supply"
+   }
+  ]
+ },
+ "objectProps": "columned porch, plan chest, filing cabinets, a printed register, the front room table, a printed week on the wall",
+ "members": [
+  {
+   "id": "gideon",
+   "name": "Gideon",
+   "function": "owner",
+   "title": "Principal architect",
+   "colour": "chart-1",
+   "room": "Partner Office North",
+   "ownsCore": false,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": null,
+   "beats": [
+    "front-sign",
+    "front-ask",
+    "manager-letter",
+    "kitchen-notes"
+   ],
+   "apps": [
+    "docuseal",
+    "anything-llm",
+    "libreoffice",
+    "ci-memory"
+   ]
+  },
+  {
+   "id": "hira",
+   "name": "Hira",
+   "function": "design",
+   "title": "Architect",
+   "colour": "chart-2",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "front-plans",
+    "open-sketch",
+    "open-photos"
+   ],
+   "apps": [
+    "stirling-pdf",
+    "drawio",
+    "immich"
+   ]
+  },
+  {
+   "id": "reuben",
+   "name": "Reuben",
+   "function": "projects",
+   "title": "Project architect",
+   "colour": "chart-3",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "field_project_lead",
+    "personaResearch": "contractor",
+    "comfort": 3,
+    "tone": "Plain, dry, unhurried. Fragments: \"Quote done. Photos in.\"",
+    "aiStance": "Pragmatic: the paperwork, not the trade.",
+    "honestLimit": "The site and the van are out of every scene; the office, the yard and the bench are the story."
+   },
+   "companion": null,
+   "beats": [
+    "open-hours",
+    "open-spec",
+    "archive-search"
+   ],
+   "apps": [
+    "kimai",
+    "libreoffice",
+    "paperless"
+   ]
+  },
+  {
+   "id": "delphine",
+   "name": "Delphine",
+   "function": "finance",
+   "title": "Practice manager",
+   "colour": "chart-4",
+   "room": "Partner Office South",
+   "ownsCore": true,
+   "lens": {
+    "role": "finance_bookkeeping",
+    "personaResearch": "business-owner and organiser",
+    "comfort": 3,
+    "tone": "Exact, dry, deadline-led. Numbers are not adjectives.",
+    "aiStance": "Cautious. \"I read every line.\"",
+    "honestLimit": "Bookkeeping tools, never accounting, tax or legal advice; no payroll, no bank feeds; never tell anyone to leave their accountant."
+   },
+   "companion": {
+    "name": "Rafter",
+    "runtime": "Hermes",
+    "job": "Drafts the monthly note that goes with each fee invoice from details Delphine types.",
+    "personality": [
+     "exact",
+     "dry",
+     "patient"
+    ],
+    "voice": "v-steady-m",
+    "memory": false,
+    "limits": "Drafts only. Delphine reads and sends every note."
+   },
+   "beats": [
+    "ftue-hello",
+    "comms-rafter",
+    "manager-fees"
+   ],
+   "apps": [
+    "ci-hermes",
+    "invoice-ninja"
+   ]
+  },
+  {
+   "id": "oskar",
+   "name": "Oskar",
+   "function": "legal",
+   "title": "Appointments and contracts coordinator",
+   "colour": "chart-5",
+   "room": "Reception",
+   "ownsCore": false,
+   "lens": {
+    "role": "legal_contracts",
+    "personaResearch": "lawyer",
+    "comfort": 3,
+    "tone": "Precise, dry, guarded. Allergic to promises.",
+    "aiStance": "Split. Useful for a first pass; checks every cite.",
+    "honestLimit": "No legal, compliance or privilege claim; never a statement that a signature is valid."
+   },
+   "companion": null,
+   "beats": [
+    "comms-note",
+    "desk-post",
+    "archive-ask"
+   ],
+   "apps": [
+    "cryptgeon",
+    "paperless",
+    "anything-llm"
+   ]
+  },
+  {
+   "id": "rhys",
+   "name": "Rhys",
+   "function": "people",
+   "title": "Office and people coordinator",
+   "colour": "chart-1",
+   "room": "Open Office",
+   "ownsCore": false,
+   "lens": {
+    "role": "office_manager",
+    "personaResearch": "organiser",
+    "comfort": 3,
+    "tone": "Brisk, list-making, kind. Triages out loud. Humour about the printer.",
+    "aiStance": "Quiet user for notices and summaries. Not proud, not hiding. [?] no role survey",
+    "honestLimit": "Accounts are made app by app by whoever looks after each app; the Core is not a managed service."
+   },
+   "companion": null,
+   "beats": [
+    "desk-calendar",
+    "open-drawings",
+    "kitchen-standards"
+   ],
+   "apps": [
+    "baikal",
+    "nextcloud",
+    "bookstack"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "comms",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Comms Room",
+   "title": "The old pantry"
+  },
+  {
+   "id": "desk",
+   "kind": "room",
+   "room": "reception",
+   "roomName": "Reception",
+   "title": "The front desk"
+  },
+  {
+   "id": "front",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Meeting Room",
+   "title": "The front room"
+  },
+  {
+   "id": "manager",
+   "kind": "room",
+   "room": "office",
+   "roomName": "Partner Office South",
+   "title": "The practice manager's desk"
+  },
+  {
+   "id": "open",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office",
+   "title": "The open office"
+  },
+  {
+   "id": "archive",
+   "kind": "room",
+   "room": "store",
+   "roomName": "Archive Room",
+   "title": "The archive"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Kitchenette",
+   "title": "The kitchenette"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel under the porch",
+   "seed": "A parcel waits under the columned porch. Rhys carries it through the hall to the former pantry, where Delphine has cleared a shelf.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Oskar lifts the Core out, and Delphine reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Delphine plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Delphine opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the practice network.",
+   "limit": "phone rows: Join the Core's own network; Choose the practice network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Delphine picks Hermes, and the practice adds Nextcloud and Paperless-ngx. Then the drawings carry on.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "paperless",
+    "nextcloud"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "delphine",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Rafter says hello",
+   "seed": "Delphine messages the agent she named Rafter from her desk. Rafter answers from the Core in the old pantry.",
+   "limit": "note: Messages pass through the chat service you choose.",
+   "say": {
+    "speaker": "delphine",
+    "text": "Hello, Delphine. I draft the notes. You send them."
+   },
+   "agent": "delphine",
+   "approval": "delphine",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "comms-note",
+   "chapter": "comms",
+   "member": "oskar",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "cryptgeon",
+   "replaces": [
+    "Privnote"
+   ],
+   "chips": [
+    "Cryptgeon",
+    "replaces Privnote"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "A password that opens once",
+   "seed": "Oskar types the Wi-Fi password into Cryptgeon for a visiting surveyor. The note opens once, on the office network, and is gone.",
+   "limit": "Never \"secure\", \"private\" or \"encrypted\". Office network only: no link sent outside. Write the app name exactly: Cryptgeon.",
+   "capabilityHint": "Send a note or file as a one-time link that destroys itself after it is read."
+  },
+  {
+   "id": "comms-rafter",
+   "chapter": "comms",
+   "member": "delphine",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "The monthly note, drafted",
+   "seed": "Rafter drafts the monthly note that goes out with each fee invoice. Delphine reads it, changes a line and sends it herself.",
+   "limit": "Agent prepares, person approves; contacting a client needs the approval in the beat. The channel is not local. No result or time claim.",
+   "agent": "delphine",
+   "approval": "delphine",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "desk-post",
+   "chapter": "desk",
+   "member": "oskar",
+   "anchor": {
+    "role": "reception-desk",
+    "room": "reception",
+    "fallback": [
+     {
+      "role": "counter",
+      "room": "reception"
+     },
+     {
+      "role": "room",
+      "room": "reception"
+     }
+    ]
+   },
+   "app": "paperless",
+   "replaces": [
+    "Evernote"
+   ],
+   "chips": [
+    "Paperless-ngx",
+    "replaces Evernote"
+   ],
+   "category": "documents",
+   "film": true,
+   "title": "The post, scanned at the desk",
+   "seed": "The morning post is scanned at the front desk into Paperless-ngx. Oskar finds a council letter by one word on the page.",
+   "limit": "PDFs and scans only. AI features off by default. Never bare \"Paperless\". Never \"files your taxes\" or any compliance word.",
+   "capabilityHint": "Scan and file your paperwork. It reads every page, tags it and makes the lot searchable."
+  },
+  {
+   "id": "desk-calendar",
+   "chapter": "desk",
+   "member": "rhys",
+   "anchor": {
+    "role": "reception-desk",
+    "room": "reception",
+    "fallback": [
+     {
+      "role": "counter",
+      "room": "reception"
+     },
+     {
+      "role": "room",
+      "room": "reception"
+     }
+    ]
+   },
+   "app": "baikal",
+   "replaces": [
+    "Google Calendar",
+    "iCloud Calendar"
+   ],
+   "chips": [
+    "Baikal",
+    "replaces Google Calendar",
+    "replaces iCloud Calendar"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The front room, on a calendar",
+   "seed": "The front room has a calendar at the front desk. Rhys adds each meeting in Baikal, and everyone reads it on the office network.",
+   "limit": "CalDAV clients are the way in; invitations from outside people still arrive at the mail provider. Overlaps Radicale: name one.",
+   "bringHome": {
+    "from": "Google Calendar",
+    "carries": "events, times, recurrence and attendees from the .ics file",
+    "doesNot": "sharing settings; Meet links; Tasks"
+   },
+   "capabilityHint": "A small CalDAV and CardDAV server for your calendars and contacts."
+  },
+  {
+   "id": "front-sign",
+   "chapter": "front",
+   "member": "gideon",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "docuseal",
+   "replaces": [
+    "DocuSign"
+   ],
+   "chips": [
+    "Docuseal",
+    "replaces DocuSign"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "The appointment, signed at the table",
+   "seed": "Gideon and a client sign the appointment letter at the front room table. DocuSeal keeps the signed copy on the Core.",
+   "limit": "Never \"legally binding\" or \"valid\". The client is in the room; signers outside the office cannot reach the Core. No legal advice.",
+   "capabilityHint": "Fill and sign PDF forms on any device, from your own Core."
+  },
+  {
+   "id": "front-plans",
+   "chapter": "front",
+   "member": "hira",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "stirling-pdf",
+   "replaces": [
+    "Adobe Acrobat"
+   ],
+   "chips": [
+    "Stirling-PDF",
+    "replaces Adobe Acrobat"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "One set of drawings",
+   "seed": "Hira merges the plans, the sections and the schedule into one set with Stirling-PDF. The set goes into the job folder.",
+   "limit": "Never show the sign-in wall. No claim that redaction is complete. No planning or regulatory claim.",
+   "capabilityHint": "Merge, split, compress and convert PDFs on your own Core."
+  },
+  {
+   "id": "front-ask",
+   "chapter": "front",
+   "member": "gideon",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "anything-llm",
+   "replaces": [
+    "ChatGPT"
+   ],
+   "chips": [
+    "AnythingLLM",
+    "replaces ChatGPT"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "A question for the standards",
+   "seed": "Gideon asks a model on the Core what the practice's own standards say about a flat roof edge. He reads the page before he answers.",
+   "limit": "Local model only. No accuracy, speed or parity claim. Avoid the listing's \"multi-user\" and \"privacy-first\" words. No building-rule or compliance claim.",
+   "capabilityHint": "Chat with your own documents and run agents with web browsing, with several users and permissions."
+  },
+  {
+   "id": "manager-fees",
+   "chapter": "manager",
+   "member": "delphine",
+   "anchor": {
+    "role": "workstation",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "invoice-ninja",
+   "replaces": [
+    "QuickBooks",
+    "FreshBooks"
+   ],
+   "chips": [
+    "Invoice Ninja",
+    "replaces QuickBooks",
+    "replaces FreshBooks"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "Fee invoices, by stage",
+   "seed": "Delphine raises each fee invoice in Invoice Ninja at the end of a stage. The quotes and the invoices sit on the Core.",
+   "limit": "Invoicing, not payment processing. Emailing invoices needs SMTP. No ledger. Elastic License 2.0: never \"open source\". The accountant may need QuickBooks or Xero.",
+   "bringHome": {
+    "from": "QuickBooks",
+    "carries": "customers and invoices as CSV per data type",
+    "doesNot": "the full books; the pay service; bank feeds"
+   },
+   "capabilityHint": "Send invoices and quotes, track expenses and time, and get paid."
+  },
+  {
+   "id": "manager-letter",
+   "chapter": "manager",
+   "member": "gideon",
+   "anchor": {
+    "role": "desk",
+    "room": "office",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "office"
+     },
+     {
+      "role": "room",
+      "room": "office"
+     }
+    ]
+   },
+   "app": "libreoffice",
+   "replaces": [
+    "Microsoft Office"
+   ],
+   "chips": [
+    "LibreOffice",
+    "replaces Microsoft Office"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "A fee letter, drafted",
+   "seed": "Gideon drafts a fee letter in LibreOffice on the Core. It shows in his browser, and he saves it into the job folder.",
+   "limit": "One streamed desktop session, not co-editing. Name the suite, not features. Layout can differ from Office files. LibreOffice is one streamed desktop session shared by whoever opens it: never \"his own copy\" or \"saves to the job folder\" by itself.",
+   "capabilityHint": "The LibreOffice suite (Writer, Calc and more) in your browser."
+  },
+  {
+   "id": "open-sketch",
+   "chapter": "open",
+   "member": "hira",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "drawio",
+   "replaces": [
+    "Microsoft Visio"
+   ],
+   "chips": [
+    "draw.io",
+    "replaces Microsoft Visio"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "A diagram, saved with the job",
+   "seed": "Hira draws the stair logic as a diagram in draw.io. She saves the file into the job folder beside the plans.",
+   "limit": "draw.io is stateless: the file lives with the person or in the folder, never \"sits on the Core\" as an app. VSDX imports; layers and stencils may differ.",
+   "bringHome": {
+    "from": "Microsoft Visio",
+    "carries": "shapes, connectors and text in most diagrams",
+    "doesNot": "data graphics, macros and some stencils; layers and page behaviour; draw.io keeps no copy, the file is saved by the person"
+   },
+   "capabilityHint": "Draw flowcharts, floor plans and network maps in the browser."
+  },
+  {
+   "id": "open-photos",
+   "chapter": "open",
+   "member": "hira",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "immich",
+   "replaces": [
+    "Google Photos"
+   ],
+   "chips": [
+    "Immich",
+    "replaces Google Photos"
+   ],
+   "category": "projects",
+   "film": true,
+   "title": "Site photos, filed on return",
+   "seed": "Hira's site photos go into Immich on the Core once her phone is back on the office Wi-Fi. Each job has its own album.",
+   "limit": "The site visit is out of frame: only the return to the office is shown. Phones on the office network only. First start takes a while.",
+   "bringHome": {
+    "from": "Google Photos",
+    "carries": "photos and videos with capture dates; named albums",
+    "doesNot": "sharing and comments; untitled albums; faces and memories"
+   },
+   "capabilityHint": "Back up, search and organise your family photos and videos on your own Core."
+  },
+  {
+   "id": "open-hours",
+   "chapter": "open",
+   "member": "reuben",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "kimai",
+   "replaces": [],
+   "chips": [
+    "Kimai"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "Each person logs their hours",
+   "seed": "Each person logs their own hours against the job in Kimai. Reuben reads the totals before the stage ends.",
+   "limit": "Each person logs their own hours; never \"tracks every employee\". Not a billing or tax tool. No replaces chip (none listed).",
+   "capabilityHint": "Track time per project and client, with reports."
+  },
+  {
+   "id": "open-spec",
+   "chapter": "open",
+   "member": "reuben",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "libreoffice",
+   "replaces": [
+    "Microsoft Office"
+   ],
+   "chips": [
+    "LibreOffice",
+    "replaces Microsoft Office"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "The specification, drafted",
+   "seed": "Reuben drafts the specification in LibreOffice and saves it with the drawings. A printed copy goes on the plan chest.",
+   "limit": "Layout and tracked changes can differ from Office files; test a few important files first.",
+   "capabilityHint": "The LibreOffice suite (Writer, Calc and more) in your browser."
+  },
+  {
+   "id": "open-drawings",
+   "chapter": "open",
+   "member": "rhys",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "nextcloud",
+   "replaces": [
+    "Google Drive",
+    "Dropbox"
+   ],
+   "chips": [
+    "Nextcloud",
+    "replaces Google Drive",
+    "replaces Dropbox"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Drawings sit on the Core",
+   "seed": "Every job's drawings sit in Nextcloud on the Core. Rhys opens a section from the open office, and the old shared drive stays shut.",
+   "limit": "No sharing with clients or consultants outside: not claimed. Share links and version history do not come across.",
+   "bringHome": {
+    "from": "Google Drive",
+    "carries": "files and folders with names and structure; Docs and Sheets as Office files",
+    "doesNot": "sharing and access settings; comments and suggestion history; version history"
+   },
+   "capabilityHint": "Your files, calendar and contacts on your own Core, synced to your devices."
+  },
+  {
+   "id": "archive-search",
+   "chapter": "archive",
+   "member": "reuben",
+   "anchor": {
+    "role": "bookshelf",
+    "room": "store",
+    "fallback": [
+     {
+      "role": "printer",
+      "room": "store"
+     },
+     {
+      "role": "room",
+      "room": "store"
+     }
+    ]
+   },
+   "app": "paperless",
+   "replaces": [
+    "Google Drive"
+   ],
+   "chips": [
+    "Paperless-ngx",
+    "replaces Google Drive"
+   ],
+   "category": "documents",
+   "film": true,
+   "title": "The old drawing register",
+   "seed": "The paper register of finished jobs is scanned into Paperless-ngx. Reuben finds a ten-year-old detail by one word.",
+   "limit": "Never bare \"Paperless\". Scans and PDFs only. Do not call it an archive of record.",
+   "capabilityHint": "Scan and file your paperwork. It reads every page, tags it and makes the lot searchable."
+  },
+  {
+   "id": "archive-ask",
+   "chapter": "archive",
+   "member": "oskar",
+   "anchor": {
+    "role": "bookshelf",
+    "room": "store",
+    "fallback": [
+     {
+      "role": "printer",
+      "room": "store"
+     },
+     {
+      "role": "room",
+      "room": "store"
+     }
+    ]
+   },
+   "app": "anything-llm",
+   "replaces": [
+    "Claude"
+   ],
+   "chips": [
+    "AnythingLLM",
+    "replaces Claude"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Which letters mention a stage",
+   "seed": "Oskar asks a model on the Core which appointment letters mention a given stage. He opens each letter himself before he relies on it.",
+   "limit": "Local model only. Name the model \"a model on the Core\". No accuracy or legal claim.",
+   "capabilityHint": "Chat with your own documents and run agents with web browsing, with several users and permissions."
+  },
+  {
+   "id": "kitchen-standards",
+   "chapter": "kitchen",
+   "member": "rhys",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "bookstack",
+   "replaces": [
+    "Confluence",
+    "Notion"
+   ],
+   "chips": [
+    "BookStack",
+    "replaces Confluence",
+    "replaces Notion"
+   ],
+   "category": "people",
+   "film": false,
+   "title": "The office standards, in a book",
+   "seed": "The practice's standards are a BookStack book on the Core. Rhys walks a new starter through them at the kitchen table.",
+   "limit": "Change the default credentials at first start. No verified Notion or Confluence importer for BookStack.",
+   "capabilityHint": "Write a wiki or a set of manuals in books, chapters and pages, with search and history."
+  },
+  {
+   "id": "kitchen-notes",
+   "chapter": "kitchen",
+   "member": "gideon",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "ci-memory",
+   "replaces": [],
+   "chips": [
+    "Companion Memory"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "His own notes, kept close",
+   "seed": "Gideon keeps his own site notes in Companion Memory (beta). It is one person's file, and he chooses what goes in.",
+   "limit": "Beta, first mention \"(beta)\". One person's context; imports opt-in; crash reports on by default. Never \"company brain\".",
+   "capabilityHint": "Companion Memory keeps your digital life on your own disk, so your agents know your context and a cloud does not."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to your practice",
+   "seed": "The drawings, the post, the hours and the fee invoices now sit in one old pantry. Browse the Companion Hub store and pick your first apps.",
+   "limit": "closing body."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Gideon"
+   ],
+   "rows": [
+    {
+     "app": "docuseal",
+     "name": "Docuseal",
+     "replaces": [
+      "DocuSign"
+     ],
+     "beats": [
+      "front-sign"
+     ]
+    },
+    {
+     "app": "anything-llm",
+     "name": "AnythingLLM",
+     "replaces": [
+      "ChatGPT"
+     ],
+     "beats": [
+      "front-ask"
+     ]
+    },
+    {
+     "app": "libreoffice",
+     "name": "LibreOffice",
+     "replaces": [
+      "Microsoft Office"
+     ],
+     "beats": [
+      "manager-letter"
+     ]
+    },
+    {
+     "app": "ci-memory",
+     "name": "Companion Memory",
+     "replaces": [],
+     "beats": [
+      "kitchen-notes"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "design",
+   "people": [
+    "Hira"
+   ],
+   "rows": [
+    {
+     "app": "stirling-pdf",
+     "name": "Stirling-PDF",
+     "replaces": [
+      "Adobe Acrobat"
+     ],
+     "beats": [
+      "front-plans"
+     ]
+    },
+    {
+     "app": "drawio",
+     "name": "draw.io",
+     "replaces": [
+      "Microsoft Visio"
+     ],
+     "beats": [
+      "open-sketch"
+     ]
+    },
+    {
+     "app": "immich",
+     "name": "Immich",
+     "replaces": [
+      "Google Photos"
+     ],
+     "beats": [
+      "open-photos"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "projects",
+   "people": [
+    "Reuben"
+   ],
+   "rows": [
+    {
+     "app": "kimai",
+     "name": "Kimai",
+     "replaces": [],
+     "beats": [
+      "open-hours"
+     ]
+    },
+    {
+     "app": "libreoffice",
+     "name": "LibreOffice",
+     "replaces": [
+      "Microsoft Office"
+     ],
+     "beats": [
+      "open-spec"
+     ]
+    },
+    {
+     "app": "paperless",
+     "name": "Paperless-ngx",
+     "replaces": [
+      "Google Drive"
+     ],
+     "beats": [
+      "archive-search"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "finance",
+   "people": [
+    "Delphine"
+   ],
+   "rows": [
+    {
+     "app": "ci-hermes",
+     "name": "Hermes",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "comms-rafter"
+     ]
+    },
+    {
+     "app": "invoice-ninja",
+     "name": "Invoice Ninja",
+     "replaces": [
+      "QuickBooks",
+      "FreshBooks"
+     ],
+     "beats": [
+      "manager-fees"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "legal",
+   "people": [
+    "Oskar"
+   ],
+   "rows": [
+    {
+     "app": "cryptgeon",
+     "name": "Cryptgeon",
+     "replaces": [
+      "Privnote"
+     ],
+     "beats": [
+      "comms-note"
+     ]
+    },
+    {
+     "app": "paperless",
+     "name": "Paperless-ngx",
+     "replaces": [
+      "Evernote"
+     ],
+     "beats": [
+      "desk-post"
+     ]
+    },
+    {
+     "app": "anything-llm",
+     "name": "AnythingLLM",
+     "replaces": [
+      "Claude"
+     ],
+     "beats": [
+      "archive-ask"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "people",
+   "people": [
+    "Rhys"
+   ],
+   "rows": [
+    {
+     "app": "baikal",
+     "name": "Baikal",
+     "replaces": [
+      "Google Calendar",
+      "iCloud Calendar"
+     ],
+     "beats": [
+      "desk-calendar"
+     ]
+    },
+    {
+     "app": "nextcloud",
+     "name": "Nextcloud",
+     "replaces": [
+      "Google Drive",
+      "Dropbox"
+     ],
+     "beats": [
+      "open-drawings"
+     ]
+    },
+    {
+     "app": "bookstack",
+     "name": "BookStack",
+     "replaces": [
+      "Confluence",
+      "Notion"
+     ],
+     "beats": [
+      "kitchen-standards"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "desk-calendar",
+   "member": "rhys",
+   "app": "baikal",
+   "from": "Google Calendar",
+   "carries": "events, times, recurrence and attendees from the .ics file",
+   "doesNot": "sharing settings; Meet links; Tasks"
+  },
+  {
+   "beat": "manager-fees",
+   "member": "delphine",
+   "app": "invoice-ninja",
+   "from": "QuickBooks",
+   "carries": "customers and invoices as CSV per data type",
+   "doesNot": "the full books; the pay service; bank feeds"
+  },
+  {
+   "beat": "open-sketch",
+   "member": "hira",
+   "app": "drawio",
+   "from": "Microsoft Visio",
+   "carries": "shapes, connectors and text in most diagrams",
+   "doesNot": "data graphics, macros and some stencils; layers and page behaviour; draw.io keeps no copy, the file is saved by the person"
+  },
+  {
+   "beat": "open-photos",
+   "member": "hira",
+   "app": "immich",
+   "from": "Google Photos",
+   "carries": "photos and videos with capture dates; named albums",
+   "doesNot": "sharing and comments; untitled albums; faces and memories"
+  },
+  {
+   "beat": "open-drawings",
+   "member": "rhys",
+   "app": "nextcloud",
+   "from": "Google Drive",
+   "carries": "files and folders with names and structure; Docs and Sheets as Office files",
+   "doesNot": "sharing and access settings; comments and suggestion history; version history"
+  }
+ ],
+ "rentedBefore": [
+  "Privnote",
+  "Evernote",
+  "Google Calendar",
+  "iCloud Calendar",
+  "DocuSign",
+  "Adobe Acrobat",
+  "ChatGPT",
+  "QuickBooks",
+  "FreshBooks",
+  "Microsoft Office",
+  "Microsoft Visio",
+  "Google Photos",
+  "Google Drive",
+  "Dropbox",
+  "Claude",
+  "Confluence",
+  "Notion"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "cryptgeon",
+    "name": "Cryptgeon",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "paperless",
+    "name": "Paperless-ngx",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "baikal",
+    "name": "Baikal",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "docuseal",
+    "name": "Docuseal",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "stirling-pdf",
+    "name": "Stirling-PDF",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "anything-llm",
+    "name": "AnythingLLM",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "invoice-ninja",
+    "name": "Invoice Ninja",
+    "storySafe": "with-caveat",
+    "qa": "screenshot",
+    "licence": "Elastic License 2.0 (source-available)"
+   },
+   {
+    "id": "libreoffice",
+    "name": "LibreOffice",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "drawio",
+    "name": "draw.io",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "immich",
+    "name": "Immich",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "kimai",
+    "name": "Kimai",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "nextcloud",
+    "name": "Nextcloud",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "bookstack",
+    "name": "BookStack",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   }
+  ],
+  "firstParty": [
+   "ci-hermes",
+   "ci-memory"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "comms-rafter",
+   "desk-post",
+   "manager-fees",
+   "open-photos",
+   "archive-search",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 204,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Lintel & Sill",
+   "address": "9 Tanyard Terrace, Quenby Green",
+   "tagline": "Eleven people draw extensions and shopfronts. The paper lives on one Core.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "oskar",
+    "name": "Oskar",
+    "title": "Appointments and contracts coordinator",
+    "hookBeat": "desk-post",
+    "hookTitle": "The post, scanned at the desk",
+    "chips": [
+     "Paperless-ngx",
+     "replaces Evernote"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "delphine",
+    "name": "Delphine",
+    "title": "Practice manager",
+    "hookBeat": "manager-fees",
+    "hookTitle": "Fee invoices, by stage",
+    "chips": [
+     "Invoice Ninja",
+     "replaces QuickBooks",
+     "replaces FreshBooks"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "hira",
+    "name": "Hira",
+    "title": "Architect",
+    "hookBeat": "open-photos",
+    "hookTitle": "Site photos, filed on return",
+    "chips": [
+     "Immich",
+     "replaces Google Photos"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms",
+  "not-advice"
+ ],
+ "doNotSay": [
+  "planning or building-regulation compliance",
+  "a statement that a signature is valid",
+  "share drawings with a consultant outside",
+  "client portal",
+  "tax"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 25,
+  "ftue": 6,
+  "roomBeats": 18,
+  "film": 9,
+  "members": 6,
+  "apps": 15,
+  "thirdPartyApps": 13,
+  "replacedServices": 17,
+  "bringHomeBeats": 5,
+  "categories": [
+   "setup",
+   "it",
+   "money",
+   "documents",
+   "communication",
+   "customers",
+   "design",
+   "projects",
+   "people"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "comms-note: dropped \"replaces WeTransfer\": Cryptgeon notes open once on the office network and cannot send a file to an outsider (the beat's own limit)",
+   "open-spec: dropped \"replaces Google Workspace\" (market review: documents part only; Baikal already carries the calendar swap)",
+   "open-sketch: draw.io keeps no copy, said in the bring-your-data-home row",
+   "hook line and titles: \"stay in the office/studio/shop\" is a place claim wider than the canon's \"sits on the Core\" (and a sent newsletter hands its addresses to the mail provider); now \"sit on the Core\""
+  ],
+  "unverified": [
+   "AnythingLLM multi-user mode and its listing words (\"multi-user\", \"privacy-first\") are not repeated",
+   "Cryptgeon: notes live only in RAM; a restart wipes every unread note"
+  ]
+ }
+}

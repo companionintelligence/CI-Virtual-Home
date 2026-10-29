@@ -1,0 +1,1818 @@
+{
+ "schema": "company-brief/v1",
+ "note": "Starting brief for the story writer of this company (WP4). Not a story file: seeds are lint-clean example wording (the banned phrases of claims.json plus the proposed business rows, the shape rules and the app matcher ran over every string), to be rewritten, not pasted. Names are invented and pending counsel clearance.",
+ "generated": "2026-10-19",
+ "slug": "gutterfold",
+ "wave": 2,
+ "sizeLabel": "Small business",
+ "company": {
+  "name": "Gutterfold",
+  "tagline": "Fourteen people design the packaging for food and drink makers.",
+  "sector": "Brand and packaging studio",
+  "size": "small",
+  "scope": "company",
+  "headcount": 14,
+  "floor": 14,
+  "story": "Gutterfold designs brands and packaging for food and drink makers. Fourteen people work in a former printworks, under a double-height studio floor. Files, proofs, hours and invoices sit on one Companion Core.",
+  "address": {
+   "line": "11 Bindery Lane",
+   "place": "Pardew Cross"
+  },
+  "narrator": "v-storyteller-m"
+ },
+ "hookLine": "Design files sit on the Core, in the studio.",
+ "arc": "A studio told through objects: the brand folders, the pin-up wall, the proofs from the printer, the Friday hours. The studio manager touches every app and owns the Core, so she narrates the office. Designers stay conflicted about AI: one small beat, a summary she checks. Edge: clients outside cannot reach the Core; proofs reach clients the way they always have.",
+ "honestEdge": "Clients outside the studio cannot reach the Core. Files leave the way they always left: carried, printed or sent through the mail provider.",
+ "building": {
+  "id": "agency-printworks",
+  "display": "The Old Printworks",
+  "concept": "Dark-brick two-storey printworks conversion: tall steel windows, a glazed former loading door, a double-height studio floor with a mezzanine over about 40 percent of the plate.",
+  "exterior": "brick printworks",
+  "storeys": 2,
+  "areaSqm": 290,
+  "seats": 18,
+  "core": {
+   "room": "Comms Room",
+   "surface": "wall shelf, chalk Core",
+   "note": "Comms Room 3.6 x 3.6 m on level one, at the back of the studio floor. The stair to the mezzanine is not on the route (reached by story walks only). Rails across the stair step-off need a check (APARTMENTS 2.6)."
+  },
+  "route": "glazed loading door, Reception, past the long table under the mezzanine, the Comms Room at the back.",
+  "rooms": [
+   {
+    "name": "Reception",
+    "sqm": 14,
+    "roles": [
+     "reception"
+    ],
+    "program": "reception"
+   },
+   {
+    "name": "Studio Floor",
+    "sqm": 62,
+    "roles": [
+     "workfloor"
+    ],
+    "program": "workspace",
+    "seats": 8,
+    "note": "double height, pin-up wall"
+   },
+   {
+    "name": "Pitch Room",
+    "sqm": 16,
+    "roles": [
+     "meeting"
+    ],
+    "program": "meeting",
+    "seats": 8
+   },
+   {
+    "name": "Studio Kitchen",
+    "sqm": 18,
+    "roles": [
+     "kitchen"
+    ],
+    "program": "kitchen"
+   },
+   {
+    "name": "Print Room",
+    "sqm": 9,
+    "roles": [
+     "workshop"
+    ],
+    "program": "supply",
+    "note": "plan table, large-format printer (P2 agency set)"
+   },
+   {
+    "name": "Phone Booth",
+    "sqm": 4,
+    "roles": [
+     "meeting"
+    ]
+   },
+   {
+    "name": "Comms Room",
+    "sqm": 13,
+    "roles": [
+     "server"
+    ],
+    "core": true
+   },
+   {
+    "name": "Open Office Mezzanine",
+    "sqm": 40,
+    "level": 2,
+    "roles": [
+     "workfloor",
+     "office"
+    ],
+    "program": "workspace",
+    "seats": 8
+   },
+   {
+    "name": "Producer Office",
+    "sqm": 10,
+    "level": 2,
+    "roles": [
+     "office"
+    ],
+    "program": "study"
+   }
+  ]
+ },
+ "objectProps": "pin-up wall and long table under the mezzanine, plan table and printer in the print room, proofs on a rail",
+ "members": [
+  {
+   "id": "freya",
+   "name": "Freya",
+   "function": "owner",
+   "title": "Founder and creative director",
+   "colour": "chart-1",
+   "room": "Studio Floor",
+   "ownsCore": false,
+   "lens": {
+    "role": "founder_owner",
+    "personaResearch": "business-owner",
+    "comfort": 2,
+    "tone": "Short dry bursts to peers, warm and exact with clients. Opens on a concrete noun.",
+    "aiStance": "Pragmatic. Wants drafts and answers from her own files. Proud of a chore done, not of having AI.",
+    "honestLimit": "No payroll, card processing or bank feeds; backup is the company's job; one Core is one owner's."
+   },
+   "companion": null,
+   "beats": [
+    "studio-clients",
+    "studio-brief",
+    "pitch-sign"
+   ],
+   "apps": [
+    "espocrm",
+    "open-webui",
+    "documenso"
+   ]
+  },
+  {
+   "id": "amara",
+   "name": "Amara",
+   "function": "design",
+   "title": "Art director",
+   "colour": "chart-2",
+   "room": "Studio Floor",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "studio-files",
+    "print-proofs",
+    "print-swatch"
+   ],
+   "apps": [
+    "nextcloud",
+    "stirling-pdf"
+   ]
+  },
+  {
+   "id": "luca",
+   "name": "Luca",
+   "function": "design",
+   "title": "Senior designer",
+   "colour": "chart-3",
+   "room": "Studio Floor",
+   "ownsCore": false,
+   "lens": {
+    "role": "designer",
+    "personaResearch": "creative",
+    "comfort": 3,
+    "tone": "Visual, opinionated, short. Reads terms updates like contracts.",
+    "aiStance": "The most guarded about generative AI. Practical about retouching, wary of generation. Do not push AI.",
+    "honestLimit": "Penpot is a tool, not a Figma migration; files an outside client must open stay on the office network."
+   },
+   "companion": null,
+   "beats": [
+    "studio-layout",
+    "studio-vector",
+    "print-photos"
+   ],
+   "apps": [
+    "penpot",
+    "inkscape",
+    "immich"
+   ]
+  },
+  {
+   "id": "tamsin",
+   "name": "Tamsin",
+   "function": "projects",
+   "title": "Studio producer",
+   "colour": "chart-4",
+   "room": "Pitch Room",
+   "ownsCore": false,
+   "lens": {
+    "role": "field_project_lead",
+    "personaResearch": "contractor",
+    "comfort": 3,
+    "tone": "Plain, dry, unhurried. Fragments: \"Quote done. Photos in.\"",
+    "aiStance": "Pragmatic: the paperwork, not the trade.",
+    "honestLimit": "The site and the van are out of every scene; the office, the yard and the bench are the story."
+   },
+   "companion": null,
+   "beats": [
+    "studio-board",
+    "pitch-wall",
+    "kitchen-hours"
+   ],
+   "apps": [
+    "planka",
+    "excalidraw",
+    "kimai"
+   ]
+  },
+  {
+   "id": "imani",
+   "name": "Imani",
+   "function": "marketing",
+   "title": "Studio marketing lead",
+   "colour": "chart-5",
+   "room": "Open Office Mezzanine",
+   "ownsCore": false,
+   "lens": {
+    "role": "marketing",
+    "personaResearch": "marketer",
+    "comfort": 3,
+    "tone": "Practical, sceptical of gurus, short. \"Who holds the list?\"",
+    "aiStance": "Pragmatic, quietly pleased, careful who is told.",
+    "honestLimit": "Posts still go out to the platform; mail still leaves through a sender; no result, time or money claim."
+   },
+   "companion": null,
+   "beats": [
+    "studio-chat",
+    "mezz-news",
+    "mezz-draft"
+   ],
+   "apps": [
+    "mattermost",
+    "listmonk",
+    "open-webui"
+   ]
+  },
+  {
+   "id": "priya",
+   "name": "Priya",
+   "function": "operations",
+   "title": "Studio manager",
+   "colour": "chart-1",
+   "room": "Comms Room",
+   "ownsCore": true,
+   "lens": {
+    "role": "office_manager",
+    "personaResearch": "organiser",
+    "comfort": 3,
+    "tone": "Brisk, list-making, kind. Triages out loud. Humour about the printer.",
+    "aiStance": "Quiet user for notices and summaries. Not proud, not hiding. [?] no role survey",
+    "honestLimit": "Accounts are made app by app by whoever looks after each app; the Core is not a managed service."
+   },
+   "companion": {
+    "name": "Bobbin",
+    "runtime": "Hermes",
+    "job": "Drafts payment reminders and supplier notes from the details Priya types to it.",
+    "personality": [
+     "kind",
+     "brisk",
+     "tidy"
+    ],
+    "voice": "v-warm-f",
+    "memory": false,
+    "limits": "Drafts only. Priya reads and sends every message."
+   },
+   "beats": [
+    "ftue-hello",
+    "comms-dns",
+    "comms-late",
+    "kitchen-handbook"
+   ],
+   "apps": [
+    "ci-hermes",
+    "pi-hole",
+    "nextcloud"
+   ]
+  },
+  {
+   "id": "bilal",
+   "name": "Bilal",
+   "function": "finance",
+   "title": "Part-time bookkeeper",
+   "colour": "chart-2",
+   "room": "Open Office Mezzanine",
+   "ownsCore": false,
+   "lens": {
+    "role": "finance_bookkeeping",
+    "personaResearch": "business-owner and organiser",
+    "comfort": 3,
+    "tone": "Exact, dry, deadline-led. Numbers are not adjectives.",
+    "aiStance": "Cautious. \"I read every line.\"",
+    "honestLimit": "Bookkeeping tools, never accounting, tax or legal advice; no payroll, no bank feeds; never tell anyone to leave their accountant."
+   },
+   "companion": null,
+   "beats": [
+    "mezz-invoices",
+    "mezz-books",
+    "kitchen-rents"
+   ],
+   "apps": [
+    "invoice-ninja",
+    "nextcloud",
+    "wallos"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "ftue",
+   "kind": "ftue",
+   "title": "First run"
+  },
+  {
+   "id": "comms",
+   "kind": "room",
+   "room": "server",
+   "roomName": "Comms Room",
+   "title": "The comms room"
+  },
+  {
+   "id": "studio",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Studio Floor",
+   "title": "The studio floor"
+  },
+  {
+   "id": "pitch",
+   "kind": "room",
+   "room": "meeting",
+   "roomName": "Pitch Room",
+   "title": "The pitch room"
+  },
+  {
+   "id": "print",
+   "kind": "room",
+   "room": "workshop",
+   "roomName": "Print Room",
+   "title": "The print room"
+  },
+  {
+   "id": "mezz",
+   "kind": "room",
+   "room": "workfloor",
+   "roomName": "Open Office Mezzanine",
+   "title": "The mezzanine"
+  },
+  {
+   "id": "kitchen",
+   "kind": "room",
+   "room": "kitchen",
+   "roomName": "Studio Kitchen",
+   "title": "The studio kitchen"
+  },
+  {
+   "id": "outro",
+   "kind": "outro",
+   "title": "Your turn"
+  }
+ ],
+ "beats": [
+  {
+   "id": "ftue-delivery",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "front-door",
+    "fallback": [
+     {
+      "role": "street"
+     }
+    ]
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "A parcel at the loading door",
+   "seed": "A parcel waits at the old loading door. Luca wheels it across the studio floor to the comms room, where Priya has cleared a shelf.",
+   "limit": ""
+  },
+  {
+   "id": "ftue-unbox",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Unbox the Companion Core",
+   "seed": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Amara lifts the Core out, and Priya reads the guide.",
+   "limit": "Show exactly the box contents."
+  },
+  {
+   "id": "ftue-plug-in",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Plug it in",
+   "seed": "Priya plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+   "limit": "note: Companion OS is in beta."
+  },
+  {
+   "id": "ftue-join",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Join it from a phone",
+   "seed": "Priya opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the studio network.",
+   "limit": "phone rows: Join the Core's own network; Choose the studio network; Enter its password",
+   "phone": true
+  },
+  {
+   "id": "ftue-pick",
+   "chapter": "ftue",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": false,
+   "title": "Pick the first agent and apps",
+   "seed": "In the Companion Hub store, Priya picks Hermes, and the studio adds Nextcloud and Mattermost. Then everyone gets back to the proofs.",
+   "limit": "note: Installing apps uses the internet.",
+   "phone": true,
+   "with": [
+    "mattermost",
+    "nextcloud"
+   ]
+  },
+  {
+   "id": "ftue-hello",
+   "chapter": "ftue",
+   "member": "priya",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "setup",
+   "film": true,
+   "title": "Bobbin says hello",
+   "seed": "Priya messages the agent she named Bobbin from the studio floor. Bobbin answers from the Core in the comms room.",
+   "limit": "note: Messages pass through the chat service you choose.",
+   "say": {
+    "speaker": "priya",
+    "text": "Hello, Priya. I draft the reminders. You press send."
+   },
+   "agent": "priya",
+   "approval": "priya",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "comms-dns",
+   "chapter": "comms",
+   "member": "priya",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "pi-hole",
+   "replaces": [
+    "AdGuard",
+    "NextDNS"
+   ],
+   "chips": [
+    "Pi-hole",
+    "replaces AdGuard",
+    "replaces NextDNS"
+   ],
+   "category": "it",
+   "film": false,
+   "title": "Ads and trackers, blocked",
+   "seed": "Pi-hole blocks known ad and tracker domains for the devices pointed at it. Priya makes no promise beyond that.",
+   "limit": "No safety, parental-control or protection promise. It blocks ad and tracker domains only. The package publishes DNS on port 8053, not 53 (compose addPorts): never say the router, the office or the studio network uses it, never \"answers the studio's name lookups\". Unblocked lookups still go to an upstream resolver. If the Core is off those devices lose lookups.",
+   "capabilityHint": "Block ads, trackers and bad domains for every device on your network at the DNS level."
+  },
+  {
+   "id": "comms-late",
+   "chapter": "comms",
+   "member": "priya",
+   "anchor": {
+    "role": "core"
+   },
+   "app": "ci-hermes",
+   "replaces": [],
+   "chips": [
+    "Hermes"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "A late payer, politely",
+   "seed": "Bobbin drafts a polite reminder to a client whose invoice is overdue. Priya reads it, adds a line and sends it herself.",
+   "limit": "Agent prepares, person approves; contacting a third party needs the approval in the beat (cap-autonomy). The channel is not local. Never \"chases automatically\".",
+   "agent": "priya",
+   "approval": "priya",
+   "capabilityHint": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+  },
+  {
+   "id": "studio-files",
+   "chapter": "studio",
+   "member": "amara",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "nextcloud",
+   "replaces": [
+    "Google Drive",
+    "Dropbox"
+   ],
+   "chips": [
+    "Nextcloud",
+    "replaces Google Drive",
+    "replaces Dropbox"
+   ],
+   "category": "documents",
+   "film": true,
+   "title": "Brand files sit on the Core",
+   "seed": "Every client's brand folder sits in Nextcloud on the Core. Amara opens a logo file from the studio floor without leaving the room.",
+   "limit": "Clients outside cannot reach the Core: no sharing claim. Share links and version history do not come across from the old drive. Hub wizard recommends Nextcloud.",
+   "bringHome": {
+    "from": "Dropbox",
+    "carries": "files and folders with names and structure",
+    "doesNot": "share links and shared-folder membership; version history; Paper docs; file requests and comments"
+   },
+   "capabilityHint": "Your files, calendar and contacts on your own Core, synced to your devices."
+  },
+  {
+   "id": "studio-layout",
+   "chapter": "studio",
+   "member": "luca",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "penpot",
+   "replaces": [
+    "Figma"
+   ],
+   "chips": [
+    "Penpot",
+    "replaces Figma"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "Layouts, drawn on the Core",
+   "seed": "Luca lays out the pack structure in Penpot on the Core. The files sit beside the brand folders they came from.",
+   "limit": "Penpot is not Canva (no template library) and has no verified Figma importer. Do not describe the screen.",
+   "bringHome": {
+    "from": "Figma",
+    "carries": "nothing automatic; components rebuilt by hand",
+    "doesNot": "plugins; prototypes; comment history"
+   },
+   "capabilityHint": "Design and prototype in a web-based design tool you host."
+  },
+  {
+   "id": "studio-vector",
+   "chapter": "studio",
+   "member": "luca",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "inkscape",
+   "replaces": [
+    "Adobe Illustrator"
+   ],
+   "chips": [
+    "Inkscape",
+    "replaces Adobe Illustrator"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "The mark, redrawn",
+   "seed": "Luca redraws a client's mark as clean vectors in Inkscape, in a browser tab. He files the result in the brand folder.",
+   "limit": "A browser session. No Photoshop equivalent; do not claim the whole Adobe set. Inkscape has no storage volume in the store package: a file leaves it by hand.",
+   "capabilityHint": "Draw logos, diagrams and line art as vector graphics, in your browser."
+  },
+  {
+   "id": "studio-board",
+   "chapter": "studio",
+   "member": "tamsin",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "planka",
+   "replaces": [
+    "Trello"
+   ],
+   "chips": [
+    "Planka",
+    "replaces Trello"
+   ],
+   "category": "projects",
+   "film": true,
+   "title": "The job board, in the studio",
+   "seed": "Tamsin runs the studio's jobs on a Planka board on the Core. Each card is a client, and it moves when a proof is approved.",
+   "limit": "Trello board JSON carries lists, cards, labels, checklists and comments; attachments and members unverified. Licence unasserted: never \"open source\".",
+   "bringHome": {
+    "from": "Trello",
+    "carries": "lists, cards, labels, checklists, comments",
+    "doesNot": "Power-Ups and automations; attachments and members (check one board first)"
+   },
+   "capabilityHint": "A real-time Kanban board for a team or a family project."
+  },
+  {
+   "id": "studio-clients",
+   "chapter": "studio",
+   "member": "freya",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "espocrm",
+   "replaces": [
+    "Salesforce"
+   ],
+   "chips": [
+    "EspoCRM",
+    "replaces Salesforce"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "The client list, kept here",
+   "seed": "Freya keeps the client list in EspoCRM on the Core. Each client has a row, a contact and the jobs they have commissioned.",
+   "limit": "Web interface only. Do not show a real-looking client list. Roles and teams are EspoCRM's own feature: say nothing about who sees what.",
+   "bringHome": {
+    "from": "Salesforce",
+    "carries": "accounts and contacts as CSV rows with fields mapped",
+    "doesNot": "automations and reports; sharing rules; activity history"
+   },
+   "capabilityHint": "Manage customers, sales pipelines, campaigns and support cases in a CRM you host."
+  },
+  {
+   "id": "studio-chat",
+   "chapter": "studio",
+   "member": "imani",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "mattermost",
+   "replaces": [
+    "Slack",
+    "Discord"
+   ],
+   "chips": [
+    "Mattermost",
+    "replaces Slack",
+    "replaces Discord"
+   ],
+   "category": "communication",
+   "film": false,
+   "title": "The studio's own channel",
+   "seed": "The studio talks in Mattermost on the office network. Each person has an account inside Mattermost, which is Mattermost's own feature.",
+   "limit": "Email sign-up is open by default: the admin closes it. Do not repeat \"secure collaboration\". Slack move: mmetl then mmctl; integrations, canvases and Slack Connect do not move.",
+   "bringHome": {
+    "from": "Slack",
+    "carries": "users, channels, direct messages, threads, files and reactions per the Mattermost mapping",
+    "doesNot": "Slack Connect channels; canvases; custom emoji images; integrations and workflows"
+   },
+   "capabilityHint": "Team chat with channels, threads and files that stays on your Core."
+  },
+  {
+   "id": "studio-brief",
+   "chapter": "studio",
+   "member": "freya",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "open-webui",
+   "replaces": [
+    "ChatGPT"
+   ],
+   "chips": [
+    "Open WebUI",
+    "replaces ChatGPT"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "A long brief, summarised",
+   "seed": "Freya asks a model on the Core to summarise a client's long brief. She reads the brief herself too, with a pencil.",
+   "limit": "Designers are the most guarded about AI: keep it small and optional. Local model only; no cloud key; no parity or speed claim.",
+   "capabilityHint": "Chat with models running on your own Core, from any browser."
+  },
+  {
+   "id": "pitch-wall",
+   "chapter": "pitch",
+   "member": "tamsin",
+   "anchor": {
+    "role": "whiteboard",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "meeting-table",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "excalidraw",
+   "replaces": [
+    "Miro"
+   ],
+   "chips": [
+    "Excalidraw",
+    "replaces Miro"
+   ],
+   "category": "projects",
+   "film": false,
+   "title": "The week, sketched on the wall",
+   "seed": "Tamsin and the team sketch the week's run of jobs on the pitch room wall in Excalidraw. The wall is redrawn each Monday.",
+   "limit": "amd64 only. Miro boards are redrawn, not converted. Excalidraw here is the editor plus a collaboration relay with no storage volume: it keeps nothing on the Core. Never \"saved\", \"kept\" or \"sits on the Core\"; no bring-your-data-home beat for it.",
+   "capabilityHint": "A whiteboard with a hand-drawn look. Sketch ideas together."
+  },
+  {
+   "id": "pitch-sign",
+   "chapter": "pitch",
+   "member": "freya",
+   "anchor": {
+    "role": "meeting-table",
+    "room": "meeting",
+    "fallback": [
+     {
+      "role": "whiteboard",
+      "room": "meeting"
+     },
+     {
+      "role": "room",
+      "room": "meeting"
+     }
+    ]
+   },
+   "app": "documenso",
+   "replaces": [
+    "DocuSign"
+   ],
+   "chips": [
+    "Documenso",
+    "replaces DocuSign"
+   ],
+   "category": "customers",
+   "film": false,
+   "title": "The brief, signed at the table",
+   "seed": "Freya and a drinks maker sign the brief at the pitch table. Documenso keeps the signed copy on the Core.",
+   "limit": "Never \"legally binding\" (its manifest says so: do not repeat). Signing email needs SMTP, or the bundled catcher delivers nothing. The signer is in the room.",
+   "capabilityHint": "A document signing platform you host yourself, with signing workflows."
+  },
+  {
+   "id": "print-proofs",
+   "chapter": "print",
+   "member": "amara",
+   "anchor": {
+    "role": "printer",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "stirling-pdf",
+   "replaces": [
+    "Adobe Acrobat"
+   ],
+   "chips": [
+    "Stirling-PDF",
+    "replaces Adobe Acrobat"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Proofs, merged into one pack",
+   "seed": "Amara merges the printer's proofs into one pack with Stirling-PDF. The pack goes into the job folder before the client visit.",
+   "limit": "Never show the sign-in wall (default credentials). No claim that redaction is complete.",
+   "capabilityHint": "Merge, split, compress and convert PDFs on your own Core."
+  },
+  {
+   "id": "print-photos",
+   "chapter": "print",
+   "member": "luca",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "workstation",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "immich",
+   "replaces": [
+    "Google Photos"
+   ],
+   "chips": [
+    "Immich",
+    "replaces Google Photos"
+   ],
+   "category": "design",
+   "film": false,
+   "title": "Shoot references, filed",
+   "seed": "Luca files the shoot references for a new pack in Immich on the Core. Each job has its own album beside the proofs.",
+   "limit": "First start takes a while. Phones on the office network only. Takeout import is partial.",
+   "bringHome": {
+    "from": "Google Photos",
+    "carries": "photos and videos with dates; named albums",
+    "doesNot": "sharing and comments; untitled albums; faces and memories"
+   },
+   "capabilityHint": "Back up, search and organise your family photos and videos on your own Core."
+  },
+  {
+   "id": "print-swatch",
+   "chapter": "print",
+   "member": "amara",
+   "anchor": {
+    "role": "workbench",
+    "room": "workshop",
+    "fallback": [
+     {
+      "role": "printer",
+      "room": "workshop"
+     },
+     {
+      "role": "room",
+      "room": "workshop"
+     }
+    ]
+   },
+   "app": "nextcloud",
+   "replaces": [
+    "Google Drive"
+   ],
+   "chips": [
+    "Nextcloud",
+    "replaces Google Drive"
+   ],
+   "category": "documents",
+   "film": false,
+   "title": "Colour swatches, scanned in",
+   "seed": "Amara scans the printer's colour swatches into the job folder in Nextcloud. Next year's reprint starts from the same swatch.",
+   "limit": "Do not claim colour accuracy. Same app as studio-files by design.",
+   "capabilityHint": "Your files, calendar and contacts on your own Core, synced to your devices."
+  },
+  {
+   "id": "mezz-invoices",
+   "chapter": "mezz",
+   "member": "bilal",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "invoice-ninja",
+   "replaces": [
+    "QuickBooks",
+    "FreshBooks"
+   ],
+   "chips": [
+    "Invoice Ninja",
+    "replaces QuickBooks",
+    "replaces FreshBooks"
+   ],
+   "category": "money",
+   "film": true,
+   "title": "Invoices, from the jobs",
+   "seed": "Bilal raises each invoice in Invoice Ninja from the job it belongs to. The quotes and the invoices sit on the Core.",
+   "limit": "Invoicing, not payment processing; card payments need an outside provider. Emailing invoices needs SMTP. No ledger. Elastic License 2.0: never \"open source\".",
+   "bringHome": {
+    "from": "QuickBooks",
+    "carries": "customers, invoices and related lists as CSV per data type",
+    "doesNot": "the full books; the pay service; bank feeds"
+   },
+   "capabilityHint": "Send invoices and quotes, track expenses and time, and get paid."
+  },
+  {
+   "id": "mezz-books",
+   "chapter": "mezz",
+   "member": "bilal",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "nextcloud",
+   "replaces": [
+    "Google Drive",
+    "Dropbox"
+   ],
+   "chips": [
+    "Nextcloud",
+    "replaces Google Drive",
+    "replaces Dropbox"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "The year-end folder",
+   "seed": "Bilal builds the year-end folder in Nextcloud: receipts, statements and the signed briefs. He copies it onto a drive for the accountant.",
+   "limit": "No claim that the accountant reaches the Core. No tax or accounting advice. Same app as studio-files by design.",
+   "capabilityHint": "Your files, calendar and contacts on your own Core, synced to your devices."
+  },
+  {
+   "id": "mezz-news",
+   "chapter": "mezz",
+   "member": "imani",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "listmonk",
+   "replaces": [
+    "Mailchimp"
+   ],
+   "chips": [
+    "Listmonk",
+    "replaces Mailchimp"
+   ],
+   "category": "marketing",
+   "film": false,
+   "title": "Newsletter list, kept on the Core",
+   "seed": "Imani keeps the studio's newsletter list in Listmonk on the Core. The mail itself leaves through the sender she picks.",
+   "limit": "Never promise delivery or analytics of opens. An SMTP provider is set inside the app. Mailchimp campaigns, templates and automations do not move; sending reputation starts again.",
+   "bringHome": {
+    "from": "Mailchimp",
+    "carries": "subscriber emails and CSV fields (Ghost's migrator; Listmonk imports CSV too)",
+    "doesNot": "campaigns and templates; automations and segments; reports"
+   },
+   "capabilityHint": "Write and send newsletters to your own mailing list."
+  },
+  {
+   "id": "mezz-draft",
+   "chapter": "mezz",
+   "member": "imani",
+   "anchor": {
+    "role": "workstation",
+    "room": "workfloor",
+    "fallback": [
+     {
+      "role": "desk",
+      "room": "workfloor"
+     },
+     {
+      "role": "room",
+      "room": "workfloor"
+     }
+    ]
+   },
+   "app": "open-webui",
+   "replaces": [
+    "ChatGPT"
+   ],
+   "chips": [
+    "Open WebUI",
+    "replaces ChatGPT"
+   ],
+   "category": "marketing",
+   "film": false,
+   "title": "An intro, drafted and rewritten",
+   "seed": "Imani asks a model on the Core for a first line of the newsletter. She rewrites it in her own voice before it goes anywhere.",
+   "limit": "Local model only. The person writes; nothing is published alone.",
+   "capabilityHint": "Chat with models running on your own Core, from any browser."
+  },
+  {
+   "id": "kitchen-hours",
+   "chapter": "kitchen",
+   "member": "tamsin",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "kimai",
+   "replaces": [],
+   "chips": [
+    "Kimai"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "Friday hours, one table",
+   "seed": "On Friday everyone logs their own hours in Kimai at the long kitchen table. Tamsin reads the totals for each job.",
+   "limit": "Each person logs their own hours; never \"tracks every employee\". Not a billing or tax tool. No replaces chip (none listed).",
+   "capabilityHint": "Track time per project and client, with reports."
+  },
+  {
+   "id": "kitchen-rents",
+   "chapter": "kitchen",
+   "member": "bilal",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "wallos",
+   "replaces": [],
+   "chips": [
+    "Wallos"
+   ],
+   "category": "money",
+   "film": false,
+   "title": "What the studio rents",
+   "seed": "Bilal keeps the list of the studio's rented tools in Wallos, with the renewal dates. The same list hangs by the kettle.",
+   "limit": "No price, no saving, no total. Wallos fetches logos from outside: do not show logos.",
+   "capabilityHint": "Track every subscription you pay for and get a reminder before it renews."
+  },
+  {
+   "id": "kitchen-handbook",
+   "chapter": "kitchen",
+   "member": "priya",
+   "anchor": {
+    "role": "counter",
+    "room": "kitchen",
+    "fallback": [
+     {
+      "role": "room",
+      "room": "kitchen"
+     }
+    ]
+   },
+   "app": "nextcloud",
+   "replaces": [
+    "Google Drive"
+   ],
+   "chips": [
+    "Nextcloud",
+    "replaces Google Drive"
+   ],
+   "category": "people",
+   "film": false,
+   "title": "The handbook, a folder",
+   "seed": "The studio handbook is a folder in Nextcloud. Priya walks a new starter through it at the kitchen table on her first morning.",
+   "limit": "Per-folder sharing is Nextcloud's own feature; never imply who can see what. No HR or payroll claim.",
+   "capabilityHint": "Your files, calendar and contacts on your own Core, synced to your devices."
+  },
+  {
+   "id": "outro-close",
+   "chapter": "outro",
+   "member": null,
+   "anchor": {
+    "role": "core"
+   },
+   "app": null,
+   "replaces": [],
+   "chips": [],
+   "category": "setup",
+   "film": true,
+   "title": "Over to your studio",
+   "seed": "The brand files, proofs, hours and invoices now sit on one Core in the comms room. Browse the Companion Hub store and pick your first apps.",
+   "limit": "closing body."
+  }
+ ],
+ "stack": [
+  {
+   "function": "owner",
+   "people": [
+    "Freya"
+   ],
+   "rows": [
+    {
+     "app": "espocrm",
+     "name": "EspoCRM",
+     "replaces": [
+      "Salesforce"
+     ],
+     "beats": [
+      "studio-clients"
+     ]
+    },
+    {
+     "app": "open-webui",
+     "name": "Open WebUI",
+     "replaces": [
+      "ChatGPT"
+     ],
+     "beats": [
+      "studio-brief"
+     ]
+    },
+    {
+     "app": "documenso",
+     "name": "Documenso",
+     "replaces": [
+      "DocuSign"
+     ],
+     "beats": [
+      "pitch-sign"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "design",
+   "people": [
+    "Amara",
+    "Luca"
+   ],
+   "rows": [
+    {
+     "app": "nextcloud",
+     "name": "Nextcloud",
+     "replaces": [
+      "Google Drive"
+     ],
+     "beats": [
+      "studio-files",
+      "print-swatch"
+     ]
+    },
+    {
+     "app": "penpot",
+     "name": "Penpot",
+     "replaces": [
+      "Figma"
+     ],
+     "beats": [
+      "studio-layout"
+     ]
+    },
+    {
+     "app": "inkscape",
+     "name": "Inkscape",
+     "replaces": [
+      "Adobe Illustrator"
+     ],
+     "beats": [
+      "studio-vector"
+     ]
+    },
+    {
+     "app": "stirling-pdf",
+     "name": "Stirling-PDF",
+     "replaces": [
+      "Adobe Acrobat"
+     ],
+     "beats": [
+      "print-proofs"
+     ]
+    },
+    {
+     "app": "immich",
+     "name": "Immich",
+     "replaces": [
+      "Google Photos"
+     ],
+     "beats": [
+      "print-photos"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "projects",
+   "people": [
+    "Tamsin"
+   ],
+   "rows": [
+    {
+     "app": "planka",
+     "name": "Planka",
+     "replaces": [
+      "Trello"
+     ],
+     "beats": [
+      "studio-board"
+     ]
+    },
+    {
+     "app": "excalidraw",
+     "name": "Excalidraw",
+     "replaces": [
+      "Miro"
+     ],
+     "beats": [
+      "pitch-wall"
+     ]
+    },
+    {
+     "app": "kimai",
+     "name": "Kimai",
+     "replaces": [],
+     "beats": [
+      "kitchen-hours"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "marketing",
+   "people": [
+    "Imani"
+   ],
+   "rows": [
+    {
+     "app": "mattermost",
+     "name": "Mattermost",
+     "replaces": [
+      "Slack",
+      "Discord"
+     ],
+     "beats": [
+      "studio-chat"
+     ]
+    },
+    {
+     "app": "listmonk",
+     "name": "Listmonk",
+     "replaces": [
+      "Mailchimp"
+     ],
+     "beats": [
+      "mezz-news"
+     ]
+    },
+    {
+     "app": "open-webui",
+     "name": "Open WebUI",
+     "replaces": [
+      "ChatGPT"
+     ],
+     "beats": [
+      "mezz-draft"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "operations",
+   "people": [
+    "Priya"
+   ],
+   "rows": [
+    {
+     "app": "ci-hermes",
+     "name": "Hermes",
+     "replaces": [],
+     "beats": [
+      "ftue-hello",
+      "comms-late"
+     ]
+    },
+    {
+     "app": "pi-hole",
+     "name": "Pi-hole",
+     "replaces": [
+      "AdGuard",
+      "NextDNS"
+     ],
+     "beats": [
+      "comms-dns"
+     ]
+    },
+    {
+     "app": "nextcloud",
+     "name": "Nextcloud",
+     "replaces": [
+      "Google Drive"
+     ],
+     "beats": [
+      "kitchen-handbook"
+     ]
+    }
+   ]
+  },
+  {
+   "function": "finance",
+   "people": [
+    "Bilal"
+   ],
+   "rows": [
+    {
+     "app": "invoice-ninja",
+     "name": "Invoice Ninja",
+     "replaces": [
+      "QuickBooks",
+      "FreshBooks"
+     ],
+     "beats": [
+      "mezz-invoices"
+     ]
+    },
+    {
+     "app": "nextcloud",
+     "name": "Nextcloud",
+     "replaces": [
+      "Google Drive",
+      "Dropbox"
+     ],
+     "beats": [
+      "mezz-books"
+     ]
+    },
+    {
+     "app": "wallos",
+     "name": "Wallos",
+     "replaces": [],
+     "beats": [
+      "kitchen-rents"
+     ]
+    }
+   ]
+  }
+ ],
+ "bringHome": [
+  {
+   "beat": "studio-files",
+   "member": "amara",
+   "app": "nextcloud",
+   "from": "Dropbox",
+   "carries": "files and folders with names and structure",
+   "doesNot": "share links and shared-folder membership; version history; Paper docs; file requests and comments"
+  },
+  {
+   "beat": "studio-layout",
+   "member": "luca",
+   "app": "penpot",
+   "from": "Figma",
+   "carries": "nothing automatic; components rebuilt by hand",
+   "doesNot": "plugins; prototypes; comment history"
+  },
+  {
+   "beat": "studio-board",
+   "member": "tamsin",
+   "app": "planka",
+   "from": "Trello",
+   "carries": "lists, cards, labels, checklists, comments",
+   "doesNot": "Power-Ups and automations; attachments and members (check one board first)"
+  },
+  {
+   "beat": "studio-clients",
+   "member": "freya",
+   "app": "espocrm",
+   "from": "Salesforce",
+   "carries": "accounts and contacts as CSV rows with fields mapped",
+   "doesNot": "automations and reports; sharing rules; activity history"
+  },
+  {
+   "beat": "studio-chat",
+   "member": "imani",
+   "app": "mattermost",
+   "from": "Slack",
+   "carries": "users, channels, direct messages, threads, files and reactions per the Mattermost mapping",
+   "doesNot": "Slack Connect channels; canvases; custom emoji images; integrations and workflows"
+  },
+  {
+   "beat": "print-photos",
+   "member": "luca",
+   "app": "immich",
+   "from": "Google Photos",
+   "carries": "photos and videos with dates; named albums",
+   "doesNot": "sharing and comments; untitled albums; faces and memories"
+  },
+  {
+   "beat": "mezz-invoices",
+   "member": "bilal",
+   "app": "invoice-ninja",
+   "from": "QuickBooks",
+   "carries": "customers, invoices and related lists as CSV per data type",
+   "doesNot": "the full books; the pay service; bank feeds"
+  },
+  {
+   "beat": "mezz-news",
+   "member": "imani",
+   "app": "listmonk",
+   "from": "Mailchimp",
+   "carries": "subscriber emails and CSV fields (Ghost's migrator; Listmonk imports CSV too)",
+   "doesNot": "campaigns and templates; automations and segments; reports"
+  }
+ ],
+ "rentedBefore": [
+  "AdGuard",
+  "NextDNS",
+  "Google Drive",
+  "Dropbox",
+  "Figma",
+  "Adobe Illustrator",
+  "Trello",
+  "Salesforce",
+  "Slack",
+  "Discord",
+  "ChatGPT",
+  "Miro",
+  "DocuSign",
+  "Adobe Acrobat",
+  "Google Photos",
+  "QuickBooks",
+  "FreshBooks",
+  "Mailchimp"
+ ],
+ "apps": {
+  "thirdParty": [
+   {
+    "id": "pi-hole",
+    "name": "Pi-hole",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "nextcloud",
+    "name": "Nextcloud",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "penpot",
+    "name": "Penpot",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "inkscape",
+    "name": "Inkscape",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "planka",
+    "name": "Planka",
+    "storySafe": "yes",
+    "qa": "screenshot",
+    "licence": "PLANKA Community License, Fair Use License 1.1 (source-available): internal use in an organisation is permitted; accounts may not be shared with outside parties"
+   },
+   {
+    "id": "espocrm",
+    "name": "EspoCRM",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "mattermost",
+    "name": "Mattermost",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "open-webui",
+    "name": "Open WebUI",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "excalidraw",
+    "name": "Excalidraw",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "documenso",
+    "name": "Documenso",
+    "storySafe": "with-caveat",
+    "qa": "screenshot"
+   },
+   {
+    "id": "stirling-pdf",
+    "name": "Stirling-PDF",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "immich",
+    "name": "Immich",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "invoice-ninja",
+    "name": "Invoice Ninja",
+    "storySafe": "with-caveat",
+    "qa": "screenshot",
+    "licence": "Elastic License 2.0 (source-available)"
+   },
+   {
+    "id": "listmonk",
+    "name": "Listmonk",
+    "storySafe": "with-caveat",
+    "qa": "screenshot"
+   },
+   {
+    "id": "kimai",
+    "name": "Kimai",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   },
+   {
+    "id": "wallos",
+    "name": "Wallos",
+    "storySafe": "yes",
+    "qa": "screenshot"
+   }
+  ],
+  "firstParty": [
+   "ci-hermes"
+  ]
+ },
+ "film": {
+  "flaggedBeats": [
+   "ftue-plug-in",
+   "ftue-join",
+   "ftue-hello",
+   "comms-late",
+   "studio-files",
+   "studio-board",
+   "mezz-invoices",
+   "outro-close"
+  ],
+  "spokenWordsEstimate": 188,
+  "note": "validator: 8 to 12 film beats, at most 215 spoken words, estimated 75 to 115 s; the film runs in daylight, 16:9 and 9:16, label Fictional company. Real software. Spoken words include the 3-word sign-off (quotas.mts filmWords).",
+  "titleCard": {
+   "heading": "Gutterfold",
+   "address": "11 Bindery Lane, Pardew Cross",
+   "tagline": "Fourteen people design the packaging for food and drink makers.",
+   "label": "Fictional company. Real software."
+  },
+  "cuts": [
+   {
+    "member": "tamsin",
+    "name": "Tamsin",
+    "title": "Studio producer",
+    "hookBeat": "studio-board",
+    "hookTitle": "The job board, in the studio",
+    "chips": [
+     "Planka",
+     "replaces Trello"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "amara",
+    "name": "Amara",
+    "title": "Art director",
+    "hookBeat": "studio-files",
+    "hookTitle": "Brand files sit on the Core",
+    "chips": [
+     "Nextcloud",
+     "replaces Google Drive",
+     "replaces Dropbox"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   },
+   {
+    "member": "bilal",
+    "name": "Bilal",
+    "title": "Part-time bookkeeper",
+    "hookBeat": "mezz-invoices",
+    "hookTitle": "Invoices, from the jobs",
+    "chips": [
+     "Invoice Ninja",
+     "replaces QuickBooks",
+     "replaces FreshBooks"
+    ],
+    "flagged": true,
+    "aspects": [
+     "1x1",
+     "4x5",
+     "16x9 (LinkedIn and feed)",
+     "9x16 (Reels, Shorts, TikTok)"
+    ]
+   }
+  ]
+ },
+ "disclosuresRequired": [
+  "fictional-company",
+  "not-customers",
+  "beta-short",
+  "scripted-scenes",
+  "stylised-art",
+  "names-owners",
+  "third-party-apps (office wording: apps-by-others)",
+  "internet-steps",
+  "apps-availability",
+  "first-party-crash",
+  "attribution-agents",
+  "synthetic-voice (when the tour has a voice)",
+  "licence-terms",
+  "not-advice"
+ ],
+ "doNotSay": [
+  "share a folder with a client",
+  "client portal",
+  "Photoshop equivalent",
+  "AI-generated artwork",
+  "a result for the studio"
+ ],
+ "reviewNeeded": [],
+ "writerRules": [
+  "one person, one room, one app per beat; chip row is the app name then \"replaces <service>\" from the catalog entry",
+  "title at most six words, body at most thirty, sentence at most twenty, no digit, no dash, no exclamation mark, full stop",
+  "no UI mockup, no screen described, no customer, no price, no result, no time or capacity claim",
+  "the agent prepares and a person approves; one companion, on the Core's owner",
+  "every scene stays in the building on the office network; no remote, hybrid, mobile, public link or client portal",
+  "per-app accounts only, named as that app's own feature; never a Companion account per person",
+  "say what did not come along in every bring-your-data-home beat",
+  "sentence case; sign in, not log in; agent, not assistant; Companion Core, Companion Hub store",
+  "a file moves between apps by a person's hand (download, copy, file it), never by an integration: LibreOffice, Inkscape, Stirling-PDF, BentoPDF and draw.io keep nothing on the Core; never \"goes straight into\", \"syncs to\" or \"lands in\" another app (skeptic)",
+  "Hermes runs isolated from the other apps: it works from what a person types or pastes to it, never from a repository, a wiki or a drive it \"reads\" (skeptic)",
+  "capabilityHint strings are the catalog's own words and are never scanned by the validator: do not paste them into a title, body, caption or note; they hold words the canon bans (private, sandbox, QR code, bot API, nothing is uploaded, not sent to a third party, stays on your Core) (skeptic)",
+  "no sentence puts a head count and the Core together as \"N people on one Core\"; the Core belongs to one owner and the apps keep their own sign-ins (skeptic)",
+  "a replaces chip is the store's own pair; where a beat below carries no chip it is deliberate (skeptic: Uptime Kuma, Cryptgeon and LibreOffice pairs the briefs' own limits contradict)"
+ ],
+ "metrics": {
+  "beats": 28,
+  "ftue": 6,
+  "roomBeats": 21,
+  "film": 8,
+  "members": 7,
+  "apps": 17,
+  "thirdPartyApps": 16,
+  "replacedServices": 18,
+  "bringHomeBeats": 8,
+  "categories": [
+   "setup",
+   "it",
+   "money",
+   "documents",
+   "design",
+   "projects",
+   "customers",
+   "communication",
+   "marketing",
+   "people"
+  ]
+ },
+ "skeptic": {
+  "changes": [
+   "comms-dns: Pi-hole as the studio's DNS cannot work as shipped (port 8053) and implied a dependency of the whole network on the Core; now \"devices pointed at it\"; title \"The studio's name lookups\" -> \"Ads and trackers, blocked\"",
+   "studio-vector: \"goes straight into the brand folder\" implied an integration; Inkscape has no storage volume",
+   "pitch-wall: \"The sketch is kept on the Core\" is false; Miro to Excalidraw bring-your-data-home flag removed",
+   "planka licence note corrected",
+   "hook line and titles: \"stay in the office/studio/shop\" is a place claim wider than the canon's \"sits on the Core\" (and a sent newsletter hands its addresses to the mail provider); now \"sit on the Core\""
+  ],
+  "unverified": [
+   "Documenso: signing links without SMTP are shared by hand; the in-room flow is unverified",
+   "Mattermost image is mattermost-team-edition:latest (MIT compiled licence per upstream LICENSE.txt); whether the current free build carries a user or history cap is not verified from here"
+  ]
+ }
+}

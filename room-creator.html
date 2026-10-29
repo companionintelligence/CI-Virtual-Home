@@ -7708,7 +7708,8 @@
       // The editor always reads the spec on disk (it is where specs are edited); the portal's player goes through
       // the HTTP cache, so the spec the gallery warmed on hover is the one it builds.
       const viewMode = document.documentElement.dataset.mode === 'view';
-      const res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });
+      let res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });
+      if (!res.ok) res = await fetch(`./content/offices/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });   // SPIKE: offices live in their own directory
       if (!res.ok) throw new Error(`House spec "${id}" not found (${res.status})`);
       const spec = await res.json();
       houseSpecs.set(id, spec);

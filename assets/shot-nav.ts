@@ -331,7 +331,7 @@ export function roomProgram(room: WRoom): string {
 }
 const INTEREST: Record<string, number> = {
   living: 1.0, library: 1.0, den: 1.0, media: 1.0, kitchen: 0.9, 'kitchen-dining': 0.95, sunroom: 0.8, greenhouse: 0.8, dining: 0.7, study: 0.7, studio: 0.7, bar: 0.7,
-  foyer: 0.3, 'bed-primary': 0.3, 'bed-kid': 0.3, 'bed-guest': 0.3, nursery: 0.3, bath: 0.2, ensuite: 0.2, powder: 0.1, hall: 0.1, laundry: 0.05, garage: 0, outdoor: 0.2, playroom: 0.5, gym: 0.3,
+  workspace: 1.0, meeting: 0.8, foyer: 0.3, 'bed-primary': 0.3, 'bed-kid': 0.3, 'bed-guest': 0.3, nursery: 0.3, bath: 0.2, ensuite: 0.2, powder: 0.1, hall: 0.1, laundry: 0.05, garage: 0, outdoor: 0.2, playroom: 0.5, gym: 0.3,
 };
 const FOCAL = [
   { re: /fireplace|hearth|stove/, bonus: 0.5, kind: 'fireplace' },

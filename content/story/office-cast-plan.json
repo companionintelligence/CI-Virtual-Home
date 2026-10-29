@@ -1,0 +1,770 @@
+{
+ "v": 1,
+ "generated": "2026-10-19",
+ "note": "PROPOSED seed of content/story/office-cast-plan.json for WP4.0. Authored once, then edited by hand; office-casting.json is derived from it and from the building specs. Room names must be the real rooms of the baked building (WP3): update them when a building is frozen. Names are invented and pending counsel clearance.",
+ "companies": [
+  {
+   "slug": "reelwick",
+   "house": "startup-loft",
+   "wave": 1,
+   "name": "Reelwick",
+   "place": "Ostley Wick",
+   "address": "2 Maltings Yard",
+   "size": "startup",
+   "scope": "company",
+   "headcount": 6,
+   "floor": 6,
+   "sector": "Software for independent cinemas",
+   "narrator": "v-clear-f",
+   "reason": "Seven people become six, one list.",
+   "signatureApps": [
+    "ci-hermes",
+    "uptime-kuma",
+    "vaultwarden",
+    "forgejo",
+    "penpot",
+    "twenty",
+    "planka",
+    "campfire",
+    "nextcloud",
+    "n8n",
+    "wallos",
+    "docmost",
+    "excalidraw",
+    "docuseal",
+    "anything-llm",
+    "paperless",
+    "ci-planning",
+    "ci-memory"
+   ],
+   "beatApps": {
+    "it": "uptime-kuma",
+    "engineering": "forgejo",
+    "design": "penpot",
+    "customers": "twenty",
+    "projects": "planka",
+    "communication": "campfire",
+    "documents": "nextcloud",
+    "money": "wallos",
+    "people": "docmost"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "marit",
+     "name": "Marit",
+     "function": "owner",
+     "title": "Founder and chief executive",
+     "room": "Meeting Room",
+     "ownsCore": false
+    },
+    {
+     "id": "anselm",
+     "name": "Anselm",
+     "function": "engineering",
+     "title": "Chief technology officer",
+     "room": "Comms Room",
+     "ownsCore": true,
+     "companion": "Rivet",
+     "runtime": "Hermes",
+     "voice": "v-steady-m"
+    },
+    {
+     "id": "femi",
+     "name": "Femi",
+     "function": "engineering",
+     "title": "Software engineer",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "anika",
+     "name": "Anika",
+     "function": "design",
+     "title": "Product designer",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "kofi",
+     "name": "Kofi",
+     "function": "sales",
+     "title": "Sales and partnerships",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "odile",
+     "name": "Odile",
+     "function": "people",
+     "title": "People and office lead",
+     "room": "Kitchenette",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "pannierwell",
+   "house": "garage-lab",
+   "wave": 2,
+   "name": "Pannierwell",
+   "place": "Brackenmere",
+   "address": "5 Cooper's Row",
+   "size": "startup",
+   "scope": "company",
+   "headcount": 5,
+   "floor": 5,
+   "sector": "Battery packs for cargo bikes",
+   "narrator": "v-steady-m",
+   "reason": "A hardware startup that is also a bench.",
+   "signatureApps": [
+    "ci-openclaw",
+    "vaultwarden",
+    "gitea",
+    "drawio",
+    "jupyterlab",
+    "immich",
+    "inkscape",
+    "vikunja",
+    "grist",
+    "papra",
+    "stirling-pdf",
+    "libreoffice",
+    "bookstack",
+    "baikal",
+    "akaunting",
+    "ci-planning"
+   ],
+   "beatApps": {
+    "it": "vaultwarden",
+    "engineering": "gitea",
+    "design": "immich",
+    "projects": "vikunja",
+    "documents": "grist",
+    "people": "bookstack",
+    "customers": "papra",
+    "communication": "baikal",
+    "money": "akaunting"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "haldis",
+     "name": "Haldis",
+     "function": "owner",
+     "title": "Founder and electrical engineer",
+     "room": "Back Room",
+     "ownsCore": true,
+     "companion": "Gantry",
+     "runtime": "OpenClaw",
+     "voice": "v-warm-f"
+    },
+    {
+     "id": "teodor",
+     "name": "Teodor",
+     "function": "engineering",
+     "title": "Firmware engineer",
+     "room": "Workshop Bay",
+     "ownsCore": false
+    },
+    {
+     "id": "saoirse",
+     "name": "Saoirse",
+     "function": "design",
+     "title": "Mechanical designer",
+     "room": "Workshop Bay",
+     "ownsCore": false
+    },
+    {
+     "id": "lior",
+     "name": "Lior",
+     "function": "operations",
+     "title": "Supply and operations",
+     "room": "Desk Room",
+     "ownsCore": false
+    },
+    {
+     "id": "quentin",
+     "name": "Quentin",
+     "function": "support",
+     "title": "Test and support lead",
+     "room": "Workshop Bay",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "curatory",
+   "house": "dev-shop-unit",
+   "wave": 3,
+   "name": "Curatory",
+   "place": "Sallowfold",
+   "address": "6 Cartwheel Park",
+   "size": "startup",
+   "scope": "company",
+   "headcount": 11,
+   "floor": 11,
+   "sector": "Visitor guides for small museums",
+   "narrator": "v-warm-f",
+   "reason": "A startup of eleven where the person who answers the museums owns the Core: support is the thin role, and here it is the one who installs the apps.",
+   "signatureApps": [
+    "ci-hermes",
+    "vaultwarden",
+    "forgejo",
+    "penpot",
+    "inkscape",
+    "twenty",
+    "rocketchat",
+    "akaunting",
+    "bookstack",
+    "baserow",
+    "jupyterlab",
+    "libretranslate",
+    "papra",
+    "open-webui"
+   ],
+   "beatApps": {
+    "it": "vaultwarden",
+    "engineering": "forgejo",
+    "design": "penpot",
+    "customers": "twenty",
+    "communication": "rocketchat",
+    "money": "akaunting",
+    "documents": "libretranslate",
+    "people": "bookstack"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "yara",
+     "name": "Yara",
+     "function": "owner",
+     "title": "Founder and chief executive",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "ilse",
+     "name": "Ilse",
+     "function": "support",
+     "title": "Customer success lead",
+     "room": "Comms Room",
+     "ownsCore": true,
+     "companion": "Tally",
+     "runtime": "Hermes",
+     "voice": "v-steady-m"
+    },
+    {
+     "id": "dmitri",
+     "name": "Dmitri",
+     "function": "engineering",
+     "title": "Backend engineer",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "naledi",
+     "name": "Naledi",
+     "function": "engineering",
+     "title": "App engineer",
+     "room": "Device Lab",
+     "ownsCore": false
+    },
+    {
+     "id": "rashida",
+     "name": "Rashida",
+     "function": "design",
+     "title": "Product designer",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "joaquin",
+     "name": "Joaquin",
+     "function": "sales",
+     "title": "Partnerships manager",
+     "room": "Meeting Room",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "gutterfold",
+   "house": "agency-printworks",
+   "wave": 2,
+   "name": "Gutterfold",
+   "place": "Pardew Cross",
+   "address": "11 Bindery Lane",
+   "size": "small",
+   "scope": "company",
+   "headcount": 14,
+   "floor": 14,
+   "sector": "Brand and packaging studio",
+   "narrator": "v-storyteller-m",
+   "reason": "A studio told through objects: the brand folders, the pin-up wall, the proofs from the printer, the Friday hours.",
+   "signatureApps": [
+    "ci-hermes",
+    "pi-hole",
+    "nextcloud",
+    "penpot",
+    "inkscape",
+    "planka",
+    "espocrm",
+    "mattermost",
+    "open-webui",
+    "excalidraw",
+    "documenso",
+    "stirling-pdf",
+    "immich",
+    "invoice-ninja",
+    "listmonk",
+    "kimai",
+    "wallos"
+   ],
+   "beatApps": {
+    "it": "pi-hole",
+    "documents": "nextcloud",
+    "design": "penpot",
+    "projects": "planka",
+    "customers": "espocrm",
+    "communication": "mattermost",
+    "money": "invoice-ninja",
+    "marketing": "listmonk",
+    "people": "nextcloud"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "freya",
+     "name": "Freya",
+     "function": "owner",
+     "title": "Founder and creative director",
+     "room": "Studio Floor",
+     "ownsCore": false
+    },
+    {
+     "id": "amara",
+     "name": "Amara",
+     "function": "design",
+     "title": "Art director",
+     "room": "Studio Floor",
+     "ownsCore": false
+    },
+    {
+     "id": "luca",
+     "name": "Luca",
+     "function": "design",
+     "title": "Senior designer",
+     "room": "Studio Floor",
+     "ownsCore": false
+    },
+    {
+     "id": "tamsin",
+     "name": "Tamsin",
+     "function": "projects",
+     "title": "Studio producer",
+     "room": "Pitch Room",
+     "ownsCore": false
+    },
+    {
+     "id": "imani",
+     "name": "Imani",
+     "function": "marketing",
+     "title": "Studio marketing lead",
+     "room": "Open Office Mezzanine",
+     "ownsCore": false
+    },
+    {
+     "id": "priya",
+     "name": "Priya",
+     "function": "operations",
+     "title": "Studio manager",
+     "room": "Comms Room",
+     "ownsCore": true,
+     "companion": "Bobbin",
+     "runtime": "Hermes",
+     "voice": "v-warm-f"
+    },
+    {
+     "id": "bilal",
+     "name": "Bilal",
+     "function": "finance",
+     "title": "Part-time bookkeeper",
+     "room": "Open Office Mezzanine",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "lintel-and-sill",
+   "house": "practice-townhouse",
+   "wave": 1,
+   "name": "Lintel & Sill",
+   "place": "Quenby Green",
+   "address": "9 Tanyard Terrace",
+   "size": "small",
+   "scope": "company",
+   "headcount": 11,
+   "floor": 11,
+   "sector": "Architecture practice",
+   "narrator": "v-warm-f",
+   "reason": "The best-fit small business: one building, one network, an owner who decides and paper everywhere.",
+   "signatureApps": [
+    "ci-hermes",
+    "cryptgeon",
+    "paperless",
+    "baikal",
+    "docuseal",
+    "stirling-pdf",
+    "anything-llm",
+    "invoice-ninja",
+    "libreoffice",
+    "drawio",
+    "immich",
+    "kimai",
+    "nextcloud",
+    "bookstack",
+    "ci-memory"
+   ],
+   "beatApps": {
+    "it": "cryptgeon",
+    "documents": "paperless",
+    "communication": "baikal",
+    "customers": "docuseal",
+    "money": "invoice-ninja",
+    "design": "drawio",
+    "projects": "immich",
+    "people": "bookstack"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "gideon",
+     "name": "Gideon",
+     "function": "owner",
+     "title": "Principal architect",
+     "room": "Partner Office North",
+     "ownsCore": false
+    },
+    {
+     "id": "hira",
+     "name": "Hira",
+     "function": "design",
+     "title": "Architect",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "reuben",
+     "name": "Reuben",
+     "function": "projects",
+     "title": "Project architect",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "delphine",
+     "name": "Delphine",
+     "function": "finance",
+     "title": "Practice manager",
+     "room": "Partner Office South",
+     "ownsCore": true,
+     "companion": "Rafter",
+     "runtime": "Hermes",
+     "voice": "v-steady-m"
+    },
+    {
+     "id": "oskar",
+     "name": "Oskar",
+     "function": "legal",
+     "title": "Appointments and contracts coordinator",
+     "room": "Reception",
+     "ownsCore": false
+    },
+    {
+     "id": "rhys",
+     "name": "Rhys",
+     "function": "people",
+     "title": "Office and people coordinator",
+     "room": "Open Office",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "posy-and-pail",
+   "house": "shop-backoffice",
+   "wave": 2,
+   "name": "Posy & Pail",
+   "place": "Tarnmouth",
+   "address": "14 Market Parade",
+   "size": "small",
+   "scope": "company",
+   "headcount": 10,
+   "floor": 10,
+   "sector": "Florist and wedding workroom",
+   "narrator": "v-clear-f",
+   "reason": "The visual small business: a florist whose Core stands on a desk in the back office.",
+   "signatureApps": [
+    "ci-hermes",
+    "pi-hole",
+    "papra",
+    "invoice-ninja",
+    "grist",
+    "listmonk",
+    "espocrm",
+    "docuseal",
+    "libreoffice",
+    "baikal",
+    "planka",
+    "ci-planning"
+   ],
+   "beatApps": {
+    "it": "pi-hole",
+    "money": "papra",
+    "projects": "grist",
+    "marketing": "listmonk",
+    "customers": "espocrm",
+    "documents": "libreoffice",
+    "communication": "baikal"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "rosa",
+     "name": "Rosa",
+     "function": "owner",
+     "title": "Owner and head florist",
+     "room": "Workroom",
+     "ownsCore": false
+    },
+    {
+     "id": "katya",
+     "name": "Katya",
+     "function": "marketing",
+     "title": "Shop and newsletter lead",
+     "room": "Back Office",
+     "ownsCore": true,
+     "companion": "Pennant",
+     "runtime": "Hermes",
+     "voice": "v-storyteller-m"
+    },
+    {
+     "id": "olu",
+     "name": "Olu",
+     "function": "operations",
+     "title": "Shop manager",
+     "room": "Shop Floor",
+     "ownsCore": false
+    },
+    {
+     "id": "eamon",
+     "name": "Eamon",
+     "function": "sales",
+     "title": "Events consultant",
+     "room": "Consultation Room",
+     "ownsCore": false
+    },
+    {
+     "id": "maren",
+     "name": "Maren",
+     "function": "finance",
+     "title": "Part-time bookkeeper",
+     "room": "Back Office",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "hartnoll-joinery",
+   "house": "contractor-yard",
+   "wave": 3,
+   "name": "Hartnoll Joinery",
+   "place": "Hollowmere",
+   "address": "4 Sawpit Lane",
+   "size": "medium",
+   "scope": "site",
+   "headcount": 90,
+   "floor": 22,
+   "sector": "Joinery and shopfitting firm",
+   "narrator": "v-steady-m",
+   "reason": "The medium business, told as one site of a firm of about ninety.",
+   "signatureApps": [
+    "ci-openclaw",
+    "uptime-kuma",
+    "pi-hole",
+    "mattermost",
+    "vikunja",
+    "grist",
+    "paperless",
+    "bentopdf",
+    "kimai",
+    "akaunting",
+    "espocrm",
+    "n8n",
+    "documenso",
+    "docmost",
+    "ci-memory"
+   ],
+   "beatApps": {
+    "it": "uptime-kuma",
+    "communication": "mattermost",
+    "projects": "vikunja",
+    "documents": "paperless",
+    "money": "kimai",
+    "customers": "espocrm",
+    "people": "docmost"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "cormac",
+     "name": "Cormac",
+     "function": "owner",
+     "title": "Managing director",
+     "room": "Estimating Office",
+     "ownsCore": false
+    },
+    {
+     "id": "wei",
+     "name": "Wei",
+     "function": "it",
+     "title": "Systems administrator",
+     "room": "Comms Room",
+     "ownsCore": true,
+     "companion": "Lathe",
+     "runtime": "OpenClaw",
+     "voice": "v-clear-f"
+    },
+    {
+     "id": "stellan",
+     "name": "Stellan",
+     "function": "operations",
+     "title": "Production planner",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "lucia",
+     "name": "Lucia",
+     "function": "legal",
+     "title": "Contracts manager",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "tariq",
+     "name": "Tariq",
+     "function": "sales",
+     "title": "Estimator",
+     "room": "Estimating Office",
+     "ownsCore": false
+    },
+    {
+     "id": "una",
+     "name": "Una",
+     "function": "finance",
+     "title": "Finance manager",
+     "room": "Open Office",
+     "ownsCore": false
+    }
+   ]
+  },
+  {
+   "slug": "loamfield",
+   "house": "hub-courtyard",
+   "wave": 2,
+   "name": "Loamfield",
+   "place": "Ruddock Vale",
+   "address": "12 Furrow Lane",
+   "size": "medium",
+   "scope": "department",
+   "headcount": 110,
+   "floor": 24,
+   "sector": "Soil-moisture sensor maker",
+   "narrator": "v-storyteller-m",
+   "reason": "The second medium: a department inside a company of about a hundred.",
+   "signatureApps": [
+    "ci-hermes",
+    "uptime-kuma",
+    "ntfy",
+    "forgejo",
+    "mattermost",
+    "vikunja",
+    "excalidraw",
+    "open-webui",
+    "n8n",
+    "baserow",
+    "jupyterlab",
+    "drawio",
+    "docmost",
+    "libretranslate",
+    "wallos"
+   ],
+   "beatApps": {
+    "it": "uptime-kuma",
+    "engineering": "forgejo",
+    "communication": "mattermost",
+    "projects": "vikunja",
+    "design": "excalidraw",
+    "documents": "docmost",
+    "people": "docmost",
+    "money": "wallos"
+   },
+   "reviewNeeded": [],
+   "members": [
+    {
+     "id": "chiara",
+     "name": "Chiara",
+     "function": "engineering",
+     "title": "Firmware lead",
+     "room": "Open Office",
+     "ownsCore": true,
+     "companion": "Sprocket",
+     "runtime": "Hermes",
+     "voice": "v-warm-f"
+    },
+    {
+     "id": "yusuf",
+     "name": "Yusuf",
+     "function": "engineering",
+     "title": "Test engineer",
+     "room": "Test Lab",
+     "ownsCore": false
+    },
+    {
+     "id": "oona",
+     "name": "Oona",
+     "function": "design",
+     "title": "Product designer",
+     "room": "Open Office",
+     "ownsCore": false
+    },
+    {
+     "id": "dilnoza",
+     "name": "Dilnoza",
+     "function": "design",
+     "title": "Technical writer",
+     "room": "Open Office Gallery",
+     "ownsCore": false
+    },
+    {
+     "id": "ewa",
+     "name": "Ewa",
+     "function": "it",
+     "title": "Company systems administrator",
+     "room": "Comms Room",
+     "ownsCore": false
+    },
+    {
+     "id": "hester",
+     "name": "Hester",
+     "function": "projects",
+     "title": "Programme manager",
+     "room": "Open Office",
+     "ownsCore": false
+    }
+   ]
+  }
+ ]
+}

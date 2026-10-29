@@ -15,6 +15,7 @@ export const PROGRAMS = [
   'living', 'kitchen', 'dining', 'kitchen-dining', 'bed-primary', 'bed-kid', 'bed-guest', 'nursery',
   'bath', 'ensuite', 'powder', 'study', 'library', 'den', 'media', 'playroom', 'sunroom', 'greenhouse',
   'foyer', 'hall', 'laundry', 'studio', 'bar', 'gym', 'garage', 'outdoor',
+  'workspace', 'meeting',   // SPIKE (w20): the office's first two programs
 ] as const;
 export type Program = typeof PROGRAMS[number];
 export const isProgram = (p: unknown): p is Program => typeof p === 'string' && (PROGRAMS as readonly string[]).includes(p);
@@ -29,7 +30,7 @@ const KIND: Record<Program, string> = {
   bath: 'bath', ensuite: 'bath', powder: 'bath',
   study: 'work', library: 'work', studio: 'work',
   den: 'living', media: 'living', playroom: 'living', sunroom: 'living', bar: 'living',
-  foyer: 'hall', hall: 'hall', laundry: 'service', gym: 'service', garage: 'service', greenhouse: 'service', outdoor: 'outdoor',   // (S1's kit-rules.ts PROGRAM_KIND is the same table: its fixtures follow it)
+  workspace: 'work', meeting: 'work', foyer: 'hall', hall: 'hall', laundry: 'service', gym: 'service', garage: 'service', greenhouse: 'service', outdoor: 'outdoor',   // (S1's kit-rules.ts PROGRAM_KIND is the same table: its fixtures follow it)
 };
 export const programKind = (p: string): string | null => (isProgram(p) ? KIND[p] : null);
 
@@ -59,6 +60,8 @@ const NAMES: Array<[Program, RegExp]> = [
   ['media', /media|cinema|theatre|theater|\btv\b|screening/i],
   ['bar', /\bbar\b|wine|lounge bar|pub\b/i],
   ['studio', /studio|atelier|\bart\b|craft|music|workroom/i],
+  ['meeting', /meeting|conference|board ?room|huddle|war room/i],
+  ['workspace', /open[- ]plan|work ?space|bullpen|team (floor|area)|desk (area|zone)|hot[- ]desk/i],
   ['study', /study|office|\bdesk\b|work ?room|den office|home office/i],
   ['kitchen-dining', /kitchen.*(dining|breakfast|eat)|(dining|breakfast).*kitchen|eat-in/i],
   ['living', /(living|lounge|family|great).*dining|dining.*(living|lounge)/i],   // a living-dining room: its seating

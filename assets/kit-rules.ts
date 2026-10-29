@@ -175,7 +175,7 @@ export const PROGRAM_KIND: Record<string, string> = {
   kitchen: 'kitchen', 'kitchen-dining': 'kitchen', dining: 'dining',
   'bed-primary': 'bed', 'bed-kid': 'bed', 'bed-guest': 'bed', nursery: 'bed',
   bath: 'bath', ensuite: 'bath', powder: 'bath',
-  study: 'work', library: 'work', studio: 'work',
+  study: 'work', library: 'work', studio: 'work', workspace: 'work', meeting: 'work',
   foyer: 'hall', hall: 'hall',
   laundry: 'service', garage: 'service', gym: 'service', greenhouse: 'service',
   outdoor: 'outdoor',

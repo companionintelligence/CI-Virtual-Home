@@ -26019,6 +26019,271 @@
     ],
     "styles": []
    }
+  },
+  "office-desk": {
+   "footprint": [
+    1.4,
+    0.7
+   ],
+   "height": 0.74,
+   "box": [
+    -0.7,
+    0,
+    -0.35,
+    0.7,
+    0.74,
+    0.35
+   ],
+   "meshes": 7,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color",
+    "screen"
+   ],
+   "tags": [
+    "office"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.7,
+      0.71,
+      -0.35,
+      0.7,
+      0.74,
+      0.35
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.68,
+      0,
+      -0.3,
+      -0.64,
+      0.71,
+      0.3
+     ],
+     "color": "role:metal"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.64,
+      0,
+      -0.3,
+      0.68,
+      0.71,
+      0.3
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "desk",
+    "roles": [
+     "office-desk"
+    ],
+    "programs": [
+     "workspace"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "scandi"
+    ],
+    "top": 0.74
+   }
+  },
+  "office-chair": {
+   "footprint": [
+    0.57,
+    0.56
+   ],
+   "height": 0.96,
+   "box": [
+    -0.285,
+    0.007,
+    -0.247,
+    0.285,
+    0.971,
+    0.315
+   ],
+   "meshes": 19,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "office"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.24,
+      0.42,
+      -0.19,
+      0.24,
+      0.5,
+      0.27
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.23,
+      0.5,
+      -0.22,
+      0.23,
+      1,
+      -0.18
+     ],
+     "color": "#1f2937"
+    },
+    {
+     "shape": "cyl",
+     "box": [
+      -0.27,
+      0,
+      -0.25,
+      0.27,
+      0.4,
+      0.29
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "office-chair"
+    ],
+    "programs": [
+     "workspace",
+     "meeting"
+    ],
+    "styles": []
+   }
+  },
+  "conference-table": {
+   "footprint": [
+    3,
+    1.2
+   ],
+   "height": 0.77,
+   "box": [
+    -1.5,
+    0,
+    -0.6,
+    1.5,
+    0.77,
+    0.6
+   ],
+   "meshes": 8,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "office"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1.5,
+      0.71,
+      -0.6,
+      1.5,
+      0.75,
+      0.6
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.95,
+      0,
+      -0.35,
+      -0.87,
+      0.71,
+      0.35
+     ],
+     "color": "role:metal"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.87,
+      0,
+      -0.35,
+      0.95,
+      0.71,
+      0.35
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.8,
+     "side": 0.8,
+     "back": 0.8
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "meeting-table"
+    ],
+    "programs": [
+     "meeting"
+    ],
+    "styles": [],
+    "top": 0.75
+   }
   }
  },
  "patterns": {
