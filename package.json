@@ -61,6 +61,8 @@
     "// ---- ad kit ----": "story:ads renders the silent persona ad cuts and refreshes content/story/ads.json; story:ads:test is its pure-Node test (reference/story/ads.md)",
     "story:ads": "node --experimental-strip-types scripts/render-persona-cuts.mts",
     "story:ads:test": "node --experimental-strip-types --test scripts/test-ads.mts",
+    "story:brand-studio": "node --experimental-strip-types scripts/export-brand-studio.mts",
+    "story:brand-studio:test": "node --experimental-strip-types --test scripts/test-brand-studio-export.mts",
     "// ---- end ad kit ----": "",
     "// ---- app media ----": "story:media builds the real app logos and screenshots (WebP, content-hashed) and content/story/app-media.json from the sibling repos' git objects, ffmpeg only; story:media:test is its pure-Node test (reference/story/story-v2.md, App media)",
     "story:media": "node --experimental-strip-types scripts/story/build-app-media.mts",

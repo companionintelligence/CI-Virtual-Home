@@ -264,17 +264,23 @@ export function glMode(flag: string | undefined, env: NodeJS.ProcessEnv = proces
 export function chromiumFor(pw: any, env: NodeJS.ProcessEnv = process.env): { executablePath?: string; note: string } {
   let own: string | undefined; try { own = pw.chromium.executablePath(); } catch { /* none */ }
   if (own && fs.existsSync(own)) return { note: `Playwright's own Chromium (${own})` };
-  const roots = [env.PLAYWRIGHT_BROWSERS_PATH, path.join(os.homedir(), '.cache', 'ms-playwright')].filter((x): x is string => !!x && fs.existsSync(x));
-  const found: Array<{ rev: number; exe: string; shell: boolean }> = [];
-  for (const root of roots) for (const d of fs.readdirSync(root)) {
-    const m = /^(chromium_headless_shell|chromium)-(\d+)$/.exec(d); if (!m) continue;
-    const shell = m[1] === 'chromium_headless_shell';
-    for (const sub of fs.readdirSync(path.join(root, d))) {
-      const exe = path.join(root, d, sub, shell ? 'chrome-headless-shell' : 'chrome');
-      if (sub.startsWith('chrome') && fs.existsSync(exe)) found.push({ rev: +m[2], exe, shell });
+  // An explicit PLAYWRIGHT_BROWSERS_PATH is an operator choice, not one candidate in a
+  // global version race. Search roots in priority order and only fall back when a root has
+  // no usable Chromium; this keeps CI and local repros on the browser they selected.
+  const roots = [env.PLAYWRIGHT_BROWSERS_PATH, path.join(os.homedir(), '.cache', 'ms-playwright')]
+    .filter((x): x is string => !!x && fs.existsSync(x));
+  for (const root of roots) {
+    const found: Array<{ rev: number; exe: string; shell: boolean }> = [];
+    for (const d of fs.readdirSync(root)) {
+      const m = /^(chromium_headless_shell|chromium)-(\d+)$/.exec(d); if (!m) continue;
+      const shell = m[1] === 'chromium_headless_shell';
+      for (const sub of fs.readdirSync(path.join(root, d))) {
+        const exe = path.join(root, d, sub, shell ? 'chrome-headless-shell' : 'chrome');
+        if (sub.startsWith('chrome') && fs.existsSync(exe)) found.push({ rev: +m[2], exe, shell });
+      }
     }
+    found.sort((a, b) => (b.shell === a.shell ? b.rev - a.rev : a.shell ? -1 : 1));
+    if (found.length) return { executablePath: found[0].exe, note: `${found[0].exe} (the pinned Playwright's own build is not installed)` };
   }
-  found.sort((a, b) => (b.shell === a.shell ? b.rev - a.rev : a.shell ? -1 : 1));
-  if (!found.length) return { note: 'no Chromium found (pnpm exec playwright install chromium: a download the owner approves)' };
-  return { executablePath: found[0].exe, note: `${found[0].exe} (the pinned Playwright's own build is not installed)` };
+  return { note: 'no Chromium found (pnpm exec playwright install chromium: a download the owner approves)' };
 }

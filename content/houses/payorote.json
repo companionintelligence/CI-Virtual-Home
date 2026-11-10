@@ -1479,7 +1479,7 @@
       "type": "stair",
       "from": [
         -0.5,
-        9.6,
+        12.1,
         0
       ],
       "to": [
@@ -2052,23 +2052,6 @@
         "flowers"
       ],
       "layout": "poisson"
-    },
-    {
-      "type": "stair",
-      "from": [
-        -3,
-        8.2,
-        2.3
-      ],
-      "to": [
-        -3,
-        7.8,
-        5.1
-      ],
-      "w": 0.5,
-      "style": "timber",
-      "color": "#5a3f28",
-      "landing": false
     },
     {
       "type": "wall-low",
