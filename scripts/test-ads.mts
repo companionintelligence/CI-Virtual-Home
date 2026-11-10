@@ -492,11 +492,13 @@ test('the GPU switch: default is the machine\'s own GPU through ANGLE, software 
   // the Chromium: Playwright's own, else the newest in the browsers folder; never a download
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-pw-'));
   try {
-    for (const [d, exe] of [['chromium-1100', 'chrome-linux64/chrome'], ['chromium_headless_shell-1200', 'chrome-headless-shell-linux64/chrome-headless-shell'], ['chromium_headless_shell-1234', 'chrome-headless-shell-linux64/chrome-headless-shell']]) {
+    for (const [d, exe] of [['chromium-1100', 'chrome-linux64/chrome'], ['chromium_headless_shell-1200', 'chrome-headless-shell-linux64/chrome-headless-shell'], ['chromium_headless_shell-9999', 'chrome-headless-shell-linux64/chrome-headless-shell']]) {
       fs.mkdirSync(path.dirname(path.join(dir, d, exe)), { recursive: true }); fs.writeFileSync(path.join(dir, d, exe), '');
     }
-    const r = chromiumFor({ chromium: { executablePath: () => '/nowhere/chrome' } }, { PLAYWRIGHT_BROWSERS_PATH: dir });
-    assert.ok(r.executablePath!.includes('chromium_headless_shell-1234'), r.executablePath);
+    // Isolate the fixture from the host cache: chromiumFor falls back to the
+    // user's cache when the configured browser path is not enough.
+    const r = chromiumFor({ chromium: { executablePath: () => '/nowhere/chrome' } }, { PLAYWRIGHT_BROWSERS_PATH: dir, HOME: path.join(dir, 'home') });
+    assert.ok(r.executablePath!.includes('chromium_headless_shell-9999'), r.executablePath);
     assert.equal(chromiumFor({ chromium: { executablePath: () => process.execPath } }, {}).executablePath, undefined, 'Playwright\'s own is used when it is there');
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
