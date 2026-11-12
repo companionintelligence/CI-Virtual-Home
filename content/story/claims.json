@@ -317,10 +317,10 @@
     },
     {
       "id": "num-app-counts",
-      "pattern": "\\b(?!300\\+ apps and agents available in the Companion Hub store)\\d[\\d,]*\\+?\\s+(?:free\\s+|one[- ]click\\s+|open[- ]source\\s+|self[- ]hosted\\s+)*(apps?|agents?|integrations?|services|tools|plugins|connectors|models|importers)\\b|\\ball (of )?(the )?\\d+\\b|\\bevery app\\b|\\bany app\\b|\\bthousands of apps\\b",
+      "pattern": "\\b(?!550\\+ apps and agents available in the Companion Hub store)\\d[\\d,]*\\+?\\s+(?:free\\s+|one[- ]click\\s+|open[- ]source\\s+|self[- ]hosted\\s+)*(apps?|agents?|integrations?|services|tools|plugins|connectors|models|importers)\\b|\\ball (of )?(the )?\\d+\\b|\\bevery app\\b|\\bany app\\b|\\bthousands of apps\\b",
       "flags": "i",
       "severity": "error",
-      "why": "The only app count is \"300+ apps and agents available in the Companion Hub store.\" (owner ruling 22 Sep 2026). 84 integrations, 250+, 200+, 1,296 and 814 are all banned (cautions: 84 has no source; 1,296 is a directory count).",
+      "why": "The only app count is \"550+ apps and agents available in the Companion Hub store.\" (owner ruling 22 Sep 2026; re-ruled 10 Nov 2026 from 300+). 84 integrations, 300+, 250+, 200+, 1,296 and 814 are all banned (cautions: 84 has no source; 1,296 is a directory count).",
       "fix": "Use the sanctioned sentence or no number."
     },
     {
@@ -656,7 +656,7 @@
     },
     {
       "term": "the Companion Hub store",
-      "rule": "With \"available\": \"300+ apps and agents available in the Companion Hub store.\" is the only count."
+      "rule": "With \"available\": \"550+ apps and agents available in the Companion Hub store.\" is the only count."
     }
   ],
   "allowedClaims": [
@@ -820,8 +820,8 @@
     },
     {
       "id": "hub-count",
-      "text": "300+ apps and agents available in the Companion Hub store.",
-      "source": "CAMPAIGN.md 6c; owner ruling 22 Sep 2026",
+      "text": "550+ apps and agents available in the Companion Hub store.",
+      "source": "CAMPAIGN.md 6c; owner ruling 22 Sep 2026, re-ruled 10 Nov 2026 as 550+",
       "tag": "V",
       "status": "ok-verbatim",
       "note": "Always \"available\", always \"the Companion Hub store\". Never add the 84 integrations."

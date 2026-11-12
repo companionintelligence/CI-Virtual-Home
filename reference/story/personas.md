@@ -170,7 +170,7 @@ campaign):
 - No UI mockups, no screen recordings, no render that could pass for a photograph, no invented person presented as a
   customer. Characters are named, drawn and labelled as characters.
 - Daylight and warm light only. No neon, no glow, no RGB. Day or golden hour, never night bloom.
-- App count, if printed: "300+ apps and agents available in the Companion Hub
+- App count, if printed: "550+ apps and agents available in the Companion Hub
   store." Never a price.
 - Third-party software is always named in text. Its real logo may identify it beside that name on the family pages and on the chip that names it in an
   ad cut or a film, never alone and never as decoration. A real, unedited screenshot of an app, of Companion Hub or of the Companion account page

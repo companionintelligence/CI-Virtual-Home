@@ -119,7 +119,7 @@ quotes are folded first.
 | `num-fps` | error | No frame-rate, fps or refresh figure exists for Steam Headless on a Core: it depends on the GPU the Core has, the game and the network. Same footing as `num-tokens`. |
 | `cap-lag-free` | error | "Lag-free", "zero lag", "no delay": an unmeasured performance claim. ("Zero latency" is `num-tokens`' catch; the word latency is banned outright.) |
 | `num-silent` | error | The Core has a Noctua fan. The measured fact is 19 dB at idle; there is no load figure. |
-| `num-app-counts` | error | The only app count is "300+ apps and agents available in the Companion Hub store." (owner ruling 22 Sep 2026). 84 integrations, 250+, 200+, 1,296 and 814 are all banned (cautions: 84 has no source; 1,296 is a directory count). |
+| `num-app-counts` | error | The only app count is "550+ apps and agents available in the Companion Hub store." (owner ruling 22 Sep 2026; re-ruled 10 Nov 2026 from 300+). 84 integrations, 300+, 250+, 200+, 1,296 and 814 are all banned (cautions: 84 has no source; 1,296 is a directory count). |
 | `num-field-units` | review | Founder-letter number, not yet on the fact sheet (COPY.md 12.9). |
 | `num-minutes` | error | No measured setup or install time exists. "Installs in minutes" is a house pitch line but not on the campaign sheet. |
 | `num-model-names` | error | Fabrication-guard model names (HUB-MODELS cautions). |
